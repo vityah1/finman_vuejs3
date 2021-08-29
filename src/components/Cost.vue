@@ -1,50 +1,75 @@
 <template>
   <div v-if="currentCost" class="edit-form">
-    <h4>Cost</h4>
+    <!-- <div class="edit-form"> -->
+    <h4>Edit Cost</h4>
     <form>
       <div class="form-group">
-        <label for="title">Cat</label>
+        <label for="cat">date</label>
         <input
           type="text"
           class="form-control"
-          id="title"
-          v-model="currentCost.title"
+          id="rdate"
+          v-model="currentCost.rdate"
         />
       </div>
       <div class="form-group">
-        <label for="description">Description</label>
+        <label for="cat">Cat</label>
         <input
           type="text"
           class="form-control"
-          id="description"
-          v-model="currentCost.description"
+          id="cat"
+          v-model="currentCost.cat"
         />
       </div>
 
       <div class="form-group">
-        <label><strong>Status:</strong></label>
-        {{ currentCost.published ? "Published" : "Pending" }}
+        <label for="cat">Sub Cat</label>
+        <input
+          type="text"
+          class="form-control"
+          id="sub_cat"
+          v-model="currentCost.sub_cat"
+        />
+      </div>
+      <div class="form-group">
+        <label for="mydesc">Description</label>
+        <input
+          type="text"
+          class="form-control"
+          id="mydesc"
+          v-model="currentCost.mydesc"
+        />
+      </div>
+
+      <div class="form-group">
+        <label><strong>Value:</strong></label>
+        <input
+          type="text"
+          class="form-control"
+          id="suma"
+          v-model="currentCost.suma"
+        />
       </div>
     </form>
 
-    <button
+    <!-- <button
       class="badge badge-primary mr-2"
-      v-if="currentCost.published"
+      v-if="currentCost.suma"
       @click="updatePublished(false)"
     >
       UnPublish
-    </button>
-    <button
+    </button> -->
+    <!-- <button
       v-else
       class="badge badge-primary mr-2"
       @click="updatePublished(true)"
     >
       Publish
-    </button>
-
-    <button class="badge badge-danger mr-2" @click="deleteCost">Delete</button>
-
-    <button type="submit" class="badge badge-success" @click="updateCost">
+    </button> -->
+    <p></p>
+    <button class="btn btn-danger mr-2" @click="deleteCost">Delete</button>
+    &nbsp;&nbsp;
+    <button type="submit" class="btn btn-success" @click="updateCost">
       Update
     </button>
     <p>{{ message }}</p>
@@ -58,6 +83,7 @@
 
 <script>
 import CostDataService from "../services/CostDataService";
+import moment from "moment";
 
 export default {
   name: "cost",
@@ -71,27 +97,11 @@ export default {
     getCost(id) {
       CostDataService.get(id)
         .then((response) => {
-          this.currentCost = response.data;
+          response.data[0]["rdate"] = moment(response.data[0]["rdate"]).format(
+            "DD.MM.YYYY"
+          );
+          this.currentCost = response.data[0];
           console.log(response.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-
-    updatePublished(status) {
-      var data = {
-        id: this.currentCost.id,
-        title: this.currentCost.title,
-        description: this.currentCost.description,
-        published: status,
-      };
-
-      CostDataService.update(this.currentCost.id, data)
-        .then((response) => {
-          console.log(response.data);
-          this.currentCost.published = status;
-          this.message = "The status was updated successfully!";
         })
         .catch((e) => {
           console.log(e);

@@ -2,25 +2,83 @@
   <div class="submit-form">
     <div v-if="!submitted">
       <div class="form-group">
-        <label for="title">Title</label>
+        <label for="cat">date</label>
         <input
-          type="text"
+          type="date"
           class="form-control"
-          id="title"
+          id="rdate"
+          v-model="cost.rdate"
+        />
+      </div>
+      <div v-if="catsOptions" class="form-group">
+        <label for="cat">Cat</label>
+        <select
+          v-model="cost.cat"
+          class="form-control"
+          id="cat"
+          name="cat"
+          :value="catValue"
+          v-bind="{
+            ...$attrs,
+            onChange: ($event) => {
+              $emit('update:catValue', $event.target.value);
+            },
+          }"
+        >
+          <option
+            v-for="opt in catsOptions"
+            :value="opt.id"
+            :key="opt.id"
+            :selected="opt.id === catValue"
+          >
+            {{ opt.name }} <span v-if="opt.sub_cat">[{{ opt.sub_cat }}]</span>
+          </option>
+        </select>
+        <h2>{{ catValue }}</h2>
+      </div>
+
+      <!-- <div class="form-group">
+        <label for="sub_cat">Sub cat</label>
+        <Select2
+          class="form-control"
+          id="sub_cat"
+          name="sub_cat"
+          v-model="sub_cat"
+          :options="sub_catsOptions"
+          @change="ChangeSubCatEvent($event)"
+          @select="SelectSubCatEvent($event)"
+        />
+        <h2>{{ sub_cat }}</h2> -->
+
+      <!-- <select
+          class="form-control"
+          id="sub_cat"
           required
-          v-model="cost.title"
-          name="title"
+          v-model="cost.sub_cat"
+          name="sub_cat"
+        >{{options}}
+        </select> 
+      </div>-->
+
+      <div class="form-group">
+        <label for="desc">Desc</label>
+        <input
+          class="form-control"
+          id="mydesc"
+          required
+          v-model="cost.mydesc"
+          name="desc"
         />
       </div>
 
       <div class="form-group">
-        <label for="description">Description</label>
+        <label for="desc">Value</label>
         <input
           class="form-control"
-          id="description"
+          id="suma"
           required
-          v-model="cost.description"
-          name="description"
+          v-model="cost.suma"
+          name="suma"
         />
       </div>
 
@@ -36,6 +94,8 @@
 
 <script>
 import CostDataService from "../services/CostDataService";
+import moment from "moment";
+// import Select2 from "vue3-select2-component";
 
 export default {
   name: "add-cost",
@@ -43,20 +103,49 @@ export default {
     return {
       cost: {
         id: null,
+        rdate: moment(Date()).format("DD.MM.YYYY"),
         cat: "",
-        description: "",
-        published: false,
+        // sub_cat: "",
+        mydesc: "",
+        suma: 0,
       },
+      catValue: "",
+      //   sub_cat: "",
+      catsOptions: [],
+      //   sub_catsOptions: [],
       submitted: false,
     };
   },
+  //   setup() {
+  //     console.log("Component is mounted!");
+  //     this.pullCats();
+  //     // mounted
+  //     // onMounted(() => {
+  //     //   console.log('Component is mounted!')
+  //     // })
+  //   },
+
+  //   setup() {
+  //     console.log("Component is mounted!");
+  //     let catsOptions = [];
+  //     catsOptions = this.pullCats();
+  //     return catsOptions;
+  //   },
   methods: {
+    ChangeCatEvent(val) {
+      console.log(val);
+    },
+    SelectCatEvent({ id, text }) {
+      console.log({ id, text });
+    },
     saveCost() {
       var data = {
-        title: this.tutorial.title,
-        description: this.tutorial.description,
+        rdate: this.cost.rdate,
+        cat: this.cost.cat,
+        sub_cat: this.cost.sub_cat,
+        desc: this.cost.mydesc,
+        suma: this.cost.suma,
       };
-
       CostDataService.create(data)
         .then((response) => {
           this.cost.id = response.data.id;
@@ -67,11 +156,40 @@ export default {
           console.log(e);
         });
     },
-
+    pullCats() {
+      console.log("exec pullCats");
+      CostDataService.cats()
+        .then((response) => {
+          this.catsOptions = response.data;
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    // pullSubCats() {
+    //   var cat = this.cat.val();
+    //   CostDataService.subcats(cat)
+    //     .then((response) => {
+    //       this.options = response;
+    //       console.log(response.data);
+    //     })
+    //     .catch((e) => {
+    //       console.log(e);
+    //     });
+    // },
     newCost() {
       this.submitted = false;
       this.cost = {};
+      this.pullCats();
     },
+    // created() {
+    //   this.pullCats();
+    // },
+  },
+  mounted() {
+    console.log("mounted");
+    this.pullCats();
   },
 };
 </script>

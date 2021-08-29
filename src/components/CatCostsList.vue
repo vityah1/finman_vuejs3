@@ -29,7 +29,7 @@
       v-for="(cost, index) in costs"
       :key="index"
     >
-      <router-link class="col-1" :to="'/costs/' + cost.id">
+      <router-link  class="col-1" :to="'/costs/' + cost.id">
         {{ $moment(cost.rdate).format("DD.MMM") }}
       </router-link>
       <div class="col-4">{{ cost.sub_cat }}</div>

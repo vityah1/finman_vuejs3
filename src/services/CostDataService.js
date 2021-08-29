@@ -5,6 +5,14 @@ class CostDataService {
         return http.get("/costs");
     }
 
+    cats() {
+        return http.get("/cats");
+    }
+
+    subcats(cat) {
+        return http.get("/subcats?="+cat);
+    }
+
     get(id) {
         return http.get(`/costs/${id}`);
     }
@@ -21,12 +29,12 @@ class CostDataService {
         return http.delete(`/costs/${id}`);
     }
 
-    deleteAll() {
-        return http.delete(`/costs`);
-    }
+    // deleteAll() {
+    //     return http.delete(`/costs`);
+    // }
 
-    findByCat(cat) {
-        return http.get(`/costs?cat=${cat}`);
+    FindCost(q) {
+        return http.get(`/costs?q=${q}`);
     }
 }
 
