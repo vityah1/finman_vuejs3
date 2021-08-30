@@ -2,7 +2,7 @@
   <div class="submit-form">
     <div v-if="!submitted">
       <div class="form-group">
-        <label for="cat">date</label>
+        <label for="rdate">Date</label>
         <input
           type="date"
           class="form-control"
@@ -17,62 +17,54 @@
           class="form-control"
           id="cat"
           name="cat"
-          :value="catValue"
-          v-bind="{
-            ...$attrs,
-            onChange: ($event) => {
-              $emit('update:catValue', $event.target.value);
-            },
-          }"
+          @change="pullSubCats(cost.cat)"
         >
           <option
-            v-for="opt in catsOptions"
-            :value="opt.id"
-            :key="opt.id"
-            :selected="opt.id === catValue"
+            v-for="cat in catsOptions"
+            :value="cat.name"
+            :key="cat.id"
+            :selected="cat.name === cost.cat"
           >
-            {{ opt.name }} <span v-if="opt.sub_cat">[{{ opt.sub_cat }}]</span>
+            {{ cat.name }}
+            <!-- <span v-if="cat.sub_cat">[{{ cat.sub_cat }}]</span> -->
           </option>
         </select>
-        <h2>{{ catValue }}</h2>
+        <h2>{{ cost.cat }}</h2>
       </div>
 
-      <!-- <div class="form-group">
+      <div class="form-group">
         <label for="sub_cat">Sub cat</label>
-        <Select2
+        <select
           class="form-control"
           id="sub_cat"
           name="sub_cat"
-          v-model="sub_cat"
-          :options="sub_catsOptions"
-          @change="ChangeSubCatEvent($event)"
-          @select="SelectSubCatEvent($event)"
-        />
-        <h2>{{ sub_cat }}</h2> -->
-
-      <!-- <select
-          class="form-control"
-          id="sub_cat"
-          required
           v-model="cost.sub_cat"
-          name="sub_cat"
-        >{{options}}
-        </select> 
-      </div>-->
+        >
+          <option
+            v-for="sub_cat in subcatsOptions"
+            :value="sub_cat.name"
+            :key="sub_cat.id"
+            :selected="sub_cat.name === cost.sub_cat"
+          >
+            {{ sub_cat.name }}
+          </option>
+        </select>
+        <h2>{{ cost.sub_cat }}</h2>
+      </div>
 
       <div class="form-group">
-        <label for="desc">Desc</label>
+        <label for="mydesc">Desc</label>
         <input
           class="form-control"
           id="mydesc"
           required
           v-model="cost.mydesc"
-          name="desc"
+          name="mydesc"
         />
       </div>
 
       <div class="form-group">
-        <label for="desc">Value</label>
+        <label for="suma">Value</label>
         <input
           class="form-control"
           id="suma"
@@ -81,12 +73,12 @@
           name="suma"
         />
       </div>
-
+      <p></p>
       <button @click="saveCost" class="btn btn-success">Submit</button>
     </div>
 
     <div v-else>
-      <h4>You submitted successfully!</h4>
+      <h4>You submitted successfully! {{result}}</h4>
       <button class="btn btn-success" @click="newCost">Add</button>
     </div>
   </div>
@@ -103,60 +95,20 @@ export default {
     return {
       cost: {
         id: null,
-        rdate: moment(Date()).format("DD.MM.YYYY"),
+        rdate: moment(Date()).format("YYYY-MM-DD"),
         cat: "",
-        // sub_cat: "",
+        sub_cat: "",
         mydesc: "",
         suma: 0,
       },
-      catValue: "",
-      //   sub_cat: "",
       catsOptions: [],
-      //   sub_catsOptions: [],
+      subcatsOptions: [],
       submitted: false,
+      result:""
     };
   },
-  //   setup() {
-  //     console.log("Component is mounted!");
-  //     this.pullCats();
-  //     // mounted
-  //     // onMounted(() => {
-  //     //   console.log('Component is mounted!')
-  //     // })
-  //   },
-
-  //   setup() {
-  //     console.log("Component is mounted!");
-  //     let catsOptions = [];
-  //     catsOptions = this.pullCats();
-  //     return catsOptions;
-  //   },
   methods: {
-    ChangeCatEvent(val) {
-      console.log(val);
-    },
-    SelectCatEvent({ id, text }) {
-      console.log({ id, text });
-    },
-    saveCost() {
-      var data = {
-        rdate: this.cost.rdate,
-        cat: this.cost.cat,
-        sub_cat: this.cost.sub_cat,
-        desc: this.cost.mydesc,
-        suma: this.cost.suma,
-      };
-      CostDataService.create(data)
-        .then((response) => {
-          this.cost.id = response.data.id;
-          console.log(response.data);
-          this.submitted = true;
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    pullCats() {
+    async pullCats() {
       console.log("exec pullCats");
       CostDataService.cats()
         .then((response) => {
@@ -167,17 +119,38 @@ export default {
           console.log(e);
         });
     },
-    // pullSubCats() {
-    //   var cat = this.cat.val();
-    //   CostDataService.subcats(cat)
-    //     .then((response) => {
-    //       this.options = response;
-    //       console.log(response.data);
-    //     })
-    //     .catch((e) => {
-    //       console.log(e);
-    //     });
-    // },
+    async pullSubCats(cat) {
+      // var cat = this.cat.val();
+      console.log("exec pullSubCats");
+      CostDataService.subcats(cat)
+        .then((response) => {
+          this.subcatsOptions = response.data;
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    async saveCost() {
+      var data = {
+        rdate: this.cost.rdate,
+        cat: this.cost.cat,
+        sub_cat: this.cost.sub_cat,
+        mydesc: this.cost.mydesc,
+        suma: this.cost.suma,
+      };
+      console.log(data);
+      CostDataService.create(data)
+        .then((response) => {
+          this.cost.id = response.data.id;
+          console.log(response.data);
+          this.result=response.data
+          this.submitted = true;
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
     newCost() {
       this.submitted = false;
       this.cost = {};

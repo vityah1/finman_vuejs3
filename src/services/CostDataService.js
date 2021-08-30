@@ -1,8 +1,19 @@
 import http from "../http-common";
 
+// var optionAxios = {
+//     headers: {
+//         'Content-Type': 'application/x-www-form-urlencoded'
+//     }
+// }
+
 class CostDataService {
-    getAll() {
-        return http.get("/costs");
+    getAll(sort) {
+        if (sort == '') { sort = 1; }
+        return http.get("/costs?sort=" + sort);
+    }
+
+    getCatCosts() {
+        return http.get("/catcosts");
     }
 
     cats() {
@@ -10,7 +21,7 @@ class CostDataService {
     }
 
     subcats(cat) {
-        return http.get("/subcats?="+cat);
+        return http.get("/subcats?cat=" + cat);
     }
 
     get(id) {

@@ -22,7 +22,13 @@
   </div>
   <div class="container">
     <h4>Costs List</h4>
-    <!-- <ul class="list-group"> -->
+    <div class="row bg-info">
+      <div class="col-1" @click="retrieveCosts(1)">Дата</div>
+      <div class="col-4" @click="retrieveCosts(2)">Розділ</div>
+      <div class="col-4">Опис</div>
+      <div class="col-2" @click="retrieveCosts(3)">Сума</div>
+    </div>
+
     <div
       class="row"
       :class="{ active: index == currentIndex }"
@@ -54,8 +60,8 @@ export default {
     };
   },
   methods: {
-    retrieveCosts() {
-      CostDataService.getAll()
+    retrieveCosts(sort) {
+      CostDataService.getAll(sort)
         .then((response) => {
           this.costs = response.data;
           console.log(response.data);
@@ -66,7 +72,7 @@ export default {
     },
 
     refreshList() {
-      this.retrieveCosts();
+      this.retrieveCosts(3);
       this.currentCost = null;
       this.currentIndex = -1;
     },
@@ -89,7 +95,7 @@ export default {
     },
   },
   mounted() {
-    this.retrieveCosts();
+    this.retrieveCosts(3);
   },
 };
 </script>

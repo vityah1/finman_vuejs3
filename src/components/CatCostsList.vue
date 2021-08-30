@@ -21,20 +21,18 @@
     </div>
   </div>
   <div class="container">
-    <h4>Costs List</h4>
+    <h4>Cat Costs List</h4>
     <!-- <ul class="list-group"> -->
     <div
       class="row"
       :class="{ active: index == currentIndex }"
-      v-for="(cost, index) in costs"
+      v-for="(cat, index) in catcosts"
       :key="index"
+      @click="getCat(cat.cat)"
     >
-      <router-link  class="col-1" :to="'/costs/' + cost.id">
-        {{ $moment(cost.rdate).format("DD.MMM") }}
-      </router-link>
-      <div class="col-4">{{ cost.sub_cat }}</div>
-      <div class="col-4">{{ cost.mydesc }}</div>
-      <div class="col-2">{{ cost.suma }} грн</div>
+      <div class="col-4">{{ cat.cat }}</div>
+      <div class="col-2">{{ cat.suma }} грн</div>
+      <div class="col-2">{{ cat.cnt }}</div>
     </div>
   </div>
 </template>
@@ -44,20 +42,20 @@ import CostDataService from "../services/CostDataService";
 // import moment from "moment";
 
 export default {
-  name: "costs-list",
+  name: "cat-costs-list",
   data() {
     return {
-      costs: [],
-      currentCost: null,
+      catcosts: [],
+      currentCat: null,
       currentIndex: -1,
       q: "",
     };
   },
   methods: {
-    retrieveCosts() {
-      CostDataService.getAll()
+    retrieveCatCosts() {
+      CostDataService.getCatCosts()
         .then((response) => {
-          this.costs = response.data;
+          this.catcosts = response.data;
           console.log(response.data);
         })
         .catch((e) => {
@@ -66,30 +64,13 @@ export default {
     },
 
     refreshList() {
-      this.retrieveCosts();
-      this.currentCost = null;
+      this.retrieveCatCosts();
+      this.currentCat = null;
       this.currentIndex = -1;
-    },
-
-    setActiveCost(cost, index) {
-      this.currentCost = cost;
-      this.currentIndex = cost ? index : -1;
-    },
-
-    searchCost() {
-      CostDataService.FindCost(this.q)
-        .then((response) => {
-          this.costs = response.data;
-          this.setActiveCost(null);
-          console.log(response.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
     },
   },
   mounted() {
-    this.retrieveCosts();
+    this.retrieveCatCosts();
   },
 };
 </script>
