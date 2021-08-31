@@ -7,17 +7,26 @@ import http from "../http-common";
 // }
 
 class CostDataService {
-    getAll(sort) {
+    getAll({ sort, period, cat } = {}) {
         if (sort == '') { sort = 1; }
-        return http.get("/costs?sort=" + sort);
+        return http.get("/costs?sort=" + sort + "&period=" + period + "&cat=" + cat);
     }
 
-    getCatCosts() {
-        return http.get("/catcosts");
+    getCatCosts({ year = '', month = '' } = {}) {
+        console.log(`getCatCosts => year: ${year}, month: ${month}`)
+        return http.get("/catcosts?year=" + year + "&month=" + month);
     }
 
     cats() {
         return http.get("/cats");
+    }
+
+    getYears() {
+        return http.get("/years");
+    }
+
+    getMonths(year) {
+        return http.get("/months/" + year);
     }
 
     subcats(cat) {
@@ -44,8 +53,8 @@ class CostDataService {
     //     return http.delete(`/costs`);
     // }
 
-    FindCost(q) {
-        return http.get(`/costs?q=${q}`);
+    FindCost({ q = '', sort = 3, cat = '', year = '', month = '' } = {}) {
+        return http.get(`/costs?q=${q}&sort=${sort}&cat=${cat}&year=${year}&month=${month}`);
     }
 }
 

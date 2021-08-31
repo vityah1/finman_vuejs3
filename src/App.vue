@@ -1,15 +1,13 @@
 <template>
   <div id="app">
     <nav class="navbar navbar-expand navbar-dark bg-dark">
-      <router-link to="/" class="navbar-brand">Costs</router-link>
+      <router-link to="/" class="navbar-brand">Фін мен</router-link>
       <div class="navbar-nav mr-auto">
         <li class="nav-item">
-          <router-link to="/catcosts" class="nav-link"
-            >По категоріях</router-link
-          >
+          <router-link to="/catcosts" class="nav-link">Поточні</router-link>
         </li>
         <li class="nav-item">
-          <router-link to="/costs" class="nav-link">Розходи</router-link>
+          <router-link to="/years" class="nav-link">По роках</router-link>
         </li>
         <li class="nav-item">
           <router-link to="/add" class="nav-link">Додати</router-link>

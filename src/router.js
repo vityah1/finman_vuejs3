@@ -9,6 +9,18 @@ const routes = [
     },
     {
         path: "/",
+        alias: "/years",
+        name: "years",
+        component: () => import("./components/YearsList")
+    },
+    {
+        path: "/",
+        alias: "/months/:year",
+        name: "months",
+        component: () => import("./components/MonthsList")
+    },
+    {
+        path: "/",
         alias: "/catcosts",
         name: "catcosts",
         component: () => import("./components/CatCostsList")

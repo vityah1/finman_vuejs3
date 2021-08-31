@@ -2,38 +2,59 @@
   <div class="list row">
     <div class="col-md-8">
       <div class="input-group mb-3">
-        <input
-          type="text"
+        <select
           class="form-control"
-          placeholder="Search"
-          v-model="q"
-        />
+          placeholder="year"
+          v-model="year"
+          id="year"
+          name="year"
+        >
+          <option v-for="(y, index) in years" :value="y" :key="index">
+            {{ y }}
+          </option>
+        </select>
+
+        <select
+          class="form-control"
+          placeholder="month"
+          v-model="month"
+          id="month"
+          name="month"
+        >
+          <option v-for="(m, index) in months" :value="m" :key="index">
+            {{ m }}
+          </option>
+        </select>
         <div class="input-group-append">
           <button
             class="btn btn-outline-secondary"
             type="button"
-            @click="searchCost"
+            @click="retrieveCatCosts(year, month)"
           >
-            Search
+            Ok
           </button>
         </div>
       </div>
     </div>
   </div>
   <div class="container">
-    <h4>Cat Costs List</h4>
+    <h4>Cat Costs List [{{ year }}-{{ month }}]</h4>
     <!-- <ul class="list-group"> -->
-    <div
+    <div class="row">
+      <div class="col-4 h4 text-success">Всього:</div>
+      <div class="col-2 h4 text-danger">{{ total }}</div>
+      <div class="col-2">{{ total_cnt }}</div>
+    </div>
+    <router-link
       class="row"
-      :class="{ active: index == currentIndex }"
       v-for="(cat, index) in catcosts"
       :key="index"
-      @click="getCat(cat.cat)"
+      :to="'costs?cat=' + cat.cat + '&year=' + year + '&month=' + month"
     >
       <div class="col-4">{{ cat.cat }}</div>
-      <div class="col-2">{{ cat.suma }} грн</div>
+      <div class="col-2">{{ cat.suma }}</div>
       <div class="col-2">{{ cat.cnt }}</div>
-    </div>
+    </router-link>
   </div>
 </template>
 
@@ -46,14 +67,43 @@ export default {
   data() {
     return {
       catcosts: [],
-      currentCat: null,
-      currentIndex: -1,
       q: "",
+      year: this.$route.query.year || "",
+      month: this.$route.query.month || "",
+      years: Array.from({ length: 12 }, (x, i) => i + 2011),
+      months: Array.from({ length: 12 }, (x, i) => i + 1),
+      total: 0,
+      total_cnt: 0,
     };
   },
   methods: {
-    retrieveCatCosts() {
-      CostDataService.getCatCosts()
+    retrieveCatCosts(year, month) {
+      // year=this.year
+      // month=this.month
+      console.log(
+        `retrieveCatCosts => year: ${this.year}, month: ${this.month}`
+      );
+      CostDataService.getCatCosts({ year: year, month: month })
+        .then((response) => {
+          this.catcosts = response.data;
+          console.log(response.data);
+          let total = 0;
+          let total_cnt = 0;
+          this.catcosts.forEach((val) => {
+            total += Number(val.suma);
+            total_cnt += Number(val.cnt);
+            //or if you pass float numbers , use parseFloat()
+          });
+          this.total = total;
+          this.total_cnt = total_cnt;
+          console.log(total);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    getCat(cat) {
+      CostDataService.getAll({ cat: cat })
         .then((response) => {
           this.catcosts = response.data;
           console.log(response.data);
@@ -62,15 +112,15 @@ export default {
           console.log(e);
         });
     },
-
     refreshList() {
       this.retrieveCatCosts();
-      this.currentCat = null;
-      this.currentIndex = -1;
     },
   },
   mounted() {
-    this.retrieveCatCosts();
+    let year = this.$route.query.year || "";
+    let month = this.$route.query.month || "";
+
+    this.retrieveCatCosts(year, month);
   },
 };
 </script>
