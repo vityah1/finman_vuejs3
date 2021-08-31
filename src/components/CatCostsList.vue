@@ -42,7 +42,7 @@
     <!-- <ul class="list-group"> -->
     <div class="row">
       <div class="col-4 h4 text-success">Всього:</div>
-      <div class="col-2 h4 text-danger">{{ total }}</div>
+      <div class="col-2 h4 text-danger">{{ total.toLocaleString() }}</div>
       <div class="col-2">{{ total_cnt }}</div>
     </div>
     <router-link
@@ -52,7 +52,7 @@
       :to="'costs?cat=' + cat.cat + '&year=' + year + '&month=' + month"
     >
       <div class="col-4">{{ cat.cat }}</div>
-      <div class="col-2">{{ cat.suma }}</div>
+      <div class="col-2">{{ cat.suma.toLocaleString() }}</div>
       <div class="col-2">{{ cat.cnt }}</div>
     </router-link>
   </div>

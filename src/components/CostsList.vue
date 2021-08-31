@@ -34,7 +34,7 @@
     </h4>
     <div class="row">
       <div class="col-4 h4 text-success">Всього:</div>
-      <div class="col-2 h4 text-danger">{{ total }}</div>
+      <div class="col-2 h4 text-danger">{{ total.toLocaleString() }}</div>
       <div class="col-2">{{ total_cnt }}</div>
     </div>
     <div class="row bg-info">
@@ -50,7 +50,7 @@
       </router-link>
       <div class="col-4">{{ cost.sub_cat }}</div>
       <div class="col-4">{{ cost.mydesc }}</div>
-      <div class="col-2">{{ cost.suma }}</div>
+      <div class="col-2">{{ cost.suma.toLocaleString() }}</div>
     </div>
   </div>
 </template>

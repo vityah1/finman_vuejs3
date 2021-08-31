@@ -15,7 +15,7 @@
       <router-link class="col-2" :to="'/months/' + year.year">
         {{ year.year }}
       </router-link>
-      <div class="col-2">{{ year.suma }}</div>
+      <div class="col-2">{{ year.suma.toLocaleString() }}</div>
       <div class="col-2">{{ year.cnt }}</div>
     </div>
   </div>

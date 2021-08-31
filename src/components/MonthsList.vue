@@ -14,7 +14,7 @@
       >
         {{ month.month }}
       </router-link>
-      <div class="col-2">{{ month.suma }}</div>
+      <div class="col-2">{{ month.suma.toLocaleString() }}</div>
       <div class="col-2">{{ month.cnt }}</div>
     </div>
   </div>
