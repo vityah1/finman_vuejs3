@@ -1,28 +1,7 @@
 <template>
-  <div class="list row">
-    <div class="col-md-8">
-      <div class="input-group mb-3">
-        <input
-          type="text"
-          class="form-control"
-          placeholder="Search"
-          v-model="q"
-        />
-        <div class="input-group-append">
-          <button
-            class="btn btn-outline-secondary"
-            type="button"
-            @click="searchCost"
-          >
-            Search
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
   <div class="container">
     <h4>
-      Costs List
+      <span @click="this.$router.go(-1)">&lt;=</span> Costs List
       <span v-if="this.$route.query.period"
         >[{{ this.$route.query.period }}]</span
       >
@@ -38,16 +17,18 @@
       <div class="col-2">{{ total_cnt }}</div>
     </div>
     <div class="row bg-info">
-      <div class="col-1" @click="sortCosts(1)">Дата</div>
+      <div class="col-2" @click="sortCosts(1)">Дата</div>
       <div class="col-4" @click="sortCosts(2)">Розділ</div>
       <div class="col-4">Опис</div>
       <div class="col-2" @click="sortCosts(3)">Сума</div>
     </div>
 
     <div class="row" v-for="(cost, index) in costs" :key="index">
-      <router-link class="col-1" :to="'/costs/' + cost.id">
-        {{ $moment(cost.rdate).format("DD.MMM") }}
-      </router-link>
+      <div class="col-2">
+        <router-link :to="'/costs/' + cost.id">
+          {{ $moment(cost.rdate).format("DD.MMM") }}
+        </router-link>
+      </div>
       <div class="col-4">{{ cost.sub_cat }}</div>
       <div class="col-4">{{ cost.mydesc }}</div>
       <div class="col-2">{{ cost.suma.toLocaleString() }}</div>
@@ -64,7 +45,7 @@ export default {
   data() {
     return {
       costs: [],
-      q: "",
+      q: this.$route.query.q || "",
       total: 0,
       total_cnt: 0,
     };
@@ -75,12 +56,14 @@ export default {
       let year = this.$route.query.year || "";
       let month = this.$route.query.month || "";
       let cat = this.$route.query.cat || "";
-
+      let q = this.$route.query.q || "";
+      console.log(q, year, month, cat, sort);
       CostDataService.FindCost({
         sort: sort,
         year: year,
         month: month,
         cat: cat,
+        q: q,
       })
         // CostDataService.getAll({sort:sort})
         .then((response) => {
@@ -117,6 +100,14 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+    },
+  },
+  watch: {
+    $route(to, from) {
+      // react to route changes...
+      if (to !== from) {
+        location.reload();
+      }
     },
   },
   mounted() {
