@@ -1,25 +1,28 @@
 <template>
   <div class="container">
     <header class="jumbotron">
-      <h3>{{ content }}</h3>
+      <h3>About</h3>
     </header>
+    <div v-html="htmlContent"></div>
+    {{ content }}
   </div>
 </template>
 
 <script>
-import UserService from "../services/user.service";
+import CostDataService from "../services/CostDataService";
 
 export default {
-  name: "Home",
+  name: "About",
   data() {
     return {
-      content: "",
+      htmlContent: "",
     };
   },
   mounted() {
-    UserService.getPublicContent().then(
+    CostDataService.getAbout().then(
       (response) => {
-        this.content = response.data;
+        this.htmlContent = response.data.data;
+        console.log(this.htmlContent);
       },
       (error) => {
         this.content =

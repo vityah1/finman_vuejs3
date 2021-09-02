@@ -1,112 +1,147 @@
 <template>
   <div id="app">
-    <nav class="navbar navbar-expand navbar-dark bg-dark">
-      <router-link to="/" class="navbar-brand">ФМ</router-link>
-      <div class="navbar-nav mr-auto">
-        <li v-if="currentUser" class="nav-item">
-          <router-link to="/catcosts" class="nav-link">Поточні</router-link>
-        </li>
-        <li v-if="currentUser" class="nav-item">
-          <router-link to="/years" class="nav-link">По роках</router-link>
-        </li>
-        <li v-if="currentUser" class="nav-item">
-          <router-link to="/add" class="nav-link">Додати</router-link>
-        </li>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+      <div class="container-fluid">
+        <router-link to="/" class="navbar-brand">ФМ</router-link>
 
-        <!-- <li class="nav-item">
-          <router-link to="/home" class="nav-link">
-            <font-awesome-icon icon="home" /> Home
-          </router-link>
-        </li>
-        <li v-if="showAdminBoard" class="nav-item">
-          <router-link to="/admin" class="nav-link">Admin Board</router-link>
-        </li>
-        <li v-if="showModeratorBoard" class="nav-item">
-          <router-link to="/mod" class="nav-link">Moderator Board</router-link>
-        </li>
-        <li class="nav-item">
-          <router-link v-if="currentUser" to="/user" class="nav-link"
-            >User</router-link
-          >
-        </li> -->
-      </div>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+          id="btn-collapse"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <ul class="collapse navbar-collapse" id="navbarSupportedContent">
+          <div class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <router-link v-if="currentUser" to="/add" class="nav-link"
+                >Add</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link v-if="currentUser" to="/catcosts" class="nav-link"
+                >Поточні</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link v-if="currentUser" to="/years" class="nav-link"
+                >Роки</router-link
+              >
+            </li>
+            <li class="nav-item">
+              <router-link to="/about" class="nav-link">
+                <font-awesome-icon icon="home" />Про
+              </router-link>
+            </li>
 
-      <div v-if="!currentUser" class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <router-link to="/register" class="nav-link">
-            <font-awesome-icon icon="user-plus" /> Sign Up
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <router-link to="/login" class="nav-link">
-            <font-awesome-icon icon="sign-in-alt" /> Login
-          </router-link>
-        </li>
-      </div>
+            <ul v-if="!currentUser" class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Usr
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li class="dropdown-item">
+                  <router-link to="/register" class="nav-link">
+                    <font-awesome-icon icon="user-plus" /> Sign Up
+                  </router-link>
+                </li>
+                <li class="dropdown-item">
+                  <router-link to="/login" class="nav-link">
+                    <font-awesome-icon icon="sign-in-alt" /> Login
+                  </router-link>
+                </li>
+              </div>
+            </ul>
+            <li class="nav-item">
+              <router-link v-if="currentUser" to="/profile" class="nav-link">
+                <font-awesome-icon icon="user" />
+                {{ currentUser.username }}
+              </router-link>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" @click.prevent="logOut">
+                <font-awesome-icon icon="sign-out-alt" /> LogOut
+              </a>
+            </li>
+          </div>
 
-      <div v-if="currentUser" class="navbar-nav ml-auto">
-        <li class="nav-item">
-          <router-link to="/profile" class="nav-link">
-            <font-awesome-icon icon="user" />
-            {{ currentUser.username }}
-          </router-link>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" @click.prevent="logOut">
-            <font-awesome-icon icon="sign-out-alt" /> LogOut
-          </a>
-        </li>
-
-        <div class="col-md-6">
-          <div class="input-group mb-3">
+          <form class="d-flex">
             <input
               type="text"
-              class="form-control"
+              class="form-control me-2"
               placeholder="Search"
               v-model="q"
             />
-            <div class="input-group-append">
-              <button
-                class="btn btn-outline-secondary"
-                type="button"
-                @click="AppFindCosts(q)"
-              >
-                Search
-              </button>
-            </div>
-          </div>
-        </div>
+            <button
+              class="btn btn-outline-success"
+              type="button"
+              @click="AppFindCosts(q)"
+              placeholder="Search"
+              aria-label="Search"
+            >
+              Search
+            </button>
+          </form>
+        </ul>
       </div>
     </nav>
-
-    <div class="container mt-3">
-      <router-view />
-    </div>
   </div>
+  <router-view />
 </template>
 
 <script>
+// import * as bootstrap from "bootstrap";
+// window.bootstrap = require("bootstrap")
+const navLinks = document.querySelectorAll(".nav-item");
+// const menuToggle = document.getElementById("navbarSupportedContent");
+// const bsCollapse = new bootstrap.Collapse(menuToggle, { toggle: false });
+// const bsCollapse = new bootstrap.Collapse(document.getElementById('navbarSupportedContent'), { toggle: false });
+
+const bsCollapse = document.getElementById("btn-collapse");
+
+navLinks.forEach((l) => {
+  l.addEventListener("click", () => {
+    bsCollapse.click();
+  });
+});
 export default {
+  // data() {
+  //   return {
+  //     toggle: true, //toggle variable
+  //   };
+  // },
   name: "app",
   computed: {
     currentUser() {
       return this.$store.state.auth.user;
     },
-    showAdminBoard() {
-      if (this.currentUser && this.currentUser["roles"]) {
-        return this.currentUser["roles"].includes("ROLE_ADMIN");
-      }
+    // showAdminBoard() {
+    //   if (this.currentUser && this.currentUser["roles"]) {
+    //     return this.currentUser["roles"].includes("ROLE_ADMIN");
+    //   }
 
-      return false;
-    },
-    showModeratorBoard() {
-      if (this.currentUser && this.currentUser["roles"]) {
-        return this.currentUser["roles"].includes("ROLE_MODERATOR");
-      }
+    //   return false;
+    // },
+    // showModeratorBoard() {
+    //   if (this.currentUser && this.currentUser["roles"]) {
+    //     return this.currentUser["roles"].includes("ROLE_MODERATOR");
+    //   }
 
-      return false;
-    },
+    //   return false;
+    // },
   },
+
   methods: {
     logOut() {
       this.$store.dispatch("auth/logout");

@@ -94,5 +94,10 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+.profile-img-card {
+  max-height: 192px;
+  max-width: 192px;
+  align-self: center;
+}
 </style>

@@ -9,6 +9,13 @@ import authHeader from './auth-header';
 // }
 
 class CostDataService {
+
+
+
+    getAbout() {
+        return http.get('/about');
+    }
+
     getAll({ sort, period, cat } = {}) {
         if (sort == '') { sort = 1; }
         return http.get("/costs?sort=" + sort + "&period=" + period + "&cat=" + cat, { headers: authHeader() });
@@ -55,7 +62,7 @@ class CostDataService {
     //     return http.delete(`/costs`);
     // }
 
-    FindCost({ q = '', sort = 3, cat = '', year = '', month = '' } = {}) {
+    showCost({ q = '', sort = 3, cat = '', year = '', month = '' } = {}) {
         return http.get(`/costs?q=${q}&sort=${sort}&cat=${cat}&year=${year}&month=${month}`, { headers: authHeader() });
     }
 }

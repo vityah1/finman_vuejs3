@@ -50,6 +50,11 @@ export default {
       total_cnt: 0,
     };
   },
+  computed: {
+    currentUser() {
+      return this.$store.state.auth.user;
+    },
+  },
   methods: {
     retrieveCosts() {
       let sort = this.$route.query.sort || "";
@@ -58,7 +63,7 @@ export default {
       let cat = this.$route.query.cat || "";
       let q = this.$route.query.q || "";
       console.log(q, year, month, cat, sort);
-      CostDataService.FindCost({
+      CostDataService.showCost({
         sort: sort,
         year: year,
         month: month,
@@ -92,7 +97,7 @@ export default {
       console.log(sort_table);
     },
     searchCost() {
-      CostDataService.FindCost({ q: this.q })
+      CostDataService.showCost({ q: this.q })
         .then((response) => {
           this.costs = response.data;
           console.log(response.data);
@@ -111,6 +116,9 @@ export default {
     },
   },
   mounted() {
+    if (!this.currentUser) {
+      this.$router.push("/login");
+    }
     this.retrieveCosts();
   },
 };
