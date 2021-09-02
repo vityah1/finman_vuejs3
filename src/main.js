@@ -3,11 +3,15 @@
 // import './plugins/bootstrap-vue'
 import { createApp } from 'vue'
 import App from './App.vue'
+import store from "./store";
+import router from './router'
+import moment from 'moment'
+
 import 'bootstrap'
 import 'bootstrap/dist/css/bootstrap.min.css'
 import "bootstrap/dist/js/bootstrap.min.js"
-import router from './router'
-import moment from 'moment'
+import { FontAwesomeIcon } from './plugins/font-awesome'
+
 // import Select2 from 'vue3-select2-component';
 // import { BootstrapVue, IconsPlugin } from 'bootstrap-vue'
 
@@ -27,4 +31,5 @@ app.config.globalProperties.$moment = moment
 // app.use(IconsPlugin)
 
 // app.use(router).use(BootstrapVue).use(IconsPlugin).mount('#app')
-app.use(router).mount('#app')
+app.use(router).use(store).component("font-awesome-icon", FontAwesomeIcon)
+app.mount('#app')
