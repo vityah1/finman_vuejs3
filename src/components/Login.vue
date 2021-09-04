@@ -19,7 +19,12 @@
         </div>
 
         <div class="form-group">
-          <button class="btn btn-primary btn-block" :disabled="loading">
+          <button
+            class="btn btn-primary btn-block clsMenu"
+            :disabled="loading"
+            data-bs-toggle="collapse"
+            data-bs-target=".navbar-collapse.show"
+          >
             <span
               v-show="loading"
               class="spinner-border spinner-border-sm"
@@ -94,10 +99,3 @@ export default {
 };
 </script>
 
-<style>
-.profile-img-card {
-  max-height: 192px;
-  max-width: 192px;
-  align-self: center;
-}
-</style>

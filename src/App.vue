@@ -18,23 +18,41 @@
         </button>
         <ul class="collapse navbar-collapse" id="navbarSupportedContent">
           <div class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li class="nav-item">
-              <router-link v-if="currentUser" to="/add" class="nav-link"
-                >Add</router-link
-              >
+            <li
+              v-if="currentUser"
+              class="nav-item"
+              data-bs-toggle="collapse"
+              data-bs-target=".navbar-collapse.show"
+            >
+              <router-link to="/add" class="nav-link clsMenu">Add</router-link>
             </li>
-            <li class="nav-item">
-              <router-link v-if="currentUser" to="/catcosts" class="nav-link"
+            <li
+              v-if="currentUser"
+              class="nav-item"
+              data-bs-toggle="collapse"
+              data-bs-target=".navbar-collapse.show"
+            >
+              <router-link to="/catcosts" class="nav-link clsMenu"
                 >Поточні</router-link
               >
             </li>
-            <li class="nav-item">
-              <router-link v-if="currentUser" to="/years" class="nav-link"
+            <li
+              v-if="currentUser"
+              class="nav-item"
+              data-bs-toggle="collapse"
+              data-bs-target=".navbar-collapse.show"
+            >
+              <router-link to="/years" class="nav-link clsMenu"
                 >Роки</router-link
               >
             </li>
             <li class="nav-item">
-              <router-link to="/about" class="nav-link">
+              <router-link
+                to="/about"
+                class="nav-link clsMenu"
+                data-bs-toggle="collapse"
+                data-bs-target=".navbar-collapse.show"
+              >
                 <font-awesome-icon icon="home" />Про
               </router-link>
             </li>
@@ -51,26 +69,44 @@
                 Usr
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li class="dropdown-item">
-                  <router-link to="/register" class="nav-link">
+                <li
+                  class="dropdown-item"
+                  data-bs-toggle="collapse"
+                  data-bs-target=".navbar-collapse.show"
+                >
+                  <router-link to="/register" class="nav-link clsMenu">
                     <font-awesome-icon icon="user-plus" /> Sign Up
                   </router-link>
                 </li>
-                <li class="dropdown-item">
-                  <router-link to="/login" class="nav-link">
+                <li
+                  class="dropdown-item"
+                  data-bs-toggle="collapse"
+                  data-bs-target=".navbar-collapse.show"
+                >
+                  <router-link to="/login" class="nav-link clsMenu">
                     <font-awesome-icon icon="sign-in-alt" /> Login
                   </router-link>
                 </li>
               </div>
             </ul>
-            <li class="nav-item">
-              <router-link v-if="currentUser" to="/profile" class="nav-link">
+            <li
+              v-if="currentUser"
+              class="nav-item"
+              data-bs-toggle="collapse"
+              data-bs-target=".navbar-collapse.show"
+            >
+              <router-link to="/profile" class="nav-link clsMenu">
                 <font-awesome-icon icon="user" />
                 {{ currentUser.username }}
               </router-link>
             </li>
-            <li class="nav-item">
-              <a class="nav-link" @click.prevent="logOut">
+            <li
+              v-if="currentUser"
+              class="nav-item"
+              data-bs-toggle="collapse"
+              data-bs-target=".navbar-collapse.show"
+            >
+              <a class="nav-link clsMenu" @click.prevent="logOut">
                 <font-awesome-icon icon="sign-out-alt" /> LogOut
               </a>
             </li>
@@ -84,7 +120,7 @@
               v-model="q"
             />
             <button
-              class="btn btn-outline-success"
+              class="btn btn-outline-success clsMenu"
               type="button"
               @click="AppFindCosts(q)"
               placeholder="Search"
@@ -101,20 +137,6 @@
 </template>
 
 <script>
-// import * as bootstrap from "bootstrap";
-// window.bootstrap = require("bootstrap")
-const navLinks = document.querySelectorAll(".nav-item");
-// const menuToggle = document.getElementById("navbarSupportedContent");
-// const bsCollapse = new bootstrap.Collapse(menuToggle, { toggle: false });
-// const bsCollapse = new bootstrap.Collapse(document.getElementById('navbarSupportedContent'), { toggle: false });
-
-const bsCollapse = document.getElementById("btn-collapse");
-
-navLinks.forEach((l) => {
-  l.addEventListener("click", () => {
-    bsCollapse.click();
-  });
-});
 export default {
   // data() {
   //   return {
@@ -141,7 +163,15 @@ export default {
     //   return false;
     // },
   },
-
+  watch: {
+    // $route() {
+    //   // $('#navbar-collapse').collapse('hide');
+    //   document
+    //     .querySelector("#navbarSupportedContent")
+    //     .classList.toggle("show");
+    //   // document.querySelector("#btn-collapse").click();
+    // },
+  },
   methods: {
     logOut() {
       this.$store.dispatch("auth/logout");
@@ -153,9 +183,36 @@ export default {
       // this.$router.go({ path: '/costs', query: { q: q } });
     },
   },
+  mounted() {
+    // import * as bootstrap from "bootstrap";
+    // window.bootstrap = require("bootstrap")
+    // const navLinks = document.querySelectorAll(".clsMenu");
+    // // const menuToggle = document.getElementById("navbarSupportedContent");
+    // // const bsCollapse = new bootstrap.Collapse(menuToggle, { toggle: false });
+    // // const bsCollapse = new bootstrap.Collapse(document.getElementById('navbarSupportedContent'), { toggle: false });
+    // // const bsCollapse = document.getElementById("btn-collapse");
+    // navLinks.forEach((l) => {
+    //   l.addEventListener("click", () => {
+    //     // bsCollapse.click();
+    //     document
+    //       .querySelector("#navbarSupportedContent")
+    //       // .classList.toggle("show");
+    //       .classList.remove("show");
+    //     // document.querySelector("#btn-collapse").click();
+    //   });
+    // });
+  },
 
   //   watch(()=>route.params, (previous, current) => {
   //   console.log(`${previous} and ${current}`);
   // },{deep:true})
 };
 </script>
+
+<style>
+.profile-img-card {
+  max-height: 192px;
+  max-width: 192px;
+  align-self: center;
+}
+</style>
