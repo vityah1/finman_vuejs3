@@ -78,7 +78,7 @@
     </div>
 
     <div v-else>
-      <h4>You submitted successfully! {{result}}</h4>
+      <h4>You submitted successfully! {{ result }}</h4>
       <button class="btn btn-success" @click="newCost">Add</button>
     </div>
   </div>
@@ -104,7 +104,7 @@ export default {
       catsOptions: [],
       subcatsOptions: [],
       submitted: false,
-      result:""
+      result: "",
     };
   },
   methods: {
@@ -143,8 +143,8 @@ export default {
       CostDataService.create(data)
         .then((response) => {
           this.cost.id = response.data.id;
-          console.log(response.data);
-          this.result=response.data
+          console.log(response.data.data);
+          this.result = response.data.data;
           this.submitted = true;
         })
         .catch((e) => {
