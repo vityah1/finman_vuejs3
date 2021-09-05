@@ -1,7 +1,11 @@
 <template>
   <div class="container">
     <h4>
-      <span @click="this.$router.go(-1)">&lt;=</span> Costs List
+      <router-link
+        :to="'catcosts?year='+$route.query.year+'&month='+$route.query.month"
+        >Cat cost</router-link
+      >
+      Costs List
       <span v-if="this.$route.query.period"
         >[{{ this.$route.query.period }}]</span
       >

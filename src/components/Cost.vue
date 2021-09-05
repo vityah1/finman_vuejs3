@@ -6,7 +6,7 @@
       <div class="form-group">
         <label for="cat">date</label>
         <input
-          type="text"
+          type="date"
           class="form-control"
           id="rdate"
           v-model="currentCost.rdate"
@@ -14,17 +14,80 @@
       </div>
       <div class="form-group">
         <label for="cat">Cat</label>
-        <input
+        <select
+          v-model="currentCost.cat"
+          class="form-control"
+          id="cat"
+          name="cat"
+          @change="pullSubCats(currentCost.cat)"
+        >
+          <option
+            v-for="cat in catsOptions"
+            :value="cat.name"
+            :key="cat.id"
+            :selected="cat.name === currentCost.cat"
+          >
+            {{ cat.name }}
+            <!-- <span v-if="cat.sub_cat">[{{ cat.sub_cat }}]</span> -->
+          </option>
+        </select>
+
+        <!-- <input
           type="text"
           class="form-control"
           id="cat"
           v-model="currentCost.cat"
-        />
+        /> -->
       </div>
 
       <div class="form-group">
         <label for="cat">Sub Cat</label>
+        <select
+          v-if="
+            subcatsOptions.some((e) => e.name == currentCost.sub_cat) ||
+            currentCost.sub_cat == ''
+          "
+          class="form-control"
+          id="sub_cat"
+          name="sub_cat"
+          v-model="currentCost.sub_cat"
+        >
+          <option value=""></option>
+          <option
+            v-for="sub_cat in subcatsOptions"
+            :value="sub_cat.name"
+            :key="sub_cat.id"
+            :selected="sub_cat.name === currentCost.sub_cat"
+          >
+            {{ sub_cat.name }}
+          </option>
+        </select>
+
         <input
+          :load="
+            log(
+              'input -> subcatsOptions.includes(currentCost.sub_cat): ' +
+                Object.values(subcatsOptions).includes(currentCost.sub_cat) +
+                ', subcatsOptions.some(e=>e.id==currentCost.sub_cat):' +
+                subcatsOptions.some((e) => e.name == currentCost.sub_cat) +
+                ', subcatsOptions.map(a=>a.id).includes(currentCost.sub_cat):' +
+                subcatsOptions
+                  .map((a) => a.name)
+                  .includes(currentCost.sub_cat) +
+                ', subcatsOptions: ' +
+                Object.values(subcatsOptions).toString() +
+                ', currentCost.sub_cat: ' +
+                currentCost.sub_cat +
+                ', subcatsOptions.map((a)=>a.id):' +
+                subcatsOptions.map((a) => a[a.name])
+            )
+          "
+          v-if="
+            !(
+              subcatsOptions.some((e) => e.name == currentCost.sub_cat) ||
+              currentCost.sub_cat == ''
+            )
+          "
           type="text"
           class="form-control"
           id="sub_cat"
@@ -91,16 +154,43 @@ export default {
     return {
       currentCost: null,
       message: "",
+      catsOptions: [],
+      subcatsOptions: [],
     };
   },
   methods: {
-    getCost(id) {
+    async pullCats() {
+      console.log("exec pullCats");
+      CostDataService.cats()
+        .then((response) => {
+          this.catsOptions = response.data;
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    async pullSubCats(cat) {
+      // var cat = this.cat.val();
+      console.log("exec pullSubCats");
+      CostDataService.subcats(cat)
+        .then((response) => {
+          this.subcatsOptions = response.data;
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    async getCost(id) {
       CostDataService.get(id)
         .then((response) => {
           response.data[0]["rdate"] = moment(response.data[0]["rdate"]).format(
-            "DD.MM.YYYY"
+            "YYYY-MM-DD"
           );
           this.currentCost = response.data[0];
+          this.pullCats();
+          this.pullSubCats(this.currentCost.cat);
           console.log(response.data);
         })
         .catch((e) => {
@@ -112,7 +202,7 @@ export default {
       CostDataService.update(this.currentCost.id, this.currentCost)
         .then((response) => {
           console.log(response.data);
-          this.message = "The cost was updated successfully!";
+          this.message = response.data;
         })
         .catch((e) => {
           console.log(e);
@@ -129,10 +219,28 @@ export default {
           console.log(e);
         });
     },
+    log(item) {
+      console.log(item);
+    },
+    elExists(arr, val) {
+      return arr.some(function (el) {
+        console.log(el.name);
+        return el.name === val;
+      });
+    },
   },
   mounted() {
     this.message = "";
     this.getCost(this.$route.params.id);
+    // this.pullCats();
+
+    // console.log(
+    //   "currentCost.cat: " +
+    //     this.currentCost.cat +
+    //     ", catsOptions[currentCost.cat]: " +
+    //     this.catsOptions[currentCost.cat]
+    // );
+    // this.pullSubCats(this.catsOptions[this.currentCost.cat]);
   },
 };
 </script>

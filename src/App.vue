@@ -18,41 +18,27 @@
         </button>
         <ul class="collapse navbar-collapse" id="navbarSupportedContent">
           <div class="navbar-nav me-auto mb-2 mb-lg-0">
-            <li
+            <!-- <li v-if="currentUser" class="nav-item"> -->
+            <router-link
               v-if="currentUser"
-              class="nav-item"
-              data-bs-toggle="collapse"
-              data-bs-target=".navbar-collapse.show"
+              to="/add"
+              class="nav-item nav-link clsMenu"
             >
-              <router-link to="/add" class="nav-link clsMenu">Add</router-link>
-            </li>
-            <li
-              v-if="currentUser"
-              class="nav-item"
-              data-bs-toggle="collapse"
-              data-bs-target=".navbar-collapse.show"
+              Add</router-link
             >
+            <!-- </li> -->
+            <li v-if="currentUser" class="nav-item">
               <router-link to="/catcosts" class="nav-link clsMenu"
                 >Поточні</router-link
               >
             </li>
-            <li
-              v-if="currentUser"
-              class="nav-item"
-              data-bs-toggle="collapse"
-              data-bs-target=".navbar-collapse.show"
-            >
+            <li v-if="currentUser" class="nav-item">
               <router-link to="/years" class="nav-link clsMenu"
                 >Роки</router-link
               >
             </li>
             <li class="nav-item">
-              <router-link
-                to="/about"
-                class="nav-link clsMenu"
-                data-bs-toggle="collapse"
-                data-bs-target=".navbar-collapse.show"
-              >
+              <router-link to="/about" class="nav-link clsMenu">
                 <font-awesome-icon icon="home" />Про
               </router-link>
             </li>
@@ -69,43 +55,25 @@
                 Usr
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
-                <li
-                  class="dropdown-item"
-                  data-bs-toggle="collapse"
-                  data-bs-target=".navbar-collapse.show"
-                >
+                <li class="dropdown-item">
                   <router-link to="/register" class="nav-link clsMenu">
                     <font-awesome-icon icon="user-plus" /> Sign Up
                   </router-link>
                 </li>
-                <li
-                  class="dropdown-item"
-                  data-bs-toggle="collapse"
-                  data-bs-target=".navbar-collapse.show"
-                >
+                <li class="dropdown-item">
                   <router-link to="/login" class="nav-link clsMenu">
                     <font-awesome-icon icon="sign-in-alt" /> Login
                   </router-link>
                 </li>
               </div>
             </ul>
-            <li
-              v-if="currentUser"
-              class="nav-item"
-              data-bs-toggle="collapse"
-              data-bs-target=".navbar-collapse.show"
-            >
+            <li v-if="currentUser" class="nav-item">
               <router-link to="/profile" class="nav-link clsMenu">
                 <font-awesome-icon icon="user" />
                 {{ currentUser.username }}
               </router-link>
             </li>
-            <li
-              v-if="currentUser"
-              class="nav-item"
-              data-bs-toggle="collapse"
-              data-bs-target=".navbar-collapse.show"
-            >
+            <li v-if="currentUser" class="nav-item">
               <a class="nav-link clsMenu" @click.prevent="logOut">
                 <font-awesome-icon icon="sign-out-alt" /> LogOut
               </a>
@@ -186,21 +154,21 @@ export default {
   mounted() {
     // import * as bootstrap from "bootstrap";
     // window.bootstrap = require("bootstrap")
-    // const navLinks = document.querySelectorAll(".clsMenu");
-    // // const menuToggle = document.getElementById("navbarSupportedContent");
-    // // const bsCollapse = new bootstrap.Collapse(menuToggle, { toggle: false });
-    // // const bsCollapse = new bootstrap.Collapse(document.getElementById('navbarSupportedContent'), { toggle: false });
-    // // const bsCollapse = document.getElementById("btn-collapse");
-    // navLinks.forEach((l) => {
-    //   l.addEventListener("click", () => {
-    //     // bsCollapse.click();
-    //     document
-    //       .querySelector("#navbarSupportedContent")
-    //       // .classList.toggle("show");
-    //       .classList.remove("show");
-    //     // document.querySelector("#btn-collapse").click();
-    //   });
-    // });
+    const navLinks = document.querySelectorAll(".clsMenu");
+    // const menuToggle = document.getElementById("navbarSupportedContent");
+    // const bsCollapse = new bootstrap.Collapse(menuToggle, { toggle: false });
+    // const bsCollapse = new bootstrap.Collapse(document.getElementById('navbarSupportedContent'), { toggle: false });
+    // const bsCollapse = document.getElementById("btn-collapse");
+    navLinks.forEach((l) => {
+      l.addEventListener("click", () => {
+        // bsCollapse.click();
+        document
+          .querySelector("#navbarSupportedContent")
+          // .classList.toggle("show");
+          .classList.remove("show");
+        // document.querySelector("#btn-collapse").click();
+      });
+    });
   },
 
   //   watch(()=>route.params, (previous, current) => {
