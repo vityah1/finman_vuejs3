@@ -198,9 +198,10 @@
       :key="index"
       data-bs-toggle="modal"
       data-bs-target="#editModal"
+      @click="getCost(cost.id)"
     >
       <div class="col-2">
-        <span @click="getCost(cost.id)">
+        <span>
           {{ $moment(cost.rdate).format("DD.MMM") }}
         </span>
       </div>

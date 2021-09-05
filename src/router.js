@@ -37,7 +37,7 @@ const routes = [
     {
         path: "/costs/:id",
         name: "cost-details",
-        component: () => import("./components/Cost")
+        component: () => import("./components/CostsList")
     },
     {
         path: "/add",
