@@ -1,25 +1,25 @@
 <template>
   <div class="container">
-    <div class="row"><div class="col-3">
-      <span>Months List [{{ year }}] y</span>
+    <div class="row">
+      <div class="col-3">
+        <span>Months List [{{ year }}] y</span>
       </div>
-<div class="col-3">
-
-    <div class="input-group mb-3">
-        <select
-          class="form-control"
-          placeholder="year"
-          v-model="year"
-          id="year"
-          name="year"
-          @change="retrieveMonths(year)"
-        >
-          <option v-for="(y, index) in years" :value="y" :key="index">
-            {{ y }}
-          </option>
-        </select>
+      <div class="col-3">
+        <div class="input-group mb-3">
+          <select
+            class="form-control"
+            placeholder="year"
+            v-model="year"
+            id="year"
+            name="year"
+            @change="retrieveMonths(year)"
+          >
+            <option v-for="(y, index) in years" :value="y" :key="index">
+              {{ y }}
+            </option>
+          </select>
         </div>
-  </div>      
+      </div>
     </div>
 
     <div class="row">
@@ -36,7 +36,7 @@
     <div class="row" v-for="(month, index) in months" :key="index">
       <router-link
         class="col-2"
-        :to="'/catcosts?year=' + year + '&month=' + month.month"
+        :to="{ name: 'catcosts', query: { year: year, month: month.month } }"
       >
         {{ month.month }}
       </router-link>

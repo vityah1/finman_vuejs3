@@ -1,7 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:5000/api/auth';
-// const API_URL = 'https://kt.if.ua/finman_api/api/auth';
+// const API_URL = 'http://localhost:5000/api/auth';
+const API_URL = 'https://kt.if.ua/finman_api/api/auth';
 
 class AuthService {
     login(user) {

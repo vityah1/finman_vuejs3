@@ -377,16 +377,16 @@ export default {
     },
   },
   watch: {
-    $route(to, from) {
-      // react to route changes...
-      if (to !== from) {
-        location.reload();
-      }
-    },
+    // $route(to, from) {
+    //   // react to route changes...
+    //   if (to !== from) {
+    //     location.reload();
+    //   }
+    // },
   },
   mounted() {
     if (!this.currentUser) {
-      this.$router.push("{name:'login'}");
+      this.$router.push({name:'login'});
     }
     this.retrieveCosts();
   },

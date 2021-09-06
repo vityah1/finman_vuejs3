@@ -21,24 +21,24 @@
             <!-- <li v-if="currentUser" class="nav-item"> -->
             <router-link
               v-if="currentUser"
-              :to="{name:'add'}"
+              :to="{ name: 'add' }"
               class="nav-item nav-link clsMenu"
             >
               Add</router-link
             >
             <!-- </li> -->
             <li v-if="currentUser" class="nav-item">
-              <router-link :to="{name:'catcosts'}" class="nav-link clsMenu"
+              <router-link :to="{ name: 'catcosts' }" class="nav-link clsMenu"
                 >Поточні</router-link
               >
             </li>
             <li v-if="currentUser" class="nav-item">
-              <router-link :to="{name:'years'}" class="nav-link clsMenu"
+              <router-link :to="{ name: 'years' }" class="nav-link clsMenu"
                 >Роки</router-link
               >
             </li>
             <li class="nav-item">
-              <router-link :to="{name:'about'}" class="nav-link clsMenu">
+              <router-link :to="{ name: 'about' }" class="nav-link clsMenu">
                 <font-awesome-icon icon="home" />Про
               </router-link>
             </li>
@@ -56,19 +56,22 @@
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li class="dropdown-item">
-                  <router-link :to="{name:'register'}" class="nav-link clsMenu">
+                  <router-link
+                    :to="{ name: 'register' }"
+                    class="nav-link clsMenu"
+                  >
                     <font-awesome-icon icon="user-plus" /> Sign Up
                   </router-link>
                 </li>
                 <li class="dropdown-item">
-                  <router-link :to="{name:'login'}" class="nav-link clsMenu">
+                  <router-link :to="{ name: 'login' }" class="nav-link clsMenu">
                     <font-awesome-icon icon="sign-in-alt" /> Login
                   </router-link>
                 </li>
               </div>
             </ul>
             <li v-if="currentUser" class="nav-item">
-              <router-link :to="{name:'profile'}" class="nav-link clsMenu">
+              <router-link :to="{ name: 'profile' }" class="nav-link clsMenu">
                 <font-awesome-icon icon="user" />
                 {{ currentUser.username }}
               </router-link>
@@ -101,7 +104,7 @@
       </div>
     </nav>
   </div>
-  <router-view />
+  <router-view :key="$router.fullPath" />
 </template>
 
 <script>
