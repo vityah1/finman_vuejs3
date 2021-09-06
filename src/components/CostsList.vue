@@ -164,9 +164,10 @@
 
     <h4>
       <router-link
-        :to="
-          'catcosts?year=' + $route.query.year + '&month=' + $route.query.month
-        "
+        :to="{
+          name: 'catcosts',
+          query: { year: $route.query.year, month: $route.query.month },
+        }"
         >Cat cost</router-link
       >
       Costs List
@@ -385,7 +386,7 @@ export default {
   },
   mounted() {
     if (!this.currentUser) {
-      this.$router.push("/login");
+      this.$router.push("{name:'login'}");
     }
     this.retrieveCosts();
   },

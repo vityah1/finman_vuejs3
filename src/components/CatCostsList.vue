@@ -49,7 +49,7 @@
       class="row"
       v-for="(cat, index) in catcosts"
       :key="index"
-      :to="'costs?cat=' + cat.cat + '&year=' + year + '&month=' + month"
+      :to="{ name: 'costs', query: { cat: cat.cat, year: year, month: month } }"
     >
       <div class="col-4">{{ cat.cat }}</div>
       <div class="col-2">{{ cat.suma.toLocaleString() }}</div>
@@ -69,7 +69,7 @@ export default {
       catcosts: [],
       q: "",
       year: this.$route.query.year || new Date().getFullYear(),
-      month: this.$route.query.month || new Date().getMonth()+1,
+      month: this.$route.query.month || new Date().getMonth() + 1,
       years: Array.from({ length: 8 }, (x, i) => i + 2014),
       months: Array.from({ length: 12 }, (x, i) => i + 1),
       total: 0,
@@ -118,7 +118,7 @@ export default {
   },
   mounted() {
     let year = this.$route.query.year || new Date().getFullYear();
-    let month = this.$route.query.month || new Date().getMonth()+1;
+    let month = this.$route.query.month || new Date().getMonth() + 1;
 
     this.retrieveCatCosts(year, month);
   },

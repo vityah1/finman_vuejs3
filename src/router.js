@@ -11,32 +11,32 @@ import { createWebHistory, createRouter } from "vue-router";
 
 const routes = [
     {
-        path: "/",
-        alias: "/costs",
+        path: "/costs",
+        // alias: "costs",
         name: "costs",
         component: () => import("./components/CostsList")
     },
     {
-        path: "/",
-        alias: "/years",
+        path: "/years",
+        // alias: "years",
         name: "years",
         component: () => import("./components/YearsList")
     },
     {
-        path: "/",
+        path: "/month",
         alias: "/months/:year",
         name: "months",
         component: () => import("./components/MonthsList")
     },
     {
-        path: "/",
-        alias: "/catcosts",
+        path: "/catcosts",
+        // alias: "/catcosts",
         name: "catcosts",
         component: () => import("./components/CatCostsList")
     },
     {
         path: "/costs/:id",
-        name: "cost-details",
+        name: "cost-detail",
         component: () => import("./components/CostsList")
     },
     {
@@ -60,6 +60,7 @@ const routes = [
     },
     {
         path: "/register",
+        name: "register",
         // component: Register,
         component: () => import("./components/Register"),
     },
@@ -91,7 +92,8 @@ const routes = [
 ];
 
 const router = createRouter({
-    history: createWebHistory(),
+    base: "/finman",
+    history: createWebHistory(process.env.BASE_URL),
     routes,
 });
 
