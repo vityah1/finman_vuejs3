@@ -83,7 +83,7 @@
             </li>
           </div>
 
-          <form class="d-flex">
+          <form class="d-flex" v-if="currentUser">
             <input
               type="text"
               class="form-control me-2"
@@ -117,7 +117,12 @@ export default {
   name: "app",
   computed: {
     currentUser() {
-      return this.$store.state.auth.user;
+      try {
+        return this.$store.state.auth.user;
+      } catch {
+        this.logOut();
+        return "";
+      }
     },
     // showAdminBoard() {
     //   if (this.currentUser && this.currentUser["roles"]) {

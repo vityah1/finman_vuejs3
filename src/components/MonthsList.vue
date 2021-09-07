@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <div class="col-3">
-        <span>Months List [{{ year }}] y</span>
+        <span>Year:</span>
       </div>
       <div class="col-3">
         <div class="input-group mb-3">
@@ -23,25 +23,27 @@
     </div>
 
     <div class="row">
-      <div class="col-2 h4 text-success">Всього:</div>
-      <div class="col-2 h4 text-danger">{{ total.toLocaleString() }}</div>
-      <div class="col-2">{{ total_cnt }}</div>
+      <div class="col-1 text-small">грн</div>
+      <div class="col-4 h4 text-danger">
+        {{ total.toLocaleString() }}
+      </div>
+      <div class="col-4">{{ total_cnt }}</div>
     </div>
     <div class="row bg-info">
-      <div class="col-2">Місяць</div>
-      <div class="col-2">Сума</div>
-      <div class="col-2">К-сть</div>
+      <div class="col-4">Місяць</div>
+      <div class="col-4">Сума</div>
+      <div class="col-4">К-сть</div>
     </div>
 
     <div class="row" v-for="(month, index) in months" :key="index">
       <router-link
-        class="col-2"
+        class="col-4"
         :to="{ name: 'catcosts', query: { year: year, month: month.month } }"
       >
         {{ month.month }}
       </router-link>
-      <div class="col-2">{{ month.suma.toLocaleString() }}</div>
-      <div class="col-2">{{ month.cnt }}</div>
+      <div class="col-4">{{ month.suma.toLocaleString() }}</div>
+      <div class="col-4">{{ month.cnt }}</div>
     </div>
   </div>
 </template>

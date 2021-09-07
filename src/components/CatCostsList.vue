@@ -38,12 +38,12 @@
     </div>
   </div>
   <div class="container">
-    <h4>Cat Costs List [{{ year }}-{{ month }}]</h4>
+    <!-- <h4>Cat Costs List [{{ year }}-{{ month }}]</h4> -->
     <!-- <ul class="list-group"> -->
     <div class="row">
       <div class="col-4 h4 text-success">Всього:</div>
-      <div class="col-2 h4 text-danger">{{ total.toLocaleString() }}</div>
-      <div class="col-2">{{ total_cnt }}</div>
+      <div class="col-4 h4 text-danger">{{ total.toLocaleString() }}</div>
+      <div class="col-4">{{ total_cnt }}</div>
     </div>
     <router-link
       class="row"
@@ -52,8 +52,8 @@
       :to="{ name: 'costs', query: { cat: cat.cat, year: year, month: month } }"
     >
       <div class="col-4">{{ cat.cat }}</div>
-      <div class="col-2">{{ cat.suma.toLocaleString() }}</div>
-      <div class="col-2">{{ cat.cnt }}</div>
+      <div class="col-4">{{ cat.suma.toLocaleString() }}</div>
+      <div class="col-4">{{ cat.cnt }}</div>
     </router-link>
   </div>
 </template>

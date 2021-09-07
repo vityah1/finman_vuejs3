@@ -162,24 +162,31 @@
       </div>
     </div>
 
-    <h4>
-      <router-link
-        :to="{
-          name: 'catcosts',
-          query: { year: $route.query.year, month: $route.query.month },
-        }"
-        >Cat cost</router-link
-      >
-      Costs List
-      <span v-if="this.$route.query.period"
+    <div class="row">
+      <div class="col-2">
+        <router-link
+          :to="{
+            name: 'catcosts',
+            query: { year: $route.query.year, month: $route.query.month },
+          }"
+          ><font-awesome-icon icon="angle-double-left"
+        /></router-link>
+      </div>
+      <div class="col-10">
+        <!-- <span v-if="this.$route.query.period"
         >[{{ this.$route.query.period }}]</span
-      >
-      <span v-if="this.$route.query.cat">[{{ this.$route.query.cat }}]</span>
-      <span v-if="this.$route.query.year">[{{ this.$route.query.year }}]</span>
-      <span v-if="this.$route.query.month"
-        >[{{ this.$route.query.month }}]</span
-      >
-    </h4>
+      > -->
+        <span class="text-small" v-if="this.$route.query.cat"
+          >[{{ this.$route.query.cat }}]</span
+        >
+        <span v-if="this.$route.query.year"
+          >[{{ this.$route.query.year }}]</span
+        >
+        <span v-if="this.$route.query.month"
+          >[{{ this.$route.query.month }}]</span
+        >
+      </div>
+    </div>
     <p>{{ message }}</p>
     <div class="row">
       <div class="col-4 h4 text-success">Всього:</div>
@@ -386,7 +393,7 @@ export default {
   },
   mounted() {
     if (!this.currentUser) {
-      this.$router.push({name:'login'});
+      this.$router.push({ name: "login" });
     }
     this.retrieveCosts();
   },
