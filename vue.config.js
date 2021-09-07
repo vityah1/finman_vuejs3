@@ -4,4 +4,12 @@ module.exports = {
     }, configureWebpack: {
         devtool: 'source-map'
     }
+    // , publicPath: '/finman'
+    ,
+    // publicPath: process.env.NODE_ENV === 'production'
+    //     ? '/finman/'
+    //     : '/',
+    publicPath: '/finman/',
+    // assetsPublicPath: '/finman/',
+    productionSourceMap: false
 }

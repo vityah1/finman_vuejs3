@@ -2,7 +2,7 @@
   <div id="app">
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
       <div class="container-fluid">
-        <router-link to="/" class="navbar-brand">ФМ</router-link>
+        <router-link to="./" class="navbar-brand">ФМ</router-link>
 
         <button
           class="navbar-toggler"
@@ -21,24 +21,24 @@
             <!-- <li v-if="currentUser" class="nav-item"> -->
             <router-link
               v-if="currentUser"
-              to="/add"
+              :to="{ name: 'add' }"
               class="nav-item nav-link clsMenu"
             >
               Add</router-link
             >
             <!-- </li> -->
             <li v-if="currentUser" class="nav-item">
-              <router-link to="/catcosts" class="nav-link clsMenu"
+              <router-link :to="{ name: 'catcosts' }" class="nav-link clsMenu"
                 >Поточні</router-link
               >
             </li>
             <li v-if="currentUser" class="nav-item">
-              <router-link to="/years" class="nav-link clsMenu"
+              <router-link :to="{ name: 'years' }" class="nav-link clsMenu"
                 >Роки</router-link
               >
             </li>
             <li class="nav-item">
-              <router-link to="/about" class="nav-link clsMenu">
+              <router-link :to="{ name: 'about' }" class="nav-link clsMenu">
                 <font-awesome-icon icon="home" />Про
               </router-link>
             </li>
@@ -56,19 +56,22 @@
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li class="dropdown-item">
-                  <router-link to="/register" class="nav-link clsMenu">
+                  <router-link
+                    :to="{ name: 'register' }"
+                    class="nav-link clsMenu"
+                  >
                     <font-awesome-icon icon="user-plus" /> Sign Up
                   </router-link>
                 </li>
                 <li class="dropdown-item">
-                  <router-link to="/login" class="nav-link clsMenu">
+                  <router-link :to="{ name: 'login' }" class="nav-link clsMenu">
                     <font-awesome-icon icon="sign-in-alt" /> Login
                   </router-link>
                 </li>
               </div>
             </ul>
             <li v-if="currentUser" class="nav-item">
-              <router-link to="/profile" class="nav-link clsMenu">
+              <router-link :to="{ name: 'profile' }" class="nav-link clsMenu">
                 <font-awesome-icon icon="user" />
                 {{ currentUser.username }}
               </router-link>
@@ -101,7 +104,7 @@
       </div>
     </nav>
   </div>
-  <router-view />
+  <router-view :key="$router.fullPath" />
 </template>
 
 <script>
@@ -143,11 +146,11 @@ export default {
   methods: {
     logOut() {
       this.$store.dispatch("auth/logout");
-      this.$router.push("/login");
+      this.$router.push({ name: "login" });
     },
     AppFindCosts(q) {
       // this.$router.push({ name: "costs", params: { q: q } });
-      this.$router.push({ path: "/costs", query: { q: q } });
+      this.$router.push({ name: "costs", query: { q: q } });
       // this.$router.go({ path: '/costs', query: { q: q } });
     },
   },
