@@ -189,34 +189,37 @@
     </div>
     <p>{{ message }}</p>
     <div class="row">
-      <div class="col-4 h4 text-success">Всього:</div>
-      <div class="col-2 h4 text-danger">{{ total.toLocaleString() }}</div>
+      <div class="col-2 h4 text-success">Всього:</div>
+      <div class="col-2 h4 text-danger">{{ total.toLocaleString() }} грн</div>
       <div class="col-2">{{ total_cnt }}</div>
     </div>
-    <div class="row bg-info">
-      <div class="col-2" @click="sortCosts(1)">Дата</div>
-      <div class="col-4" @click="sortCosts(2)">Розділ</div>
-      <div class="col-4">Опис</div>
-      <div class="col-2" @click="sortCosts(3)">Сума</div>
-    </div>
+    <table class="table-sm table-hover">
+      <thead>
+        <th @click="sortCosts(1)">Дата</th>
+        <th @click="sortCosts(2)">Розділ</th>
+        <th>Опис</th>
+        <th @click="sortCosts(3)">Сума</th>
+      </thead>
 
-    <div
-      class="row"
-      v-for="(cost, index) in costs"
-      :key="index"
-      data-bs-toggle="modal"
-      data-bs-target="#editModal"
-      @click="getCost(cost.id)"
-    >
-      <div class="col-2">
-        <span>
-          {{ $moment(cost.rdate).format("DD.MMM") }}
-        </span>
-      </div>
-      <div class="col-4">{{ cost.sub_cat }}</div>
-      <div class="col-4">{{ cost.mydesc }}</div>
-      <div class="col-2">{{ cost.suma.toLocaleString() }}</div>
-    </div>
+      <tbody>
+        <tr
+          v-for="(cost, index) in costs"
+          :key="index"
+          data-bs-toggle="modal"
+          data-bs-target="#editModal"
+          @click="getCost(cost.id)"
+        >
+          <td>
+            <span>
+              {{ $moment(cost.rdate).format("DD.MMM") }}
+            </span>
+          </td>
+          <td>{{ cost.sub_cat }}</td>
+          <td>{{ cost.mydesc }}</td>
+          <td>{{ cost.suma.toLocaleString() }}</td>
+        </tr>
+      </tbody>
+    </table>
   </div>
 </template>
 
@@ -399,11 +402,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.list {
-  text-align: left;
-  max-width: 750px;
-  margin: auto;
-}
-</style>
