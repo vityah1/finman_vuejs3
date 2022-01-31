@@ -33,6 +33,11 @@
               >
             </li>
             <li v-if="currentUser" class="nav-item">
+              <router-link :to="{ name: 'last' }" class="nav-link clsMenu"
+                >Останні</router-link
+              >
+            </li>
+            <li v-if="currentUser" class="nav-item">
               <router-link :to="{ name: 'years' }" class="nav-link clsMenu"
                 >Роки</router-link
               >
