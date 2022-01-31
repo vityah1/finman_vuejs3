@@ -70,7 +70,9 @@ export default {
       q: "",
       year: this.$route.query.year || new Date().getFullYear(),
       month: this.$route.query.month || new Date().getMonth() + 1,
-      years: Array.from({ length: 8 }, (x, i) => i + 2014),
+      // set list of years
+      years: Array.from({ length: 9 }, (x, i) => i + 2014),
+      // set list of months
       months: Array.from({ length: 12 }, (x, i) => i + 1),
       total: 0,
       total_cnt: 0,
