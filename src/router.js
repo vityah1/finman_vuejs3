@@ -15,6 +15,11 @@ const routes = [
         // alias: "costs",
         name: "costs",
         component: () => import("./components/CostsList")
+    }, {
+        path: "/last",
+        // alias: "costs",
+        name: "last",
+        component: () => import("./components/CostsList?cat=last")
     },
     {
         path: "/years",
