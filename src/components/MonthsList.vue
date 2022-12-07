@@ -12,12 +12,26 @@
             v-model="year"
             id="year"
             name="year"
-            @change="retrieveMonths(year)"
+            @change="retrieveMonths(year, user)"
           >
             <option v-for="(y, index) in years" :value="y" :key="index">
               {{ y }}
             </option>
           </select>
+
+          <select
+          class="form-control"
+          placeholder="user"
+          v-model="user"
+          id="user"
+          name="user"
+          @change="retrieveMonths(year, user)"
+        >
+          <option v-for="(u, index) in users" :value="u" :key="index">
+            {{ u }}
+          </option>
+        </select>
+
         </div>
       </div>
     </div>
@@ -38,7 +52,7 @@
     <div class="row" v-for="(month, index) in months" :key="index">
       <router-link
         class="col-4"
-        :to="{ name: 'catcosts', query: { year: year, month: month.month } }"
+        :to="{ name: 'catcosts', query: { year: year, month: month.month , user: user} }"
       >
         {{ month.month }}
       </router-link>
@@ -61,11 +75,13 @@ export default {
       total: 0,
       total_cnt: 0,
       years: Array.from({ length: 9 }, (x, i) => i + 2014),
+      user: this.$route.query.user || 'all',
+      users: ['all', 'vik', 'tanya']      
     };
   },
   methods: {
-    retrieveMonths(year) {
-      CostDataService.getMonths(year)
+    retrieveMonths(year, user) {
+      CostDataService.getMonths(year, user)
         // CostDataService.getAll({sort:sort})
         .then((response) => {
           this.months = response.data;
@@ -87,7 +103,7 @@ export default {
     },
   },
   mounted() {
-    this.retrieveMonths(this.$route.params.year);
+    this.retrieveMonths(this.$route.params.year, this.$route.params.user);
   },
 };
 </script>

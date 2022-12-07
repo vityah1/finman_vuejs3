@@ -34,8 +34,8 @@ class CostDataService {
         return http.get("/years", { headers: authHeader() });
     }
 
-    getMonths(year) {
-        return http.get("/months/" + year, { headers: authHeader() });
+    getMonths(year, user) {
+        return http.get("/months/" + year + '?user=' + user, { headers: authHeader() });
     }
 
     subcats(cat) {
