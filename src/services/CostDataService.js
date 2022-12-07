@@ -21,9 +21,9 @@ class CostDataService {
         return http.get("/costs?sort=" + sort + "&period=" + period + "&cat=" + cat, { headers: authHeader() });
     }
 
-    getCatCosts({ year = '', month = '' } = {}) {
-        console.log(`getCatCosts => year: ${year}, month: ${month}`)
-        return http.get("/catcosts?year=" + year + "&month=" + month, { headers: authHeader() });
+    getCatCosts({ year = '', month = '', user = '' } = {}) {
+        console.log(`getCatCosts => year: ${year}, month: ${month}, user: ${user}`)
+        return http.get("/catcosts?year=" + year + "&month=" + month + "&user=" + user, { headers: authHeader() });
     }
 
     cats() {

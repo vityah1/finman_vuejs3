@@ -25,11 +25,24 @@
             {{ m }}
           </option>
         </select>
+
+        <select
+          class="form-control"
+          placeholder="user"
+          v-model="user"
+          id="user"
+          name="user"
+        >
+          <option v-for="(u, index) in users" :value="u" :key="index">
+            {{ u }}
+          </option>
+        </select>
+
         <div class="input-group-append">
           <button
             class="btn btn-outline-secondary"
             type="button"
-            @click="retrieveCatCosts(year, month)"
+            @click="retrieveCatCosts(year, month, user)"
           >
             Ok
           </button>
@@ -76,16 +89,18 @@ export default {
       months: Array.from({ length: 12 }, (x, i) => i + 1),
       total: 0,
       total_cnt: 0,
+      user: this.$route.query.user || 'all',
+      users: ['all', 'vik', 'tanya']
     };
   },
   methods: {
-    retrieveCatCosts(year, month) {
+    retrieveCatCosts(year, month, user) {
       // year=this.year
       // month=this.month
       console.log(
-        `retrieveCatCosts => year: ${this.year}, month: ${this.month}`
+        `retrieveCatCosts => year: ${this.year}, month: ${this.month}, user: ${this.user}`
       );
-      CostDataService.getCatCosts({ year: year, month: month })
+      CostDataService.getCatCosts({ year: year, month: month, user: user })
         .then((response) => {
           this.catcosts = response.data;
           console.log(response.data);
@@ -121,8 +136,9 @@ export default {
   mounted() {
     let year = this.$route.query.year || new Date().getFullYear();
     let month = this.$route.query.month || new Date().getMonth() + 1;
+    let user = this.$route.query.user || 'all';
 
-    this.retrieveCatCosts(year, month);
+    this.retrieveCatCosts(year, month, user);
   },
 };
 </script>
