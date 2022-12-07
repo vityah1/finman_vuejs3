@@ -13,7 +13,7 @@
             {{ y }}
           </option>
         </select>
-
+&nbsp;
         <select
           class="form-control"
           placeholder="month"
@@ -25,7 +25,7 @@
             {{ m }}
           </option>
         </select>
-
+&nbsp;
         <select
           class="form-control"
           placeholder="user"
@@ -37,7 +37,7 @@
             {{ u }}
           </option>
         </select>
-
+&nbsp;
         <div class="input-group-append">
           <button
             class="btn btn-outline-secondary"
