@@ -17,7 +17,7 @@
           class="form-control"
           id="cat"
           name="cat"
-          @change="pullSubCats(cost.cat)"
+          @change="selSubCats(cost.cat)"
         >
           <option
             v-for="cat in catsOptions"
@@ -105,6 +105,7 @@ export default {
       subcatsOptions: [],
       submitted: false,
       result: "",
+      subAllcatsOptions: [],
     };
   },
   methods: {
@@ -119,6 +120,18 @@ export default {
           console.log(e);
         });
     },
+    async pullAllSubCats() {
+      // var cat = this.cat.val();
+      console.log("exec pullAllSubCats");
+      CostDataService.subcats()
+        .then((response) => {
+          this.subAllcatsOptions = response.data;
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },    
     async pullSubCats(cat) {
       // var cat = this.cat.val();
       console.log("exec pullSubCats");
@@ -130,6 +143,19 @@ export default {
         .catch((e) => {
           console.log(e);
         });
+    },
+    selSubCats(cat) {
+      // var cat = this.cat.val();
+      console.log("exec selSubCats");
+      // console.log('cat => ', cat);
+      // console.log('catsOptions => ', this.catsOptions);
+      let selectedCat = this.catsOptions.find(obj => obj.name === cat);
+      // console.log('selectedCat => ', selectedCat);
+      // console.log('this.subAllcatsOptions => ', this.subAllcatsOptions);
+      this.subcatsOptions = this.subAllcatsOptions.filter(function(item) {
+  return item.id_cat === selectedCat.id;
+});
+      console.log('this.subcatsOptions => ', this.subcatsOptions);
     },
     async saveCost() {
       var data = {
@@ -154,7 +180,7 @@ export default {
     newCost() {
       this.submitted = false;
       this.cost = {};
-      this.pullCats();
+      // this.pullCats();
     },
     // created() {
     //   this.pullCats();
@@ -163,6 +189,7 @@ export default {
   mounted() {
     console.log("mounted");
     this.pullCats();
+    this.pullAllSubCats();
   },
 };
 </script>

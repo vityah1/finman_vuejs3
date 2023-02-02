@@ -38,7 +38,7 @@ class CostDataService {
         return http.get("/months/" + year + '?user=' + user, { headers: authHeader() });
     }
 
-    subcats(cat) {
+    subcats(cat = '') {
         return http.get("/subcats?cat=" + cat);
     }
 
@@ -62,8 +62,8 @@ class CostDataService {
     //     return http.delete(`/costs`);
     // }
 
-    showCost({ q = '', sort = 3, cat = '', year = '', month = '' } = {}) {
-        return http.get(`/costs?q=${q}&sort=${sort}&cat=${cat}&year=${year}&month=${month}`, { headers: authHeader() });
+    showCost({ q = '', sort = 3, cat = '', year = '', month = '', user = '' } = {}) {
+        return http.get(`/costs?q=${q}&sort=${sort}&cat=${cat}&year=${year}&month=${month}&user=${user}`, { headers: authHeader() });
     }
 }
 

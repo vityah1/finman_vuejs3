@@ -1,5 +1,17 @@
 # rozhody
 
+## setup node
+```nvm list```
+
+```
+* 18.12.1 (Currently using 64-bit executable)
+11.15.0
+8.15.1
+```
+
+**select node 11.15.0**
+```nvm use 11.15.0```
+
 ## Project setup
 ```
 npm install

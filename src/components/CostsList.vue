@@ -39,7 +39,7 @@
                   class="form-control"
                   id="cat"
                   name="cat"
-                  @change="pullSubCats(currentCost.cat)"
+                  @change="selSubCats(currentCost.cat)"
                 >
                   <option
                     v-for="cat in catsOptions"
@@ -167,7 +167,7 @@
         <router-link
           :to="{
             name: 'catcosts',
-            query: { year: $route.query.year, month: $route.query.month },
+            query: { year: $route.query.year, month: $route.query.month, user: $route.query.user },
           }"
           ><font-awesome-icon icon="angle-double-left"
         /></router-link>
@@ -185,6 +185,9 @@
         <span v-if="this.$route.query.month"
           >[{{ this.$route.query.month }}]</span
         >
+        <span v-if="this.$route.query.user"
+          >[{{ this.$route.query.user }}]</span
+        >        
       </div>
     </div>
     <p>{{ message }}</p>
@@ -238,7 +241,9 @@ export default {
       currentCost: null,
       catsOptions: [],
       subcatsOptions: [],
+      subAllcatsOptions: [],
       message: "",
+      user: this.$route.query.user || 'all',
     };
   },
   computed: {
@@ -270,6 +275,31 @@ export default {
           console.log(e);
         });
     },
+    selSubCats(cat) {
+      // var cat = this.cat.val();
+      console.log("exec selSubCats");
+      // console.log('cat => ', cat);
+      // console.log('catsOptions => ', this.catsOptions);
+      let selectedCat = this.catsOptions.find(obj => obj.name === cat);
+      // console.log('selectedCat => ', selectedCat);
+      // console.log('this.subAllcatsOptions => ', this.subAllcatsOptions);
+      this.subcatsOptions = this.subAllcatsOptions.filter(function(item) {
+  return item.id_cat === selectedCat.id;
+});
+      console.log('this.subcatsOptions => ', this.subcatsOptions);
+    },    
+    async pullAllSubCats() {
+      // var cat = this.cat.val();
+      console.log("exec pullAllSubCats");
+      CostDataService.subcats()
+        .then((response) => {
+          this.subAllcatsOptions = response.data;
+          console.log(response.data);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },    
     async getCost(id) {
       CostDataService.get(id)
         .then((response) => {
@@ -277,8 +307,6 @@ export default {
             "YYYY-MM-DD"
           );
           this.currentCost = response.data[0];
-          this.pullCats();
-          this.pullSubCats(this.currentCost.cat);
           console.log(response.data);
         })
         .catch((e) => {
@@ -341,13 +369,15 @@ export default {
       let month = this.$route.query.month || "";
       let cat = this.$route.query.cat || "";
       let q = this.$route.query.q || "";
-      console.log(q, year, month, cat, sort);
+      let user = this.$route.query.user || "";
+      console.log(q, year, month, cat, sort, user);
       CostDataService.showCost({
         sort: sort,
         year: year,
         month: month,
         cat: cat,
         q: q,
+        user: user,
       })
         // CostDataService.getAll({sort:sort})
         .then((response) => {
@@ -399,6 +429,8 @@ export default {
       this.$router.push({ name: "login" });
     }
     this.retrieveCosts();
+    this.pullCats();
+    this.pullAllSubCats();
   },
 };
 </script>

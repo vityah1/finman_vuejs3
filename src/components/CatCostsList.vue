@@ -62,7 +62,7 @@
       class="row"
       v-for="(cat, index) in catcosts"
       :key="index"
-      :to="{ name: 'costs', query: { cat: cat.cat, year: year, month: month } }"
+      :to="{ name: 'costs', query: { cat: cat.cat, year: year, month: month, user: user } }"
     >
       <div class="col-4">{{ cat.cat }}</div>
       <div class="col-4">{{ cat.suma.toLocaleString() }}</div>
@@ -84,7 +84,7 @@ export default {
       year: this.$route.query.year || new Date().getFullYear(),
       month: this.$route.query.month || new Date().getMonth() + 1,
       // set list of years
-      years: Array.from({ length: 9 }, (x, i) => i + 2014),
+      years: [],
       // set list of months
       months: Array.from({ length: 12 }, (x, i) => i + 1),
       total: 0,
@@ -129,6 +129,17 @@ export default {
           console.log(e);
         });
     },
+    retrieveYears() {
+      CostDataService.getYears()
+        .then((response) => {
+          let filteredYears = response.data.filter(obj => obj.year > 1900);
+          this.years = filteredYears.map(obj => obj.year);
+          console.log(`retrieveYears => years => ${this.years}`);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },    
     refreshList() {
       this.retrieveCatCosts();
     },
@@ -137,7 +148,7 @@ export default {
     let year = this.$route.query.year || new Date().getFullYear();
     let month = this.$route.query.month || new Date().getMonth() + 1;
     let user = this.$route.query.user || 'all';
-
+    this.retrieveYears();
     this.retrieveCatCosts(year, month, user);
   },
 };
