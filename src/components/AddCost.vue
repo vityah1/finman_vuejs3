@@ -7,29 +7,29 @@
           type="date"
           class="form-control"
           id="rdate"
-          v-model="cost.rdate"
+          v-model="currentCost.rdate"
         />
       </div>
       <div v-if="catsOptions" class="form-group">
         <label for="cat">Cat</label>
         <select
-          v-model="cost.cat"
+          v-model="currentCost.cat"
           class="form-control"
           id="cat"
           name="cat"
-          @change="selSubCats(cost.cat)"
+          @change="selSubCats(currentCost.cat)"
         >
           <option
             v-for="cat in catsOptions"
             :value="cat.name"
             :key="cat.id"
-            :selected="cat.name === cost.cat"
+            :selected="cat.name === currentCost.cat"
           >
             {{ cat.name }}
             <!-- <span v-if="cat.sub_cat">[{{ cat.sub_cat }}]</span> -->
           </option>
         </select>
-        <h2>{{ cost.cat }}</h2>
+        <h2>{{ currentCost.cat }}</h2>
       </div>
 
       <div class="form-group">
@@ -38,27 +38,44 @@
           class="form-control"
           id="sub_cat"
           name="sub_cat"
-          v-model="cost.sub_cat"
+          v-model="currentCost.sub_cat"
         >
           <option
             v-for="sub_cat in subcatsOptions"
             :value="sub_cat.name"
             :key="sub_cat.id"
-            :selected="sub_cat.name === cost.sub_cat"
+            :selected="sub_cat.name === currentCost.sub_cat"
           >
             {{ sub_cat.name }}
           </option>
         </select>
-        <h2>{{ cost.sub_cat }}</h2>
+        <h2>{{ currentCost.sub_cat }}</h2>
       </div>
 
-      <div class="form-group">
+      <div 
+      :load="log('currentCost.sub_cat: ' + currentCost.sub_cat + 
+      ', currentCost.cat: ' + currentCost.cat
+      )"
+      v-if="is_sub_cat_refuel" class="form-group">
+                <label for="id_km">km:</label>
+                <input type="text" class="form-control" id="id_km" v-model="currentCost.km" />
+                <label for="id_litres">Litres:</label>
+                <input type="text" class="form-control" id="id_litres" v-model="currentCost.litres" />
+                <label for="id_price_val">Price (EUR):</label>
+                <input type="text" class="form-control" id="id_price_val" v-model="currentCost.price_val" />
+                <label for="id_name_station">Name station:</label>
+                <input type="text" class="form-control" id="id_name_station" v-model="currentCost.station" />
+              </div>
+
+      <div 
+      v-if="!is_sub_cat_refuel" class="form-group"
+      >
         <label for="mydesc">Desc</label>
         <input
           class="form-control"
           id="mydesc"
           required
-          v-model="cost.mydesc"
+          v-model="currentCost.mydesc"
           name="mydesc"
         />
       </div>
@@ -69,7 +86,7 @@
           class="form-control"
           id="suma"
           required
-          v-model="cost.suma"
+          v-model="currentCost.suma"
           name="suma"
         />
       </div>
@@ -93,13 +110,17 @@ export default {
   name: "add-cost",
   data() {
     return {
-      cost: {
+      currentCost: {
         id: null,
         rdate: moment(Date()).format("YYYY-MM-DD"),
         cat: "",
         sub_cat: "",
         mydesc: "",
         suma: 0,
+        km: "",
+        litres: "",
+        price_val: "",
+        station: "",
       },
       catsOptions: [],
       subcatsOptions: [],
@@ -159,16 +180,19 @@ export default {
     },
     async saveCost() {
       var data = {
-        rdate: this.cost.rdate,
-        cat: this.cost.cat,
-        sub_cat: this.cost.sub_cat,
-        mydesc: this.cost.mydesc,
-        suma: this.cost.suma,
+        rdate: this.currentCost.rdate,
+        cat: this.currentCost.cat,
+        sub_cat: this.currentCost.sub_cat,
+        mydesc: this.currentCost.mydesc,
+        suma: this.currentCost.suma,
+        km: this.currentCost.km,
+        litres: this.currentCost.litres,
+        price_val: this.currentCost.price_val,        
       };
       console.log(data);
       CostDataService.create(data)
         .then((response) => {
-          this.cost.id = response.data.id;
+          this.currentCost.id = response.data.id;
           console.log(response.data.data);
           this.result = response.data.data;
           this.submitted = true;
@@ -179,8 +203,11 @@ export default {
     },
     newCost() {
       this.submitted = false;
-      this.cost = {};
+      this.currentCost = {};
       // this.pullCats();
+    },
+    log(item) {
+      console.log(item);
     },
     // created() {
     //   this.pullCats();
@@ -191,7 +218,18 @@ export default {
     this.pullCats();
     this.pullAllSubCats();
   },
-};
+  computed: {
+    is_sub_cat_refuel () {
+      console.log('this.currentCost.sub_cat: ' + this.currentCost.sub_cat);
+      if (this.currentCost.sub_cat === 'Заправка') 
+      {console.log('is refuel!!!');
+        return true}
+      else 
+      {console.log('Not refuel!!!');
+        return false}
+    }
+  }
+}
 </script>
 
 <style>

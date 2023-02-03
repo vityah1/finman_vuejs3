@@ -1,160 +1,88 @@
 <template>
   <div class="container">
     <!-- Modal -->
-    <div
-      class="modal fade"
-      id="editModal"
-      tabindex="-1"
-      aria-labelledby="exampleModalLabel"
-      aria-hidden="true"
-    >
+    <div class="modal fade" id="editModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title text-danger" id="exampleModalLabel">
               Edit Form
             </h5>
-            <button
-              type="button"
-              class="btn-close"
-              data-bs-dismiss="modal"
-              aria-label="Close"
-            ></button>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
             <form v-if="currentCost">
               <div class="form-group">
-                <label for="cat">date</label>
-                <input
-                  type="date"
-                  class="form-control"
-                  id="rdate"
-                  v-model="currentCost.rdate"
-                />
+                <label for="rdate">Date:</label>
+                <input type="date" class="form-control" id="rdate" v-model="currentCost.rdate" />
               </div>
               <div class="form-group">
-                <label for="cat">Cat</label>
-                <select
-                  v-model="currentCost.cat"
-                  class="form-control"
-                  id="cat"
-                  name="cat"
-                  @change="selSubCats(currentCost.cat)"
-                >
-                  <option
-                    v-for="cat in catsOptions"
-                    :value="cat.name"
-                    :key="cat.id"
-                    :selected="cat.name === currentCost.cat"
-                  >
+                <label for="cat">Cat:</label>
+                <select v-model="currentCost.cat" class="form-control" id="cat" name="cat"
+                  @change="selSubCats(currentCost.cat, true)">
+                  <option v-for="cat in catsOptions" :value="cat.name" :key="cat.id"
+                    :selected="cat.name === currentCost.cat">
                     {{ cat.name }}
                   </option>
                 </select>
               </div>
 
               <div class="form-group">
-                <label for="cat">Sub Cat</label>
-                <select
-                  v-if="
-                    subcatsOptions.some((e) => e.name == currentCost.sub_cat) ||
-                    currentCost.sub_cat == ''
-                  "
-                  class="form-control"
-                  id="sub_cat"
-                  name="sub_cat"
-                  v-model="currentCost.sub_cat"
-                >
+                <label for="sub_cat">Sub Cat:</label>
+                <select v-if="
+                  subcatsOptions.some((e) => e.name == currentCost.sub_cat) ||
+                  currentCost.sub_cat == ''
+                " class="form-control" id="sub_cat" name="sub_cat" v-model="currentCost.sub_cat">
                   <option value=""></option>
-                  <option
-                    v-for="sub_cat in subcatsOptions"
-                    :value="sub_cat.name"
-                    :key="sub_cat.id"
-                    :selected="sub_cat.name === currentCost.sub_cat"
-                  >
+                  <option v-for="sub_cat in subcatsOptions" :value="sub_cat.name" :key="sub_cat.id"
+                    :selected="sub_cat.name === currentCost.sub_cat">
                     {{ sub_cat.name }}
                   </option>
                 </select>
 
-                <input
-                  :load="
-                    log(
-                      'input -> subcatsOptions.includes(currentCost.sub_cat): ' +
-                        Object.values(subcatsOptions).includes(
-                          currentCost.sub_cat
-                        ) +
-                        ', subcatsOptions.some(e=>e.id==currentCost.sub_cat):' +
-                        subcatsOptions.some(
-                          (e) => e.name == currentCost.sub_cat
-                        ) +
-                        ', subcatsOptions.map(a=>a.id).includes(currentCost.sub_cat):' +
-                        subcatsOptions
-                          .map((a) => a.name)
-                          .includes(currentCost.sub_cat) +
-                        ', subcatsOptions: ' +
-                        Object.values(subcatsOptions).toString() +
-                        ', currentCost.sub_cat: ' +
-                        currentCost.sub_cat +
-                        ', subcatsOptions.map((a)=>a.id):' +
-                        subcatsOptions.map((a) => a[a.name])
-                    )
-                  "
-                  v-if="
-                    !(
-                      subcatsOptions.some(
-                        (e) => e.name == currentCost.sub_cat
-                      ) || currentCost.sub_cat == ''
-                    )
-                  "
-                  type="text"
-                  class="form-control"
-                  id="sub_cat"
-                  v-model="currentCost.sub_cat"
-                />
+                <input v-if="
+                  !(
+                    subcatsOptions.some(
+                      (e) => e.name == currentCost.sub_cat
+                    ) || currentCost.sub_cat == ''
+                  )
+                " type="text" class="form-control" id="sub_cat" v-model="currentCost.sub_cat" />
               </div>
-              <div class="form-group">
-                <label for="mydesc">Description</label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="mydesc"
-                  v-model="currentCost.mydesc"
-                />
+
+              <div v-if="this.currentCost.sub_cat == 'Заправка'" class="form-group">
+                <label for="id_km">km:</label>
+                <input type="text" class="form-control" id="id_km" v-model="currentCost.km" />
+                <label for="id_litres">Litres:</label>
+                <input type="text" class="form-control" id="id_litres" v-model="currentCost.litres" />
+                <label for="id_price_val">Price (EUR):</label>
+                <input type="text" class="form-control" id="id_price_val" v-model="currentCost.price_val" />
+
+                <label for="id_name_station">Name station:</label>
+                <input type="text" class="form-control" id="id_name_station" v-model="currentCost.station" />
+
               </div>
+
+              <div v-if="this.currentCost.sub_cat != 'Заправка'" class="form-group">
+                <label for="mydesc">Description:</label>
+                <input type="text" class="form-control" id="mydesc" v-model="currentCost.mydesc" />
+              </div>              
 
               <div class="form-group">
                 <label><strong>Value:</strong></label>
-                <input
-                  type="text"
-                  class="form-control"
-                  id="suma"
-                  v-model="currentCost.suma"
-                />
+                <input type="text" class="form-control" id="suma" v-model="currentCost.suma" />
               </div>
             </form>
             <p></p>
-            <button
-              class="btn btn-danger mr-2"
-              @click="deleteCost"
-              data-bs-dismiss="modal"
-            >
+            <button class="btn btn-danger mr-2" @click="deleteCost" data-bs-dismiss="modal">
               Delete
             </button>
             &nbsp;&nbsp;
-            <button
-              type="submit"
-              class="btn btn-success"
-              @click="updateCost"
-              data-bs-dismiss="modal"
-            >
+            <button type="submit" class="btn btn-success" @click="updateCost" data-bs-dismiss="modal">
               Update
             </button>
           </div>
           <div class="modal-footer">
-            <button
-              type="button"
-              class="btn btn-warning"
-              data-bs-dismiss="modal"
-            >
+            <button type="button" class="btn btn-warning" data-bs-dismiss="modal">
               Close
             </button>
           </div>
@@ -164,30 +92,19 @@
 
     <div class="row">
       <div class="col-2">
-        <router-link
-          :to="{
-            name: 'catcosts',
-            query: { year: $route.query.year, month: $route.query.month, user: $route.query.user },
-          }"
-          ><font-awesome-icon icon="angle-double-left"
-        /></router-link>
+        <router-link :to="{
+          name: 'catcosts',
+          query: { year: $route.query.year, month: $route.query.month, user: $route.query.user },
+        }"><font-awesome-icon icon="angle-double-left" /></router-link>
       </div>
       <div class="col-10">
         <!-- <span v-if="this.$route.query.period"
         >[{{ this.$route.query.period }}]</span
       > -->
-        <span class="text-small" v-if="this.$route.query.cat"
-          >[{{ this.$route.query.cat }}]</span
-        >
-        <span v-if="this.$route.query.year"
-          >[{{ this.$route.query.year }}]</span
-        >
-        <span v-if="this.$route.query.month"
-          >[{{ this.$route.query.month }}]</span
-        >
-        <span v-if="this.$route.query.user"
-          >[{{ this.$route.query.user }}]</span
-        >        
+        <span class="text-small" v-if="this.$route.query.cat">[{{ this.$route.query.cat }}]</span>
+        <span v-if="this.$route.query.year">[{{ this.$route.query.year }}]</span>
+        <span v-if="this.$route.query.month">[{{ this.$route.query.month }}]</span>
+        <span v-if="this.$route.query.user">[{{ this.$route.query.user }}]</span>
       </div>
     </div>
     <p>{{ message }}</p>
@@ -205,13 +122,8 @@
       </thead>
 
       <tbody>
-        <tr
-          v-for="(cost, index) in costs"
-          :key="index"
-          data-bs-toggle="modal"
-          data-bs-target="#editModal"
-          @click="getCost(cost.id)"
-        >
+        <tr v-for="(cost, index) in costs" :key="index" data-bs-toggle="modal" data-bs-target="#editModal"
+          @click="getCost(cost.id)">
           <td>
             <span>
               {{ $moment(cost.rdate).format("DD.MMM") }}
@@ -275,19 +187,17 @@ export default {
           console.log(e);
         });
     },
-    selSubCats(cat) {
-      // var cat = this.cat.val();
+    selSubCats(cat, is_edit) {
       console.log("exec selSubCats");
-      // console.log('cat => ', cat);
-      // console.log('catsOptions => ', this.catsOptions);
       let selectedCat = this.catsOptions.find(obj => obj.name === cat);
-      // console.log('selectedCat => ', selectedCat);
-      // console.log('this.subAllcatsOptions => ', this.subAllcatsOptions);
-      this.subcatsOptions = this.subAllcatsOptions.filter(function(item) {
-  return item.id_cat === selectedCat.id;
-});
+      this.subcatsOptions = this.subAllcatsOptions.filter(function (item) {
+        return item.id_cat === selectedCat.id;
+      });
+      if (this.subcatsOptions && is_edit) {
+        this.currentCost.sub_cat = '';
+      }
       console.log('this.subcatsOptions => ', this.subcatsOptions);
-    },    
+    },
     async pullAllSubCats() {
       // var cat = this.cat.val();
       console.log("exec pullAllSubCats");
@@ -299,7 +209,7 @@ export default {
         .catch((e) => {
           console.log(e);
         });
-    },    
+    },
     async getCost(id) {
       CostDataService.get(id)
         .then((response) => {
@@ -308,6 +218,7 @@ export default {
           );
           this.currentCost = response.data[0];
           console.log(response.data);
+          this.selSubCats(this.currentCost.cat, false);
         })
         .catch((e) => {
           console.log(e);
@@ -328,6 +239,10 @@ export default {
                 mydesc: this.currentCost.mydesc,
                 rdate: this.currentCost.rdate,
                 suma: this.currentCost.suma,
+                km: this.currentCost.km,
+                litres: this.currentCost.litres,
+                price_val: this.currentCost.price_val,
+                station: this.currentCost.station,
               };
             }
           });
