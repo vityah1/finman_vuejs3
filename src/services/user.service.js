@@ -1,8 +1,9 @@
 import axios from 'axios';
 // import authHeader from './auth-header';
 
-const API_URL = 'http://localhost:5000/api/';
+// const API_URL = 'http://localhost:5000/api/';
 // const API_URL = 'https://kt.if.ua/finman_api/api/';
+const API_URL = 'https://site--main--b4xj54d6jsp4.code.run/api/'
 
 class UserService {
     getPublicContent() {
