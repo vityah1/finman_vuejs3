@@ -9,7 +9,7 @@ console.log('API_URL:' +  API_URL);
 class AuthService {
     login(user) {
         return axios
-            .post(API_URL + '/signin', {
+            .post(API_URL + '/auth/signin', {
                 username: user.username,
                 password: user.password
             })
@@ -27,7 +27,7 @@ class AuthService {
     }
 
     register(user) {
-        return axios.post(API_URL + '/signup', {
+        return axios.post(API_URL + '/auth/signup', {
             username: user.username,
             email: user.email,
             password: user.password

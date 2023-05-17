@@ -11,6 +11,16 @@ import { createWebHistory, createRouter } from "vue-router";
 
 const routes = [
     {
+        path: "/show_token",
+        name: "show_token",
+        component: () => import("./components/Mono")
+    }, 
+    {
+        path: "/set_token",
+        name: "set_token",
+        component: () => import("./components/Mono")
+    },    
+    {
         path: "/costs",
         // alias: "costs",
         name: "costs",

@@ -19,13 +19,43 @@
         <ul class="collapse navbar-collapse" id="navbarSupportedContent">
           <div class="navbar-nav me-auto mb-2 mb-lg-0">
             <!-- <li v-if="currentUser" class="nav-item"> -->
-            <router-link
+            
+              <ul v-if="currentUser" class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                id="navbarDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Mono
+              </a>
+              <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                <li class="dropdown-item">
+                  <router-link
+                    :to="{ name: 'show_token' }"
+                    class="nav-link clsMenu"
+                  >
+                    <font-awesome-icon icon="card" /> Show tokens
+                  </router-link>
+                </li>
+                <li class="dropdown-item">
+                  <router-link :to="{ name: 'set_token' }" class="nav-link clsMenu">
+                    <font-awesome-icon icon="card" /> Set token
+                  </router-link>
+                </li>
+              </div>
+            </ul>
+            
+              <router-link
               v-if="currentUser"
               :to="{ name: 'add' }"
               class="nav-item nav-link clsMenu"
             >
               Add</router-link
             >
+
             <!-- </li> -->
             <li v-if="currentUser" class="nav-item">
               <router-link :to="{ name: 'catcosts' }" class="nav-link clsMenu"
