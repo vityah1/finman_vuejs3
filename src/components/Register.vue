@@ -13,16 +13,30 @@
             <Field name="username" type="text" class="form-control" />
             <ErrorMessage name="username" class="error-feedback" />
           </div>
-          <div class="form-group">
-            <label for="email">Email</label>
-            <Field name="email" type="email" class="form-control" />
-            <ErrorMessage name="email" class="error-feedback" />
-          </div>
+
           <div class="form-group">
             <label for="password">Password</label>
             <Field name="password" type="password" class="form-control" />
             <ErrorMessage name="password" class="error-feedback" />
           </div>
+
+          <div class="form-group">
+          <label for="fullname">Full name</label>
+          <Field name="fullname" type="text" class="form-control" />
+          <ErrorMessage name="fullname" class="error-feedback" />
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone</label>
+          <Field name="phone" type="text" class="form-control" />
+          <ErrorMessage name="phone" class="error-feedback" />
+        </div>  
+
+        <div class="form-group">
+          <label for="email">Email</label>
+          <Field name="email" type="text" class="form-control" />
+          <ErrorMessage name="email" class="error-feedback" />
+        </div>  
 
           <div class="form-group">
             <button class="btn btn-primary btn-block" :disabled="loading">
@@ -75,6 +89,10 @@ export default {
         .required("Password is required!")
         .min(6, "Must be at least 6 characters!")
         .max(40, "Must be maximum 40 characters!"),
+      fullname: yup
+        .string(),
+      phone: yup
+        .string(),         
     });
 
     return {

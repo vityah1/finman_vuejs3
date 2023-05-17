@@ -4,16 +4,34 @@
       <h3>Mono</h3>
     </header> 
     <div>
-      this api server webhook: {{this_api_webhook}}
+      This api server webhook: <br><span class="">{{this_api_webhook}}</span>
       <hr>
-      current user webhook: 
-      <input type="text" v-model="webhook">
-      <input type="button" @click="save_webhook" value = "Set webhook">
+      Current user webhook: <br>
+      <input type="text" v-model="webhook" class="form-control mw-100"> 
+      <input type="button" @click="save_webhook" value = "Set webhook" class="btn btn-primary">
       <hr>
-      user info:
-      {{ JSON.stringify(jsonResponse, null, 2) }}
+      User info:
+      {{jsonResponse.name}}
+      <table class="table ">
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Card</th>
+        <th>Balance, UAH</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="item in filteredData" :key="item.id">
+        <td>{{ item.type }}</td>
+        <td>{{ item.maskedPan }}</td>
+        <td>{{ item.balance/100 }}</td>
+        <!-- <td>{{ item.currencyCode}}</td> -->
+      </tr>
+    </tbody>
+  </table>
+
     <br>
-    
+    <!-- {{ JSON.stringify(jsonResponse, null, 2) }} -->
     </div>
     {{ content }}
   </div>
@@ -30,12 +48,17 @@ export default {
       webhook: '',
       content: '',
       this_api_webhook: '',
+      filteredData: [],
     };
   },
   computed: {
     currentUser() {
       return this.$store.state.auth.user;
     },
+  //   filteredData() {
+  //   // Apply the condition to filter the data
+  //   return this.jsonResponse.accounts.filter(item => item.currencyCode == 980);
+  // }
   },  
   methods: {
     async save_webhook() {
@@ -61,6 +84,12 @@ export default {
         // console.log(this.jsonResponse);
         this.webhook = response.data.webHookUrl;
         this.this_api_webhook = response.data.this_api_webhook;
+        const accounts = this.jsonResponse.accounts;
+        console.log('accounts: ', accounts)
+        this.filteredData = accounts.filter(
+          item => item.currencyCode > 25 && (
+            item.type == 'black' || item.type == 'white'));
+
       },
       (error) => {
         this.content =

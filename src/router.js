@@ -16,9 +16,9 @@ const routes = [
         component: () => import("./components/Mono")
     }, 
     {
-        path: "/set_token",
-        name: "set_token",
-        component: () => import("./components/Mono")
+        path: "/mono_payments",
+        name: "mono_payments",
+        component: () => import("./components/MonoPayments")
     },    
     {
         path: "/costs",

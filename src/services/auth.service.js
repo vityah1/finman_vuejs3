@@ -29,10 +29,23 @@ class AuthService {
     register(user) {
         return axios.post(API_URL + '/auth/signup', {
             username: user.username,
+            password: user.password,
+            phone: user.phone,
             email: user.email,
-            password: user.password
+            fullname: user.fullname,
         });
     }
+
+    edit(user) {
+        console.log('user_id: ', user.user_id, 'user.fullname: ', user.fullname)
+        return axios.patch(API_URL + '/users/' + user.user_id, {
+            username: user.username,
+            password: user.password,
+            phone: user.phone,
+            email: user.email,
+            fullname: user.fullname,
+        });
+    }    
 }
 
 export default new AuthService();

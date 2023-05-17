@@ -41,8 +41,8 @@
                   </router-link>
                 </li>
                 <li class="dropdown-item">
-                  <router-link :to="{ name: 'set_token' }" class="nav-link clsMenu">
-                    <font-awesome-icon icon="card" /> Set token
+                  <router-link :to="{ name: 'mono_payments' }" class="nav-link clsMenu">
+                    <font-awesome-icon icon="card" /> Payments
                   </router-link>
                 </li>
               </div>
