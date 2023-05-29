@@ -11,54 +11,48 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form v-if="currentCost">
+            <form v-if="currentPayment">
               <div class="form-group">
                 <label for="rdate">Date:</label>
-                <input type="date" class="form-control" id="rdate" v-model="currentCost.rdate" />
+                <input type="date" class="form-control" id="rdate" v-model="currentPayment.rdate" />
               </div>
               <div class="form-group">
-                <label for="cat">Category:</label>
-                <select v-model="currentCost.parent_category_id" class="form-control" id="cat" name="cat"
-                  @change="selSubCats(currentCost.category_id)">
-                  <option v-for="category in catsOptions" :value="category.id" :key="category.id"
-                    :selected="(category.id === currentCost.category_id)">
-                    {{ category.name }}
-                  </option>
-                </select>
-              </div>
-
-              <div class="form-group">
-                <label for="sub_cat">Sub Cat:</label>
-                <select class="form-control" id="sub_cat" name="sub_cat" v-model="currentCost.category_id">
+                <label for="main_category">Category:</label>
+                <select class="form-control" ref="main_category" id="main_category" name="main_category"
+                  @change="change_category()">
                   <option value=""></option>
-                  <option v-for="sub_cat in subcatsOptions" :value="sub_cat.id" :key="sub_cat.id"
-                    :selected="(sub_cat.id === currentCost.category_id)">
-                    {{ sub_cat.name }}
-                  </option>
                 </select>
               </div>
 
-              <div v-if="this.currentCost.sub_cat == 'Заправка'" class="form-group">
+              <div class="form-group">
+                <label for="sub_category">Sub Cat:</label>
+                <select class="form-control" id="sub_category" ref="sub_category" name="sub_cat"
+                @change="change_category()">
+                  <option value=""></option>
+                </select>
+              </div>
+
+              <div v-if="this.currentPayment.sub_cat == 'Заправка'" class="form-group">
                 <label for="id_km">km:</label>
-                <input type="text" class="form-control" id="id_km" v-model="currentCost.km" />
+                <input type="text" class="form-control" id="id_km" v-model="currentPayment.km" />
                 <label for="id_litres">Litres:</label>
-                <input type="text" class="form-control" id="id_litres" v-model="currentCost.litres" />
+                <input type="text" class="form-control" id="id_litres" v-model="currentPayment.litres" />
                 <label for="id_price_val">Price (EUR):</label>
-                <input type="text" class="form-control" id="id_price_val" v-model="currentCost.price_val" />
+                <input type="text" class="form-control" id="id_price_val" v-model="currentPayment.price_val" />
 
                 <label for="id_name_station">Name station:</label>
-                <input type="text" class="form-control" id="id_name_station" v-model="currentCost.station" />
+                <input type="text" class="form-control" id="id_name_station" v-model="currentPayment.station" />
 
               </div>
 
-              <div v-if="this.currentCost.sub_cat != 'Заправка'" class="form-group">
+              <div v-if="this.currentPayment.sub_cat != 'Заправка'" class="form-group">
                 <label for="description">Description:</label>
-                <input type="text" class="form-control" id="description" v-model="currentCost.description" />
+                <input type="text" class="form-control" id="description" v-model="currentPayment.description" />
               </div>              
 
               <div class="form-group">
                 <label><strong>Value:</strong></label>
-                <input type="text" class="form-control" id="amount" v-model="currentCost.amount" />
+                <input type="text" class="form-control" id="amount" v-model="currentPayment.amount" />
               </div>
             </form>
             <p></p>
@@ -112,7 +106,7 @@
 
       <tbody>
         <tr v-for="(cost, index) in payments" :key="index" data-bs-toggle="modal" data-bs-target="#editModal"
-          @click="getCost(cost.id)">
+          @click="get_payment(cost.id)">
           <td>
             <span>
               {{ $moment(cost.rdate).format("DD.MMM") }}
@@ -135,11 +129,14 @@ export default {
   name: "payments-list",
   data() {
     return {
+      // main_category: null,
+      // sub_category: null,
       payments: [],
       q: this.$route.query.q || "",
       total: 0,
       total_cnt: 0,
-      currentCost: null,
+      currentPayment: null,
+      categories: [],
       catsOptions: [],
       subcatsOptions: [],
       subAllcatsOptions: [],
@@ -153,86 +150,102 @@ export default {
     },
   },
   methods: {
-    async pullCats() {
-      console.log("exec pullCats");
-      CostDataService.cats()
+    async get_categories(mode) {
+      console.log("exec categories");
+      CostDataService.categories(mode)
         .then((response) => {
-          this.catsOptions = response.data;
-          console.log(response.data);
+          this.categories = response.data;
+          this.subAllcatsOptions = response.data.find(obj => obj.parent_id != 0);
+          // console.log(response.data);
         })
         .catch((e) => {
           console.log(e);
         });
-    },
-    async pullSubCats(category_id) {
-      // var cat = this.cat.val();
-      console.log("exec pullSubCats");
-      CostDataService.subcats(category_id)
-        .then((response) => {
-          this.subcatsOptions = response.data;
-          console.log(response.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    selSubCats(category_id) {
+    }, 
+    change_category(category_id) {
       console.log(`Exec selSubCats, category_id: ${category_id}`);
-      // console.log(`this.catsOptions: ${JSON.stringify(this.catsOptions)}`);
-      let selectedCat = this.catsOptions.find(obj => obj.id === category_id);
-      console.log(`selectedCat: ${JSON.stringify(selectedCat)}`);
-      this.subcatsOptions = this.subAllcatsOptions.filter(function (item) {
-        return item.parent_id === selectedCat.id;
-      });
-      // if (this.subcatsOptions && is_edit) {
-      //   this.currentCost.sub_cat = '';
-      // }
-      console.log('this.subcatsOptions => ', JSON.stringify(this.subcatsOptions));
     },
-    async pullAllSubCats() {
-      // var cat = this.cat.val();
-      console.log("exec pullAllSubCats");
-      CostDataService.subcats()
-        .then((response) => {
-          this.subAllcatsOptions = response.data;
-          console.log(response.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    async getCost(id) {
+    async get_payment(id) {
       CostDataService.get(id)
         .then((response) => {
           response.data["rdate"] = moment(response.data["rdate"]).format(
             "YYYY-MM-DD"
-          );
-          this.currentCost = response.data;
+          );            
+          this.currentPayment = response.data;          
           console.log(response.data);
-          this.selSubCats(this.currentCost.category_id);
+          this.$nextTick(() => {
+          this.select_category();
+      });
         })
         .catch((e) => {
           console.log(e);
         });
+    },    
+    select_category() {
+      console.log(`Exec select_category`);
+      var parent_category_id = undefined
+      var category = this.categories.find(obj => obj.id === this.currentPayment.category_id);
+      console.log(`category: ${JSON.stringify(category)}`);
+      
+      if (category.parent_id == 0) {parent_category_id = category.id; }
+      else {parent_category_id = category.parent_id;}
+      console.log(`parent_category_id: ${JSON.stringify(parent_category_id)}`);   
+      
+      var options = this.categories.filter(obj => obj.parent_id == 0);
+      // console.log(`options: ${JSON.stringify(options)}`);
+
+      // var main_category = document.getElementById('main_category');
+      var main_category = this.$refs.main_category;
+      main_category.innerHTML = '';
+      // console.log(`main_category: ${JSON.stringify(main_category)}`);
+      for (let i = 0; i < options.length; i++) {
+        console.log(`option: ${options[i].name}`);
+        var option = document.createElement('option');
+        option.value = options[i].id;
+        option.text = options[i].name;
+        if (options[i].id == parent_category_id) {
+          option.selected = true;
+          console.log(`selected option: ${option.text}`);
+        }
+        main_category.appendChild(option);
+      }
+
+      var sub_options = this.categories.filter(obj => obj.parent_id != 0);
+      console.log(`sub_options: ${JSON.stringify(sub_options)}`);
+      // var sub_category = document.getElementById('sub_category');
+      var sub_category = this.$refs.sub_category;
+      sub_category.innerHTML = '';
+      console.log(`sub_category: ${JSON.stringify(sub_category)}`);
+      for (let i = 0; i < sub_options.length; i++) {
+        console.log(`sub_options[i].parent_id: ${sub_options[i].parent_id} == `);
+        console.log(`category.id: ${category.id}`)
+        if (sub_options[i].parent_id == category.id) {
+        var sub_option = document.createElement('option');
+        sub_option.value = sub_options[i].id;
+        sub_option.text = sub_options[i].name;
+        if (sub_options[i].id == this.currentPayment.category_id) {sub_option.selected = true;}
+        sub_category.appendChild(sub_option);
+        }
+      }
     },
     updateCost() {
-      CostDataService.update(this.currentCost.id, this.currentCost)
+      CostDataService.update(this.currentPayment.id, this.currentPayment)
         .then((response) => {
           console.log(response.data.data);
           this.message = response.data.data;
 
           this.payments.map((c, index) => {
-            if (c.id === this.currentCost.id) {
+            if (c.id === this.currentPayment.id) {
               this.payments[index] = {
-                id: this.currentCost.id,
-                category_id: this.currentCost.category_id,
-                description: this.currentCost.description,
-                rdate: this.currentCost.rdate,
-                amount: this.currentCost.amount,
-                km: this.currentCost.km,
-                litres: this.currentCost.litres,
-                price_val: this.currentCost.price_val,
-                station: this.currentCost.station,
+                id: this.currentPayment.id,
+                category_id: this.currentPayment.category_id,
+                description: this.currentPayment.description,
+                rdate: this.currentPayment.rdate,
+                amount: this.currentPayment.amount,
+                km: this.currentPayment.km,
+                litres: this.currentPayment.litres,
+                price_val: this.currentPayment.price_val,
+                station: this.currentPayment.station,
               };
             }
           });
@@ -246,9 +259,8 @@ export default {
         return l_cur_row[p_key] != p_value_to_remove;
       });
     },
-
     deleteCost() {
-      CostDataService.delete(this.currentCost.id)
+      CostDataService.delete(this.currentPayment.id)
         .then((response) => {
           console.log(response.data.data);
           this.message = response.data.data;
@@ -257,7 +269,7 @@ export default {
             .map(function (item) {
               return item.id;
             })
-            .indexOf(this.currentCost.id);
+            .indexOf(this.currentPayment.id);
 
           this.payments.splice(index, 1);
         })
@@ -303,7 +315,6 @@ export default {
           console.log(e);
         });
     },
-
     refreshList() {
       this.retrieveCosts();
     },
@@ -326,8 +337,7 @@ export default {
       this.$router.push({ name: "login" });
     }
     this.retrieveCosts();
-    this.pullCats();
-    this.pullAllSubCats();
+    this.get_categories();  
   },
 };
 </script>

@@ -26,8 +26,11 @@ class CostDataService {
         return https.get("/payments/period?year=" + year + "&month=" + month + "&user=" + user, { headers: authHeader()});
     }
 
-    cats() {
-        return https.get("/categories", { headers: authHeader()});
+    categories(mode) {
+        let categories_mode = ''
+        if (mode == 'main') {categories_mode = '/main';}
+        else if (mode == 'child') {categories_mode = '/child';}
+        return https.get("/categories" + categories_mode, { headers: authHeader()});
     }
 
     getYears() {
@@ -38,9 +41,9 @@ class CostDataService {
         return https.get("payments/years/" + year + '?user=' + user, { headers: authHeader()});
     }
 
-    subcats(category_id = '') {
-        return https.get("/categories/childs?category_id" + category_id, { headers: authHeader()});
-    }
+    // subcats(category_id = '') {
+    //     return https.get("/categories/childs?category_id" + category_id, { headers: authHeader()});
+    // }
 
     get(id) {
         return https.get(`/payments/${id}`, { headers: authHeader()});
