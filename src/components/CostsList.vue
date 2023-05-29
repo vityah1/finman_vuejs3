@@ -17,36 +17,25 @@
                 <input type="date" class="form-control" id="rdate" v-model="currentCost.rdate" />
               </div>
               <div class="form-group">
-                <label for="cat">Cat:</label>
-                <select v-model="currentCost.cat" class="form-control" id="cat" name="cat"
-                  @change="selSubCats(currentCost.cat, true)">
-                  <option v-for="cat in catsOptions" :value="cat.name" :key="cat.id"
-                    :selected="cat.name === currentCost.cat">
-                    {{ cat.name }}
+                <label for="cat">Category:</label>
+                <select v-model="currentCost.parent_category_id" class="form-control" id="cat" name="cat"
+                  @change="selSubCats(currentCost.category_id)">
+                  <option v-for="category in catsOptions" :value="category.id" :key="category.id"
+                    :selected="(category.id === currentCost.category_id)">
+                    {{ category.name }}
                   </option>
                 </select>
               </div>
 
               <div class="form-group">
                 <label for="sub_cat">Sub Cat:</label>
-                <select v-if="
-                  subcatsOptions.some((e) => e.name == currentCost.sub_cat) ||
-                  currentCost.sub_cat == ''
-                " class="form-control" id="sub_cat" name="sub_cat" v-model="currentCost.sub_cat">
+                <select class="form-control" id="sub_cat" name="sub_cat" v-model="currentCost.category_id">
                   <option value=""></option>
-                  <option v-for="sub_cat in subcatsOptions" :value="sub_cat.name" :key="sub_cat.id"
-                    :selected="sub_cat.name === currentCost.sub_cat">
+                  <option v-for="sub_cat in subcatsOptions" :value="sub_cat.id" :key="sub_cat.id"
+                    :selected="(sub_cat.id === currentCost.category_id)">
                     {{ sub_cat.name }}
                   </option>
                 </select>
-
-                <input v-if="
-                  !(
-                    subcatsOptions.some(
-                      (e) => e.name == currentCost.sub_cat
-                    ) || currentCost.sub_cat == ''
-                  )
-                " type="text" class="form-control" id="sub_cat" v-model="currentCost.sub_cat" />
               </div>
 
               <div v-if="this.currentCost.sub_cat == 'Заправка'" class="form-group">
@@ -63,13 +52,13 @@
               </div>
 
               <div v-if="this.currentCost.sub_cat != 'Заправка'" class="form-group">
-                <label for="mydesc">Description:</label>
-                <input type="text" class="form-control" id="mydesc" v-model="currentCost.mydesc" />
+                <label for="description">Description:</label>
+                <input type="text" class="form-control" id="description" v-model="currentCost.description" />
               </div>              
 
               <div class="form-group">
                 <label><strong>Value:</strong></label>
-                <input type="text" class="form-control" id="suma" v-model="currentCost.suma" />
+                <input type="text" class="form-control" id="amount" v-model="currentCost.amount" />
               </div>
             </form>
             <p></p>
@@ -93,7 +82,7 @@
     <div class="row">
       <div class="col-2">
         <router-link :to="{
-          name: 'catcosts',
+          name: 'payments_period',
           query: { year: $route.query.year, month: $route.query.month, user: $route.query.user },
         }"><font-awesome-icon icon="angle-double-left" /></router-link>
       </div>
@@ -115,14 +104,14 @@
     </div>
     <table class="table-sm table-hover">
       <thead>
-        <th @click="sortCosts(1)">Дата</th>
-        <th @click="sortCosts(2)">Розділ</th>
-        <th>Опис</th>
-        <th @click="sortCosts(3)">Сума</th>
+        <th @click="sortCosts(1)">Date</th>
+        <th @click="sortCosts(2)">Category</th>
+        <th>Descript</th>
+        <th @click="sortCosts(3)">Amount</th>
       </thead>
 
       <tbody>
-        <tr v-for="(cost, index) in costs" :key="index" data-bs-toggle="modal" data-bs-target="#editModal"
+        <tr v-for="(cost, index) in payments" :key="index" data-bs-toggle="modal" data-bs-target="#editModal"
           @click="getCost(cost.id)">
           <td>
             <span>
@@ -130,8 +119,8 @@
             </span>
           </td>
           <td>{{ cost.sub_cat }}</td>
-          <td>{{ cost.mydesc }}</td>
-          <td>{{ cost.suma.toLocaleString() }}</td>
+          <td>{{ cost.description }}</td>
+          <td>{{ cost.amount.toLocaleString() }}</td>
         </tr>
       </tbody>
     </table>
@@ -143,10 +132,10 @@ import CostDataService from "../services/CostDataService";
 import moment from "moment";
 
 export default {
-  name: "costs-list",
+  name: "payments-list",
   data() {
     return {
-      costs: [],
+      payments: [],
       q: this.$route.query.q || "",
       total: 0,
       total_cnt: 0,
@@ -175,10 +164,10 @@ export default {
           console.log(e);
         });
     },
-    async pullSubCats(cat) {
+    async pullSubCats(category_id) {
       // var cat = this.cat.val();
       console.log("exec pullSubCats");
-      CostDataService.subcats(cat)
+      CostDataService.subcats(category_id)
         .then((response) => {
           this.subcatsOptions = response.data;
           console.log(response.data);
@@ -187,16 +176,18 @@ export default {
           console.log(e);
         });
     },
-    selSubCats(cat, is_edit) {
-      console.log("exec selSubCats");
-      let selectedCat = this.catsOptions.find(obj => obj.name === cat);
+    selSubCats(category_id) {
+      console.log(`Exec selSubCats, category_id: ${category_id}`);
+      // console.log(`this.catsOptions: ${JSON.stringify(this.catsOptions)}`);
+      let selectedCat = this.catsOptions.find(obj => obj.id === category_id);
+      console.log(`selectedCat: ${JSON.stringify(selectedCat)}`);
       this.subcatsOptions = this.subAllcatsOptions.filter(function (item) {
-        return item.id_cat === selectedCat.id;
+        return item.parent_id === selectedCat.id;
       });
-      if (this.subcatsOptions && is_edit) {
-        this.currentCost.sub_cat = '';
-      }
-      console.log('this.subcatsOptions => ', this.subcatsOptions);
+      // if (this.subcatsOptions && is_edit) {
+      //   this.currentCost.sub_cat = '';
+      // }
+      console.log('this.subcatsOptions => ', JSON.stringify(this.subcatsOptions));
     },
     async pullAllSubCats() {
       // var cat = this.cat.val();
@@ -213,12 +204,12 @@ export default {
     async getCost(id) {
       CostDataService.get(id)
         .then((response) => {
-          response.data[0]["rdate"] = moment(response.data[0]["rdate"]).format(
+          response.data["rdate"] = moment(response.data["rdate"]).format(
             "YYYY-MM-DD"
           );
-          this.currentCost = response.data[0];
+          this.currentCost = response.data;
           console.log(response.data);
-          this.selSubCats(this.currentCost.cat, false);
+          this.selSubCats(this.currentCost.category_id);
         })
         .catch((e) => {
           console.log(e);
@@ -230,15 +221,14 @@ export default {
           console.log(response.data.data);
           this.message = response.data.data;
 
-          this.costs.map((c, index) => {
+          this.payments.map((c, index) => {
             if (c.id === this.currentCost.id) {
-              this.costs[index] = {
+              this.payments[index] = {
                 id: this.currentCost.id,
-                cat: this.currentCost.cat,
-                sub_cat: this.currentCost.sub_cat,
-                mydesc: this.currentCost.mydesc,
+                category_id: this.currentCost.category_id,
+                description: this.currentCost.description,
                 rdate: this.currentCost.rdate,
-                suma: this.currentCost.suma,
+                amount: this.currentCost.amount,
                 km: this.currentCost.km,
                 litres: this.currentCost.litres,
                 price_val: this.currentCost.price_val,
@@ -262,14 +252,14 @@ export default {
         .then((response) => {
           console.log(response.data.data);
           this.message = response.data.data;
-          // this.$router.push({ name: "costs" });
-          const index = this.costs
+          // this.$router.push({ name: "payments" });
+          const index = this.payments
             .map(function (item) {
               return item.id;
             })
             .indexOf(this.currentCost.id);
 
-          this.costs.splice(index, 1);
+          this.payments.splice(index, 1);
         })
         .catch((e) => {
           console.log(e);
@@ -282,26 +272,26 @@ export default {
       let sort = this.$route.query.sort || "";
       let year = this.$route.query.year || "";
       let month = this.$route.query.month || "";
-      let cat = this.$route.query.cat || "";
+      let category_id = this.$route.query.category_id || "";
       let q = this.$route.query.q || "";
       let user = this.$route.query.user || "";
-      console.log(q, year, month, cat, sort, user);
+      console.log(q, year, month, category_id, sort, user);
       CostDataService.showCost({
         sort: sort,
         year: year,
         month: month,
-        cat: cat,
+        category_id: category_id,
         q: q,
         user: user,
       })
         // CostDataService.getAll({sort:sort})
         .then((response) => {
-          this.costs = response.data;
+          this.payments = response.data;
           console.log(response.data);
           let total = 0;
           let total_cnt = 0;
-          this.costs.forEach((val) => {
-            total += Number(val.suma);
+          this.payments.forEach((val) => {
+            total += Number(val.amount);
             total_cnt += 1;
             //or if you pass float numbers , use parseFloat()
           });
@@ -323,21 +313,13 @@ export default {
     searchCost() {
       CostDataService.showCost({ q: this.q })
         .then((response) => {
-          this.costs = response.data;
+          this.payments = response.data;
           console.log(response.data);
         })
         .catch((e) => {
           console.log(e);
         });
     },
-  },
-  watch: {
-    // $route(to, from) {
-    //   // react to route changes...
-    //   if (to !== from) {
-    //     location.reload();
-    //   }
-    // },
   },
   mounted() {
     if (!this.currentUser) {

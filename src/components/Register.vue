@@ -9,9 +9,9 @@
       <Form @submit="handleRegister" :validation-schema="schema">
         <div v-if="!successful">
           <div class="form-group">
-            <label for="username">Username</label>
-            <Field name="username" type="text" class="form-control" />
-            <ErrorMessage name="username" class="error-feedback" />
+            <label for="login">Username</label>
+            <Field name="login" type="text" class="form-control" />
+            <ErrorMessage name="login" class="error-feedback" />
           </div>
 
           <div class="form-group">
@@ -74,7 +74,7 @@ export default {
   },
   data() {
     const schema = yup.object().shape({
-      username: yup
+      login: yup
         .string()
         .required("Username is required!")
         .min(3, "Must be at least 3 characters!")

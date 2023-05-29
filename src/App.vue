@@ -34,7 +34,7 @@
               <div class="dropdown-menu" aria-labelledby="navbarDropdown">
                 <li class="dropdown-item">
                   <router-link
-                    :to="{ name: 'show_token' }"
+                    :to="{ name: 'mono_user_token' }"
                     class="nav-link clsMenu"
                   >
                     <font-awesome-icon icon="card" /> Show tokens
@@ -50,7 +50,7 @@
             
               <router-link
               v-if="currentUser"
-              :to="{ name: 'add' }"
+              :to="{ name: 'payments_add' }"
               class="nav-item nav-link clsMenu"
             >
               Add</router-link
@@ -58,17 +58,17 @@
 
             <!-- </li> -->
             <li v-if="currentUser" class="nav-item">
-              <router-link :to="{ name: 'catcosts' }" class="nav-link clsMenu"
+              <router-link :to="{ name: 'payments_period' }" class="nav-link clsMenu"
                 >Поточні</router-link
               >
             </li>
             <li v-if="currentUser" class="nav-item">
-              <router-link :to="{ name: 'last' }" class="nav-link clsMenu"
+              <router-link :to="{ name: 'payments_last' }" class="nav-link clsMenu"
                 >Останні</router-link
               >
             </li>
             <li v-if="currentUser" class="nav-item">
-              <router-link :to="{ name: 'years' }" class="nav-link clsMenu"
+              <router-link :to="{ name: 'payments_years' }" class="nav-link clsMenu"
                 >Роки</router-link
               >
             </li>
@@ -108,7 +108,7 @@
             <li v-if="currentUser" class="nav-item">
               <router-link :to="{ name: 'profile' }" class="nav-link clsMenu">
                 <font-awesome-icon icon="user" />
-                {{ currentUser.username }}
+                {{ currentUser.login }}
               </router-link>
             </li>
             <li v-if="currentUser" class="nav-item">
@@ -189,9 +189,9 @@ export default {
       this.$router.push({ name: "login" });
     },
     AppFindCosts(q) {
-      // this.$router.push({ name: "costs", params: { q: q } });
-      this.$router.push({ name: "costs", query: { q: q } });
-      // this.$router.go({ path: '/costs', query: { q: q } });
+      // this.$router.push({ name: "payments", params: { q: q } });
+      this.$router.push({ name: "payments", query: { q: q } });
+      // this.$router.go({ path: '/payments', query: { q: q } });
     },
   },
   mounted() {

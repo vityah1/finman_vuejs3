@@ -13,23 +13,23 @@
       <div v-if="catsOptions" class="form-group">
         <label for="cat">Cat</label>
         <select
-          v-model="currentCost.cat"
+          v-model="currentCost.category_id"
           class="form-control"
           id="cat"
           name="cat"
-          @change="selSubCats(currentCost.cat)"
+          @change="selSubCats(currentCost.category_id)"
         >
           <option
             v-for="cat in catsOptions"
             :value="cat.name"
             :key="cat.id"
-            :selected="cat.name === currentCost.cat"
+            :selected="(cat.name === currentCost.category_id)"
           >
             {{ cat.name }}
             <!-- <span v-if="cat.sub_cat">[{{ cat.sub_cat }}]</span> -->
           </option>
         </select>
-        <h2>{{ currentCost.cat }}</h2>
+        <h2>{{ currentCost.category_id }}</h2>
       </div>
 
       <div class="form-group">
@@ -54,7 +54,7 @@
 
       <div 
       :load="log('currentCost.sub_cat: ' + currentCost.sub_cat + 
-      ', currentCost.cat: ' + currentCost.cat
+      ', currentCost.category_id: ' + currentCost.category_id
       )"
       v-if="is_sub_cat_refuel" class="form-group">
                 <label for="id_km">km:</label>
@@ -70,24 +70,24 @@
       <div 
       v-if="!is_sub_cat_refuel" class="form-group"
       >
-        <label for="mydesc">Desc</label>
+        <label for="description">Desc</label>
         <input
           class="form-control"
-          id="mydesc"
+          id="description"
           required
-          v-model="currentCost.mydesc"
-          name="mydesc"
+          v-model="currentCost.description"
+          name="description"
         />
       </div>
 
       <div class="form-group">
-        <label for="suma">Value</label>
+        <label for="amount">Value</label>
         <input
           class="form-control"
-          id="suma"
+          id="amount"
           required
-          v-model="currentCost.suma"
-          name="suma"
+          v-model="currentCost.amount"
+          name="amount"
         />
       </div>
       <p></p>
@@ -115,8 +115,8 @@ export default {
         rdate: moment(Date()).format("YYYY-MM-DD"),
         cat: "",
         sub_cat: "",
-        mydesc: "",
-        suma: 0,
+        description: "",
+        amount: 0,
         km: "",
         litres: "",
         price_val: "",
@@ -181,10 +181,10 @@ export default {
     async saveCost() {
       var data = {
         rdate: this.currentCost.rdate,
-        cat: this.currentCost.cat,
+        category_id: this.currentCost.category_id,
         sub_cat: this.currentCost.sub_cat,
-        mydesc: this.currentCost.mydesc,
-        suma: this.currentCost.suma,
+        description: this.currentCost.description,
+        amount: this.currentCost.amount,
         km: this.currentCost.km,
         litres: this.currentCost.litres,
         price_val: this.currentCost.price_val,        

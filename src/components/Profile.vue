@@ -2,7 +2,7 @@
   <div class="container">
     <header class="jumbotron">
       <h3>
-        <strong>{{ currentUser.username }}</strong> [{{ currentUser.user_id }}] Profile
+        <strong>{{ currentUser.login }}</strong> [{{ currentUser.user_id }}] Profile
       </h3>
     </header>
 
@@ -13,9 +13,9 @@
         </div>
 
         <div class="form-group">
-          <label for="username">Username</label>
-          <Field name="username" type="text" class="form-control" v-model="currentUser.username"/>
-          <ErrorMessage name="username" class="error-feedback" />
+          <label for="login">Username</label>
+          <Field name="login" type="text" class="form-control" v-model="currentUser.login"/>
+          <ErrorMessage name="login" class="error-feedback" />
         </div>
 
         <div class="form-group">
@@ -71,7 +71,7 @@ export default {
     const schema = yup.object().shape({
       user_id: yup
         .string(),
-      username: yup
+      login: yup
         .string()
         .required("Username is required!")
         .min(3, "Must be at least 3 characters!")

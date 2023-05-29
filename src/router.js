@@ -1,65 +1,56 @@
 import { createWebHistory, createRouter } from "vue-router";
 
-// import Login from "./components/Login.vue";
-// import Register from "./components/Register.vue";
-// lazy-loaded
-// const Profile = () => import("./components/Profile.vue")
-// const BoardAdmin = () => import("./components/BoardAdmin.vue")
-// const BoardModerator = () => import("./components/BoardModerator.vue")
-// const BoardUser = () => import("./components/BoardUser.vue")
-
 
 const routes = [
     {
-        path: "/show_token",
-        name: "show_token",
+        path: "/mono/users/token",
+        name: "mono_user_token",
         component: () => import("./components/Mono")
     }, 
     {
-        path: "/mono_payments",
+        path: "/mono/payments",
         name: "mono_payments",
         component: () => import("./components/MonoPayments")
     },    
     {
-        path: "/costs",
-        // alias: "costs",
-        name: "costs",
+        path: "/payments",
+        // alias: "payments",
+        name: "payments",
         component: () => import("./components/CostsList")
     }, {
-        path: "/last",
-        // alias: "costs",
-        name: "last",
+        path: "/payments/last",
+        // alias: "payments",
+        name: "payments_last",
         component: () => import("./components/CostsList?cat=last")
     },
     {
-        path: "/years",
+        path: "/payments/:id",
+        name: "payment",
+        component: () => import("./components/CostsList")
+    },    
+    {
+        path: "/payments/years",
         // alias: "years",
-        name: "years",
+        name: "payments_years",
         component: () => import("./components/YearsList")
     },
     {
-        path: "/month",
-        alias: "/months/:year",
-        name: "months",
+        path: "/payments/years/:year",
+        alias: "/payments/years/:year",
+        name: "payments_months",
         component: () => import("./components/MonthsList")
     },
     {
-        path: "/catcosts",
-        // alias: "/catcosts",
-        name: "catcosts",
+        path: "/payments/period",
+        // alias: "/catpayments",
+        name: "payments_period",
         component: () => import("./components/CatCostsList")
     },
     {
-        path: "/costs/:id",
-        name: "cost-detail",
-        component: () => import("./components/CostsList")
-    },
-    {
-        path: "/add",
-        name: "add",
+        path: "/payment/add",
+        name: "payments_add",
         component: () => import("./components/AddCost")
     },
-
     {
         path: "/about",
         name: "about",
@@ -85,24 +76,6 @@ const routes = [
         // lazy-loaded
         component: () => import("./components/Profile"),
     },
-    // {
-    //     path: "/admin",
-    //     name: "admin",
-    //     // lazy-loaded
-    //     component: BoardAdmin,
-    // },
-    // {
-    //     path: "/mod",
-    //     name: "moderator",
-    //     // lazy-loaded
-    //     component: BoardModerator,
-    // },
-    // {
-    //     path: "/user",
-    //     name: "user",
-    //     // lazy-loaded
-    //     component: BoardUser,
-    // },
 
 ];
 

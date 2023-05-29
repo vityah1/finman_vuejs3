@@ -52,11 +52,11 @@
     <div class="row" v-for="(month, index) in months" :key="index">
       <router-link
         class="col-4"
-        :to="{ name: 'catcosts', query: { year: year, month: month.month , user: user} }"
+        :to="{ name: 'payments_period', query: { year: year, month: month.month , user: user} }"
       >
         {{ month.month }}
       </router-link>
-      <div class="col-4">{{ month.suma.toLocaleString() }}</div>
+      <div class="col-4">{{ month.amount.toLocaleString() }}</div>
       <div class="col-4">{{ month.cnt }}</div>
     </div>
   </div>
@@ -89,7 +89,7 @@ export default {
           let total = 0;
           let total_cnt = 0;
           this.months.forEach((val) => {
-            total += Number(val.suma);
+            total += Number(val.amount);
             total_cnt += 1;
             //or if you pass float numbers , use parseFloat()
           });

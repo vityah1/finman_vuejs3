@@ -62,10 +62,10 @@
       class="row"
       v-for="(cat, index) in catcosts"
       :key="index"
-      :to="{ name: 'costs', query: { cat: cat.cat, year: year, month: month, user: user } }"
+      :to="{ name: 'payments', query: { category_id: cat.category_id, year: year, month: month, user: user } }"
     >
-      <div class="col-4">{{ cat.cat }}</div>
-      <div class="col-4">{{ cat.suma.toLocaleString() }}</div>
+      <div class="col-4">{{ cat.name }}</div>
+      <div class="col-4">{{ cat.amount.toLocaleString() }}</div>
       <div class="col-4">{{ cat.cnt }}</div>
     </router-link>
   </div>
@@ -107,7 +107,7 @@ export default {
           let total = 0;
           let total_cnt = 0;
           this.catcosts.forEach((val) => {
-            total += Number(val.suma);
+            total += Number(val.amount);
             total_cnt += Number(val.cnt);
             //or if you pass float numbers , use parseFloat()
           });
