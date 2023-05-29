@@ -9,11 +9,11 @@
     <div class="row" v-for="(year, index) in years" :key="index">
       <router-link
         class="col-2"
-        :to="{ name: 'months', params: { year: year.year } }"
+        :to="{ name: 'payments_months', params: { year: year.year } }"
       >
         {{ year.year }}
       </router-link>
-      <div class="col-4">{{ year.suma.toLocaleString() }}</div>
+      <div class="col-4">{{ year.amount.toLocaleString() }}</div>
       <div class="col-3">{{ year.cnt }}</div>
     </div>
   </div>

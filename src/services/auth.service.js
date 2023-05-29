@@ -10,7 +10,7 @@ class AuthService {
     login(user) {
         return axios
             .post(API_URL + '/auth/signin', {
-                username: user.username,
+                login: user.login,
                 password: user.password
             })
             .then(response => {
@@ -28,7 +28,7 @@ class AuthService {
 
     register(user) {
         return axios.post(API_URL + '/auth/signup', {
-            username: user.username,
+            login: user.login,
             password: user.password,
             phone: user.phone,
             email: user.email,
@@ -39,7 +39,7 @@ class AuthService {
     edit(user) {
         console.log('user_id: ', user.user_id, 'user.fullname: ', user.fullname)
         return axios.patch(API_URL + '/users/' + user.user_id, {
-            username: user.username,
+            login: user.login,
             password: user.password,
             phone: user.phone,
             email: user.email,

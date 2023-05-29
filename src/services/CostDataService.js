@@ -16,54 +16,54 @@ class CostDataService {
         return https.get('/about');
     }
 
-    getAll({ sort, period, cat } = {}) {
+    getAll({ sort, period, category_id } = {}) {
         if (sort == '') { sort = 1; }
-        return https.get("/costs?sort=" + sort + "&period=" + period + "&cat=" + cat, { headers: authHeader() });
+        return https.get("/payments?sort=" + sort + "&period=" + period + "&category_id=" + category_id, { headers: authHeader()});
     }
 
     getCatCosts({ year = '', month = '', user = '' } = {}) {
         console.log(`getCatCosts => year: ${year}, month: ${month}, user: ${user}`)
-        return https.get("/catcosts?year=" + year + "&month=" + month + "&user=" + user, { headers: authHeader() });
+        return https.get("/payments/period?year=" + year + "&month=" + month + "&user=" + user, { headers: authHeader()});
     }
 
     cats() {
-        return https.get("/cats");
+        return https.get("/categories", { headers: authHeader()});
     }
 
     getYears() {
-        return https.get("/years", { headers: authHeader() });
+        return https.get("/payments/years", { headers: authHeader()});
     }
 
     getMonths(year, user) {
-        return https.get("/months/" + year + '?user=' + user, { headers: authHeader() });
+        return https.get("payments/years/" + year + '?user=' + user, { headers: authHeader()});
     }
 
-    subcats(cat = '') {
-        return https.get("/subcats?cat=" + cat);
+    subcats(category_id = '') {
+        return https.get("/categories/childs?category_id" + category_id, { headers: authHeader()});
     }
 
     get(id) {
-        return https.get(`/costs/${id}`, { headers: authHeader() });
+        return https.get(`/payments/${id}`, { headers: authHeader()});
     }
 
     create(data) {
-        return https.post("/costs", data, { headers: authHeader() });
+        return https.post("/payments", data, { headers: authHeader()});
     }
 
     update(id, data) {
-        return https.put(`/costs/${id}`, data, { headers: authHeader() });
+        return https.put(`/payments/${id}`, data, { headers: authHeader()});
     }
 
     delete(id) {
-        return https.delete(`/costs/${id}`, { headers: authHeader() });
+        return https.delete(`/payments/${id}`, { headers: authHeader()});
     }
 
     // deleteAll() {
-    //     return https.delete(`/costs`);
+    //     return https.delete(`/payments`);
     // }
 
-    showCost({ q = '', sort = 3, cat = '', year = '', month = '', user = '' } = {}) {
-        return https.get(`/costs?q=${q}&sort=${sort}&cat=${cat}&year=${year}&month=${month}&user=${user}`, { headers: authHeader() });
+    showCost({ q = '', sort = 3, category_id = '', year = '', month = '', user = '' } = {}) {
+        return https.get(`/payments?q=${q}&sort=${sort}&category_id=${category_id}&year=${year}&month=${month}&user=${user}`, { headers: authHeader()});
     }
 }
 
