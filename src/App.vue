@@ -45,6 +45,11 @@
                     <font-awesome-icon icon="card" /> Payments
                   </router-link>
                 </li>
+                <li class="dropdown-item">
+                  <router-link :to="{ name: 'mono_users' }" class="nav-link clsMenu">
+                    <font-awesome-icon icon="card" /> Mono users
+                  </router-link>
+                </li>                
               </div>
             </ul>
             
@@ -72,6 +77,15 @@
                 >Роки</router-link
               >
             </li>
+
+            <router-link
+              v-if="currentUser"
+              :to="{ name: 'config' }"
+              class="nav-item nav-link clsMenu"
+            >
+              Settings</router-link
+            >
+
             <li class="nav-item">
               <router-link :to="{ name: 'about' }" class="nav-link clsMenu">
                 <font-awesome-icon icon="home" />Про

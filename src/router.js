@@ -3,6 +3,11 @@ import { createWebHistory, createRouter } from "vue-router";
 
 const routes = [
     {
+        path: "/config",
+        name: "config",
+        component: () => import("./components/Config")
+    },    
+    {
         path: "/mono/users/token",
         name: "mono_user_token",
         component: () => import("./components/Mono")
@@ -11,45 +16,50 @@ const routes = [
         path: "/mono/payments",
         name: "mono_payments",
         component: () => import("./components/MonoPayments")
-    },    
+    }, 
+    {
+        path: "/mono/users",
+        name: "mono_users",
+        component: () => import("./components/MonoUsers")
+    },        
     {
         path: "/payments",
         // alias: "payments",
         name: "payments",
-        component: () => import("./components/CostsList")
+        component: () => import("./components/Payments")
     }, {
         path: "/payments/last",
         // alias: "payments",
         name: "payments_last",
-        component: () => import("./components/CostsList?cat=last")
+        component: () => import("./components/Payments?category_name=last")
     },
     {
         path: "/payments/:id",
         name: "payment",
-        component: () => import("./components/CostsList")
+        component: () => import("./components/Payments")
     },    
     {
         path: "/payments/years",
         // alias: "years",
         name: "payments_years",
-        component: () => import("./components/YearsList")
+        component: () => import("./components/PaymentsYears")
     },
     {
         path: "/payments/years/:year",
         alias: "/payments/years/:year",
         name: "payments_months",
-        component: () => import("./components/MonthsList")
+        component: () => import("./components/PaymentsByYear")
     },
     {
         path: "/payments/period",
         // alias: "/catpayments",
         name: "payments_period",
-        component: () => import("./components/CatCostsList")
+        component: () => import("./components/PaymentPeriod")
     },
     {
         path: "/payment/add",
         name: "payments_add",
-        component: () => import("./components/AddCost")
+        component: () => import("./components/AddPayment")
     },
     {
         path: "/about",

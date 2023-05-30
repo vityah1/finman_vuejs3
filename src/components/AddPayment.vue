@@ -102,7 +102,7 @@
 </template>
 
 <script>
-import CostDataService from "../services/CostDataService";
+import PaymentService from "../services/PaymentService";
 import moment from "moment";
 // import Select2 from "vue3-select2-component";
 
@@ -132,7 +132,7 @@ export default {
   methods: {
     async pullCats() {
       console.log("exec pullCats");
-      CostDataService.cats()
+      PaymentService.cats()
         .then((response) => {
           this.catsOptions = response.data;
           console.log(response.data);
@@ -144,7 +144,7 @@ export default {
     async pullAllSubCats() {
       // var cat = this.cat.val();
       console.log("exec pullAllSubCats");
-      CostDataService.subcats()
+      PaymentService.subcats()
         .then((response) => {
           this.subAllcatsOptions = response.data;
           console.log(response.data);
@@ -156,7 +156,7 @@ export default {
     async pullSubCats(cat) {
       // var cat = this.cat.val();
       console.log("exec pullSubCats");
-      CostDataService.subcats(cat)
+      PaymentService.subcats(cat)
         .then((response) => {
           this.subcatsOptions = response.data;
           console.log(response.data);
@@ -190,7 +190,7 @@ export default {
         price_val: this.currentCost.price_val,        
       };
       console.log(data);
-      CostDataService.create(data)
+      PaymentService.addPayment(data)
         .then((response) => {
           this.currentCost.id = response.data.id;
           console.log(response.data.data);

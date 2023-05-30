@@ -42,7 +42,7 @@
           <button
             class="btn btn-outline-secondary"
             type="button"
-            @click="retrieveCatCosts(year, month, user)"
+            @click="getPaymentsPeriod(year, month, user)"
           >
             Ok
           </button>
@@ -51,8 +51,6 @@
     </div>
   </div>
   <div class="container">
-    <!-- <h4>Cat Costs List [{{ year }}-{{ month }}]</h4> -->
-    <!-- <ul class="list-group"> -->
     <div class="row">
       <div class="col-4 h4 text-success">Всього:</div>
       <div class="col-4 h4 text-danger">{{ total.toLocaleString() }}</div>
@@ -72,7 +70,7 @@
 </template>
 
 <script>
-import CostDataService from "../services/CostDataService";
+import PaymentService from "../services/PaymentService";
 // import moment from "moment";
 
 export default {
@@ -94,13 +92,8 @@ export default {
     };
   },
   methods: {
-    retrieveCatCosts(year, month, user) {
-      // year=this.year
-      // month=this.month
-      console.log(
-        `retrieveCatCosts => year: ${this.year}, month: ${this.month}, user: ${this.user}`
-      );
-      CostDataService.getCatCosts({ year: year, month: month, user: user })
+    getPaymentsPeriod(year, month, user) {
+      PaymentService.getPaymentsPeriod({ year: year, month: month, user: user })
         .then((response) => {
           this.catcosts = response.data;
           console.log(response.data);
@@ -119,37 +112,27 @@ export default {
           console.log(e);
         });
     },
-    getCat(cat) {
-      CostDataService.getAll({ cat: cat })
-        .then((response) => {
-          this.catcosts = response.data;
-          console.log(response.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },
-    retrieveYears() {
-      CostDataService.getYears()
+    getPaymentsYears() {
+      PaymentService.getPaymentsYears()
         .then((response) => {
           let filteredYears = response.data.filter(obj => obj.year > 1900);
           this.years = filteredYears.map(obj => obj.year);
-          console.log(`retrieveYears => years => ${this.years}`);
+          console.log(`getPaymentsYears => years => ${this.years}`);
         })
         .catch((e) => {
           console.log(e);
         });
     },    
     refreshList() {
-      this.retrieveCatCosts();
+      this.getPaymentsPeriod();
     },
   },
   mounted() {
     let year = this.$route.query.year || new Date().getFullYear();
     let month = this.$route.query.month || new Date().getMonth() + 1;
     let user = this.$route.query.user || 'all';
-    this.retrieveYears();
-    this.retrieveCatCosts(year, month, user);
+    this.getPaymentsYears();
+    this.getPaymentsPeriod(year, month, user);
   },
 };
 </script>

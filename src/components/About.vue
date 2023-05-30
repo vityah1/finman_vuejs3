@@ -9,7 +9,7 @@
 </template>
 
 <script>
-import CostDataService from "../services/CostDataService";
+import PaymentService from "../services/PaymentService";
 
 export default {
   name: "About",
@@ -19,7 +19,7 @@ export default {
     };
   },
   mounted() {
-    CostDataService.getAbout().then(
+    PaymentService.getAbout().then(
       (response) => {
         this.htmlContent = response.data.data;
         console.log(this.htmlContent);

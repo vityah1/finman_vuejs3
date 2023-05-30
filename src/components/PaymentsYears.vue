@@ -20,7 +20,7 @@
 </template>
 
 <script>
-import CostDataService from "../services/CostDataService";
+import PaymentService from "../services/PaymentService";
 // import moment from "moment";
 
 export default {
@@ -32,8 +32,7 @@ export default {
   },
   methods: {
     retrieveYears() {
-      CostDataService.getYears()
-        // CostDataService.getAll({sort:sort})
+      PaymentService.getPaymentsYears()
         .then((response) => {
           this.years = response.data;
           console.log(response.data);

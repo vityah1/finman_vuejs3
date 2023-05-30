@@ -19,7 +19,7 @@
               <div class="form-group">
                 <label for="main_category">Category:</label>
                 <select class="form-control" ref="main_category" id="main_category" name="main_category"
-                  @change="change_category()">
+                  @change="change_category($event.target.value)">
                   <option value=""></option>
                 </select>
               </div>
@@ -27,40 +27,39 @@
               <div class="form-group">
                 <label for="sub_category">Sub Cat:</label>
                 <select class="form-control" id="sub_category" ref="sub_category" name="sub_cat"
-                @change="change_category()">
+                @change="change_category($event.target.value)">
                   <option value=""></option>
                 </select>
               </div>
 
-              <div v-if="this.currentPayment.sub_cat == 'Заправка'" class="form-group">
+              <div v-if="isFuel" class="form-group">
                 <label for="id_km">km:</label>
-                <input type="text" class="form-control" id="id_km" v-model="currentPayment.km" />
+                <input type="text" class="form-control" id="id_km" v-model="currentPayment.refuel_data.km" />
                 <label for="id_litres">Litres:</label>
-                <input type="text" class="form-control" id="id_litres" v-model="currentPayment.litres" />
+                <input type="text" class="form-control" id="id_litres" v-model="currentPayment.refuel_data.litres" />
                 <label for="id_price_val">Price (EUR):</label>
-                <input type="text" class="form-control" id="id_price_val" v-model="currentPayment.price_val" />
-
+                <input type="text" class="form-control" id="id_price_val" v-model="currentPayment.refuel_data.price_val" />
                 <label for="id_name_station">Name station:</label>
-                <input type="text" class="form-control" id="id_name_station" v-model="currentPayment.station" />
+                <input type="text" class="form-control" id="id_name_station" v-model="currentPayment.refuel_data.station_name" />
 
               </div>
 
-              <div v-if="this.currentPayment.sub_cat != 'Заправка'" class="form-group">
+              <div v-if="!isFuel" class="form-group">
                 <label for="description">Description:</label>
                 <input type="text" class="form-control" id="description" v-model="currentPayment.description" />
               </div>              
 
               <div class="form-group">
-                <label><strong>Value:</strong></label>
+                <label><strong>Amount:</strong></label>
                 <input type="text" class="form-control" id="amount" v-model="currentPayment.amount" />
               </div>
             </form>
             <p></p>
-            <button class="btn btn-danger mr-2" @click="deleteCost" data-bs-dismiss="modal">
+            <button class="btn btn-danger mr-2" @click="deletePayment" data-bs-dismiss="modal">
               Delete
             </button>
             &nbsp;&nbsp;
-            <button type="submit" class="btn btn-success" @click="updateCost" data-bs-dismiss="modal">
+            <button type="submit" class="btn btn-success" @click="updatePayment" data-bs-dismiss="modal">
               Update
             </button>
           </div>
@@ -81,9 +80,6 @@
         }"><font-awesome-icon icon="angle-double-left" /></router-link>
       </div>
       <div class="col-10">
-        <!-- <span v-if="this.$route.query.period"
-        >[{{ this.$route.query.period }}]</span
-      > -->
         <span class="text-small" v-if="this.$route.query.cat">[{{ this.$route.query.cat }}]</span>
         <span v-if="this.$route.query.year">[{{ this.$route.query.year }}]</span>
         <span v-if="this.$route.query.month">[{{ this.$route.query.month }}]</span>
@@ -92,29 +88,29 @@
     </div>
     <p>{{ message }}</p>
     <div class="row">
-      <div class="col-2 h4 text-success">Всього:</div>
-      <div class="col-2 h4 text-danger">{{ total.toLocaleString() }} грн</div>
+      <div class="col-2 h4 text-success">Total:</div>
+      <div class="col-2 h4 text-danger">{{ total.toLocaleString() }} UAH</div>
       <div class="col-2">{{ total_cnt }}</div>
     </div>
     <table class="table-sm table-hover">
       <thead>
-        <th @click="sortCosts(1)">Date</th>
-        <th @click="sortCosts(2)">Category</th>
+        <th @click="sortPayments(1)">Date</th>
+        <th @click="sortPayments(2)">Category</th>
         <th>Descript</th>
-        <th @click="sortCosts(3)">Amount</th>
+        <th @click="sortPayments(3)">Amount</th>
       </thead>
 
       <tbody>
-        <tr v-for="(cost, index) in payments" :key="index" data-bs-toggle="modal" data-bs-target="#editModal"
-          @click="get_payment(cost.id)">
+        <tr v-for="(payment, index) in payments" :key="index" data-bs-toggle="modal" data-bs-target="#editModal"
+          @click="get_payment(payment.id)">
           <td>
             <span>
-              {{ $moment(cost.rdate).format("DD.MMM") }}
+              {{ $moment(payment.rdate).format("DD.MMM") }}
             </span>
           </td>
-          <td>{{ cost.sub_cat }}</td>
-          <td>{{ cost.description }}</td>
-          <td>{{ cost.amount.toLocaleString() }}</td>
+          <td>{{ payment.category_name }}</td>
+          <td>{{ payment.description }}</td>
+          <td>{{ payment.amount.toLocaleString() }}</td>
         </tr>
       </tbody>
     </table>
@@ -122,51 +118,91 @@
 </template>
 
 <script>
-import CostDataService from "../services/CostDataService";
+import PaymentService from "../services/PaymentService";
 import moment from "moment";
 
 export default {
   name: "payments-list",
   data() {
     return {
-      // main_category: null,
-      // sub_category: null,
       payments: [],
       q: this.$route.query.q || "",
       total: 0,
       total_cnt: 0,
-      currentPayment: null,
+      currentPayment: {},
+      category: {name: ''},
       categories: [],
-      catsOptions: [],
-      subcatsOptions: [],
-      subAllcatsOptions: [],
       message: "",
-      user: this.$route.query.user || 'all',
+      user: this.$route.query.user,
     };
   },
   computed: {
+    isFuel() {
+      return this.category.name == 'Заправка';
+    },
     currentUser() {
       return this.$store.state.auth.user;
     },
   },
+  watch: {
+    'category.name': function(newName, oldName) {
+      // Викликається при зміні category.name
+      console.log('Змінено category.name:', newName, oldName);
+    },
+  },
   methods: {
-    async get_categories(mode) {
-      console.log("exec categories");
-      CostDataService.categories(mode)
+    async getCategories(mode) {
+      PaymentService.categories(mode)
         .then((response) => {
           this.categories = response.data;
-          this.subAllcatsOptions = response.data.find(obj => obj.parent_id != 0);
-          // console.log(response.data);
         })
         .catch((e) => {
           console.log(e);
         });
     }, 
     change_category(category_id) {
-      console.log(`Exec selSubCats, category_id: ${category_id}`);
+      this.currentPayment.category_id = category_id;
+      this.$nextTick(() => {
+          this.set_category();
+      });
+    },    
+    set_category() {
+      var parent_category_id = undefined
+      this.category = this.categories.find(obj => obj.id == this.currentPayment.category_id);
+      
+      if (this.category.parent_id == 0) {parent_category_id = this.category.id;}
+      else {parent_category_id = this.category.parent_id;}  
+      
+      var options = this.categories.filter(obj => obj.parent_id == 0);
+      // console.log(`options: ${JSON.stringify(options)}`);
+
+      var main_category = this.$refs.main_category;
+      main_category.innerHTML = '';
+
+      for (let i = 0; i < options.length; i++) {
+        var option = document.createElement('option');
+        option.value = options[i].id;
+        option.text = options[i].name;
+        if (options[i].id == parent_category_id) {option.selected = true;}
+        main_category.appendChild(option);
+      }
+
+      var sub_options = this.categories.filter(obj => obj.parent_id != 0);
+      var sub_category = this.$refs.sub_category;
+      sub_category.innerHTML = '<option></option>';
+
+      for (let i = 0; i < sub_options.length; i++) {
+        if (sub_options[i].parent_id == parent_category_id) {
+          var sub_option = document.createElement('option');
+          sub_option.value = sub_options[i].id;
+          sub_option.text = sub_options[i].name;
+          if (sub_options[i].id == this.category.id) {sub_option.selected = true;}
+          sub_category.appendChild(sub_option);
+        }
+      }
     },
     async get_payment(id) {
-      CostDataService.get(id)
+      PaymentService.getPayment(id)
         .then((response) => {
           response.data["rdate"] = moment(response.data["rdate"]).format(
             "YYYY-MM-DD"
@@ -174,78 +210,26 @@ export default {
           this.currentPayment = response.data;          
           console.log(response.data);
           this.$nextTick(() => {
-          this.select_category();
+          this.set_category();
       });
         })
         .catch((e) => {
           console.log(e);
         });
-    },    
-    select_category() {
-      console.log(`Exec select_category`);
-      var parent_category_id = undefined
-      var category = this.categories.find(obj => obj.id === this.currentPayment.category_id);
-      console.log(`category: ${JSON.stringify(category)}`);
-      
-      if (category.parent_id == 0) {parent_category_id = category.id; }
-      else {parent_category_id = category.parent_id;}
-      console.log(`parent_category_id: ${JSON.stringify(parent_category_id)}`);   
-      
-      var options = this.categories.filter(obj => obj.parent_id == 0);
-      // console.log(`options: ${JSON.stringify(options)}`);
-
-      // var main_category = document.getElementById('main_category');
-      var main_category = this.$refs.main_category;
-      main_category.innerHTML = '';
-      // console.log(`main_category: ${JSON.stringify(main_category)}`);
-      for (let i = 0; i < options.length; i++) {
-        console.log(`option: ${options[i].name}`);
-        var option = document.createElement('option');
-        option.value = options[i].id;
-        option.text = options[i].name;
-        if (options[i].id == parent_category_id) {
-          option.selected = true;
-          console.log(`selected option: ${option.text}`);
-        }
-        main_category.appendChild(option);
-      }
-
-      var sub_options = this.categories.filter(obj => obj.parent_id != 0);
-      console.log(`sub_options: ${JSON.stringify(sub_options)}`);
-      // var sub_category = document.getElementById('sub_category');
-      var sub_category = this.$refs.sub_category;
-      sub_category.innerHTML = '';
-      console.log(`sub_category: ${JSON.stringify(sub_category)}`);
-      for (let i = 0; i < sub_options.length; i++) {
-        console.log(`sub_options[i].parent_id: ${sub_options[i].parent_id} == `);
-        console.log(`category.id: ${category.id}`)
-        if (sub_options[i].parent_id == category.id) {
-        var sub_option = document.createElement('option');
-        sub_option.value = sub_options[i].id;
-        sub_option.text = sub_options[i].name;
-        if (sub_options[i].id == this.currentPayment.category_id) {sub_option.selected = true;}
-        sub_category.appendChild(sub_option);
-        }
-      }
     },
-    updateCost() {
-      CostDataService.update(this.currentPayment.id, this.currentPayment)
+    async updatePayment() {
+      PaymentService.updatePayment(this.currentPayment.id, this.currentPayment)
         .then((response) => {
-          console.log(response.data.data);
-          this.message = response.data.data;
-
+          this.currentPayment = response.data;
           this.payments.map((c, index) => {
-            if (c.id === this.currentPayment.id) {
+            if (c.id == this.currentPayment.id) {
               this.payments[index] = {
                 id: this.currentPayment.id,
                 category_id: this.currentPayment.category_id,
+                category_name: this.currentPayment.category_name,
                 description: this.currentPayment.description,
                 rdate: this.currentPayment.rdate,
                 amount: this.currentPayment.amount,
-                km: this.currentPayment.km,
-                litres: this.currentPayment.litres,
-                price_val: this.currentPayment.price_val,
-                station: this.currentPayment.station,
               };
             }
           });
@@ -259,8 +243,8 @@ export default {
         return l_cur_row[p_key] != p_value_to_remove;
       });
     },
-    deleteCost() {
-      CostDataService.delete(this.currentPayment.id)
+    deletePayment() {
+      PaymentService.deletePayment(this.currentPayment.id)
         .then((response) => {
           console.log(response.data.data);
           this.message = response.data.data;
@@ -280,7 +264,7 @@ export default {
     log(item) {
       console.log(item);
     },
-    retrieveCosts() {
+    getPayments() {
       let sort = this.$route.query.sort || "";
       let year = this.$route.query.year || "";
       let month = this.$route.query.month || "";
@@ -288,7 +272,7 @@ export default {
       let q = this.$route.query.q || "";
       let user = this.$route.query.user || "";
       console.log(q, year, month, category_id, sort, user);
-      CostDataService.showCost({
+      PaymentService.getPayments({
         sort: sort,
         year: year,
         month: month,
@@ -296,7 +280,6 @@ export default {
         q: q,
         user: user,
       })
-        // CostDataService.getAll({sort:sort})
         .then((response) => {
           this.payments = response.data;
           console.log(response.data);
@@ -316,13 +299,13 @@ export default {
         });
     },
     refreshList() {
-      this.retrieveCosts();
+      this.getPayments();
     },
-    sortCosts(sort_table) {
+    sortPayments(sort_table) {
       console.log(sort_table);
     },
-    searchCost() {
-      CostDataService.showCost({ q: this.q })
+    searchPayments() {
+      PaymentService.getPayments({ q: this.q })
         .then((response) => {
           this.payments = response.data;
           console.log(response.data);
@@ -336,8 +319,8 @@ export default {
     if (!this.currentUser) {
       this.$router.push({ name: "login" });
     }
-    this.retrieveCosts();
-    this.get_categories();  
+    this.getPayments();
+    this.getCategories();  
   },
 };
 </script>

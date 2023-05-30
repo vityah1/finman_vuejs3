@@ -63,7 +63,7 @@
 </template>
 
 <script>
-import CostDataService from "../services/CostDataService";
+import PaymentService from "../services/PaymentService";
 // import moment from "moment";
 
 export default {
@@ -81,8 +81,7 @@ export default {
   },
   methods: {
     retrieveMonths(year, user) {
-      CostDataService.getMonths(year, user)
-        // CostDataService.getAll({sort:sort})
+      PaymentService.getPaymentsByYear(year, user)
         .then((response) => {
           this.months = response.data;
           console.log(response.data);
