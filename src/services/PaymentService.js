@@ -22,8 +22,8 @@ class PaymentService {
         return https.get("/payments/years", { headers: authHeader()});
     }
 
-    getPaymentsByYear(year, user) {
-        return https.get("/payments/years/" + year + '?user=' + user, { headers: authHeader()});
+    getPaymentsByYear(year) {
+        return https.get("/payments/years/" + year , { headers: authHeader()});
     }
 
     getPayment(id) {

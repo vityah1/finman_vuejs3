@@ -27,7 +27,7 @@
 import Mono from "../services/Mono";
 
 export default {
-  name: "Mono",
+  name: "MonoPayments",
   data() {
     return {
       HTMLResponse: '',

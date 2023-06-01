@@ -1,21 +1,37 @@
 <template>
   <div class="container">
-    <div class="row bg-info">
-      <div class="col-2">Рік</div>
-      <div class="col-4">Сума</div>
-      <div class="col-3">К-сть</div>
-    </div>
-
-    <div class="row" v-for="(year, index) in years" :key="index">
-      <router-link
-        class="col-2"
+    <b-table-simple hover small caption-top responsive>
+      <caption>Table Head</caption>
+      <colgroup>
+    <col />
+    <col />
+    <col />
+  </colgroup>      
+      <b-thead head-variant="dark">
+    <b-tr>
+      <b-th>Year</b-th>
+      <b-th>Amount</b-th>
+      <b-th>Count</b-th>
+    </b-tr>
+  </b-thead>
+  <b-tbody v-if="(years.length > 0)">
+    <b-tr v-for="(year, index) in years" :key="index">
+      <b-td>
+      <router-link 
+        v-if="year.year" 
+        class="col-2" 
         :to="{ name: 'payments_months', params: { year: year.year } }"
-      >
+        >
         {{ year.year }}
       </router-link>
-      <div class="col-4">{{ year.amount.toLocaleString() }}</div>
-      <div class="col-3">{{ year.cnt }}</div>
-    </div>
+    </b-td>
+      <b-td>{{ year.amount.toLocaleString() }}</b-td>
+      <b-td>{{ year.cnt }}</b-td>
+  </b-tr>
+</b-tbody>
+  <b-tfoot><b-tr><b-td colspan="3"></b-td></b-tr>Table footer</b-tfoot>
+  </b-table-simple>
+  <div v-if="(years.length == 0)">Data loading...</div>
   </div>
 </template>
 
@@ -24,14 +40,14 @@ import PaymentService from "../services/PaymentService";
 // import moment from "moment";
 
 export default {
-  name: "years-list",
+  name: "PaymentsYear",
   data() {
     return {
       years: [],
     };
   },
   methods: {
-    retrieveYears() {
+    async retrieveYears() {
       PaymentService.getPaymentsYears()
         .then((response) => {
           this.years = response.data;
@@ -47,11 +63,3 @@ export default {
   },
 };
 </script>
-
-<style>
-.list {
-  text-align: left;
-  max-width: 750px;
-  margin: auto;
-}
-</style>

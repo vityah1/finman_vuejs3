@@ -12,54 +12,69 @@
             v-model="year"
             id="year"
             name="year"
-            @change="retrieveMonths(year, user)"
+            @change="retrieveMonths(year)"
           >
             <option v-for="(y, index) in years" :value="y" :key="index">
               {{ y }}
             </option>
           </select>
           &nbsp;
-          <select
+          <!-- <select
           class="form-control"
           placeholder="user"
           v-model="user"
           id="user"
           name="user"
-          @change="retrieveMonths(year, user)"
+          @change="retrieveMonths(year)"
         >
           <option v-for="(u, index) in users" :value="u" :key="index">
             {{ u }}
           </option>
-        </select>
+        </select> -->
 
         </div>
       </div>
     </div>
 
     <div class="row">
-      <div class="col-1 text-small">грн</div>
+      <div class="col-1 text-small">UAH</div>
       <div class="col-4 h4 text-danger">
         {{ total.toLocaleString() }}
       </div>
       <div class="col-4">{{ total_cnt }}</div>
     </div>
-    <div class="row bg-info">
-      <div class="col-4">Місяць</div>
-      <div class="col-4">Сума</div>
-      <div class="col-4">К-сть</div>
-    </div>
-
-    <div class="row" v-for="(month, index) in months" :key="index">
+    <b-table-simple hover small caption-top responsive>
+      <caption>Table Head</caption>
+      <colgroup>
+    <col />
+    <col />
+    <col />
+  </colgroup>      
+      <b-thead head-variant="dark">
+    <b-tr>
+      <b-th>Month</b-th>
+      <b-th>Amount</b-th>
+      <b-th>Count</b-th>
+    </b-tr>
+    </b-thead>
+    <b-tbody v-if="(months.length > 0)">
+    <b-tr v-for="(month, index) in months" :key="index">
+      <b-td>
       <router-link
         class="col-4"
-        :to="{ name: 'payments_period', query: { year: year, month: month.month , user: user} }"
+        :to="{ name: 'payments_period', query: { year: year, month: month.month} }"
       >
         {{ month.month }}
       </router-link>
-      <div class="col-4">{{ month.amount.toLocaleString() }}</div>
-      <div class="col-4">{{ month.cnt }}</div>
-    </div>
-  </div>
+    </b-td>
+  <b-td>{{ month.amount.toLocaleString() }}</b-td>
+<b-td>{{ month.cnt }}</b-td>
+  </b-tr>
+    </b-tbody>
+    <b-tfoot><b-tr><b-td collspan="3"></b-td></b-tr></b-tfoot>
+    </b-table-simple>
+    <div v-if="(months.length == 0)">Data loading...</div>
+</div>
 </template>
 
 <script>
@@ -67,21 +82,20 @@ import PaymentService from "../services/PaymentService";
 // import moment from "moment";
 
 export default {
-  name: "months-list",
+  name: "PaymentsByYear",
   data() {
     return {
       months: [],
       year: this.$route.params.year,
       total: 0,
       total_cnt: 0,
-      years: Array.from({ length: 9 }, (x, i) => i + 2014),
-      user: this.$route.query.user || 'all',
-      users: ['all', 'vik', 'tanya']      
+      years: Array.from({ length: 10 }, (x, i) => i + 2014),
+      users: []      
     };
   },
   methods: {
-    retrieveMonths(year, user) {
-      PaymentService.getPaymentsByYear(year, user)
+    async retrieveMonths(year) {
+      PaymentService.getPaymentsByYear(year)
         .then((response) => {
           this.months = response.data;
           console.log(response.data);
@@ -102,7 +116,7 @@ export default {
     },
   },
   mounted() {
-    this.retrieveMonths(this.$route.params.year, this.$route.params.user);
+    this.retrieveMonths(this.$route.params.year);
   },
 };
 </script>

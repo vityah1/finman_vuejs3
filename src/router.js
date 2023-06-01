@@ -3,14 +3,19 @@ import { createWebHistory, createRouter } from "vue-router";
 
 const routes = [
     {
+        path: "/",
+        name: "home",
+        component: () => import("./components/AboutPage")
+    },      
+    {
         path: "/config",
         name: "config",
-        component: () => import("./components/Config")
+        component: () => import("./components/ConfigUser")
     },    
     {
-        path: "/mono/users/token",
+        path: "/mono/user/token",
         name: "mono_user_token",
-        component: () => import("./components/Mono")
+        component: () => import("./components/MonoSettings")
     }, 
     {
         path: "/mono/payments",
@@ -26,27 +31,25 @@ const routes = [
         path: "/payments",
         // alias: "payments",
         name: "payments",
-        component: () => import("./components/Payments")
+        component: () => import("./components/PaymentsDetail")
     }, {
         path: "/payments/last",
         // alias: "payments",
         name: "payments_last",
-        component: () => import("./components/Payments?category_name=last")
+        component: () => import("./components/PaymentsDetail?category_name=last")
     },
     {
         path: "/payments/:id",
         name: "payment",
-        component: () => import("./components/Payments")
+        component: () => import("./components/PaymentsDetail")
     },    
     {
         path: "/payments/years",
-        // alias: "years",
         name: "payments_years",
         component: () => import("./components/PaymentsYears")
     },
     {
         path: "/payments/years/:year",
-        alias: "/payments/years/:year",
         name: "payments_months",
         component: () => import("./components/PaymentsByYear")
     },
@@ -65,26 +68,26 @@ const routes = [
         path: "/about",
         name: "about",
         // lazy-loaded
-        component: () => import("./components/About"),
+        component: () => import("./components/AboutPage"),
     },
 
     {
         path: "/login",
         name: "login",
         // component: Login,
-        component: () => import("./components/Login"),
+        component: () => import("./components/UserLogin"),
     },
     {
         path: "/register",
         name: "register",
         // component: Register,
-        component: () => import("./components/Register"),
+        component: () => import("./components/UserRegister"),
     },
     {
         path: "/profile",
         name: "profile",
         // lazy-loaded
-        component: () => import("./components/Profile"),
+        component: () => import("./components/UserProfile"),
     },
 
 ];

@@ -1,18 +1,8 @@
-<template>
-  <div class="container">
-    <header class="jumbotron">
-      <h3>About</h3>
-    </header>
-    <div v-html="htmlContent"></div>
-    {{ content }}
-  </div>
-</template>
-
 <script>
-import PaymentService from "../services/PaymentService";
+import PaymentService from "../services/PaymentService"
 
 export default {
-  name: "About",
+  name: "AboutPage",
   data() {
     return {
       htmlContent: "",
@@ -36,3 +26,13 @@ export default {
   },
 };
 </script>
+
+<template>
+  <div class="container">
+    <header class="jumbotron">
+      <h3>About</h3>
+    </header>
+    <div v-html="htmlContent"></div>
+    {{ content }}
+  </div>
+</template>

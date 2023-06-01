@@ -1,89 +1,78 @@
 <template>
   <div class="container">
+    <alert-component ref="myAlert"></alert-component>
     <!-- Modal -->
-    <b-modal v-model="showModal" title="Modal form">
-          <div class="modal-header">
-            <h5 class="modal-title text-danger" id="ModalLabel">
-              Edit MonoUser [{{this.currentMonoUser.id}}]
-            </h5>
-            <!-- <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button> -->
-            <button type="button" class="btn-close" @click="showModal = false" aria-label="Close"></button>
+    <b-modal v-model="showModal" @ok="updateMonoUser()" title="Modal form" :okTitle="okTitle">
+      <template #modal-header>
+        <h5 class="modal-title text-danger">
+          Edit MonoUser [{{ this.currentMonoUser.id }}]
+        </h5>
+      </template>
+      <template #default>
+        <b-form v-if="currentMonoUser">
+          <div class="form-group">
+            <label>{{ currentMonoUser.name }}</label>
           </div>
-          <div class="modal-body">
-            <form v-if="currentMonoUser">
-              <div class="form-group">
-                <label>{{currentMonoUser.name}}</label>
-              </div>             
 
 
-              <div class="form-group">
-                <label><strong>Name:</strong></label>
-                <input type="text" class="form-control" id="amount" v-model="currentMonoUser.name" />
-              </div>
-
-              <div class="form-group">
-                <label><strong>Token:</strong></label>
-                <input type="text" class="form-control" id="amount" v-model="currentMonoUser.token" />
-              </div>
-
-            </form>
-            <p></p>
-           
+          <div class="form-group">
+            <label><strong>Name:</strong></label>
+            <input type="text" class="form-control" id="amount" v-model="currentMonoUser.name" />
           </div>
-          <div class="modal-footer">
-            <button class="btn btn-danger mr-2" @click="deleteMonoUser" data-bs-dismiss="modal">
-              Delete
-            </button>
-            &nbsp;&nbsp;
-            <button v-if="currentMonoUser.action=='edit'" class="btn btn-success" @click="updateMonoUser" data-bs-dismiss="modal">
-              Update
-            </button>
-            <button v-else type="submit" class="btn btn-success" @click="add_mono_user_action" data-bs-dismiss="modal">
-              Add
-            </button> 
+
+          <div class="form-group">
+            <label><strong>Token:</strong></label>
+            <input type="text" class="form-control" id="amount" v-model="currentMonoUser.token" />
           </div>
-      </b-modal>
+
+        </b-form>
+        <div>
+          <p></p>
+          <b-button variant="danger" @click="deleteMonoUser">
+            Delete
+          </b-button>
+        </div>
+      </template>
+    </b-modal>
+
     <div class="row">
-      <div class="col-4"><button class="btn btn-primary" @click="add_mono_user_form()"> Add Mono user </button></div>
-      <!-- <div class="col"></div> -->
+      <div class="col-4">
+        <b-button variant="primary" @click="add_mono_user_form()"> Add Mono user</b-button>
+      </div>
     </div>
-    <div class="row">
-      <div class="col-2 h4 text-success"><p>{{ message }}</p></div>
+
+    <div v-if="mono_users" class="row">
+      <div class="col-12">
+        <b-table-simple hover small caption-top responsive>
+          <caption>Mono users</caption>
+          <b-thead>
+            <b-th>Name</b-th>
+            <b-th>Token</b-th>
+          </b-thead>
+
+          <b-tbody>
+            <b-tr v-for="(mono_user, index) in mono_users" :key="index" @click="get_mono_user(mono_user.id)">
+              <b-td>{{ mono_user.name }}</b-td>
+              <b-td>{{ mono_user.token }}</b-td>
+
+            </b-tr>
+          </b-tbody>
+        </b-table-simple>
+      </div>
     </div>
-    <table class="table-sm table-hover">
-      <thead>
-        <th>Name</th>
-        <th>Token</th>
-      </thead>
-
-      <tbody>
-        <tr v-for="(mono_user, index) in mono_users" :key="index" data-bs-toggle="modal" data-bs-target="#editModal"
-          @click="get_mono_user(mono_user.id)">
-          <td>{{ mono_user.name }}</td>
-          <td>{{ mono_user.token }}</td>
-
-        </tr>
-      </tbody>
-    </table>
   </div>
 </template>
 
 <script>
-// import { Modal } from 'bootstrap-vue';
-import { BModal } from 'bootstrap-vue'
 import MonoUsersService from "../services/MonoUsersService";
-// _ = Modal;
 export default {
-  components: {
-    BModal
-  },  
-  name: "mono_users",
+  name: "MonoUsers",
   data() {
     return {
+      okTitle: "",
       showModal: false,
       mono_users: [],
       currentMonoUser: {},
-      message: "",
       user: this.$route.query.user,
     };
   },
@@ -94,27 +83,20 @@ export default {
   },
   methods: {
     async add_mono_user_form() {
+      this.okTitle = 'Add';
       this.currentMonoUser.token = '';
       this.currentMonoUser.name = name;
       this.currentMonoUser.action = 'add';
       this.showModal = true;
+      console.log('this.currentMonoUser.action:', this.currentMonoUser.action)
     },
-    async add_mono_user_action() {
-      MonoUsersService.addMonoUser(this.currentMonoUser)
+    async get_mono_user(id) {
+      this.okTitle = 'Edit';
+      MonoUsersService.getMonoUser(id)
         .then((response) => {
           this.currentMonoUser = response.data;
-          this.mono_users.push(this.currentMonoUser.name);
-          this.showModal = false;
-        })
-        .catch((e) => {
-          console.log(e);
-        });
-    },       
-    async get_mono_user(id) {
-      MonoUsersService.getMonoUser(id)
-        .then((response) => {          
-          this.currentMonoUser = response.data;          
-          console.log(response.data);
+          this.currentMonoUser.action = 'edit';
+          console.log(response.data, this.currentMonoUser.action);
           this.showModal = true;
         })
         .catch((e) => {
@@ -122,29 +104,47 @@ export default {
         });
     },
     async updateMonoUser() {
-      MonoUsersService.updateMonoUser(this.currentMonoUser.id, this.currentMonoUser)
-        .then((response) => {
-          this.currentMonoUser = response.data;
-          this.mono_users.map((c, index) => {
-            if (c.id == this.currentMonoUser.id) {
-              this.mono_users[index] = {
-                id: this.currentMonoUser.id,
-                token: this.currentMonoUser.token,
-                name: this.currentMonoUser.name,
-              };
-            }
+      console.log('@ok="updateMonoUser"', this.currentMonoUser.action)
+      if (this.currentMonoUser.action == 'edit') {
+        MonoUsersService.updateMonoUser(this.currentMonoUser.id, this.currentMonoUser)
+          .then((response) => {
+            this.currentMonoUser = response.data;
+            this.mono_users.map((c, index) => {
+              if (c.id == this.currentMonoUser.id) {
+                this.mono_users[index] = {
+                  id: this.currentMonoUser.id,
+                  token: this.currentMonoUser.token,
+                  name: this.currentMonoUser.name,
+                };
+              }
+            });
+            this.showModal = false;
+            this.$refs.myAlert.showAlert('success', 'User updated');
+          })
+          .catch((e) => {
+            console.log(e);
+            this.$refs.myAlert.showAlert('danger', 'User update failed');
           });
-          this.showModal = false;
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      }
+      else if
+        (this.currentMonoUser.action == 'add') {
+        MonoUsersService.addMonoUser(this.currentMonoUser)
+          .then((response) => {
+            this.currentMonoUser = response.data;
+            this.mono_users.push(this.currentMonoUser);
+            this.showModal = false;
+            this.$refs.myAlert.showAlert('success', 'User added');
+          })
+          .catch((e) => {
+            console.log(e);
+            this.$refs.myAlert.showAlert('danger', 'Add user failed');
+          });
+      }
     },
     async deleteMonoUser() {
       MonoUsersService.deleteMonoUser(this.currentMonoUser.id)
         .then((response) => {
           console.log(response.data.data);
-          this.message = response.data.data;
           const index = this.mono_users
             .map(function (item) {
               return item.id;
@@ -152,9 +152,12 @@ export default {
             .indexOf(this.currentMonoUser.id);
 
           this.mono_users.splice(index, 1);
+          this.showModal = false;
+          this.$refs.myAlert.showAlert('success', 'User deleted');
         })
         .catch((e) => {
           console.log(e);
+          this.$refs.myAlert.showAlert('danger', 'User delete failed');
         });
     },
     async getMonoUsers() {

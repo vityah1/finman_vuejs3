@@ -23,3 +23,5 @@ pnpm-debug.log*
 *.sw?
 package-lock.json
 package.json.bak
+*.bak
+3.1.0

@@ -26,7 +26,7 @@
           </option>
         </select>
 &nbsp;
-        <select
+        <!-- <select
           class="form-control"
           placeholder="user"
           v-model="user"
@@ -36,13 +36,13 @@
           <option v-for="(u, index) in users" :value="u" :key="index">
             {{ u }}
           </option>
-        </select>
+        </select> -->
 &nbsp;
         <div class="input-group-append">
           <button
             class="btn btn-outline-secondary"
             type="button"
-            @click="getPaymentsPeriod(year, month, user)"
+            @click="getPaymentsPeriod(year, month)"
           >
             Ok
           </button>
@@ -51,21 +51,37 @@
     </div>
   </div>
   <div class="container">
-    <div class="row">
-      <div class="col-4 h4 text-success">Всього:</div>
-      <div class="col-4 h4 text-danger">{{ total.toLocaleString() }}</div>
-      <div class="col-4">{{ total_cnt }}</div>
-    </div>
-    <router-link
-      class="row"
+    <b-table-simple hover small caption-top responsive>
+      <caption>Table Head</caption>
+      <colgroup>
+    <col />
+    <col />
+    <col />
+  </colgroup>      
+      <b-thead head-variant="dark">
+    <b-tr>
+      <b-th>Total:</b-th>
+      <b-th>{{ total.toLocaleString() }}</b-th>
+      <b-th>{{ total_cnt }}</b-th>
+    </b-tr>
+    </b-thead>
+    <b-tbody>
+      <b-tr
       v-for="(cat, index) in catcosts"
-      :key="index"
-      :to="{ name: 'payments', query: { category_id: cat.category_id, year: year, month: month, user: user } }"
-    >
-      <div class="col-4">{{ cat.name }}</div>
-      <div class="col-4">{{ cat.amount.toLocaleString() }}</div>
-      <div class="col-4">{{ cat.cnt }}</div>
-    </router-link>
+      :key="index">
+      <b-td>
+        <router-link 
+      :to="{ name: 'payments', query: { category_id: cat.category_id, year: year, month: month} }"
+      >
+        {{ cat.name }}
+      </router-link>
+      </b-td>
+      <b-td>{{ cat.amount.toLocaleString() }}</b-td>
+      <b-td>{{ cat.cnt }}</b-td>
+    
+  </b-tr>
+  </b-tbody>
+  </b-table-simple>
   </div>
 </template>
 
@@ -74,7 +90,7 @@ import PaymentService from "../services/PaymentService";
 // import moment from "moment";
 
 export default {
-  name: "cat-costs-list",
+  name: "PaymentPeriod",
   data() {
     return {
       catcosts: [],
@@ -87,13 +103,12 @@ export default {
       months: Array.from({ length: 12 }, (x, i) => i + 1),
       total: 0,
       total_cnt: 0,
-      user: this.$route.query.user || 'all',
-      users: ['all', 'vik', 'tanya']
+      users: []
     };
   },
   methods: {
-    getPaymentsPeriod(year, month, user) {
-      PaymentService.getPaymentsPeriod({ year: year, month: month, user: user })
+    async getPaymentsPeriod(year, month) {
+      PaymentService.getPaymentsPeriod({ year: year, month: month })
         .then((response) => {
           this.catcosts = response.data;
           console.log(response.data);
@@ -112,7 +127,7 @@ export default {
           console.log(e);
         });
     },
-    getPaymentsYears() {
+    async getPaymentsYears() {
       PaymentService.getPaymentsYears()
         .then((response) => {
           let filteredYears = response.data.filter(obj => obj.year > 1900);
@@ -123,16 +138,12 @@ export default {
           console.log(e);
         });
     },    
-    refreshList() {
-      this.getPaymentsPeriod();
-    },
   },
   mounted() {
     let year = this.$route.query.year || new Date().getFullYear();
     let month = this.$route.query.month || new Date().getMonth() + 1;
-    let user = this.$route.query.user || 'all';
     this.getPaymentsYears();
-    this.getPaymentsPeriod(year, month, user);
+    this.getPaymentsPeriod(year, month);
   },
 };
 </script>

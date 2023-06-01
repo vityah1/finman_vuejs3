@@ -1,15 +1,6 @@
-module.exports = {
-    devServer: {
-        port: 8081
-    }, configureWebpack: {
-        devtool: 'source-map'
-    }
-    // , publicPath: '/finman'
-    ,
-    // publicPath: process.env.NODE_ENV === 'production'
-    //     ? '/finman/'
-    //     : '/',
-    publicPath: '/finman/',
-    // assetsPublicPath: '/finman/',
-    productionSourceMap: false
-}
+const { defineConfig } = require('@vue/cli-service')
+module.exports = defineConfig({
+  transpileDependencies: true,
+  publicPath: '/finman/',
+  productionSourceMap: false  
+})

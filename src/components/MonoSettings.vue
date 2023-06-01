@@ -41,7 +41,7 @@
 import Mono from "../services/Mono";
 
 export default {
-  name: "Mono",
+  name: "MonoSettings",
   data() {
     return {
       jsonResponse: {},

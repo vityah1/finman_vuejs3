@@ -60,7 +60,7 @@ import { Form, Field, ErrorMessage } from "vee-validate";
 import * as yup from "yup";
 
 export default {
-  name: "Profile",
+  name: "UserProfile",
   components: {
     Form,
     Field,
