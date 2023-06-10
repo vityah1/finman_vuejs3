@@ -3,13 +3,13 @@ import authHeader from './auth-header';
 
 class Mono {
 
-    getWebhook(username) {
-        return https.get('/mono/webhook/' + username, { headers: authHeader() });
+    GetMonoUsersInfo(user_id) {
+        return https.get('/users/' + user_id + '/mono/info/', { headers: authHeader() });
     }
 
 
     setWebhook(data) {
-        return https.put("/mono/webhook", data, { headers: authHeader() });
+        return https.put("/mono/users/" + data.mono_user_id + "/webhook", data, { headers: authHeader() });
     }
 
     getPayments(data) {

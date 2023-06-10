@@ -3,7 +3,7 @@
     <alert-component ref="myAlert"></alert-component>
     <!-- Modal -->
     <b-modal v-if="currentConfig.name" v-model="showModal" 
-    @ok="updateConfig(currentConfig.name, currentConfig.is_need_add_value)" 
+    @ok="updateConfig()" 
     :title="okTitle" 
     :okTitle="okTitle"
     >
@@ -65,7 +65,7 @@
           <b-td class="text-start col-7">{{ config.value_data }}</b-td>
           <b-td class="text-start col-4">
             <span v-if="(config.is_need_add_value)"
-          > -> [{{ config.add_value }}]
+          > <span v-if="config.add_value">-> [{{ config.add_value }}]</span>
         </span>
         </b-td>
         </b-tr>
@@ -138,17 +138,11 @@ export default {
           console.log(e);
         });
     },
-    async updateConfig(name, is_need_add_value) {
+    async updateConfig() {
       ConfigService.updateConfig(this.currentConfig.id, this.currentConfig)
         .then((response) => {
-          this.currentConfig = response.data;
-          this.currentConfig.name = name;
-          this.currentConfig.is_need_add_value = is_need_add_value;          
-          this.configs.map((c, index) => {
-            if (c.id == this.currentConfig.id) {
-              this.configs[index] =  this.currentConfig;
-            }
-          });
+          console.log(`user config: ${response}`)
+          this.getUserConfig()
           this.$refs.myAlert.showAlert('success', 'config updated');
         })
         .catch((e) => {

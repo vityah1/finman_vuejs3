@@ -20,7 +20,12 @@ class ConfigService {
     }
 
     updateConfig(id, data) {
+        if (id === undefined) {
+            return https.post(`/users/config`, data, { headers: authHeader()});   
+        }
+        else {
         return https.patch(`/config/${id}`, data, { headers: authHeader()});
+        }
     }
 
     deleteConfig(id) {
