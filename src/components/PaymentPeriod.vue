@@ -140,10 +140,12 @@ export default {
     },    
   },
   mounted() {
-    let year = this.$route.query.year || new Date().getFullYear();
-    let month = this.$route.query.month || new Date().getMonth() + 1;
+    let data = {
+      year: this.$route.query.year || new Date().getFullYear(),
+      month: this.$route.query.month || new Date().getMonth() + 1
+    };
     this.getPaymentsYears();
-    this.getPaymentsPeriod(year, month);
+    this.getPaymentsPeriod(data);
   },
 };
 </script>

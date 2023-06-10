@@ -7,8 +7,8 @@ class PaymentService {
         return https.get('/about');
     }
 
-    getPaymentsPeriod({ year = '', month = '', user = '' } = {}) {
-        return https.get("/payments/period?year=" + year + "&month=" + month + "&user=" + user, { headers: authHeader()});
+    getPaymentsPeriod(data) {
+        return https.get("/payments/period", {params: data, headers: authHeader()});
     }
 
     categories(mode) {
@@ -42,8 +42,8 @@ class PaymentService {
         return https.delete(`/payments/${id}`, { headers: authHeader()});
     }
 
-    getPayments({ q = '', sort = 3, category_id = '', year = '', month = '', user = '' } = {}) {
-        return https.get(`/payments?q=${q}&sort=${sort}&category_id=${category_id}&year=${year}&month=${month}&user=${user}`, { headers: authHeader()});
+    getPayments(data = {}) {
+        return https.get('/payments', {params: data, headers: authHeader()});
     }
 }
 

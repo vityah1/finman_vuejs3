@@ -262,29 +262,23 @@ export default {
               return item.id;
             })
             .indexOf(this.currentPayment.id);
-
           this.payments.splice(index, 1);
         })
         .catch((e) => {
           console.log(e);
         });
+        this.showModal=false;
     },
     async getPayments() {
-      let sort = this.$route.query.sort || "";
-      let year = this.$route.query.year || "";
-      let month = this.$route.query.month || "";
-      let category_id = this.$route.query.category_id || "";
-      let q = this.$route.query.q || "";
-      let user = this.$route.query.user || "";
-      console.log(q, year, month, category_id, sort, user);
-      PaymentService.getPayments({
-        sort: sort,
-        year: year,
-        month: month,
-        category_id: category_id,
-        q: q,
-        user: user,
-      })
+      let data = {
+        sort: this.$route.query.sort || "",
+        year: this.$route.query.year || "",
+        month: this.$route.query.month || "",
+        category_id: this.$route.query.category_id || "",
+        q: this.$route.query.q || "",
+      }
+      console.log(data);
+      PaymentService.getPayments(data)
         .then((response) => {
           this.payments = response.data;
           console.log(response.data);
@@ -321,8 +315,8 @@ export default {
     if (!this.currentUser) {
       this.$router.push({ name: "login" });
     }
-    this.getPayments();
     this.getCategories();
+    this.getPayments();
   },
 };
 </script>

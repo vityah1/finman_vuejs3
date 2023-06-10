@@ -5,6 +5,7 @@ import axios from 'axios';
 // const API_URL = 'https://kt.if.ua/finman_api/api/';
 // const API_URL = 'https://site--main--b4xj54d6jsp4.code.run/api'
 const API_URL = process.env.VUE_APP_API_ENDPOINT;
+concole.log('user.service AOU_URL: ' + API_URL)
 
 class UserService {
     getPublicContent() {
