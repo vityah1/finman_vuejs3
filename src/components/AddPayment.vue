@@ -70,13 +70,13 @@
       <div 
       v-if="!is_sub_cat_refuel" class="form-group"
       >
-        <label for="description">Desc</label>
+        <label for="mydesc">Desc</label>
         <input
           class="form-control"
-          id="description"
+          id="mydesc"
           required
-          v-model="currentCost.description"
-          name="description"
+          v-model="currentCost.mydesc"
+          name="mydesc"
         />
       </div>
 
@@ -115,7 +115,7 @@ export default {
         rdate: moment(Date()).format("YYYY-MM-DD"),
         cat: "",
         sub_cat: "",
-        description: "",
+        mydesc: "",
         amount: 0,
         km: "",
         litres: "",
@@ -183,7 +183,7 @@ export default {
         rdate: this.currentCost.rdate,
         category_id: this.currentCost.category_id,
         sub_cat: this.currentCost.sub_cat,
-        description: this.currentCost.description,
+        mydesc: this.currentCost.mydesc,
         amount: this.currentCost.amount,
         km: this.currentCost.km,
         litres: this.currentCost.litres,

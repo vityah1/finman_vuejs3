@@ -49,8 +49,8 @@
               </div>
 
               <div v-if="!isFuel" class="form-group">
-                <label for="description">Description:</label>
-                <input type="text" class="form-control" id="description" v-model="currentPayment.description" />
+                <label for="mydesc">Description:</label>
+                <input type="text" class="form-control" id="mydesc" v-model="currentPayment.mydesc" />
               </div>
 
               <div class="form-group">
@@ -111,7 +111,7 @@
             </span>
           </b-td>
           <b-td>{{ payment.category_name }}</b-td>
-          <b-td>{{ payment.description }}</b-td>
+          <b-td>{{ payment.mydesc }}</b-td>
           <b-td>{{ payment.amount.toLocaleString() }}</b-td>
         </b-tr>
       </b-tbody>
@@ -235,7 +235,7 @@ export default {
                 id: this.currentPayment.id,
                 category_id: this.currentPayment.category_id,
                 category_name: this.currentPayment.category_name,
-                description: this.currentPayment.description,
+                mydesc: this.currentPayment.mydesc,
                 rdate: this.currentPayment.rdate,
                 amount: this.currentPayment.amount,
               };
