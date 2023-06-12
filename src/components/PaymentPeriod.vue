@@ -42,7 +42,7 @@
           <button
             class="btn btn-outline-secondary"
             type="button"
-            @click="getPaymentsPeriod(year, month)"
+            @click="getPaymentsPeriod({year: year, month: month})"
           >
             Ok
           </button>
@@ -107,8 +107,8 @@ export default {
     };
   },
   methods: {
-    async getPaymentsPeriod(year, month) {
-      PaymentService.getPaymentsPeriod({ year: year, month: month })
+    async getPaymentsPeriod(data) {
+      PaymentService.getPaymentsPeriod(data)
         .then((response) => {
           this.catcosts = response.data;
           console.log(response.data);
@@ -141,10 +141,11 @@ export default {
   },
   mounted() {
     let data = {
-      year: this.$route.query.year || new Date().getFullYear(),
-      month: this.$route.query.month || new Date().getMonth() + 1
+      'year': this.$route.query.year || new Date().getFullYear(),
+      'month': this.$route.query.month || new Date().getMonth() + 1
     };
     this.getPaymentsYears();
+    console.log('mounted: ', data)
     this.getPaymentsPeriod(data);
   },
 };

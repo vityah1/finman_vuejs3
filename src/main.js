@@ -20,4 +20,25 @@ app.use(BootstrapVueNext)
 app.use(router).use(store)
     .component('alert-component', AlertComponent)
     .component("font-awesome-icon", FontAwesomeIcon)
+
+
+// app.created: {
+//         get_sources() {
+//           this.$store.dispatch("sprs/get_sources");
+//         }
+//       }
+
+async function FetchDataFromApi() {
+    try {
+await store.dispatch("sprs/get_sources");
+await store.dispatch("sprs/get_currencies");
+await store.dispatch("sprs/get_categories");
 app.mount('#app')
+    }
+    catch(error) {
+        console.error(error);
+    }
+}
+
+FetchDataFromApi();
+// app.mount('#app')

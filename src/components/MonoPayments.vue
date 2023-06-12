@@ -45,7 +45,7 @@ export default {
   methods: {
     async get_payments() {
       var data = {
-        user: this.currentUser.username,
+        user: this.currentUser.user_id,
         start_date: this.start_date,
         end_date: this.end_date,
         import_mode: this.import_mode,

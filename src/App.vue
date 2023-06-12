@@ -12,15 +12,15 @@ export default {
       }
     },
   },
-  methods: {  
+  methods: {
     logOut() {
       this.$store.dispatch("auth/logout");
-      this.$router.push({ name: "Login" });
+      this.$router.push({ name: "login" });
     },
     AppFindPayments(q) {
       this.$router.push({ name: "payments", query: { q: q } });
-    },   
-  }
+    },
+  },
 }
 </script>
 
@@ -33,12 +33,16 @@ export default {
         <b-navbar-nav>
           <b-nav-item><router-link class="nav-link" :to="{ path: '/' }">Home</router-link></b-nav-item>
 
-          <b-nav-item><router-link class="nav-link" :to="{ name: 'payments_add' }">Add</router-link></b-nav-item>
-          <b-nav-item><router-link class="nav-link" :to="{ name: 'payments_period' }">Current</router-link></b-nav-item>
-          <b-nav-item><router-link class="nav-link" :to="{ name: 'payments_last' }">Last</router-link></b-nav-item>
-          <b-nav-item><router-link class="nav-link" :to="{ name: 'payments_years' }">Years</router-link></b-nav-item>
+          <b-nav-item v-if="currentUser"><router-link class="nav-link" 
+            :to="{ name: 'payments', query: {'action': 'add'} }">Add</router-link></b-nav-item>
+          <b-nav-item v-if="currentUser"><router-link class="nav-link" 
+            :to="{ name: 'payments_period' }">Current</router-link></b-nav-item>
+          <b-nav-item v-if="currentUser"><router-link class="nav-link" 
+            :to="{ name: 'payments_last' }">Last</router-link></b-nav-item>
+          <b-nav-item v-if="currentUser"><router-link class="nav-link" 
+            :to="{ name: 'payments_years' }">Years</router-link></b-nav-item>
 
-          <b-nav-item-dropdown text="Mono">
+          <b-nav-item-dropdown text="Mono" v-if="currentUser">
             <b-dropdown-item><router-link class="nav-link" :to="{ name: 'mono_user_token' }"> Show tokens
               </router-link></b-dropdown-item>
             <b-dropdown-item>
@@ -60,14 +64,20 @@ export default {
               <router-link class="nav-link" :to="{ name: 'register' }">SignUp
               </router-link>
             </b-dropdown-item>
-            <b-dropdown-item>
-              <b-nav-item><router-link class="nav-link" :to="{ name: 'config' }">Settings</router-link></b-nav-item>
+            <b-dropdown-item v-if="currentUser">
+              <b-nav-item><router-link class="nav-link" :to="{ name: 'config' }">Settings
+                </router-link></b-nav-item>
+            </b-dropdown-item>
+            <b-dropdown-item v-if="currentUser">
+              <a class="nav-link" @click.prevent="logOut">
+                <font-awesome-icon icon="sign-out-alt" />Logout
+              </a>
             </b-dropdown-item>
           </b-nav-item-dropdown>
           <b-nav-item><router-link class="nav-link" :to="{ name: 'about' }">About</router-link></b-nav-item>
         </b-navbar-nav>
       </b-collapse>
-    </b-navbar>  
+    </b-navbar>
     <div><router-view :key="$router.fullPath" /></div>
   </div>
 </template>

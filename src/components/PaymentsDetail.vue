@@ -2,75 +2,91 @@
   <div class="container">
     <alert-component ref="myAlert"></alert-component>
     <!-- Modal -->
-    <b-modal v-model="showModal" 
-    @ok="updatePayment()"
-    title="Modal form"
-    :okTitle="okTitle"
-    >
-          <template #modal-header>
-            <h5 class="modal-title text-danger">
-              Edit Payment [{{this.currentPayment.id}}]
-            </h5>
-          </template>
-          <template #default>
-            <b-form v-if="currentPayment">
-              <div class="form-group">
-                <label for="rdate">Date:</label>
-                <input type="date" class="form-control" id="rdate" v-model="currentPayment.rdate" />
-              </div>
-              <div class="form-group">
-                <label for="main_category">Category:</label>
-                <select class="form-control" ref="main_category" id="main_category" name="main_category"
-                  @change="change_category($event.target.value)">
-                  <option value=""></option>
-                </select>
-              </div>
+    <b-modal v-model="showModal" @ok="doFormAction()" title="Modal form" :okTitle="okTitle">
+      <template #modal-header>
+        <h5 class="modal-title text-danger">
+          {{ okTitle }} Payment [{{ this.currentPayment.id }}]
+        </h5>
+      </template>
+      <template #default>
+        <b-form v-if="currentPayment">
+          <div class="form-row">
+            <label for="rdate">Date:</label>
+            <input type="date" class="form-control" id="rdate" v-model="currentPayment.rdate" />
+          </div>
+          <div class="form-row">
+            <label for="main_category">Category:</label>
+            <select class="form-control" ref="main_category" id="main_category" name="main_category"
+              @change="changeCategory($event.target.value)">
+              <option value=""></option>
+            </select>
+          </div>
 
-              <div class="form-group">
-                <label for="sub_category">Sub Cat:</label>
-                <select class="form-control" id="sub_category" ref="sub_category" name="sub_cat"
-                  @change="change_category($event.target.value)">
-                  <option value=""></option>
-                </select>
-              </div>
+          <div class="form-row">
+            <label for="sub_category">Sub Cat:</label>
+            <select class="form-control" id="sub_category" ref="sub_category" name="sub_cat"
+              @change="changeCategory($event.target.value)">
+              <option value=""></option>
+            </select>
+          </div>
 
-              <div v-if="isFuel" class="form-group">
-                <label for="id_km">km:</label>
-                <input type="text" class="form-control" id="id_km" v-model="currentPayment.refuel_data.km" />
-                <label for="id_litres">Litres:</label>
-                <input type="text" class="form-control" id="id_litres" v-model="currentPayment.refuel_data.litres" />
-                <label for="id_price_val">Price (EUR):</label>
-                <input type="text" class="form-control" id="id_price_val"
-                  v-model="currentPayment.refuel_data.price_val" />
-                <label for="id_name_station">Name station:</label>
-                <input type="text" class="form-control" id="id_name_station"
-                  v-model="currentPayment.refuel_data.station_name" />
+          <div v-if="isFuel" class="form-row">
+            <label for="id_km">km:</label>
+            <input type="text" class="form-control" id="id_km" v-model="currentPayment.refuel_data.km" />
+            <label for="id_litres">Litres:</label>
+            <input type="text" class="form-control" id="id_litres" v-model="currentPayment.refuel_data.litres" />
+            <label for="id_price_val">Price (EUR):</label>
+            <input type="text" class="form-control" id="id_price_val" v-model="currentPayment.refuel_data.price_val" />
+            <label for="id_name_station">Name station:</label>
+            <input type="text" class="form-control" id="id_name_station"
+              v-model="currentPayment.refuel_data.station_name" />
 
-              </div>
+          </div>
 
-              <div v-if="!isFuel" class="form-group">
-                <label for="mydesc">Description:</label>
-                <input type="text" class="form-control" id="mydesc" v-model="currentPayment.mydesc" />
-              </div>
+          <div v-if="!isFuel" class="form-row">
+            <label for="mydesc">Description:</label>
+            <input type="text" class="form-control" id="mydesc" v-model="currentPayment.mydesc" />
+          </div>
 
-              <div class="form-group">
-                <label><strong>Amount:</strong></label>
-                <input type="text" class="form-control" id="amount" v-model="currentPayment.amount" />
-              </div>
-            </b-form>
+          <div class="row">
+            <div class="col-md-4">
+              <label for="amount"><strong>Amount:</strong></label>
+              <input type="text" class="form-control" id="amount" v-model="currentPayment.amount" />
+            </div>
 
-            <b-button variant="danger" class="mt-2" @click="deletePayment">
-              Delete
-            </b-button>
-          </template>
+            <div class="col-md-4">
+              <label for="source">Source:</label>
+              <select class="form-control" id="source" ref="source" name="source" v-model="currentPayment.source">
+                <option v-for="item in sources" :value="item.source" :key="item.id">{{ item.source }}</option>
+              </select>
+            </div>
 
+            <div class="col-md-4">
+              <label for="currency">Currency:</label>
+              <select class="form-control" id="currency" ref="currency" name="currency"
+                v-model="currentPayment.currencyCode">
+                <option v-for="item in currencies" :value="item.currencyCode" :key="item.currencyCode">{{ item.currency
+                }}</option>
+              </select>
+            </div>
+          </div>
+
+        </b-form>
+        <b-button v-if="currentPayment.action == 'edit'" variant="danger" class="mt-2" @click="delPayment">
+          Delete
+        </b-button>
+      </template>
     </b-modal>
-
+    <div class="row">
+      <div class="col-4">
+        <b-button variant="primary" @click="openFormAddPayment()"> Add Payment</b-button>
+      </div>
+    </div>
     <div class="row">
       <div class="col-2">
         <router-link :to="{
           name: 'payments_period',
-          query: { year: $route.query.year, month: $route.query.month, user: $route.query.user },
+          query: { year: $route.query.year, month: $route.query.month },
         }"><font-awesome-icon icon="angle-double-left" /></router-link>
       </div>
       <div class="col-10">
@@ -103,8 +119,7 @@
       </b-thead>
 
       <b-tbody v-if="(payments.length > 0)">
-        <b-tr v-for="(payment, index) in payments" :key="index"
-          @click="get_payment(payment.id)">
+        <b-tr v-for="(payment, index) in payments" :key="index" @click="openFormEditPayment(payment.id)">
           <b-td>
             <span>
               {{ $moment(payment.rdate).format("DD.MMM") }}
@@ -129,20 +144,29 @@ export default {
   data() {
     return {
       okTitle: "",
-      showModal: false,      
+      showModal: false,
       payments: [],
       q: this.$route.query.q || "",
       total: 0,
       total_cnt: 0,
-      currentPayment: {},
+      currentPayment: {
+        "category_id": 0,
+        "rdate": this.formatDate(new Date().toLocaleDateString()),
+        "refuel_data": { "km": '', "litres": '', "price_val": '', "station_name": '' },
+        "amount": 0,
+        "mydesc": '',
+        "currencyCode": 980,
+        "source": "pwa",
+      },
       category: { name: '' },
       categories: [],
-      user: this.$route.query.user,
+      sources: [],
+      currencies: [],
     };
   },
   computed: {
     isFuel() {
-      return this.category.name == 'Заправка';
+      return this.category && this.category.name == 'Заправка';
     },
     currentUser() {
       return this.$store.state.auth.user;
@@ -155,24 +179,21 @@ export default {
     },
   },
   methods: {
-    async getCategories(mode) {
-      PaymentService.categories(mode)
-        .then((response) => {
-          this.categories = response.data;
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+    formatDate(dateString) {
+      const parts = dateString.split('/');
+      const formattedDate = `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+      return formattedDate;
     },
-    change_category(category_id) {
+    changeCategory(category_id) {
       this.currentPayment.category_id = category_id;
       this.$nextTick(() => {
-        this.set_category();
+        this.setCategory();
       });
     },
-    set_category() {
+    setCategory() {
       var parent_category_id = undefined
       this.category = this.categories.find(obj => obj.id == this.currentPayment.category_id);
+      if (!this.category) { this.category = this.categories[0].id; }
 
       if (this.category.parent_id == 0) { parent_category_id = this.category.id; }
       else { parent_category_id = this.category.parent_id; }
@@ -205,27 +226,66 @@ export default {
         }
       }
     },
-    async get_payment(id) {
+    openFormAddPayment() {
+      console.log('this.categories', this.categories);
+      // this.currentPayment = {
+      //   "category_id": this.categories[0].id,
+      //   "rdate": this.formatDate(new Date().toLocaleDateString()),
+      //   "refuel_data": {"km": '', "litres": '', "price_val": '', "station_name": ''},
+      //   "amount": 0,
+      //   "mydesc": '',
+      // }
+      this.setCategory();
+      this.okTitle = 'Add';
+      this.currentPayment.action = 'add';
+      this.currentPayment.currencyCode = 978;
+      this.currentPayment.refuel_data = { "km": '', "litres": '', "price_val": '', "station_name": '' };
+      this.showModal = true;
+    },
+    async openFormEditPayment(id) {
       PaymentService.getPayment(id)
         .then((response) => {
           response.data["rdate"] = moment(response.data["rdate"]).format(
             "YYYY-MM-DD"
           );
           this.currentPayment = response.data;
-          this.set_category();
+          this.currentPayment.action = 'edit';
+          if (!this.currentPayment.refuel_data) {
+            this.currentPayment.refuel_data = { "km": '', "litres": '', "price_val": '', "station_name": '' };
+          }
+          this.setCategory();
           console.log(response.data);
-          // this.category.name == response.data.category_name;
-          this.okTitle =  'Edit';
+          this.okTitle = 'Edit';
           this.$nextTick(() => {
-            this.set_category();
+            this.setCategory();
           });
-          this.showModal=true;
+          this.showModal = true;
         })
         .catch((e) => {
           console.log(e);
         });
     },
-    async updatePayment() {
+    doFormAction() {
+      console.log('this.currentPayment.action: ', this.currentPayment.action)
+      if (this.currentPayment.action == 'edit') { this.doUpdatePayment(); }
+      else if (this.currentPayment.action == 'add') { this.doAddPayment(); }
+    },
+    async doAddPayment() {
+      PaymentService.addPayment(this.currentPayment)
+        .then((response) => {
+          // this.currentPayment = response.data;
+          console.log('response after add pmt: ', response.data);
+          this.$refs.myAlert.showAlert('success', 'Payment added');
+        })
+        .catch((e) => {
+          console.log(e);
+          this.$refs.myAlert.showAlert('error', 'Payment add failed');
+        });
+      this.showModal = false;
+      this.category = undefined;
+      this.isFuel = false;
+    },
+    async doUpdatePayment() {
       PaymentService.updatePayment(this.currentPayment.id, this.currentPayment)
         .then((response) => {
           this.currentPayment = response.data;
@@ -241,18 +301,20 @@ export default {
               };
             }
           });
+          this.$refs.myAlert.showAlert('success', 'Payment updated');
         })
         .catch((e) => {
           console.log(e);
+          this.$refs.myAlert.showAlert('error', 'Payment update failed');
         });
-        this.showModal=false;
+      this.showModal = false;
     },
     removeFromArrayOfHash(p_array_of_hash, p_key, p_value_to_remove) {
       return p_array_of_hash.filter((l_cur_row) => {
         return l_cur_row[p_key] != p_value_to_remove;
       });
     },
-    async deletePayment() {
+    async delPayment() {
       PaymentService.deletePayment(this.currentPayment.id)
         .then((response) => {
           console.log(response.data.data);
@@ -267,7 +329,7 @@ export default {
         .catch((e) => {
           console.log(e);
         });
-        this.showModal=false;
+      this.showModal = false;
     },
     async getPayments() {
       let data = {
@@ -311,12 +373,21 @@ export default {
         });
     },
   },
-  mounted() {
+  async mounted() {
     if (!this.currentUser) {
       this.$router.push({ name: "login" });
     }
-    this.getCategories();
-    this.getPayments();
+    // await this.getCategories();
+    this.categories = this.$store.state.sprs.categories;
+    this.currencies = this.$store.state.sprs.currencies;
+    this.sources = this.$store.state.sprs.sources;
+    console.log(this.sources)
+    if (!this.$route.query.action) {
+      this.getPayments();
+    } else {
+      this.openFormAddPayment();
+    }
   },
+  // created() {this.categories = this.$store.state.sprs.categories;}
 };
 </script>

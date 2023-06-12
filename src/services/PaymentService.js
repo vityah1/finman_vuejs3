@@ -7,8 +7,8 @@ class PaymentService {
         return https.get('/about');
     }
 
-    getPaymentsPeriod(data) {
-        return https.get("/payments/period", {params: data, headers: authHeader()});
+    getPaymentsPeriod(params) {
+        return https.get("/payments/period", {params, headers: authHeader()});
     }
 
     categories(mode) {
@@ -31,6 +31,7 @@ class PaymentService {
     }
 
     addPayment(data) {
+        console.log('addPayment: ', data);
         return https.post("/payments", data, { headers: authHeader()});
     }
 
@@ -42,7 +43,7 @@ class PaymentService {
         return https.delete(`/payments/${id}`, { headers: authHeader()});
     }
 
-    getPayments(data = {}) {
+    getPayments(data) {
         return https.get('/payments', {params: data, headers: authHeader()});
     }
 }

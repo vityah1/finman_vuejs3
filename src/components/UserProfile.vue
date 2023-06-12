@@ -2,7 +2,7 @@
   <div class="container">
     <header class="jumbotron">
       <h3>
-        <strong>{{ currentUser.login }}</strong> [{{ currentUser.user_id }}] Profile
+        Profile: <strong>{{ currentUser.login }}</strong> [{{ currentUser.id }}]
       </h3>
     </header>
 
