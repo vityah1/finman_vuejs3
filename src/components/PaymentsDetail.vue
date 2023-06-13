@@ -279,7 +279,7 @@ export default {
         })
         .catch((e) => {
           console.log(e);
-          this.$refs.myAlert.showAlert('error', 'Payment add failed');
+          this.$refs.myAlert.showAlert('danger', 'Payment add failed');
         });
       this.showModal = false;
       this.category = undefined;
@@ -305,7 +305,7 @@ export default {
         })
         .catch((e) => {
           console.log(e);
-          this.$refs.myAlert.showAlert('error', 'Payment update failed');
+          this.$refs.myAlert.showAlert('danger', 'Payment update failed');
         });
       this.showModal = false;
     },

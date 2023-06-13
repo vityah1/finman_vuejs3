@@ -42,17 +42,22 @@ export default {
           <b-nav-item v-if="currentUser"><router-link class="nav-link" 
             :to="{ name: 'payments_years' }">Years</router-link></b-nav-item>
 
-          <b-nav-item-dropdown text="Mono" v-if="currentUser">
+          <b-nav-item-dropdown text="Banks" v-if="currentUser">
             <b-dropdown-item><router-link class="nav-link" :to="{ name: 'mono_user_token' }"> Show tokens
               </router-link></b-dropdown-item>
-            <b-dropdown-item>
-              <router-link class="nav-link" :to="{ name: 'mono_payments' }">
-                Payments</router-link>
-            </b-dropdown-item>
-            <b-dropdown-item>
+              <b-dropdown-item>
               <router-link class="nav-link" :to="{ name: 'mono_users' }">
                 Mono users</router-link>
+            </b-dropdown-item>              
+            <b-dropdown-item>
+              <router-link class="nav-link" :to="{ name: 'mono_payments' }">
+                Mono payments</router-link>
             </b-dropdown-item>
+
+            <b-dropdown-item>
+              <router-link class="nav-link" :to="{ name: 'revolut' }">
+                Revolut</router-link>
+            </b-dropdown-item>            
           </b-nav-item-dropdown>
 
           <b-nav-item-dropdown text="User">

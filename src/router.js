@@ -21,7 +21,12 @@ const routes = [
         path: "/mono/payments",
         name: "mono_payments",
         component: () => import("./components/MonoPayments")
-    }, 
+    },  
+    {
+        path: "/revolut/import",
+        name: "revolut",
+        component: () => import("./components/Revolut")
+    },
     {
         path: "/mono/users",
         name: "mono_users",
@@ -59,11 +64,11 @@ const routes = [
         name: "payments_period",
         component: () => import("./components/PaymentPeriod")
     },
-    {
-        path: "/payment/add",
-        name: "payments_add",
-        component: () => import("./components/AddPayment")
-    },
+    // {
+    //     path: "/payment/add",
+    //     name: "payments_add",
+    //     component: () => import("./components/AddPayment")
+    // },
     {
         path: "/about",
         name: "about",
