@@ -115,6 +115,7 @@
           <b-th @click="sortPayments(2)">Category</b-th>
           <b-th>Descript</b-th>
           <b-th @click="sortPayments(3)">Amount</b-th>
+          <b-th>Mono user</b-th>
         </b-tr>
       </b-thead>
 
@@ -128,6 +129,7 @@
           <b-td>{{ payment.category_name }}</b-td>
           <b-td>{{ payment.mydesc }}</b-td>
           <b-td>{{ payment.amount.toLocaleString() }}</b-td>
+          <b-td>{{ payment.mono_user_name }}</b-td>
         </b-tr>
       </b-tbody>
     </b-table-simple>
@@ -228,13 +230,6 @@ export default {
     },
     openFormAddPayment() {
       console.log('this.categories', this.categories);
-      // this.currentPayment = {
-      //   "category_id": this.categories[0].id,
-      //   "rdate": this.formatDate(new Date().toLocaleDateString()),
-      //   "refuel_data": {"km": '', "litres": '', "price_val": '', "station_name": ''},
-      //   "amount": 0,
-      //   "mydesc": '',
-      // }
       this.setCategory();
       this.okTitle = 'Add';
       this.currentPayment.action = 'add';

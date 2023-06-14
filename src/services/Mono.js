@@ -14,14 +14,18 @@ class Mono {
 
     getPayments(data) {
         console.log(data.import_mode)
-        if (data.import_mode === true)
+        if (data.import_mode === 'import')
         {
             return https.post("/mono/payments", data, { headers: authHeader() });
         }
-        else
+        else if (data.import_mode === 'show')
         {
             return https.get("/mono/payments", {params: data, headers: authHeader() });
         }
+        else if (data.import_mode === 'sync')
+        {
+            return https.patch("/mono/payments", data, {headers: authHeader() });
+        }        
     }  
 
 }

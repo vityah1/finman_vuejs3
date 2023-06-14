@@ -8,8 +8,13 @@
       <input type="text" v-model="start_date" class="form-control"><br>
       <lable for="end_date">End date: </lable><br>
       <input type="text" v-model="end_date" class="form-control"><br>
-      <lable for="import_mode" class="form-check-label">Import: </lable><br>
-      <input type="checkbox" v-model="import_mode" class="form-check-input"><br><br>
+      <lable for="import_mode" class="form-check-label">Please select action: </lable><br>
+      <select v-model="import_mode" class="form-select">
+        <option value="">show</option>
+        <option value="import">import</option>
+        <option value="sync">sync</option>
+        </select>
+        <br><br>
       <input type="button" @click="get_payments" value="Get payments" class="btn btn-primary">
       <hr>
       <p v-if="HTMLResponse">
