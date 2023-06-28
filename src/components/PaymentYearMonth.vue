@@ -9,7 +9,8 @@
           id="year"
           name="year"
         >
-          <option v-for="(y, index) in years" :value="y" :key="index">
+          <option v-for="(y, index) in years" :value="y" :key="index" 
+          :selected="y === this.$route.params.year">
             {{ y }}
           </option>
         </select>
@@ -21,7 +22,8 @@
           id="month"
           name="month"
         >
-          <option v-for="(m, index) in months" :value="m" :key="index">
+          <option v-for="(m, index) in months" :value="m" :key="index" 
+          :selected="m === this.$route.params.month">
             {{ m }}
           </option>
         </select>
@@ -67,17 +69,20 @@
     </b-thead>
     <b-tbody>
       <b-tr
-      v-for="(cat, index) in catcosts"
+      v-for="(category, index) in catcosts"
       :key="index">
       <b-td>
         <router-link 
-      :to="{ name: 'payments', query: { category_id: cat.category_id, year: year, month: month} }"
+      :to="{ 
+        name: 'payments', 
+        params: { action: 'show', year: year, month: month, category_id: category.category_id} 
+        }"
       >
-        {{ cat.name }}
+        {{ category.name }}
       </router-link>
       </b-td>
-      <b-td>{{ cat.amount.toLocaleString() }}</b-td>
-      <b-td>{{ cat.cnt }}</b-td>
+      <b-td>{{ category.amount.toLocaleString() }}</b-td>
+      <b-td>{{ category.cnt }}</b-td>
     
   </b-tr>
   </b-tbody>
@@ -87,16 +92,15 @@
 
 <script>
 import PaymentService from "../services/PaymentService";
-// import moment from "moment";
 
 export default {
-  name: "PaymentPeriod",
+  name: "PaymentYearMonth",
   data() {
     return {
       catcosts: [],
       q: "",
-      year: this.$route.query.year || new Date().getFullYear(),
-      month: this.$route.query.month || new Date().getMonth() + 1,
+      year: this.$route.params.year || new Date().getFullYear(),
+      month: this.$route.params.month || new Date().getMonth() + 1,
       years: [],
       months: Array.from({ length: 12 }, (x, i) => i + 1),
       total: 0,
@@ -139,8 +143,8 @@ export default {
   },
   mounted() {
     let data = {
-      'year': this.$route.query.year || new Date().getFullYear(),
-      'month': this.$route.query.month || new Date().getMonth() + 1
+      'year': this.$route.params.year || new Date().getFullYear(),
+      'month': this.$route.params.month || new Date().getMonth() + 1
     };
     this.getPaymentsYears();
     console.log('mounted: ', data)

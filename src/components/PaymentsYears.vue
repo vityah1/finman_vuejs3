@@ -37,7 +37,6 @@
 
 <script>
 import PaymentService from "../services/PaymentService";
-// import moment from "moment";
 
 export default {
   name: "PaymentsYear",

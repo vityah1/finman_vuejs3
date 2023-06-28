@@ -77,32 +77,32 @@
         </b-button>
       </template>
     </b-modal>
-    <div class="row">
+    <!-- <div class="row">
       <div class="col-4">
-        <b-button variant="primary" @click="openFormAddPayment()"> Add Payment</b-button>
+        <b-button variant="primary" @click="openFormAddPayment()"> Add </b-button>
       </div>
-    </div>
+    </div> -->
     <div class="row">
-      <div class="col-2">
+      <div class="col-1">
         <router-link :to="{
-          name: 'payments_period',
-          query: { year: $route.query.year, month: $route.query.month },
-        }"><font-awesome-icon icon="angle-double-left" /></router-link>
+          name: 'payments_year_month',
+          params: {year: $route.params.year, month: $route.params.month },
+        }"><i class="fas fa-angle-double-left"></i></router-link>
       </div>
-      <div class="col-10">
-        <span class="text-small" v-if="this.$route.query.cat">[{{ this.$route.query.cat }}]</span>
-        <span v-if="this.$route.query.year">[{{ this.$route.query.year }}]</span>
-        <span v-if="this.$route.query.month">[{{ this.$route.query.month }}]</span>
+      <div class="col-11">
+        <span class="text-small primary" v-if="this.category_name">{{ this.category_name }}</span>
+        <span v-if="this.$route.params.year" class="text-primary">{{ this.$route.params.year }}-</span>
+        <span v-if="this.$route.params.month" class="text-primary">{{ this.$route.params.month }}</span>
         <span v-if="this.$route.query.user">[{{ this.$route.query.user }}]</span>
       </div>
     </div>
     <div class="row">
       <div class="col-2 h4 text-success">Total:</div>
-      <div class="col-2 h4 text-danger">{{ total.toLocaleString() }} UAH</div>
-      <div class="col-2">{{ total_cnt }}</div>
+      <div class="col-4 h4 text-danger">{{ total.toLocaleString() }} UAH</div>
+      <div class="col-4">{{ total_cnt }}</div>
     </div>
     <b-table-simple hover small caption-top responsive>
-      <caption>Table Head</caption>
+      <caption>category: {{category_name}}</caption>
       <colgroup>
         <col />
         <col />
@@ -153,7 +153,8 @@ export default {
       total_cnt: 0,
       currentPayment: {
         "category_id": 0,
-        "rdate": this.formatDate(new Date().toLocaleDateString()),
+        // "rdate": this.formatDate(new Date().toLocaleDateString()),
+        "rdate": this.getCurrentDate(),        
         "refuel_data": { "km": '', "litres": '', "price_val": '', "station_name": '' },
         "amount": 0,
         "mydesc": '',
@@ -164,6 +165,7 @@ export default {
       categories: [],
       sources: [],
       currencies: [],
+      category_name: '',
     };
   },
   computed: {
@@ -176,14 +178,23 @@ export default {
   },
   watch: {
     'category.name': function (newName, oldName) {
-      // Викликається при зміні category.name
       console.log('Змінено category.name:', newName, oldName);
     },
+    '$route.params.action'(newAction, oldAction) {
+      console.log('oldAction: ', oldAction)
+    if (newAction === 'add') {
+      this.openFormAddPayment();
+    }
+  }
   },
   methods: {
-    formatDate(dateString) {
-      const parts = dateString.split('/');
-      const formattedDate = `${parts[2]}-${parts[0].padStart(2, '0')}-${parts[1].padStart(2, '0')}`;
+    getCurrentDate() {
+      const currentDate = new Date();
+      const year = currentDate.getFullYear();
+      const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Add 1 to the month since it is zero-based
+      const day = String(currentDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+      console.log(formattedDate); 
       return formattedDate;
     },
     changeCategory(category_id) {
@@ -232,6 +243,7 @@ export default {
       console.log('this.categories', this.categories);
       this.setCategory();
       this.okTitle = 'Add';
+      this.currentPayment.rdate = this.getCurrentDate();
       this.currentPayment.action = 'add';
       this.currentPayment.currencyCode = 978;
       this.currentPayment.refuel_data = { "km": '', "litres": '', "price_val": '', "station_name": '' };
@@ -313,7 +325,6 @@ export default {
       PaymentService.deletePayment(this.currentPayment.id)
         .then((response) => {
           console.log(response.data.data);
-          // this.$router.push({ name: "payments" });
           const index = this.payments
             .map(function (item) {
               return item.id;
@@ -329,9 +340,9 @@ export default {
     async getPayments() {
       let data = {
         sort: this.$route.query.sort || "",
-        year: this.$route.query.year || "",
-        month: this.$route.query.month || "",
-        category_id: this.$route.query.category_id || "",
+        year: this.$route.params.year || "",
+        month: this.$route.params.month || "",
+        category_id: this.$route.params.category_id || "",
         q: this.$route.query.q || "",
       }
       console.log(data);
@@ -367,19 +378,28 @@ export default {
           console.log(e);
         });
     },
+  findCategoryNameById(categoryId) {
+  for (let i = 0; i < this.categories.length; i++) {
+    if (this.categories[i].id === categoryId) {
+      return this.categories[i].name;
+    }
+  }
+  return null; // Повертаємо null, якщо категорія не знайдена
+}    
   },
   async mounted() {
     if (!this.currentUser) {
       this.$router.push({ name: "login" });
     }
-    // await this.getCategories();
     this.categories = this.$store.state.sprs.categories;
     this.currencies = this.$store.state.sprs.currencies;
     this.sources = this.$store.state.sprs.sources;
-    console.log(this.sources)
-    if (!this.$route.query.action) {
+    this.action = this.$route.params.action;
+    this.category_name = this.findCategoryNameById(this.category_id);
+    console.log('this.action : ', this.action )
+    if (this.action == 'show') {
       this.getPayments();
-    } else {
+    } else if (this.action == 'add'){
       this.openFormAddPayment();
     }
   },

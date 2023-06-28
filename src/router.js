@@ -6,7 +6,28 @@ const routes = [
         path: "/",
         name: "home",
         component: () => import("./components/AboutPage")
-    },      
+    },
+    {
+        path: "/about",
+        name: "about",
+        component: () => import("./components/AboutPage"),
+    },
+    {
+        path: "/login",
+        name: "login",
+        // component: Login,
+        component: () => import("./components/UserLogin"),
+    },
+    {
+        path: "/register",
+        name: "register",
+        component: () => import("./components/UserRegister"),
+    },
+    {
+        path: "/profile",
+        name: "profile",
+        component: () => import("./components/UserProfile"),
+    },           
     {
         path: "/config",
         name: "config",
@@ -33,21 +54,15 @@ const routes = [
         component: () => import("./components/MonoUsers")
     },        
     {
-        path: "/payments",
-        // alias: "payments",
+        path: "/payments/:action/:year/:month/:category_id",
         name: "payments",
         component: () => import("./components/PaymentsDetail")
-    }, {
-        path: "/payments/last",
-        // alias: "payments",
-        name: "payments_last",
-        component: () => import("./components/PaymentsDetail?category_name=last")
     },
-    {
-        path: "/payments/:id",
-        name: "payment",
-        component: () => import("./components/PaymentsDetail")
-    },    
+    // {
+    //     path: "/payments/:id",
+    //     name: "payment",
+    //     component: () => import("./components/PaymentsDetail")
+    // },    
     {
         path: "/payments/years",
         name: "payments_years",
@@ -56,45 +71,14 @@ const routes = [
     {
         path: "/payments/years/:year",
         name: "payments_months",
-        component: () => import("./components/PaymentsByYear")
+        component: () => import("./components/PaymentsInYear")
     },
     {
-        path: "/payments/period",
+        path: "/payments/:year/:month",
         // alias: "/catpayments",
-        name: "payments_period",
-        component: () => import("./components/PaymentPeriod")
+        name: "payments_year_month",
+        component: () => import("./components/PaymentYearMonth")
     },
-    // {
-    //     path: "/payment/add",
-    //     name: "payments_add",
-    //     component: () => import("./components/AddPayment")
-    // },
-    {
-        path: "/about",
-        name: "about",
-        // lazy-loaded
-        component: () => import("./components/AboutPage"),
-    },
-
-    {
-        path: "/login",
-        name: "login",
-        // component: Login,
-        component: () => import("./components/UserLogin"),
-    },
-    {
-        path: "/register",
-        name: "register",
-        // component: Register,
-        component: () => import("./components/UserRegister"),
-    },
-    {
-        path: "/profile",
-        name: "profile",
-        // lazy-loaded
-        component: () => import("./components/UserProfile"),
-    },
-
 ];
 
 const router = createRouter({

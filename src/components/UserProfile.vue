@@ -9,7 +9,7 @@
     <Form @submit="editUser" :validation-schema="schema">
 
         <div class="form-group">
-          <Field name="user_id" type="hidden" v-model="currentUser.user_id" />
+          <Field name="user_id" type="hidden" v-model="currentUser.id" />
         </div>
 
         <div class="form-group">

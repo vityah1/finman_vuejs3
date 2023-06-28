@@ -34,7 +34,7 @@ class AuthService {
     }
 
     edit(user) {
-        console.log('user_id: ', user.user_id, 'user.fullname: ', user.fullname)
+        console.log('user: ', user, 'user_id: ', user.user_id, 'user.fullname: ', user.fullname)
         return axios.patch(API_URL + '/users/' + user.user_id, {
             login: user.login,
             password: user.password,

@@ -57,12 +57,12 @@
       <b-th>Count</b-th>
     </b-tr>
     </b-thead>
-    <b-tbody v-if="(months.length > 0)">
-    <b-tr v-for="(month, index) in months" :key="index">
+    <b-tbody v-if="(payments_in_year.length > 0)">
+    <b-tr v-for="(month, index) in payments_in_year" :key="index">
       <b-td>
       <router-link
         class="col-4"
-        :to="{ name: 'payments_period', query: { year: year, month: month.month} }"
+        :to="{ name: 'payments_year_month', params: { year: year, month: month.month} }"
       >
         {{ month.month }}
       </router-link>
@@ -73,19 +73,18 @@
     </b-tbody>
     <b-tfoot><b-tr><b-td collspan="3"></b-td></b-tr></b-tfoot>
     </b-table-simple>
-    <div v-if="(months.length == 0)">Data loading...</div>
+    <div v-if="(payments_in_year.length == 0)">Data loading...</div>
 </div>
 </template>
 
 <script>
 import PaymentService from "../services/PaymentService";
-// import moment from "moment";
 
 export default {
-  name: "PaymentsByYear",
+  name: "PaymentsInYear",
   data() {
     return {
-      months: [],
+      payments_in_year: [],
       year: this.$route.params.year,
       total: 0,
       total_cnt: 0,
@@ -95,13 +94,13 @@ export default {
   },
   methods: {
     async retrieveMonths(year) {
-      PaymentService.getPaymentsByYear(year)
+      PaymentService.getPaymentsInYear(year)
         .then((response) => {
-          this.months = response.data;
+          this.payments_in_year = response.data;
           console.log(response.data);
           let total = 0;
           let total_cnt = 0;
-          this.months.forEach((val) => {
+          this.payments_in_year.forEach((val) => {
             total += Number(val.amount);
             total_cnt += 1;
             //or if you pass float numbers , use parseFloat()

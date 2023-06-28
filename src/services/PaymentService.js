@@ -22,7 +22,7 @@ class PaymentService {
         return https.get("/payments/years", { headers: authHeader()});
     }
 
-    getPaymentsByYear(year) {
+    getPaymentsInYear(year) {
         return https.get("/payments/years/" + year , { headers: authHeader()});
     }
 
