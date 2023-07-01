@@ -8,6 +8,16 @@
       <input type="text" v-model="start_date" class="form-control"><br>
       <lable for="end_date">End date: </lable><br>
       <input type="text" v-model="end_date" class="form-control"><br>
+
+      <lable for="mono_user_id" class="form-check-label">Mono user: </lable><br>
+      <select v-model="mono_user_id" class="form-select">
+        <option value="">All</option>
+        <option 
+        v-for="mono_user in mono_users" :key="mono_user.id"
+        :value="mono_user.id"
+        >{{mono_user.name}}</option>
+        </select>
+      
       <lable for="import_mode" class="form-check-label">Please select action: </lable><br>
       <select v-model="import_mode" class="form-select">
         <option value="">show</option>
@@ -15,7 +25,7 @@
         <option value="sync">sync</option>
         </select>
         <br><br>
-      <input type="button" @click="get_payments" value="Get payments" class="btn btn-primary">
+      <input type="button" @click="getMonoPayments" value="Get payments" class="btn btn-primary">
       <hr>
       <p v-if="HTMLResponse">
         Payments info:
@@ -29,7 +39,8 @@
 </template>
 
 <script>
-import Mono from "../services/Mono";
+import MonoService from "../services/MonoService";
+import MonoUsersService from '../services/MonoUsersService';
 
 export default {
   name: "MonoPayments",
@@ -39,7 +50,9 @@ export default {
       content: '',
       start_date: '',
       end_date: '',
-      import_mode: false
+      import_mode: false,
+      mono_users: [],
+      mono_user_id: '',
     };
   },
   computed: {
@@ -47,16 +60,20 @@ export default {
       return this.$store.state.auth.user;
     },
   },
+  mounted() {
+    this.getMonoUsers();
+  },
   methods: {
-    async get_payments() {
+    async getMonoPayments() {
       var data = {
-        user: this.currentUser.user_id,
+        user: this.currentUser.id,
         start_date: this.start_date,
         end_date: this.end_date,
         import_mode: this.import_mode,
+        mono_user_id: this.mono_user_id,
       };
       console.log(data);
-      Mono.getPayments(data)
+      MonoService.getMonoPayments(data)
         .then((response) => {
           this.HTMLResponse = response.data;
         })
@@ -64,7 +81,15 @@ export default {
           console.log(e);
           this.content = e;
         });
-    }
+    },
+    async getMonoUsers() {
+      MonoUsersService.getMonoUsers()
+      .then((response) => {this.mono_users = response.data;})
+      .catch((e) => {
+          console.log(e);
+          this.content = e;
+        });
+    },     
   },
 };
 </script>

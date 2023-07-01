@@ -32,6 +32,11 @@ const routes = [
         path: "/config",
         name: "config",
         component: () => import("./components/ConfigUser")
+    },           
+    {
+        path: "/category",
+        name: "category",
+        component: () => import("./components/UserCategory")
     },    
     {
         path: "/mono/user/token",
@@ -54,15 +59,10 @@ const routes = [
         component: () => import("./components/MonoUsers")
     },        
     {
-        path: "/payments/:action/:year/:month/:category_id",
+        path: "/payments/:year/:month/:category_id",
         name: "payments",
-        component: () => import("./components/PaymentsDetail")
-    },
-    // {
-    //     path: "/payments/:id",
-    //     name: "payment",
-    //     component: () => import("./components/PaymentsDetail")
-    // },    
+        component: () => import("./components/PaymentsDetail"),
+    },   
     {
         path: "/payments/years",
         name: "payments_years",

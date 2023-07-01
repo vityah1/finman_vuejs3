@@ -77,11 +77,7 @@
         </b-button>
       </template>
     </b-modal>
-    <!-- <div class="row">
-      <div class="col-4">
-        <b-button variant="primary" @click="openFormAddPayment()"> Add </b-button>
-      </div>
-    </div> -->
+
     <div class="row">
       <div class="col-1">
         <router-link :to="{
@@ -152,7 +148,7 @@ export default {
       total: 0,
       total_cnt: 0,
       currentPayment: {
-        "category_id": 0,
+        "category_id": this.$store.state.sprs.categories[0].id,
         // "rdate": this.formatDate(new Date().toLocaleDateString()),
         "rdate": this.getCurrentDate(),        
         "refuel_data": { "km": '', "litres": '', "price_val": '', "station_name": '' },
@@ -168,6 +164,8 @@ export default {
       category_name: '',
     };
   },
+  created() {
+  },  
   computed: {
     isFuel() {
       return this.category && this.category.name == 'Заправка';
@@ -178,12 +176,23 @@ export default {
   },
   watch: {
     'category.name': function (newName, oldName) {
-      console.log('Змінено category.name:', newName, oldName);
+      console.log('Change category.name to', newName, ' from: ', oldName);
     },
-    '$route.params.action'(newAction, oldAction) {
+    '$route.query.action': function(newAction, oldAction) {
       console.log('oldAction: ', oldAction)
     if (newAction === 'add') {
       this.openFormAddPayment();
+    }
+  },
+    '$route.path': function(newPath, oldPath) {
+      console.log('Change route.path to', newPath, ' from: ', oldPath);
+      this.getPayments();
+  },
+    '$store.state.buttonClicked': function(newAction, oldAction) {
+      console.log('Change buttonClicked to', newAction, ' from: ', oldAction);
+    if (newAction) {
+      this.openFormAddPayment();
+      this.$store.commit('setButtonClicked', false);
     }
   }
   },
@@ -204,6 +213,8 @@ export default {
       });
     },
     setCategory() {
+      if (!this.categories){
+      this.categories = this.$store.state.sprs.categories;}
       var parent_category_id = undefined
       this.category = this.categories.find(obj => obj.id == this.currentPayment.category_id);
       if (!this.category) { this.category = this.categories[0].id; }
@@ -245,7 +256,8 @@ export default {
       this.okTitle = 'Add';
       this.currentPayment.rdate = this.getCurrentDate();
       this.currentPayment.action = 'add';
-      this.currentPayment.currencyCode = 978;
+      this.currentPayment.category_id = this.categories[0].id;
+      this.currentPayment.currencyCode = 980;
       this.currentPayment.refuel_data = { "km": '', "litres": '', "price_val": '', "station_name": '' };
       this.showModal = true;
     },
@@ -280,9 +292,24 @@ export default {
     async doAddPayment() {
       PaymentService.addPayment(this.currentPayment)
         .then((response) => {
-          // this.currentPayment = response.data;
-          console.log('response after add pmt: ', response.data);
+          console.log('response.data.rdate: ', response.data.rdate);
           this.$refs.myAlert.showAlert('success', 'Payment added');
+          const [year, month] = this.currentPayment.rdate.split('-').slice(0, 2);
+          const formattedMonth = month.replace(/^0+/, '');
+          if (
+        (this.$route.params.year != year) ||
+        (this.$route.params.month != formattedMonth) ||
+        (this.$route.params.category_id !== this.currentPayment.category_id)
+      )
+  {
+      this.$router.push({ name:"payments",
+      params: {  
+        year: year, 
+        month: formattedMonth, 
+        category_id: this.currentPayment.category_id
+        }
+      });
+    }          
         })
         .catch((e) => {
           console.log(e);
@@ -291,7 +318,8 @@ export default {
       this.showModal = false;
       this.category = undefined;
       this.isFuel = false;
-    },
+
+  },
     async doUpdatePayment() {
       PaymentService.updatePayment(this.currentPayment.id, this.currentPayment)
         .then((response) => {
@@ -384,7 +412,7 @@ export default {
       return this.categories[i].name;
     }
   }
-  return null; // Повертаємо null, якщо категорія не знайдена
+  return null;
 }    
   },
   async mounted() {
@@ -394,15 +422,13 @@ export default {
     this.categories = this.$store.state.sprs.categories;
     this.currencies = this.$store.state.sprs.currencies;
     this.sources = this.$store.state.sprs.sources;
-    this.action = this.$route.params.action;
+    this.action = this.$route.query.action;
     this.category_name = this.findCategoryNameById(this.category_id);
     console.log('this.action : ', this.action )
-    if (this.action == 'show') {
-      this.getPayments();
-    } else if (this.action == 'add'){
+    this.getPayments();
+    if (this.action == 'add'){
       this.openFormAddPayment();
     }
   },
-  // created() {this.categories = this.$store.state.sprs.categories;}
 };
 </script>

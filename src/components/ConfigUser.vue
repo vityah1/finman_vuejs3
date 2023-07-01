@@ -25,7 +25,15 @@
 
           <div v-if="currentConfig.is_need_add_value" class="form-group">
             <label for="description"><strong>Add value:</strong></label>
+          <template v-if="currentConfig.type_data == 'category_replace'">
+            <select v-model="currentConfig.add_value" class="form-select">
+            <option v-for="category in categories" :value=category.id :key=category.id
+            >{{category.name}}</option>
+            </select>
+          </template>
+          <template v-else>
             <input type="text" class="form-control" id="description" v-model="currentConfig.add_value" />
+          </template>          
           </div>
         </form>
         <b-button variant="danger" class="mt-2" @click="deleteConfig">
@@ -44,10 +52,9 @@
       <b-tbody v-if="(configs.length > 0)">
         <b-tr v-for="(config, index) in configs" :key="index">
           <b-td>
-          {{ console.log(config) }}
           <table class="w-100">
           <b-tr>
-          <b-td colspan="3"><span class="fw-bold text-dark">{{ config.name }}: </span>
+          <b-td colspan="10"><span class="fw-bold text-dark">{{ config.name }}: </span>
             <b-button v-if="(!(config.id) || (config.is_multiple))"
             @click="add_config(config.type_data, config.is_need_add_value, config.name)"
             variant="outline-primary"
@@ -62,11 +69,16 @@
            <b-td class="col-1"><span v-if="config.id">
           [{{ config.id }}]</span>
         </b-td>
-          <b-td class="text-start col-7">{{ config.value_data }}</b-td>
-          <b-td class="text-start col-4">
-            <span v-if="(config.is_need_add_value)"
-          > <span v-if="config.add_value">-> [{{ config.add_value }}]</span>
-        </span>
+          <b-td v-if="!config.is_need_add_value" class="text-start col-12">
+            {{ config.value_data }}</b-td>
+          <b-td v-else class="text-start col-2 col-md-3">
+            {{ config.value_data }}</b-td>
+          <b-td class="text-start col-4 col-md-6">
+          <span 
+          v-if="(config.is_need_add_value && config.add_value && config.type_data =='category_replace')"> 
+            -> [{{ findCategoryNameById(config.add_value) }}]</span>
+            <span v-else-if="(config.is_need_add_value && config.add_value)" class="text-bold"> 
+            -> {{ config.add_value }}</span>
         </b-td>
         </b-tr>
       </table>
@@ -96,6 +108,7 @@ export default {
       // config: {is_need_add_value: null},
       user: this.$route.query.user,
       showModal: false,
+      categories: [],
     };
   },
   computed: {
@@ -181,11 +194,20 @@ export default {
           console.log(e);
         });
     },
+  findCategoryNameById(categoryId) {
+  for (let i = 0; i < this.categories.length; i++) {
+    if (this.categories[i].id == categoryId) {
+      return this.categories[i].name;
+    }
+  }
+  return null; // Повертаємо null, якщо категорія не знайдена
+} 
   },
   mounted() {
     if (!this.currentUser) {
       this.$router.push({ name: "login" });
     }
+    this.categories = this.$store.state.sprs.categories;
     this.getConfigTypes();
     this.getUserConfig();
   },

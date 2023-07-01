@@ -18,15 +18,20 @@
             <tr>
               <th>Type</th>
               <th>Card</th>
-              <th>Balance, UAH</th>
+              <th>Balance</th>
             </tr>
           </thead>
           <tbody>
             <tr v-for="item in mono_user.filteredData" :key="item.id">
               <td>{{ item.type }}</td>
-              <td>{{ item.maskedPan }}</td>
-              <td>{{ item.balance / 100 }}</td>
-              <!-- <td>{{ item.currencyCode}}</td> -->
+              <td>
+                <template v-for="(pan, index) in item.maskedPan" :key="index">
+      {{ pan }}
+      <br>
+    </template>
+              {{item.id}}
+            </td>
+              <td>{{ item.balance / 100 }} {{ getCurrenciesByCode(item.currencyCode) }}</td>
             </tr>
           </tbody>
         </table>
@@ -39,7 +44,7 @@
 </template>
 
 <script>
-import Mono from "../services/Mono";
+import MonoService from "../services/MonoService";
 
 export default {
   name: "MonoSettings",
@@ -54,13 +59,17 @@ export default {
     },
   },
   methods: {
+    getCurrenciesByCode(currencyCode) {
+    const currency = this.currencies.find(c => c.currencyCode === currencyCode);
+    return currency ? currency.currency : '';
+  },
     async save_webhook(mono_user_id, webHookUrl) {
       var data = {
         mono_user_id: mono_user_id,
         webHookUrl: webHookUrl
       };
       console.log(data);
-      Mono.setWebhook(data)
+      MonoService.setWebhook(data)
         .then((response) => {
           this.content = JSON.stringify(response.data, null, 2);
           console.log(response.data);
@@ -71,7 +80,8 @@ export default {
     }
   },
   mounted() {
-    Mono.GetMonoUsersInfo(this.currentUser.id).then(
+    this.currencies = this.$store.state.sprs.currencies;
+    MonoService.GetMonoUsersInfo(this.currentUser.id).then(
       (response) => {
         this.mono_users = response.data;
         console.log(this.jsonResponse);

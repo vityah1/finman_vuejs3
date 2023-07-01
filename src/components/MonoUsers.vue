@@ -2,14 +2,20 @@
   <div class="container">
     <alert-component ref="myAlert"></alert-component>
     <!-- Modal -->
-    <b-modal v-model="showModal" @ok="doFormAction()" title="Modal form" :okTitle="okTitle">
+    <b-modal 
+    v-if="currentMonoUser" 
+    v-model="showModal" 
+    @ok="doFormAction()" 
+    :title="okTitle" 
+    :okTitle="okTitle"
+    >
       <template #modal-header>
         <h5 class="modal-title text-danger">
-          Edit MonoUser [{{ this.currentMonoUser.id }}]
+          {{okTitle}} MonoUser [{{ this.currentMonoUser.id }}]
         </h5>
       </template>
       <template #default>
-        <b-form v-if="currentMonoUser">
+        <b-form >
           <div class="form-group">
             <label>{{ currentMonoUser.name }}</label>
           </div>
@@ -85,7 +91,7 @@ export default {
     openFormAddMonoUser() {
       this.okTitle = 'Add';
       this.currentMonoUser.token = '';
-      this.currentMonoUser.name = name;
+      this.currentMonoUser.name = '';
       this.currentMonoUser.action = 'add';
       this.showModal = true;
       console.log('this.currentMonoUser.action:', this.currentMonoUser.action)

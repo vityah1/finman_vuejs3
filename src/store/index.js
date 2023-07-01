@@ -7,6 +7,14 @@ const store = createStore({
         auth,
         sprs,
     },
+    state: {
+        buttonClicked: false,
+      },
+      mutations: {
+        setButtonClicked(state, value) {
+          state.buttonClicked = value;
+        },
+      },
 });
 
 export default store;

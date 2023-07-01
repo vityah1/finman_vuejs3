@@ -44,6 +44,11 @@
           <b-td>{{ payment.category_name }}</b-td>
           <b-td>{{ payment.mydesc }}</b-td>
           <b-td>{{ payment.amount.toLocaleString() }}</b-td>
+          <b-td>
+  <span v-if="payment.sql" style="color: green;">&#10004;</span>
+  <span v-else style="color: red;">&#10008;</span>
+</b-td>
+
         </b-tr>
       </b-tbody>
     </b-table-simple>
@@ -77,14 +82,7 @@ export default {
       console.log('this.file = event.target.files[0];', this.file, event.target.files[0]);
     },
     handleButtonClick() {
-      if (this.selectedOption === 'import') {
-        // Відправити файл на бекенд для імпорту
-        // Використовуйте this.file для доступу до вибраного файлу
-        RevolutService.UploadFile(this.file, 'import')
-      } else if (this.selectedOption === 'show') {
-        // Показати вміст файлу
-        // Використовуйте this.file для доступу до вибраного файлу
-        RevolutService.UploadFile(this.file, 'show')
+        RevolutService.UploadFile(this.file, this.selectedOption)
         .then((response) => {
           this.payments = response.data;
 // Поєднання списку платежів зі списком категорій
@@ -103,7 +101,6 @@ this.$refs.myAlert.showAlert('success', 'File upload success');
           });
       }
     },
-  },
   mounted() {
     if (!this.currentUser) {
       this.$router.push({ name: "login" });

@@ -1,5 +1,4 @@
 <script>
-
 export default {
   name: "app",
   computed: {
@@ -21,7 +20,7 @@ export default {
     }, 
     category_id() {
       if (this.$route.params.category_id){return this.$route.params.category_id;}
-      return '_'
+      else {return this.$store.state.sprs.categories[0].id}
     }   
   },
   methods: {
@@ -33,10 +32,19 @@ export default {
       this.$router.push({ name: "payments", query: { q: q } });
     },
     GoToAddPayment() {
-      // let category_id = '_';
-      // if (this.$router.params.category_id){category_id = this.$router.params.category_id;}
-      this.$router.push({ name: "payments", 
-      params: { action: 'add' , year: this.currentYear, month: this.currentMonth, category_id: this.category_id} });
+      const currentPath = this.$route.path;
+      console.log('Current Path:', currentPath);
+      const pattern = /^\/payments\/\d{4}\/\d{1,2}\/\d+/;
+      const isMatchingRoute = pattern.test(currentPath);
+      console.log('Is matching route:', isMatchingRoute);
+      if (isMatchingRoute){
+      this.$store.commit('setButtonClicked', true);
+      console.log('ButtonClicked:', this.$store.state.buttonClicked);
+      }
+      else {
+      this.$router.push({ name: "payments", query: {action: 'add'},
+      params: {  year: this.currentYear, month: this.currentMonth, category_id: this.category_id} });
+      }
     },
   },
 }
@@ -111,6 +119,11 @@ export default {
                 <i class="fas fa-cog"></i> Settings
                 </router-link></b-nav-item>
             </b-dropdown-item>
+            <b-dropdown-item v-if="currentUser">
+              <b-nav-item><router-link class="nav-link" :to="{ name: 'category' }">
+                <i class="fas fa-cog"></i> Categories
+                </router-link></b-nav-item>
+            </b-dropdown-item>            
             <b-dropdown-item v-if="currentUser">
               <a class="nav-link" @click.prevent="logOut">
                 <i class="fas fa-sign-out-alt"></i> Logout
