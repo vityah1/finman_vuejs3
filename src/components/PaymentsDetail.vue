@@ -223,7 +223,6 @@ export default {
       else { parent_category_id = this.category.parent_id; }
 
       var options = this.categories.filter(obj => obj.parent_id == 0);
-      // console.log(`options: ${JSON.stringify(options)}`);
 
       var main_category = this.$refs.main_category;
       main_category.innerHTML = '';
@@ -238,7 +237,7 @@ export default {
 
       var sub_options = this.categories.filter(obj => obj.parent_id != 0);
       var sub_category = this.$refs.sub_category;
-      sub_category.innerHTML = '<option></option>';
+      sub_category.innerHTML = `<option value=${parent_category_id}></option>`;
 
       for (let i = 0; i < sub_options.length; i++) {
         if (sub_options[i].parent_id == parent_category_id) {
@@ -249,6 +248,8 @@ export default {
           sub_category.appendChild(sub_option);
         }
       }
+      if (this.isFuel && !this.currentPayment.refuel_data.km && this.currentPayment.mydesc) 
+      {this.currentPayment.refuel_data.station_name = this.currentPayment.mydesc;}
     },
     openFormAddPayment() {
       console.log('this.categories', this.categories);
