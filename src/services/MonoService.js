@@ -13,7 +13,7 @@ class MonoService {
     }
 
     getMonoPayments(data) {
-        console.log(data.import_mode)
+        console.log(data.mode)
         return https.post("/mono/payments", data, { headers: authHeader() });
     }
 

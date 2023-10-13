@@ -8,7 +8,6 @@ import BootstrapVueNext from "bootstrap-vue-next";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css";
 
-// import { FontAwesomeIcon } from './plugins/font-awesome'
 import AlertComponent from './components/AlertComponent'
 
 
@@ -16,15 +15,8 @@ const app = createApp(App)
 app.config.globalProperties.$moment = moment
 app.use(BootstrapVueNext)
 
-// import { library } from "@fortawesome/fontawesome-svg-core";
-// import { faPhone } from "@fortawesome/free-solid-svg-icons";
-// import { FontAwesomeIcon } from "@fortawesome/vue-fontawesome";
-// library.add(faPhone);
-
 app.use(router).use(store)
     .component('alert-component', AlertComponent)
-    // .component("font-awesome-icon", FontAwesomeIcon)
-
 
 async function FetchDataFromApi() {
     try {

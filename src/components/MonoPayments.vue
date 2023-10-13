@@ -18,9 +18,9 @@
         >{{mono_user.name}}</option>
         </select>
       
-      <lable for="import_mode" class="form-check-label">Please select action: </lable><br>
-      <select v-model="import_mode" class="form-select">
-        <option value="">show</option>
+      <lable for="mode" class="form-check-label">Please select action: </lable><br>
+      <select v-model="mode" class="form-select">
+        <option value="show" selected>show</option>
         <option value="import">import</option>
         <option value="sync">sync</option>
         </select>
@@ -50,7 +50,7 @@ export default {
       content: '',
       start_date: '',
       end_date: '',
-      import_mode: false,
+      mode: 'show',
       mono_users: [],
       mono_user_id: '',
     };
@@ -69,7 +69,7 @@ export default {
         user: this.currentUser.id,
         start_date: this.start_date,
         end_date: this.end_date,
-        import_mode: this.import_mode,
+        mode: this.mode,
         mono_user_id: this.mono_user_id,
       };
       console.log(data);

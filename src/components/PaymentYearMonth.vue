@@ -4,7 +4,6 @@
       <div class="input-group mb-3">
         <select
           class="form-control"
-          placeholder="year"
           v-model="year"
           id="year"
           name="year"
@@ -17,7 +16,6 @@
 &nbsp;
         <select
           class="form-control"
-          placeholder="month"
           v-model="month"
           id="month"
           name="month"
@@ -28,23 +26,25 @@
           </option>
         </select>
 &nbsp;
-        <!-- <select
+        <select
           class="form-control"
-          placeholder="user"
-          v-model="user"
-          id="user"
-          name="user"
+          v-model="mono_user_id"
+          id="mono_user"
+          name="mono_user"
         >
-          <option v-for="(u, index) in users" :value="u" :key="index">
-            {{ u }}
-          </option>
-        </select> -->
+            <option value="">All</option>
+          <option
+        v-for="mono_user in mono_users" :key="mono_user.id"
+        :value="mono_user.id"
+        >{{mono_user.name}}</option>
+        </select>
 &nbsp;
+
         <div class="input-group-append">
           <button
             class="btn btn-outline-secondary"
             type="button"
-            @click="getPaymentsPeriod({year: year, month: month})"
+            @click="getPaymentsPeriod({year: year, month: month, mono_user_id: mono_user_id})"
           >
             Ok
           </button>
@@ -92,6 +92,7 @@
 
 <script>
 import PaymentService from "../services/PaymentService";
+import MonoUsersService from "@/services/MonoUsersService";
 
 export default {
   name: "PaymentYearMonth",
@@ -105,7 +106,8 @@ export default {
       months: Array.from({ length: 12 }, (x, i) => i + 1),
       total: 0,
       total_cnt: 0,
-      users: []
+      mono_users: [],
+      mono_user_id: undefined,
     };
   },
   methods: {
@@ -139,7 +141,17 @@ export default {
         .catch((e) => {
           console.log(e);
         });
-    },    
+    },
+    async getMonoUsers() {
+      MonoUsersService.getMonoUsers()
+        .then((response) => {
+          this.mono_users = response.data;
+          console.log(`mono_users => ${this.mono_users}`);
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
   },
   mounted() {
     let data = {
@@ -149,6 +161,7 @@ export default {
     this.getPaymentsYears();
     console.log('mounted: ', data)
     this.getPaymentsPeriod(data);
+    this.getMonoUsers();
   },
 };
 </script>

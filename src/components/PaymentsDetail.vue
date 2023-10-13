@@ -198,11 +198,13 @@ export default {
   },
   methods: {
     getCurrentDate() {
-      const currentDate = new Date();
-      const year = currentDate.getFullYear();
-      const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Add 1 to the month since it is zero-based
-      const day = String(currentDate.getDate()).padStart(2, '0');
-      const formattedDate = `${year}-${month}-${day}`;
+      const date = new Date();
+      const formattedDate  = date.toISOString().split('T')[0];
+      // const currentDate = new Date();
+      // const year = currentDate.getFullYear();
+      // const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Add 1 to the month since it is zero-based
+      // const day = String(currentDate.getDate()).padStart(2, '0');
+      // const formattedDate = `${year}-${month}-${day}`;
       console.log(formattedDate); 
       return formattedDate;
     },
@@ -326,7 +328,7 @@ export default {
         .then((response) => {
           this.currentPayment = response.data;
           this.payments.map((c, index) => {
-            if (c.id == this.currentPayment.id) {
+            if (c.id === this.currentPayment.id) {
               this.payments[index] = {
                 id: this.currentPayment.id,
                 category_id: this.currentPayment.category_id,
