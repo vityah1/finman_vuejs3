@@ -1,4 +1,5 @@
 import SprsService from '../services/sprs.service';
+import CategoryService from '../services/CategoryService';
 
 // const currencies = JSON.parse(localStorage.getItem('currencies'));
 // const sources = JSON.parse(localStorage.getItem('sources'));
@@ -25,7 +26,7 @@ export const sprs = {
             );
         },
         get_categories({ commit }) {
-            return SprsService.get_categories().then(
+            return CategoryService.getCategories().then(
                 categories => {
                     commit('setCategory', categories);
                     return Promise.resolve(categories);

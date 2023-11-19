@@ -129,7 +129,7 @@
         </b-tr>
       </b-tbody>
     </b-table-simple>
-    <div v-if="(payments.length == 0)">Data loading...</div>
+    <div v-if="(payments.length === 0)">Data loading...</div>
   </div>
 </template>
 

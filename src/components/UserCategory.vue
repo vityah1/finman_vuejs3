@@ -90,8 +90,8 @@ export default {
   },
   methods: {
     do_form_action() {
-      if (this.currentCategory.action == 'add'){this.addCategory();}
-      else if (this.currentCategory.action == 'edit'){this.updateCategory();}
+      if (this.currentCategory.action === 'add'){this.addCategory();}
+      else if (this.currentCategory.action === 'edit'){this.updateCategory();}
     },    
     open_form_add_category() {
       this.currentCategory.parent_id = 0;
@@ -165,11 +165,11 @@ export default {
     },
     findCategoryNameById(categoryId) {
       for (let i = 0; i < this.categories.length; i++) {
-        if (this.categories[i].id == categoryId) {
+        if (this.categories[i].id === categoryId) {
           return this.categories[i].name;
         }
       }
-      return null; // Повертаємо null, якщо категорія не знайдена
+      return null;
     }
   },
   mounted() {

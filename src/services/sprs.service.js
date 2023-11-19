@@ -15,17 +15,6 @@ class SprsService {
             });
     }
 
-    get_categories() {
-        return axios
-            .get(API_URL + '/sprs/category',)
-            .then(response => {
-                if (response.data) {
-                    localStorage.setItem('categories', JSON.stringify(response.data));
-                }
-                return response.data;
-            });
-    }
-
     get_sources() {
         return axios
             .get(API_URL + '/sprs/source',)
