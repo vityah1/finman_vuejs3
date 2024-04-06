@@ -33,7 +33,8 @@ export const sprs = {
                 },
                 error => {
                     commit('unSetCategory');
-                    return Promise.reject(error);
+                    console.log(`${error}`);
+                    return [];
                 }
             );
         },

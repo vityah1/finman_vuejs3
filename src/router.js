@@ -54,6 +54,11 @@ const routes = [
         component: () => import("./components/Revolut")
     },
     {
+        path: "/wise/import",
+        name: "wise",
+        component: () => import("./components/Wise")
+    },
+    {
         path: "/mono/users",
         name: "mono_users",
         component: () => import("./components/MonoUsers")
