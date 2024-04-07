@@ -25,6 +25,15 @@ export default {
 				return this.$store.state.sprs.categories[0].id;
 			}
 		},
+		selectedCurrency: {
+			get() {
+				console.log(`computed => selectedCurrency => get => this.$store.state.selectedCurrenc=${this.$store.state.sprs.selectedCurrency}`)
+				return this.$store.state.sprs.selectedCurrency;
+			},
+			set(value) {
+				this.$store.dispatch("sprs/updateSelectedCurrency", value);
+			},
+		},
 	},
 	methods: {
 		logOut() {
@@ -59,10 +68,14 @@ export default {
 	<div class="container">
 		<b-navbar toggleable="lg">
 			<b-navbar-brand>
-				<div v-if="currentUser">
-					<a class="nav-link" @click.prevent="GoToAddPayment()">
-						<i class="fas fa-plus" style="color: #15e52d;"></i> Add
-					</a>
+				<div v-if="currentUser" class="d-flex align-items-center">
+					<select v-model="selectedCurrency" class="form-control form-control-sm me-2">
+						<option value="USD">USD</option>
+						<option value="EUR">EUR</option>
+						<option value="UAH">UAH</option>
+					</select>
+					<button class="btn btn-sm custom-button" @click.prevent="GoToAddPayment()">
+						<i class="fas fa-plus" style="color: #555;"></i></button>
 				</div>
 			</b-navbar-brand>
 			<b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
@@ -165,4 +178,15 @@ export default {
 		</div>
 	</div>
 </template>
-  
+
+<style>
+.custom-button {
+  background-color: #e7e7e7;
+  border-color: #e7e7e7;
+  color: #555;
+}
+.custom-button:hover {
+  background-color: #d6d6d6;
+  border-color: #d6d6d6;
+}
+</style>

@@ -1,18 +1,15 @@
 import SprsService from '../services/sprs.service';
 import CategoryService from '../services/CategoryService';
 
-// const currencies = JSON.parse(localStorage.getItem('currencies'));
-// const sources = JSON.parse(localStorage.getItem('sources'));
-// const categories = JSON.parse(localStorage.getItem('categories'));
-
-// const initialState = user
-//     ? { status: { loggedIn: true }, user }
-//     : { status: { loggedIn: false }, user: null };
 
 export const sprs = {
     namespaced: true,
-    state: {sources: null},
+    state: {sources: null,
+    selectedCurrency: localStorage.getItem('selectedCurrency') || 'UAH',},
     actions: {
+        updateSelectedCurrency({ commit }, currency) {
+            commit('setSelectedCurrency', currency);
+        },
         get_currencies({ commit }) {
             return SprsService.get_currencies().then(
                 currencies => {
@@ -69,6 +66,10 @@ export const sprs = {
         },
         unSetCurrency(state) {
             state.currencies = null;
+        },
+        setSelectedCurrency(state, currency) {
+            state.selectedCurrency = currency;
+            localStorage.setItem('selectedCurrency', currency);
         },
     }
 };

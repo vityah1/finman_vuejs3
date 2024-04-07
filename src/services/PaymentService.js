@@ -1,5 +1,6 @@
 import https from "../http-common";
 import authHeader from './auth-header';
+// import store from '../store';
 
 class PaymentService {
 
@@ -44,6 +45,8 @@ class PaymentService {
     }
 
     getPayments(data) {
+        // const selectedCurrency = store.state.sprs.selectedCurrency;
+        // const params = {...data, currency: selectedCurrency};
         return https.get('/payments', {params: data, headers: authHeader()});
     }
 }
