@@ -74,7 +74,7 @@
 					</div>
 
 				</b-form>
-				<b-button v-if="currentPayment.action == 'edit'" variant="danger" class="mt-2" @click="delPayment">
+				<b-button v-if="currentPayment.action === 'edit'" variant="danger" class="mt-2" @click="delPayment">
 					Delete
 				</b-button>
 			</template>
@@ -171,7 +171,7 @@ export default {
 	},
 	computed: {
 		isFuel() {
-			return this.category && this.category.name == "Заправка";
+			return this.category && this.category.name === "Заправка";
 		},
 		currentUser() {
 			return this.$store.state.auth.user;
@@ -215,7 +215,7 @@ export default {
 			return formattedDate;
 		},
 		changeCategory(category_id) {
-			this.currentPayment.category_id = category_id;
+			this.currentPayment.category_id = parseInt(category_id);
 			this.$nextTick(() => {
 				this.setCategory();
 			});
@@ -224,43 +224,43 @@ export default {
 			if (!this.categories) {
 				this.categories = this.$store.state.sprs.categories;
 			}
-			var parent_category_id = undefined;
-			this.category = this.categories.find(obj => obj.id == this.currentPayment.category_id);
+			let parent_category_id = undefined;
+			this.category = this.categories.find(obj => obj.id === this.currentPayment.category_id);
 			if (!this.category) {
 				this.category = this.categories[0].id;
 			}
 
-			if (this.category.parent_id == 0) {
+			if (this.category.parent_id === 0) {
 				parent_category_id = this.category.id;
 			} else {
 				parent_category_id = this.category.parent_id;
 			}
 
-			var options = this.categories.filter(obj => obj.parent_id == 0);
+			let options = this.categories.filter(obj => obj.parent_id === 0);
 
-			var main_category = this.$refs.main_category;
+			let main_category = this.$refs.main_category;
 			main_category.innerHTML = "";
 
 			for (let i = 0; i < options.length; i++) {
-				var option = document.createElement("option");
+				let option = document.createElement("option");
 				option.value = options[i].id;
 				option.text = options[i].name;
-				if (options[i].id == parent_category_id) {
+				if (options[i].id === parent_category_id) {
 					option.selected = true;
 				}
 				main_category.appendChild(option);
 			}
 
-			var sub_options = this.categories.filter(obj => obj.parent_id != 0);
-			var sub_category = this.$refs.sub_category;
+			let sub_options = this.categories.filter(obj => obj.parent_id !== 0);
+			let sub_category = this.$refs.sub_category;
 			sub_category.innerHTML = `<option value=${parent_category_id}></option>`;
 
 			for (let i = 0; i < sub_options.length; i++) {
-				if (sub_options[i].parent_id == parent_category_id) {
-					var sub_option = document.createElement("option");
+				if (sub_options[i].parent_id === parent_category_id) {
+					let sub_option = document.createElement("option");
 					sub_option.value = sub_options[i].id;
 					sub_option.text = sub_options[i].name;
-					if (sub_options[i].id == this.category.id) {
+					if (sub_options[i].id === this.category.id) {
 						sub_option.selected = true;
 					}
 					sub_category.appendChild(sub_option);
@@ -311,9 +311,9 @@ export default {
 		},
 		doFormAction() {
 			console.log("this.currentPayment.action: ", this.currentPayment.action);
-			if (this.currentPayment.action == "edit") {
+			if (this.currentPayment.action === "edit") {
 				this.doUpdatePayment();
-			} else if (this.currentPayment.action == "add") {
+			} else if (this.currentPayment.action === "add") {
 				this.doAddPayment();
 			}
 		},
@@ -325,8 +325,8 @@ export default {
 					const [year, month] = this.currentPayment.rdate.split("-").slice(0, 2);
 					const formattedMonth = month.replace(/^0+/, "");
 					if (
-						(this.$route.params.year != year) ||
-						(this.$route.params.month != formattedMonth) ||
+						(this.$route.params.year !== year) ||
+						(this.$route.params.month !== formattedMonth) ||
 						(this.$route.params.category_id !== this.currentPayment.category_id)
 					) {
 						this.$router.push({
@@ -374,7 +374,7 @@ export default {
 		},
 		removeFromArrayOfHash(p_array_of_hash, p_key, p_value_to_remove) {
 			return p_array_of_hash.filter((l_cur_row) => {
-				return l_cur_row[p_key] != p_value_to_remove;
+				return l_cur_row[p_key] !== p_value_to_remove;
 			});
 		},
 		async delPayment() {
@@ -437,7 +437,7 @@ export default {
 		},
 		findCategoryNameById(categoryId) {
 			for (let i = 0; i < this.categories.length; i++) {
-				if (this.categories[i].id === categoryId) {
+				if (this.categories[i].id === parseInt(categoryId)) {
 					return this.categories[i].name;
 				}
 			}
@@ -454,8 +454,8 @@ export default {
 		this.action = this.$route.query.action;
 		this.category_name = this.findCategoryNameById(this.category_id);
 		console.log("this.action : ", this.action);
-		this.getPayments();
-		if (this.action == "add") {
+		await this.getPayments();
+		if (this.action === "add") {
 			this.openFormAddPayment();
 		}
 	},

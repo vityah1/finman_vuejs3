@@ -4,12 +4,12 @@
       <h3>Mono payments:</h3>
     </header>
     <div>
-      <lable for="start_date">Start date: </lable><br>
+      <label for="start_date">Start date: </label><br>
       <input type="text" v-model="start_date" class="form-control"><br>
-      <lable for="end_date">End date: </lable><br>
+      <label for="end_date">End date: </label><br>
       <input type="text" v-model="end_date" class="form-control"><br>
 
-      <lable for="mono_user_id" class="form-check-label">Mono user: </lable><br>
+      <label for="mono_user_id" class="form-check-label">Mono user: </label><br>
       <select v-model="mono_user_id" class="form-select">
         <option value="">All</option>
         <option 
@@ -18,7 +18,7 @@
         >{{mono_user.name}}</option>
         </select>
       
-      <lable for="mode" class="form-check-label">Please select action: </lable><br>
+      <label for="mode" class="form-check-label">Please select action: </label><br>
       <select v-model="mode" class="form-select">
         <option value="show" selected>show</option>
         <option value="import">import</option>
