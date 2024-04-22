@@ -94,6 +94,7 @@
 <script>
 import PaymentService from "../services/PaymentService";
 import MonoUsersService from "@/services/MonoUsersService";
+import store from "@/store";
 
 export default {
 	name: "PaymentYearMonth",
@@ -134,7 +135,7 @@ export default {
 				});
 		},
 		async getPaymentsYears() {
-			PaymentService.getPaymentsYears()
+			PaymentService.getPaymentsYears({currency: store.state.sprs.selectedCurrency || "UAH"})
 				.then((response) => {
 					let filteredYears = response.data.filter(obj => obj.year > 1900);
 					this.years = filteredYears.map(obj => obj.year);

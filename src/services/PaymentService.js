@@ -19,12 +19,12 @@ class PaymentService {
         return https.get("/categories" + categories_mode, { headers: authHeader()});
     }
 
-    getPaymentsYears() {
-        return https.get("/payments/years", { headers: authHeader()});
+    getPaymentsYears(data) {
+        return https.get("/payments/years", { params: data, headers: authHeader()});
     }
 
-    getPaymentsInYear(year) {
-        return https.get("/payments/years/" + year , { headers: authHeader()});
+    getPaymentsInYear(year, data) {
+        return https.get("/payments/years/" + year , {params: data, headers: authHeader()});
     }
 
     getPayment(id) {

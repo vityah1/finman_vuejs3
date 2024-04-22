@@ -69,6 +69,7 @@
 
 <script>
 import PaymentService from "../services/PaymentService";
+import store from "@/store";
 
 export default {
 	name: "PaymentsInYear",
@@ -88,7 +89,7 @@ export default {
 			return Array.from({ length: currentYear - startYear + 1 }, (_, i) => startYear + i);
 		},
 		async retrieveMonths(year) {
-			PaymentService.getPaymentsInYear(year)
+			PaymentService.getPaymentsInYear(year, {currency: store.state.sprs.selectedCurrency || "UAH"})
 				.then((response) => {
 					this.payments_in_year = response.data;
 					console.log(response.data);

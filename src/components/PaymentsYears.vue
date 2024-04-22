@@ -37,6 +37,7 @@
 
 <script>
 import PaymentService from "../services/PaymentService";
+import store from "@/store";
 
 export default {
   name: "PaymentsYear",
@@ -47,7 +48,7 @@ export default {
   },
   methods: {
     async retrieveYears() {
-      PaymentService.getPaymentsYears()
+      PaymentService.getPaymentsYears({currency: store.state.sprs.selectedCurrency || "UAH"})
         .then((response) => {
           this.years = response.data;
           console.log(response.data);

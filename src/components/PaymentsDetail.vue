@@ -369,7 +369,8 @@ export default {
 				year: this.$route.params.year || "",
 				month: this.$route.params.month || "",
 				category_id: this.$route.params.category_id || "",
-				q: this.$route.query.q || "", currency: store.state.sprs.selectedCurrency || "UAH",
+				q: this.$route.query.q || "",
+				currency: store.state.sprs.selectedCurrency || "UAH",
 			};
 			console.log(data);
 			PaymentService.getPayments(data)
