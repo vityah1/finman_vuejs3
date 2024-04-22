@@ -55,7 +55,7 @@
 	</div>
 	<div class="container">
 		<b-table-simple hover small caption-top responsive>
-			<caption>Table Head</caption>
+<!--			<caption>List expenses</caption>-->
 			<colgroup>
 				<col />
 				<col />

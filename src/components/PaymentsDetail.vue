@@ -2,7 +2,7 @@
 	<div class="container">
 		<alert-component ref="myAlert"></alert-component>
 		<!-- Modal -->
-		<b-modal v-model="showModal" @ok="doFormAction()" title="Modal form" :okTitle="okTitle">
+		<b-modal v-model="showModal" @ok="doFormAction()" title="Editing expense" :okTitle="okTitle">
 			<template #modal-header>
 				<h5 class="modal-title text-danger">
 					{{ okTitle }} Payment [{{ this.currentPayment.id }}]
@@ -16,17 +16,11 @@
 					</div>
 					<div class="form-row">
 						<label for="main_category">Category:</label>
-						<select class="form-control" ref="main_category" id="main_category" name="main_category"
-								@change="changeCategory($event.target.value)">
-							<option value=""></option>
-						</select>
-					</div>
-
-					<div class="form-row">
-						<label for="sub_category">Sub Cat:</label>
-						<select class="form-control" id="sub_category" ref="sub_category" name="sub_cat"
-								@change="changeCategory($event.target.value)">
-							<option value=""></option>
+						<select v-model="selectedCategoryId" class="form-control" name="main_category" id="main_category">
+							<option disabled value="">Select category...</option>
+							<template v-for="category in formattedCategories" :key="category.id">
+								<option :value="category.id">{{ category.name }}</option>
+							</template>
 						</select>
 					</div>
 
@@ -34,11 +28,14 @@
 						<label for="id_km">km:</label>
 						<input type="text" class="form-control" id="id_km" v-model="currentPayment.refuel_data.km" />
 						<label for="id_litres">Litres:</label>
-						<input type="text" class="form-control" id="id_litres" v-model="currentPayment.refuel_data.litres" />
+						<input type="text" class="form-control" id="id_litres"
+							v-model="currentPayment.refuel_data.litres" />
 						<label for="id_price_val">Price (EUR):</label>
-						<input type="text" class="form-control" id="id_price_val" v-model="currentPayment.refuel_data.price_val" />
+						<input type="text" class="form-control" id="id_price_val"
+							v-model="currentPayment.refuel_data.price_val" />
 						<label for="id_name_station">Name station:</label>
-						<input type="text" class="form-control" id="id_name_station" v-model="currentPayment.refuel_data.station_name" />
+						<input type="text" class="form-control" id="id_name_station"
+							v-model="currentPayment.refuel_data.station_name" />
 
 					</div>
 
@@ -50,13 +47,14 @@
 					<div class="row">
 						<div class="col-md-4">
 							<label for="amount"><strong>Amount:</strong></label>
-							<input type="text" class="form-control" id="amount" v-model="currentPayment.currency_amount" />
+							<input type="text" class="form-control" id="amount"
+								v-model="currentPayment.currency_amount" />
 						</div>
 
 						<div class="col-md-4">
 							<label for="source">Source:</label>
 							<select class="form-control" id="source" ref="source" name="source"
-									v-model="currentPayment.source">
+								v-model="currentPayment.source">
 								<option v-for="item in sources" :value="item.source" :key="item.id">{{ item.source }}
 								</option>
 							</select>
@@ -65,7 +63,7 @@
 						<div class="col-md-4">
 							<label for="currency">Currency:</label>
 							<select class="form-control" id="currency" ref="currency" name="currency"
-									v-model="currentPayment.currency">
+								v-model="currentPayment.currency">
 								<option value="USD">USD</option>
 								<option value="EUR">EUR</option>
 								<option value="UAH">UAH</option>
@@ -83,9 +81,9 @@
 		<div class="row">
 			<div class="col-1">
 				<router-link :to="{
-          name: 'payments_year_month',
-          params: {year: $route.params.year, month: $route.params.month },
-        }"><i class="fas fa-angle-double-left"></i></router-link>
+					name: 'payments_year_month',
+					params: { year: $route.params.year, month: $route.params.month },
+				}"><i class="fas fa-angle-double-left"></i></router-link>
 			</div>
 			<div class="col-11">
 				<span class="text-small primary" v-if="this.category_name">{{ this.category_name }}</span>
@@ -94,13 +92,13 @@
 				<span v-if="this.$route.query.user">[{{ this.$route.query.user }}]</span>
 			</div>
 		</div>
-		<div class="row">
+		<div class="row" v-if="this.total">
 			<div class="col-2 h4 text-success">Total:</div>
-			<div class="col-4 h4 text-danger">{{ total.toLocaleString() }} {{selectedCurrency || ''}}</div>
-			<div class="col-4">{{ total_cnt }}</div>
+			<div class="col-4 h4 text-danger">{{ this.total.toLocaleString() }} {{ selectedCurrency || '' }}</div>
+			<div class="col-4">{{ this.total_cnt }}</div>
 		</div>
 		<b-table-simple hover small caption-top responsive>
-			<caption>category: {{ category_name }}</caption>
+			<!-- <caption>category: {{ category_name }}</caption> -->
 			<colgroup>
 				<col />
 				<col />
@@ -120,13 +118,13 @@
 			<b-tbody v-if="(payments.length > 0)">
 				<b-tr v-for="(payment, index) in payments" :key="index" @click="openFormEditPayment(payment.id)">
 					<b-td>
-            <span>
-              {{ $moment(payment.rdate).format("DD.MMM") }}
-            </span>
+						<span>
+							{{ $moment(payment.rdate).format("DD.MMM") }}
+						</span>
 					</b-td>
 					<b-td>{{ payment.category_name }}</b-td>
 					<b-td>{{ payment.mydesc }}</b-td>
-					<b-td>{{ payment.amount.toLocaleString() }}</b-td>
+					<b-td>{{ payment.amount.toLocaleString() || 0}}</b-td>
 					<b-td>{{ payment.mono_user_name }}</b-td>
 				</b-tr>
 			</b-tbody>
@@ -144,6 +142,7 @@ export default {
 	name: "PaymentsDetail",
 	data() {
 		return {
+			selectedCategoryId: '',
 			okTitle: "",
 			showModal: false,
 			payments: [],
@@ -160,7 +159,7 @@ export default {
 				"currency": "UAH",
 				"source": "pwa",
 			},
-			category: { name: "" },
+			selectedCategory: { name: "" },
 			categories: [],
 			sources: [],
 			currencies: [],
@@ -170,8 +169,12 @@ export default {
 	created() {
 	},
 	computed: {
+		formattedCategories() {
+			console.log("formattedCategories => ()", this.categories);
+			return this.formatCategories(this.categories);
+		},
 		isFuel() {
-			return this.category && this.category.name === "Заправка";
+			return this.selectedCategory && this.selectedCategory.is_fuel;
 		},
 		currentUser() {
 			return this.$store.state.auth.user;
@@ -181,20 +184,28 @@ export default {
 		}
 	},
 	watch: {
-		"category.name": function(newName, oldName) {
+		"selectedCategory.name": function (newName, oldName) {
 			console.log("Change category.name to", newName, " from: ", oldName);
 		},
-		"$route.query.action": function(newAction, oldAction) {
+		"selectedCategoryId": function (newCategoryId, oldCategoryId) {
+			console.log("Change selectedCategoryId to", newCategoryId, " from: ", oldCategoryId);
+			this.currentPayment.category_id = parseInt(newCategoryId);
+			this.selectedCategory = this.categories.find(category => category.id === parseInt(newCategoryId));
+			if (this.isFuel && !this.currentPayment.refuel_data.km && this.currentPayment.mydesc) {
+				this.currentPayment.refuel_data.station_name = this.currentPayment.mydesc;
+			}
+		},
+		"$route.query.action": function (newAction, oldAction) {
 			console.log("oldAction: ", oldAction);
 			if (newAction === "add") {
 				this.openFormAddPayment();
 			}
 		},
-		"$route.path": function(newPath, oldPath) {
+		"$route.path": function (newPath, oldPath) {
 			console.log("Change route.path to", newPath, " from: ", oldPath);
 			this.getPayments();
 		},
-		"$store.state.buttonClicked": function(newAction, oldAction) {
+		"$store.state.buttonClicked": function (newAction, oldAction) {
 			console.log("Change buttonClicked to", newAction, " from: ", oldAction);
 			if (newAction) {
 				this.openFormAddPayment();
@@ -203,71 +214,28 @@ export default {
 		},
 	},
 	methods: {
+		formatCategories(categories, parentId = null, prefix = '') {
+			return categories.reduce((acc, category) => {
+				if ((category.parent_id === parentId) || (parentId === null && !category.parent_id)) {
+					acc.push({
+						...category,
+						name: prefix + category.name
+					});
+					const children = this.formatCategories(categories, category.id, prefix + '--');
+					acc = acc.concat(children);
+				}
+				return acc;
+			}, []);
+		},
 		getCurrentDate() {
 			const date = new Date();
 			const formattedDate = date.toISOString().split("T")[0];
-			// const currentDate = new Date();
-			// const year = currentDate.getFullYear();
-			// const month = String(currentDate.getMonth() + 1).padStart(2, '0'); // Add 1 to the month since it is zero-based
-			// const day = String(currentDate.getDate()).padStart(2, '0');
-			// const formattedDate = `${year}-${month}-${day}`;
 			console.log(formattedDate);
 			return formattedDate;
-		},
-		changeCategory(category_id) {
-			this.currentPayment.category_id = parseInt(category_id);
-			this.$nextTick(() => {
-				this.setCategory();
-			});
 		},
 		setCategory() {
 			if (!this.categories) {
 				this.categories = this.$store.state.sprs.categories;
-			}
-			let parent_category_id = undefined;
-			this.category = this.categories.find(obj => obj.id === this.currentPayment.category_id);
-			if (!this.category) {
-				this.category = this.categories[0].id;
-			}
-
-			if (this.category.parent_id === 0) {
-				parent_category_id = this.category.id;
-			} else {
-				parent_category_id = this.category.parent_id;
-			}
-
-			let options = this.categories.filter(obj => obj.parent_id === 0);
-
-			let main_category = this.$refs.main_category;
-			main_category.innerHTML = "";
-
-			for (let i = 0; i < options.length; i++) {
-				let option = document.createElement("option");
-				option.value = options[i].id;
-				option.text = options[i].name;
-				if (options[i].id === parent_category_id) {
-					option.selected = true;
-				}
-				main_category.appendChild(option);
-			}
-
-			let sub_options = this.categories.filter(obj => obj.parent_id !== 0);
-			let sub_category = this.$refs.sub_category;
-			sub_category.innerHTML = `<option value=${parent_category_id}></option>`;
-
-			for (let i = 0; i < sub_options.length; i++) {
-				if (sub_options[i].parent_id === parent_category_id) {
-					let sub_option = document.createElement("option");
-					sub_option.value = sub_options[i].id;
-					sub_option.text = sub_options[i].name;
-					if (sub_options[i].id === this.category.id) {
-						sub_option.selected = true;
-					}
-					sub_category.appendChild(sub_option);
-				}
-			}
-			if (this.isFuel && !this.currentPayment.refuel_data.km && this.currentPayment.mydesc) {
-				this.currentPayment.refuel_data.station_name = this.currentPayment.mydesc;
 			}
 		},
 		openFormAddPayment() {
@@ -298,6 +266,7 @@ export default {
 						};
 					}
 					this.setCategory();
+					this.selectedCategoryId = this.currentPayment.category_id;
 					console.log(response.data);
 					this.okTitle = "Edit";
 					this.$nextTick(() => {
@@ -344,7 +313,7 @@ export default {
 					this.$refs.myAlert.showAlert("danger", "Payment add failed");
 				});
 			this.showModal = false;
-			this.category = undefined;
+			this.selectedCategory = undefined;
 			this.isFuel = false;
 
 		},
@@ -360,7 +329,7 @@ export default {
 								category_name: this.currentPayment.category_name,
 								mydesc: this.currentPayment.mydesc,
 								rdate: this.currentPayment.rdate,
-								currency_amount: this.currentPayment.currency_amount,
+								amount: this.currentPayment.currency_amount,
 							};
 						}
 					});
@@ -382,7 +351,7 @@ export default {
 				.then((response) => {
 					console.log(response.data.data);
 					const index = this.payments
-						.map(function(item) {
+						.map(function (item) {
 							return item.id;
 						})
 						.indexOf(this.currentPayment.id);
@@ -410,7 +379,7 @@ export default {
 					let total = 0;
 					let total_cnt = 0;
 					this.payments.forEach((val) => {
-						total += Number(val.amount);
+						total += Number(val.currency_amount);
 						total_cnt += 1;
 						//or if you pass float numbers , use parseFloat()
 					});

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <b-table-simple hover small caption-top responsive>
-      <caption>Table Head</caption>
+<!--      <caption>Table Head</caption>-->
       <colgroup>
     <col />
     <col />
@@ -29,7 +29,7 @@
       <b-td>{{ year.cnt }}</b-td>
   </b-tr>
 </b-tbody>
-  <b-tfoot><b-tr><b-td colspan="3"></b-td></b-tr>Table footer</b-tfoot>
+  <b-tfoot><b-tr><b-td colspan="3"></b-td></b-tr></b-tfoot>
   </b-table-simple>
   <div v-if="(years.length == 0)">Data loading...</div>
   </div>
