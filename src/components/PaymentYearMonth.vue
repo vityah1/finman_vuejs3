@@ -135,7 +135,7 @@ export default {
 				});
 		},
 		async getPaymentsYears() {
-			PaymentService.getPaymentsYears({currency: store.state.sprs.selectedCurrency || "UAH"})
+			PaymentService.getPaymentsYears({currency: store.state.sprs.selectedCurrency || "UAH", "grouped": true})
 				.then((response) => {
 					let filteredYears = response.data.filter(obj => obj.year > 1900);
 					this.years = filteredYears.map(obj => obj.year);
