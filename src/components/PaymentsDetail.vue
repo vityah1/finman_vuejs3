@@ -380,7 +380,7 @@ export default {
 					let total = 0;
 					let total_cnt = 0;
 					this.payments.forEach((val) => {
-						total += Number(val.currency_amount);
+						total += Number(val.amount);
 						total_cnt += 1;
 						//or if you pass float numbers , use parseFloat()
 					});
