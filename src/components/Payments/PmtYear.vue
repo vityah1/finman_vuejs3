@@ -68,7 +68,7 @@
 </template>
 
 <script>
-import PaymentService from "../services/PaymentService";
+import PaymentService from "../../services/PaymentService";
 import store from "@/store";
 
 export default {

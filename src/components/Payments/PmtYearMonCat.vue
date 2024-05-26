@@ -134,9 +134,9 @@
 </template>
 
 <script>
-import PaymentService from "../services/PaymentService";
+import PaymentService from "../../services/PaymentService";
 import moment from "moment";
-import store from "../store";
+import store from "../../store";
 
 export default {
 	name: "PaymentsDetail",

@@ -70,7 +70,7 @@
 </template>
 
 <script>
-import MonoUsersService from "../services/MonoUsersService";
+import MonoUsersService from "../../../services/MonoUsersService";
 export default {
   name: "MonoUsers",
   data() {

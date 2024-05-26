@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import RevolutService from "../services/RevolutService";
+import RevolutService from "../../services/RevolutService";
 export default {
   name: "RevolutForm",
   data() {

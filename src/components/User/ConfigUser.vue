@@ -93,7 +93,7 @@
 </template>
 
 <script>
-import ConfigService from "../services/ConfigService";
+import ConfigService from "../../services/ConfigService";
 
 export default {
   name: "ConfigUser",

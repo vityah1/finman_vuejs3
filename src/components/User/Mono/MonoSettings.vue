@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import MonoService from "../services/MonoService";
+import MonoService from "../../../services/MonoService";
 
 export default {
   name: "MonoSettings",

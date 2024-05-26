@@ -39,8 +39,8 @@
 </template>
 
 <script>
-import MonoService from "../services/MonoService";
-import MonoUsersService from '../services/MonoUsersService';
+import MonoService from "../../services/MonoService";
+import MonoUsersService from '../../services/MonoUsersService';
 
 export default {
   name: "MonoPayments",

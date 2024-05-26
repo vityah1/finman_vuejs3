@@ -92,7 +92,7 @@
 </template>
 
 <script>
-import PaymentService from "../services/PaymentService";
+import PaymentService from "../../services/PaymentService";
 import MonoUsersService from "@/services/MonoUsersService";
 import store from "@/store";
 
