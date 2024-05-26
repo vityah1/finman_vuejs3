@@ -16,7 +16,8 @@
 					</div>
 					<div class="form-row">
 						<label for="main_category">Category:</label>
-						<select v-model="selectedCategoryId" class="form-control" name="main_category" id="main_category">
+						<select v-model="selectedCategoryId" class="form-control" name="main_category"
+								id="main_category">
 							<option disabled value="">Select category...</option>
 							<template v-for="category in formattedCategories" :key="category.id">
 								<option :value="category.id">{{ category.name }}</option>
@@ -28,14 +29,11 @@
 						<label for="id_km">km:</label>
 						<input type="text" class="form-control" id="id_km" v-model="currentPayment.refuel_data.km" />
 						<label for="id_litres">Litres:</label>
-						<input type="text" class="form-control" id="id_litres"
-							v-model="currentPayment.refuel_data.litres" />
+						<input type="text" class="form-control" id="id_litres" v-model="currentPayment.refuel_data.litres" />
 						<label for="id_price_val">Price (EUR):</label>
-						<input type="text" class="form-control" id="id_price_val"
-							v-model="currentPayment.refuel_data.price_val" />
+						<input type="text" class="form-control" id="id_price_val" v-model="currentPayment.refuel_data.price_val" />
 						<label for="id_name_station">Name station:</label>
-						<input type="text" class="form-control" id="id_name_station"
-							v-model="currentPayment.refuel_data.station_name" />
+						<input type="text" class="form-control" id="id_name_station" v-model="currentPayment.refuel_data.station_name" />
 
 					</div>
 
@@ -47,14 +45,13 @@
 					<div class="row">
 						<div class="col-md-4">
 							<label for="amount"><strong>Amount:</strong></label>
-							<input type="text" class="form-control" id="amount"
-								v-model="currentPayment.currency_amount" />
+							<input type="text" class="form-control" id="amount" v-model="currentPayment.currency_amount" />
 						</div>
 
 						<div class="col-md-4">
 							<label for="source">Source:</label>
 							<select class="form-control" id="source" ref="source" name="source"
-								v-model="currentPayment.source">
+									v-model="currentPayment.source">
 								<option v-for="item in sources" :value="item.source" :key="item.id">{{ item.source }}
 								</option>
 							</select>
@@ -63,7 +60,7 @@
 						<div class="col-md-4">
 							<label for="currency">Currency:</label>
 							<select class="form-control" id="currency" ref="currency" name="currency"
-								v-model="currentPayment.currency">
+									v-model="currentPayment.currency">
 								<option value="USD">USD</option>
 								<option value="EUR">EUR</option>
 								<option value="UAH">UAH</option>
@@ -94,42 +91,46 @@
 		</div>
 		<div class="row" v-if="this.total">
 			<div class="col-2 h4 text-success">Total:</div>
-			<div class="col-4 h4 text-danger">{{ this.total.toLocaleString() }} {{ selectedCurrency || '' }}</div>
+			<div class="col-4 h4 text-danger">{{ this.total.toLocaleString() }} {{ selectedCurrency || "" }}</div>
 			<div class="col-4">{{ this.total_cnt }}</div>
 		</div>
-		<b-table-simple hover small caption-top responsive>
-			<!-- <caption>category: {{ category_name }}</caption> -->
-			<colgroup>
-				<col />
-				<col />
-				<col />
-				<col />
-			</colgroup>
-			<b-thead head-variant="dark">
-				<b-tr>
-					<b-th @click="sortPayments(1)">Date</b-th>
-					<b-th @click="sortPayments(2)">Category</b-th>
-					<b-th>Descript</b-th>
-					<b-th @click="sortPayments(3)">Amount</b-th>
-					<b-th>Mono user</b-th>
-				</b-tr>
-			</b-thead>
+		<div class="row">
+			<div class="col-md-8">
+				<b-table-simple hover small caption-top responsive>
+					<!-- <caption>category: {{ category_name }}</caption> -->
+					<colgroup>
+						<col />
+						<col />
+						<col />
+						<col />
+					</colgroup>
+					<b-thead head-variant="dark">
+						<b-tr>
+							<b-th @click="sortPayments(1)">Date</b-th>
+							<b-th @click="sortPayments(2)">Category</b-th>
+							<b-th>Descript</b-th>
+							<b-th @click="sortPayments(3)">Amount</b-th>
+							<b-th>Mono user</b-th>
+						</b-tr>
+					</b-thead>
 
-			<b-tbody v-if="(payments.length > 0)">
-				<b-tr v-for="(payment, index) in payments" :key="index" @click="openFormEditPayment(payment.id)">
-					<b-td>
+					<b-tbody v-if="(payments.length > 0)">
+						<b-tr v-for="(payment, index) in payments" :key="index" @click="openFormEditPayment(payment.id)">
+							<b-td>
 						<span>
 							{{ $moment(payment.rdate).format("DD.MMM") }}
 						</span>
-					</b-td>
-					<b-td>{{ payment.category_name }}</b-td>
-					<b-td>{{ payment.mydesc }}</b-td>
-					<b-td>{{ payment.amount.toLocaleString() || 0}}</b-td>
-					<b-td>{{ payment.mono_user_name }}</b-td>
-				</b-tr>
-			</b-tbody>
-		</b-table-simple>
-		<div v-if="(payments.length === 0)">Data loading...</div>
+							</b-td>
+							<b-td>{{ payment.category_name }}</b-td>
+							<b-td>{{ payment.mydesc }}</b-td>
+							<b-td>{{ payment.amount.toLocaleString() || 0 }}</b-td>
+							<b-td>{{ payment.mono_user_name }}</b-td>
+						</b-tr>
+					</b-tbody>
+				</b-table-simple>
+				<div v-if="(payments.length === 0)">Data loading...</div>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -142,7 +143,7 @@ export default {
 	name: "PaymentsDetail",
 	data() {
 		return {
-			selectedCategoryId: '',
+			selectedCategoryId: "",
 			okTitle: "",
 			showModal: false,
 			payments: [],
@@ -181,13 +182,13 @@ export default {
 		},
 		selectedCurrency() {
 			return store.state.sprs.selectedCurrency;
-		}
+		},
 	},
 	watch: {
-		"selectedCategory.name": function (newName, oldName) {
+		"selectedCategory.name": function(newName, oldName) {
 			console.log("Change category.name to", newName, " from: ", oldName);
 		},
-		"selectedCategoryId": function (newCategoryId, oldCategoryId) {
+		"selectedCategoryId": function(newCategoryId, oldCategoryId) {
 			console.log("Change selectedCategoryId to", newCategoryId, " from: ", oldCategoryId);
 			this.currentPayment.category_id = parseInt(newCategoryId);
 			this.selectedCategory = this.categories.find(category => category.id === parseInt(newCategoryId));
@@ -195,17 +196,17 @@ export default {
 				this.currentPayment.refuel_data.station_name = this.currentPayment.mydesc;
 			}
 		},
-		"$route.query.action": function (newAction, oldAction) {
+		"$route.query.action": function(newAction, oldAction) {
 			console.log("oldAction: ", oldAction);
 			if (newAction === "add") {
 				this.openFormAddPayment();
 			}
 		},
-		"$route.path": function (newPath, oldPath) {
+		"$route.path": function(newPath, oldPath) {
 			console.log("Change route.path to", newPath, " from: ", oldPath);
 			this.getPayments();
 		},
-		"$store.state.buttonClicked": function (newAction, oldAction) {
+		"$store.state.buttonClicked": function(newAction, oldAction) {
 			console.log("Change buttonClicked to", newAction, " from: ", oldAction);
 			if (newAction) {
 				this.openFormAddPayment();
@@ -214,14 +215,14 @@ export default {
 		},
 	},
 	methods: {
-		formatCategories(categories, parentId = null, prefix = '') {
+		formatCategories(categories, parentId = null, prefix = "") {
 			return categories.reduce((acc, category) => {
 				if ((category.parent_id === parentId) || (parentId === null && !category.parent_id)) {
 					acc.push({
 						...category,
-						name: prefix + category.name
+						name: prefix + category.name,
 					});
-					const children = this.formatCategories(categories, category.id, prefix + '--');
+					const children = this.formatCategories(categories, category.id, prefix + "--");
 					acc = acc.concat(children);
 				}
 				return acc;
@@ -351,7 +352,7 @@ export default {
 				.then((response) => {
 					console.log(response.data.data);
 					const index = this.payments
-						.map(function (item) {
+						.map(function(item) {
 							return item.id;
 						})
 						.indexOf(this.currentPayment.id);

@@ -1,5 +1,5 @@
 <template>
-	<div class="list row">
+	<div class="row">
 		<div class="col-md-8">
 			<div class="input-group mb-3">
 				<select
@@ -51,43 +51,44 @@
 					</button>
 				</div>
 			</div>
-		</div>
-	</div>
-	<div class="container">
-		<b-table-simple hover small caption-top responsive>
-<!--			<caption>List expenses</caption>-->
-			<colgroup>
-				<col />
-				<col />
-				<col />
-			</colgroup>
-			<b-thead head-variant="dark">
-				<b-tr>
-					<b-th>Total:</b-th>
-					<b-th>{{ total.toLocaleString() }}</b-th>
-					<b-th>{{ total_cnt }}</b-th>
-				</b-tr>
-			</b-thead>
-			<b-tbody>
-				<b-tr
-					v-for="(category, index) in catcosts"
-					:key="index">
-					<b-td>
-						<router-link
-							:to="{
+
+			<div class="container">
+				<b-table-simple hover small caption-top responsive>
+					<!--			<caption>List expenses</caption>-->
+					<colgroup>
+						<col />
+						<col />
+						<col />
+					</colgroup>
+					<b-thead head-variant="dark">
+						<b-tr>
+							<b-th>Total:</b-th>
+							<b-th>{{ total.toLocaleString() }}</b-th>
+							<b-th>{{ total_cnt }}</b-th>
+						</b-tr>
+					</b-thead>
+					<b-tbody>
+						<b-tr
+							v-for="(category, index) in catcosts"
+							:key="index">
+							<b-td>
+								<router-link
+									:to="{
         name: 'payments', 
         params: { action: 'show', year: year, month: month, category_id: category.category_id} 
         }"
-						>
-							{{ category.name }}
-						</router-link>
-					</b-td>
-					<b-td>{{ category.amount.toLocaleString() }}</b-td>
-					<b-td>{{ category.cnt }}</b-td>
+								>
+									{{ category.name }}
+								</router-link>
+							</b-td>
+							<b-td>{{ category.amount.toLocaleString() }}</b-td>
+							<b-td>{{ category.cnt }}</b-td>
 
-				</b-tr>
-			</b-tbody>
-		</b-table-simple>
+						</b-tr>
+					</b-tbody>
+				</b-table-simple>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -135,7 +136,7 @@ export default {
 				});
 		},
 		async getPaymentsYears() {
-			PaymentService.getPaymentsYears({currency: store.state.sprs.selectedCurrency || "UAH", "grouped": true})
+			PaymentService.getPaymentsYears({ currency: store.state.sprs.selectedCurrency || "UAH", "grouped": true })
 				.then((response) => {
 					let filteredYears = response.data.filter(obj => obj.year > 1900);
 					this.years = filteredYears.map(obj => obj.year);
