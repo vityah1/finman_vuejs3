@@ -53,7 +53,7 @@
 						<table class="w-100">
 							<b-tr>
 								<b-td colspan="10"><span class="fw-bold text-dark">{{ config_type.name }}: </span>
-									<b-button v-if="(!(config_type.id) || (config_type.is_multiple))"
+									<b-button
                                        @click="add_config(config_type.type_data, config_type.is_need_add_value, config_type.name)"
                                        variant="outline-primary"
                                        class="btn-sm"
