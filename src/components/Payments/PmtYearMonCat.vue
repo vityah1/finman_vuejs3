@@ -82,8 +82,8 @@
 					params: { year: $route.params.year, month: $route.params.month },
 				}"><i class="fas fa-angle-double-left"></i></router-link>
 			</div>
-			<div class="col-11">
-				<span class="text-small primary" v-if="this.category_name">{{ this.category_name }}</span>
+			<div class="col">
+				<span class="text-small primary me-2" v-if="this.category_name">{{ this.category_name }}</span>
 				<span v-if="this.$route.params.year" class="text-primary">{{ this.$route.params.year }}-</span>
 				<span v-if="this.$route.params.month" class="text-primary">{{ this.$route.params.month }}</span>
 				<span v-if="this.$route.query.user">[{{ this.$route.query.user }}]</span>
@@ -107,7 +107,7 @@
 					<b-thead head-variant="dark">
 						<b-tr>
 							<b-th @click="sortPayments(1)">Date</b-th>
-							<b-th @click="sortPayments(2)">Category</b-th>
+							<b-th @click="sortPayments(2)">Sub Category</b-th>
 							<b-th>Descript</b-th>
 							<b-th @click="sortPayments(3)">Amount</b-th>
 							<b-th>Mono user</b-th>
@@ -121,7 +121,7 @@
 							{{ $moment(payment.rdate).format("DD.MMM") }}
 						</span>
 							</b-td>
-							<b-td>{{ payment.category_name }}</b-td>
+							<b-td><span v-if="payment.category_name !== category_name">{{ payment.category_name }}</span></b-td>
 							<b-td>{{ payment.mydesc }}</b-td>
 							<b-td>{{ payment.amount.toLocaleString() || 0 }}</b-td>
 							<b-td>{{ payment.mono_user_name }}</b-td>
@@ -342,11 +342,6 @@ export default {
 				});
 			this.showModal = false;
 		},
-		removeFromArrayOfHash(p_array_of_hash, p_key, p_value_to_remove) {
-			return p_array_of_hash.filter((l_cur_row) => {
-				return l_cur_row[p_key] !== p_value_to_remove;
-			});
-		},
 		async delPayment() {
 			PaymentService.deletePayment(this.currentPayment.id)
 				.then((response) => {
@@ -407,13 +402,9 @@ export default {
 				});
 		},
 		findCategoryNameById(categoryId) {
-			for (let i = 0; i < this.categories.length; i++) {
-				if (this.categories[i].id === parseInt(categoryId)) {
-					return this.categories[i].name;
-				}
-			}
-			return null;
-		},
+            const category = this.categories.find(category => category.id === parseInt(categoryId));
+            return category ? category.name : null;
+        }
 	},
 	async mounted() {
 		if (!this.currentUser) {
@@ -423,7 +414,7 @@ export default {
 		this.currencies = this.$store.state.sprs.currencies;
 		this.sources = this.$store.state.sprs.sources;
 		this.action = this.$route.query.action;
-		this.category_name = this.findCategoryNameById(this.category_id);
+		this.category_name = this.findCategoryNameById(this.$route.params.category_id);
 		console.log("this.action : ", this.action);
 		await this.getPayments();
 		if (this.action === "add") {
