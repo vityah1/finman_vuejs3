@@ -40,59 +40,35 @@
 			</div>
 		</b-modal>
 
-		<b-table-simple hover small caption-top responsive>
-			<caption>Add user setting: </caption>
-			<b-thead>
-				<!-- <b-th>Name</b-th>
-				<b-th>Value</b-th>
-				<b-th>Add value</b-th> -->
-			</b-thead>
-			<b-tbody v-if="(config_types.length > 0)">
-				<b-tr v-for="(config_type, index) in config_types" :key="index">
-					<b-td>
-						<table class="w-100">
-							<b-tr>
-								<b-td colspan="10"><span class="fw-bold text-dark">{{ config_type.name }}: </span>
+<b-table-simple hover small caption-top responsive>
+  <caption>User settings</caption>
+
+  <b-tbody v-if="(configs.length > 0)">
+    <b-tr v-for="(config_type, index) in config_types" :key="index">
+      <b-td>
+        <table class="w-100">
+          <b-tr>
+              <b-td colspan="10">
+            <!-- Show config name only for the first occurrence -->
+              <span class="fw-bold text-dark">{{ config_type.name }}: </span>
 									<b-button
+										v-if="config_type.is_multiple || filteredConfigs(config_type.type_data).length === 0"
                                        @click="add_config(config_type.type_data, config_type.is_need_add_value, config_type.name)"
                                        variant="outline-primary"
                                        class="btn-sm"
 									> ➕
 									</b-button>
-								</b-td>
-							</b-tr>
-
-						</table>
-					</b-td>
-				</b-tr>
-			</b-tbody>
-		</b-table-simple>
-
-<!--			<div><p>&nbsp;</p></div>-->
-<b-table-simple hover small caption-top responsive>
-  <caption>User settings</caption>
-
-  <b-tbody v-if="(configs.length > 0)">
-    <b-tr v-for="(config, index) in configs" :key="index">
-      <b-td>
-        <table class="w-100">
-          <b-tr>
-            <!-- Show config name only for the first occurrence -->
-            <b-td v-if="index === 0 || config.name !== configs[index - 1].name" colspan="10">
-              <span class="fw-bold text-dark">{{ config.name }}: </span>
-            </b-td>
-            <!-- Leave this part empty if the name is repeated -->
-            <b-td v-else :colspan="10"></b-td>
+              </b-td>
           </b-tr>
-          <b-tr @click="get_config(config.id, config.is_need_add_value, config.name)">
+		<b-tr v-for="(config, i) in filteredConfigs(config_type.type_data)" :key="i" @click="get_config(config.id, config_type.is_need_add_value, config_type.name)">
             <b-td class="col-1"><span v-if="config.id">[{{ config.id }}]</span></b-td>
-            <b-td v-if="!config.is_need_add_value" class="text-start col-12">{{ config.value_data }}</b-td>
+            <b-td v-if="!config_type.is_need_add_value" class="text-start col-12">{{ config.value_data }}</b-td>
             <b-td v-else class="text-start col-2 col-md-3">{{ config.value_data }}</b-td>
             <b-td class="text-start col-4 col-md-6">
-              <span v-if="(config.is_need_add_value && config.add_value && config.type_data === 'category_replace')">
+              <span v-if="(config_type.is_need_add_value && config.add_value && config_type.type_data === 'category_replace')">
                 -> [{{ findCategoryNameById(config.add_value) }}]
               </span>
-              <span v-else-if="(config.is_need_add_value && config.add_value)" class="text-bold">
+              <span v-else-if="(config_type.is_need_add_value && config.add_value)" class="text-bold">
                 -> {{ config.add_value }}
               </span>
             </b-td>
@@ -131,6 +107,10 @@ export default {
 		currentUser() {
 			return this.$store.state.auth.user;
 		},
+	filteredConfigs() {return (type_data) => {
+      return this.configs.filter(config => config.type_data === type_data);
+    };
+  }
 	},
 	methods: {
 		async getConfigTypes(mode) {
@@ -143,6 +123,7 @@ export default {
 				});
 		},
 		async add_config(type_data, is_need_add_value, name) {
+			this.currentConfig.id = null;
 			this.currentConfig.value_data = "";
 			this.currentConfig.type_data = type_data;
 			this.currentConfig.is_need_add_value = is_need_add_value;
