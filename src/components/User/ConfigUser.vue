@@ -2,8 +2,8 @@
 	<div class="container">
 		<alert-component ref="myAlert"></alert-component>
 		<!-- Modal -->
-		<b-modal v-if="currentConfig.name" v-model="showModal" @ok="updateConfig()" :title="okTitle" :okTitle="okTitle">
-			<div v-if="this.currentConfig.id">
+		<b-modal v-if="currentConfig.name" v-model="showModal" @ok="handleOk()" :title="okTitle" :okTitle="okTitle">
+			<div v-if="this.currentConfig.action === 'edit'">
 				<h5 class="modal-title text-danger">
 					Edit {{ this.currentConfig.name }}
 					<span v-if="this.currentConfig.id">[{{ this.currentConfig.id }}]</span>
@@ -53,14 +53,14 @@
               <span class="fw-bold text-dark">{{ config_type.name }}: </span>
 									<b-button
 										v-if="config_type.is_multiple || filteredConfigs(config_type.type_data).length === 0"
-                                       @click="add_config(config_type.type_data, config_type.is_need_add_value, config_type.name)"
+                                       @click="addConfigForm(config_type.type_data, config_type.is_need_add_value, config_type.name)"
                                        variant="outline-primary"
                                        class="btn-sm"
 									> ➕
 									</b-button>
               </b-td>
           </b-tr>
-		<b-tr v-for="(config, i) in filteredConfigs(config_type.type_data)" :key="i" @click="get_config(config.id, config_type.is_need_add_value, config_type.name)">
+		<b-tr v-for="(config, i) in filteredConfigs(config_type.type_data)" :key="i" @click="editConfigForm(config.id, config_type.is_need_add_value, config_type.name)">
             <b-td class="col-1"><span v-if="config.id">[{{ config.id }}]</span></b-td>
             <b-td v-if="!config_type.is_need_add_value" class="text-start col-12">{{ config.value_data }}</b-td>
             <b-td v-else class="text-start col-2 col-md-3">{{ config.value_data }}</b-td>
@@ -113,6 +113,13 @@ export default {
   }
 	},
 	methods: {
+		handleOk() {
+            if (this.currentConfig.action === 'edit') {
+                this.updateConfig();
+            } else if (this.currentConfig.action === 'add') {
+                this.addConfig();
+            }
+        },
 		async getConfigTypes(mode) {
 			ConfigService.getConfigTypes(mode)
 				.then((response) => {
@@ -122,7 +129,7 @@ export default {
 					console.log(e);
 				});
 		},
-		async add_config(type_data, is_need_add_value, name) {
+		async addConfigForm(type_data, is_need_add_value, name) {
 			this.currentConfig.id = null;
 			this.currentConfig.value_data = "";
 			this.currentConfig.type_data = type_data;
@@ -133,7 +140,7 @@ export default {
 			this.okTitle = "Add";
 			this.showModal = true;
 		},
-		async get_config(id, is_need_add_value, name) {
+		async editConfigForm(id, is_need_add_value, name) {
 			ConfigService.getConfig(id)
 				.then((response) => {
 					this.currentConfig = response.data;
@@ -158,6 +165,19 @@ export default {
 				.catch((e) => {
 					console.log(e);
 					this.$refs.myAlert.showAlert("danger", "config update failed");
+				});
+			this.showModal = false;
+		},
+		async addConfig() {
+			ConfigService.addConfig(this.currentConfig)
+				.then((response) => {
+					console.log(`user config: ${response}`);
+					this.getUserConfig();
+					this.$refs.myAlert.showAlert("success", "config added");
+				})
+				.catch((e) => {
+					console.log(e);
+					this.$refs.myAlert.showAlert("danger", "config add failed");
 				});
 			this.showModal = false;
 		},
