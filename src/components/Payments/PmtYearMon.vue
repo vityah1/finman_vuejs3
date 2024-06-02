@@ -117,6 +117,7 @@ export default {
 				{ number: 10, name: "Жовтень" },
 				{ number: 11, name: "Листопад" },
 				{ number: 12, name: "Грудень" },
+				{ number: 99, name: "Всі" },
 			],
 			total: 0,
 			total_cnt: 0,
@@ -127,6 +128,10 @@ export default {
 	methods: {
 		async getPaymentsPeriod(data) {
 			data["currency"] = this.$store.state.sprs.selectedCurrency || "UAH";
+			if (data.month === 99) {
+				this.$router.push({ name: 'payments_year', params: {year: data.year} });
+				return;
+			}
 			PaymentService.getPaymentsPeriod(data)
 				.then((response) => {
 					this.catcosts = response.data;

@@ -1,10 +1,10 @@
 <template>
 	<div class="container">
 		<div class="row">
-			<div class="col-3">
+			<div class="col-auto">
 				<span>Year:</span>
 			</div>
-			<div class="col-3">
+			<div class="col-auto">
 				<div class="input-group mb-3">
 					<select
 						class="form-control"
@@ -20,50 +20,58 @@
 					</select>
 				</div>
 			</div>
+				<div class="col-auto">
+					<span class="text-danger me-3">{{ total.toLocaleString() }} {{ selectedCurrency || "UAH" }}</span>
+					<span class="text-muted">[{{ total_cnt }}]</span>
+				</div>
 		</div>
 
+		<!--<div class="row">-->
+		<!--	<div class="col text-right h4">-->
+		<!--		Total amount:-->
+		<!--		<span class="text-danger">{{ total.toLocaleString() }} {{ selectedCurrency || "UAH" }}</span>-->
+		<!--		<span class="text-muted">[{{ total_cnt }}]</span>-->
+		<!--	</div>-->
+		<!--</div>-->
 		<div class="row">
-			<div class="col-1 text-small">UAH</div>
-			<div class="col-4 h4 text-danger">
-				{{ total.toLocaleString() }}
+			<div class="col-md-8">
+				<b-table-simple hover small caption-top responsive class="table-sm">
+					<!--      <caption>Table Head</caption>-->
+					<colgroup>
+						<col />
+						<col />
+						<col />
+					</colgroup>
+					<b-thead head-variant="dark">
+						<b-tr>
+							<b-th class="px-2">Month</b-th>
+							<b-th class="px-2">Amount</b-th>
+							<b-th class="px-2">Count</b-th>
+						</b-tr>
+					</b-thead>
+					<b-tbody v-if="(payments_in_year.length > 0)">
+						<b-tr v-for="(month, index) in payments_in_year" :key="index">
+							<b-td class="px-2">
+								<router-link
+									class="col-4"
+									:to="{ name: 'payments_year_month', params: { year: year, month: month.month} }"
+								>
+									[{{ month.month }}] {{ getMonthName(month.month) }}
+								</router-link>
+							</b-td>
+							<b-td class="px-2">{{ month.amount.toLocaleString() }}</b-td>
+							<b-td class="px-2">{{ month.cnt }}</b-td>
+						</b-tr>
+					</b-tbody>
+					<b-tfoot>
+						<b-tr>
+							<b-td collspan="3"></b-td>
+						</b-tr>
+					</b-tfoot>
+				</b-table-simple>
+				<div v-if="(payments_in_year.length == 0)">Data loading...</div>
 			</div>
-			<div class="col-4">{{ total_cnt }}</div>
 		</div>
-		<b-table-simple hover small caption-top responsive>
-			<!--      <caption>Table Head</caption>-->
-			<colgroup>
-				<col />
-				<col />
-				<col />
-			</colgroup>
-			<b-thead head-variant="dark">
-				<b-tr>
-					<b-th>Month</b-th>
-					<b-th>Amount</b-th>
-					<b-th>Count</b-th>
-				</b-tr>
-			</b-thead>
-			<b-tbody v-if="(payments_in_year.length > 0)">
-				<b-tr v-for="(month, index) in payments_in_year" :key="index">
-					<b-td>
-						<router-link
-							class="col-4"
-							:to="{ name: 'payments_year_month', params: { year: year, month: month.month} }"
-						>
-							{{ month.month }}
-						</router-link>
-					</b-td>
-					<b-td>{{ month.amount.toLocaleString() }}</b-td>
-					<b-td>{{ month.cnt }}</b-td>
-				</b-tr>
-			</b-tbody>
-			<b-tfoot>
-				<b-tr>
-					<b-td collspan="3"></b-td>
-				</b-tr>
-			</b-tfoot>
-		</b-table-simple>
-		<div v-if="(payments_in_year.length == 0)">Data loading...</div>
 	</div>
 </template>
 
@@ -81,15 +89,21 @@ export default {
 			total_cnt: 0,
 			years: this.getArrayOfYears(2014),
 			users: [],
+			selectedCurrency: store.state.sprs.selectedCurrency || "UAH",
 		};
 	},
 	methods: {
+		getMonthName(monthNumber) {
+			const date = new Date();
+			date.setMonth(monthNumber - 1);
+			return date.toLocaleString(this.$store.state.locale || "default", { month: "long" });
+		},
 		getArrayOfYears: function(startYear) {
 			const currentYear = new Date().getFullYear();
 			return Array.from({ length: currentYear - startYear + 1 }, (_, i) => startYear + i);
 		},
 		async retrieveMonths(year) {
-			PaymentService.getPaymentsInYear(year, {currency: store.state.sprs.selectedCurrency || "UAH"})
+			PaymentService.getPaymentsInYear(year, { currency: store.state.sprs.selectedCurrency || "UAH" })
 				.then((response) => {
 					this.payments_in_year = response.data;
 					console.log(response.data);

@@ -75,7 +75,7 @@ const routes = [
     },
     {
         path: "/payments/years/:year",
-        name: "payments_months",
+        name: "payments_year",
         component: () => import("./components/Payments/PmtYear.vue")
     },
     {

@@ -17,7 +17,7 @@
 			<b-navbar-nav>
 				<b-nav-item>
 					<router-link :to="{ path: '/' }" class="nav-link">
-						<i class="fas fa-home"></i> Home
+						<i class="fas fa-home"></i>
 					</router-link>
 				</b-nav-item>
 				<b-nav-item v-if="currentUser">
