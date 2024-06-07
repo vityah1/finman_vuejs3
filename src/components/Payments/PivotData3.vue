@@ -1,24 +1,16 @@
 <template>
-  <div class="container">
     <alert-component ref="myAlert"></alert-component>
 
     <div class="row">
-      <div class="col-1">
-        <router-link :to="{
-          name: 'payments_year_month',
-          params: { year: $route.params.year, month: $route.params.month },
-        }"><i class="fas fa-angle-double-left"></i></router-link>
-      </div>
-      <div class="col">
-        <span v-if="category_name" class="text-small primary me-2">{{ category_name }}</span>
-        <span v-if="$route.params.year" class="text-primary">{{ $route.params.year }}-</span>
-        <span v-if="$route.params.month" class="text-primary">{{ $route.params.month }}</span>
-        <span v-if="$route.query.user">[{{ $route.query.user }}]</span>
-      </div>
+	<div class="col-md-8">
+			<selector-component
+				@change="handleSelectChange"
+			/>
+      <span> [Flexmonster]</span>
     </div>
 
     <div class="row">
-      <div class="col-md-8">
+      <div class="col-12">
         <div id="pivot-container"></div>
         <div v-if="payments.length === 0">Data loading...</div>
       </div>
@@ -30,10 +22,12 @@
 import PaymentService from "../../services/PaymentService";
 import store from "../../store";
 import Flexmonster from "flexmonster"; // Імпорт Flexmonster
-import "flexmonster/flexmonster.css"; // Імпорт стилів Flexmonster
+import "flexmonster/flexmonster.css";
+import SelectorComponent from "@/components/SelectorComponent.vue"; // Імпорт стилів Flexmonster
 
 export default {
   name: "PivotData",
+	components: { SelectorComponent },
   data() {
     return {
       payments: [],
@@ -54,19 +48,8 @@ export default {
     payments() {
       this.createPivotTable();
     },
-    "$route.query.action"(newAction) {
-      if (newAction === "add") {
-        this.openFormAddPayment();
-      }
-    },
     "$route.path"() {
       this.getPaymentData();
-    },
-    "$store.state.buttonClicked"(newAction) {
-      if (newAction) {
-        this.openFormAddPayment();
-        this.$store.commit("setButtonClicked", false);
-      }
     },
   },
   methods: {
@@ -97,7 +80,6 @@ export default {
     },
     async getPaymentData() {
       let data = {
-        sort: this.$route.query.sort || "",
         year: this.$route.params.year || "",
         month: this.$route.params.month || "",
         q: this.$route.query.q || "",
@@ -110,6 +92,12 @@ export default {
         console.log(e);
       }
     },
+	handleSelectChange({ year, month, mono_user_id }) {
+			this.$router.push({
+				name: "pivot_payments_3",
+				params: { year: year, month: month, mono_user_id: mono_user_id },
+			});
+		},
   },
   async mounted() {
     if (!this.currentUser) {
@@ -118,11 +106,7 @@ export default {
     this.categories = this.$store.state.sprs.categories;
     this.currencies = this.$store.state.sprs.currencies;
     this.sources = this.$store.state.sprs.sources;
-    this.action = this.$route.query.action;
     await this.getPaymentData();
-    if (this.action === "add") {
-      this.openFormAddPayment();
-    }
   },
 };
 </script>

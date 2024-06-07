@@ -72,29 +72,9 @@ const routes = [
         component: () => import("./components/Payments/PivotData.vue"),
     },
     {
-        path: "/payments/:year/:month/pivot2",
-        name: "pivot_payments_2",
-        component: () => import("./components/Payments/PivotData2.vue"),
-    },
-    {
         path: "/payments/:year/:month/pivot3",
         name: "pivot_payments_3",
         component: () => import("./components/Payments/PivotData3.vue"),
-    },
-    {
-        path: "/payments/:year/:month/pivot4",
-        name: "pivot_payments_4",
-        component: () => import("./components/Payments/PivotData4.vue"),
-    },
-    {
-        path: "/payments/:year/:month/pivot5",
-        name: "pivot_payments_5",
-        component: () => import("./components/Payments/PivotData5.vue"),
-    },
-    {
-        path: "/payments/:year/:month/pivot6",
-        name: "pivot_payments_6",
-        component: () => import("./components/Payments/PivotData6.vue"),
     },
     {
         path: "/payments/:year/:month/pivot7",

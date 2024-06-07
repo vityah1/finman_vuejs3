@@ -1,23 +1,16 @@
 <template>
-	<div class="container">
-		<alert-component ref="myAlert"></alert-component>
+    <alert-component ref="myAlert"></alert-component>
+
+    <div class="row">
+	<div class="col-md-8">
+			<selector-component
+				@change="handleSelectChange"
+			/>
+      <span> [WebDataRocks]</span>
+    </div>
 
 		<div class="row">
-			<div class="col-1">
-				<router-link :to="{
-					name: 'payments_year_month',
-					params: { year: $route.params.year, month: $route.params.month },
-				}"><i class="fas fa-angle-double-left"></i></router-link>
-			</div>
-			<div class="col">
-				<span v-if="this.$route.params.year" class="text-primary">{{ this.$route.params.year }}-</span>
-				<span v-if="this.$route.params.month" class="text-primary">{{ this.$route.params.month }}</span>
-				<span v-if="this.$route.query.user">[{{ this.$route.query.user }}]</span>
-			</div>
-		</div>
-
-		<div class="row">
-			<div class="col-md-8">
+			<div class="col-12">
 				<div id="pivot-container"></div>
 
 				<div v-if="(payments.length === 0)">Data loading...</div>
@@ -31,9 +24,11 @@ import PaymentService from "../../services/PaymentService";
 import store from "../../store";
 import "webdatarocks/webdatarocks.css";
 import WebDataRocks from "webdatarocks";
+import SelectorComponent from "@/components/SelectorComponent.vue";
 
 export default {
 	name: "PivotData",
+	components: { SelectorComponent },
 	data() {
 		return {
 			payments: [],
@@ -62,17 +57,9 @@ export default {
 				this.openFormAddPayment();
 			}
 		},
-		"$route.path": function(newPath, oldPath) {
-			console.log("Change route.path to", newPath, " from: ", oldPath);
-			this.getPayments();
-		},
-		"$store.state.buttonClicked": function(newAction, oldAction) {
-			console.log("Change buttonClicked to", newAction, " from: ", oldAction);
-			if (newAction) {
-				this.openFormAddPayment();
-				this.$store.commit("setButtonClicked", false);
-			}
-		},
+    "$route.path"() {
+      this.getPaymentData();
+    },
 	},
 	methods: {
 		createPivotTable() {
@@ -120,6 +107,12 @@ export default {
 					console.log(e);
 				});
 		},
+	handleSelectChange({ year, month, mono_user_id }) {
+			this.$router.push({
+				name: "pivot_payments",
+				params: { year: year, month: month, mono_user_id: mono_user_id },
+			});
+		},
 	},
 	async mounted() {
 		if (!this.currentUser) {
@@ -128,14 +121,7 @@ export default {
 		this.categories = this.$store.state.sprs.categories;
 		this.currencies = this.$store.state.sprs.currencies;
 		this.sources = this.$store.state.sprs.sources;
-		this.action = this.$route.query.action;
-		console.log("this.action : ", this.action);
 		await this.getPaymentData();
-		if (this.action === "add") {
-			this.openFormAddPayment();
-		}
-
-
 	},
 };
 </script>

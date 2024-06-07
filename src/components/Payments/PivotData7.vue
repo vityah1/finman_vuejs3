@@ -1,19 +1,12 @@
 <template>
-  <div class="container">
     <alert-component ref="myAlert"></alert-component>
 
     <div class="row">
-      <div class="col-1">
-        <router-link :to="{
-          name: 'payments_year_month',
-          params: { year: $route.params.year, month: $route.params.month },
-        }"><i class="fas fa-angle-double-left"></i></router-link>
-      </div>
-      <div class="col">
-        <span v-if="$route.params.year" class="text-primary">{{ $route.params.year }}-</span>
-        <span v-if="$route.params.month" class="text-primary">{{ $route.params.month }}</span>
-        <span v-if="$route.query.user">[{{ $route.query.user }}]</span>
-      </div>
+	<div class="col-md-8">
+			<selector-component
+				@change="handleSelectChange"
+			/>
+      <span> [Ploty]</span>
     </div>
 
     <div class="row">
@@ -29,9 +22,11 @@
 import Plotly from 'plotly.js-dist';
 import PaymentService from "../../services/PaymentService";
 import store from "../../store";
+import SelectorComponent from "@/components/SelectorComponent.vue";
 
 export default {
   name: "PivotData",
+	components: { SelectorComponent },
   data() {
     return {
       payments: [],
@@ -56,12 +51,6 @@ export default {
     },
     "$route.path"() {
       this.getPaymentData();
-    },
-    "$store.state.buttonClicked"(newAction) {
-      if (newAction) {
-        this.openFormAddPayment();
-        this.$store.commit("setButtonClicked", false);
-      }
     },
   },
   methods: {
@@ -146,6 +135,12 @@ export default {
         console.log('Error fetching payment data:', e);
       }
     },
+	handleSelectChange({ year, month, mono_user_id }) {
+			this.$router.push({
+				name: "pivot_payments_7",
+				params: { year: year, month: month, mono_user_id: mono_user_id },
+			});
+		},
   },
   async mounted() {
     if (!this.currentUser) {
