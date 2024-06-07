@@ -8,9 +8,13 @@
 					<option value="UAH">UAH</option>
 				</select>
 				<button class="btn btn-sm custom-button" @click.prevent="GoToAddPayment()">
-					<i class="fas fa-plus" style="color: #555;"></i></button>
+					<i class="fas fa-plus" style="color: #555;"></i>
+				</button>
+				<PivotSelect v-if="showPivotSelect" :year="year" :month="month" :monoUserId="mono_user_id" />
 			</div>
 		</b-navbar-brand>
+
+
 		<b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
 		<b-collapse id="nav-collapse" is-nav>
@@ -85,8 +89,8 @@
 						<router-link :to="{ name: 'mono_users' }" class="nav-link">
 							<i class="fas fa-paw"></i> Mono: users
 						</router-link>
-					</b-dropdown-item>
-					<b-dropdown-divider v-if="currentUser"></b-dropdown-divider>
+						</b-dropdown-item>
+						<b-dropdown-divider></b-dropdown-divider>
 					<b-dropdown-item v-if="currentUser">
 						<router-link :to="{ name: 'config' }" class="nav-link">
 							<i class="fas fa-cog"></i> Settings
@@ -112,8 +116,13 @@
 </template>
 
 <script>
+import PivotSelect from "@/components/PivotSelect.vue";
+
 export default {
 	name: "NavigationMenu",
+	components: {
+		PivotSelect
+	},
 	computed: {
 		currentUser() {
 			try {
@@ -140,12 +149,41 @@ export default {
 		},
 		selectedCurrency: {
 			get() {
-				console.log(`computed => selectedCurrency => get => this.$store.state.selectedCurrency=${this.$store.state.sprs.selectedCurrency}`);
 				return this.$store.state.sprs.selectedCurrency;
 			},
 			set(value) {
 				this.$store.dispatch("sprs/updateSelectedCurrency", value);
 			},
+		},
+		showPivotSelect() {
+			return this.year && this.month;
+		},
+	},
+	data() {
+		return {
+			year: null,
+			month: null,
+			mono_user_id: null,
+		};
+	},
+	watch: {
+		"$route.params.year": {
+			handler(newYear) {
+				this.year = newYear;
+			},
+			immediate: true,
+		},
+		"$route.params.month": {
+			handler(newMonth) {
+				this.month = newMonth;
+			},
+			immediate: true,
+		},
+		"$route.params.mono_user_id": {
+			handler(newMonoUserId) {
+				this.mono_user_id = newMonoUserId;
+			},
+			immediate: true,
 		},
 	},
 	methods: {
@@ -155,17 +193,21 @@ export default {
 		},
 		GoToAddPayment() {
 			const currentPath = this.$route.path;
-			console.log("Current Path:", currentPath);
 			const pattern = /^\/payments\/\d{4}\/\d{1,2}\/\d+/;
 			const isMatchingRoute = pattern.test(currentPath);
-			console.log("Is matching route:", isMatchingRoute);
 			if (isMatchingRoute) {
 				this.$store.commit("setButtonClicked", true);
-				console.log("ButtonClicked:", this.$store.state.buttonClicked);
 			} else {
 				this.$router.push({
-					name: "payments", query: { action: "add" },
-					params: { year: this.currentYear, month: this.currentMonth, category_id: this.category_id },
+					name: "payments",
+					params: {
+						year: this.currentYear,
+						month: this.currentMonth,
+						category_id: this.category_id
+					},
+					query: {
+						action: "add"
+					}
 				});
 			}
 		},

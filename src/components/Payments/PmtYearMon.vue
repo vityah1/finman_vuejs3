@@ -4,14 +4,13 @@
 			<div class="input-group mb-3">
 				<div class="col-auto">
 					<select
-						class="form-control w-auto"
-						v-model="year"
 						id="year"
+						v-model="year"
+						class="form-control w-auto"
 						name="year"
-						@change="getPaymentsPeriod({year: year, month: month, mono_user_id: mono_user_id})"
+						@change="handleSelectChange"
 					>
-						<option v-for="(y, index) in years" :value="y" :key="index"
-								:selected="y === this.$route.params.year">
+						<option v-for="(y, index) in years" :key="index" :value="y">
 							{{ y }}
 						</option>
 					</select>
@@ -19,14 +18,13 @@
 				&nbsp;
 				<div class="col-auto">
 					<select
-						class="form-control w-auto"
-						v-model="month"
 						id="month"
+						v-model="month"
+						class="form-control w-auto"
 						name="month"
-						@change="getPaymentsPeriod({year: year, month: month, mono_user_id: mono_user_id})"
+						@change="handleSelectChange"
 					>
-						<option v-for="m in months" :value="m.number" :key="m.number"
-								:selected="m.number === this.$route.params.month">
+						<option v-for="m in months" :key="m.number" :value="m.number">
 							[{{ m.number }}] {{ m.name }}
 						</option>
 					</select>
@@ -34,25 +32,21 @@
 				&nbsp;
 				<div class="col-auto">
 					<select
-						class="form-control w-auto"
-						v-model="mono_user_id"
 						id="mono_user"
+						v-model="mono_user_id"
+						class="form-control w-auto"
 						name="mono_user"
-						@change="getPaymentsPeriod({year: year, month: month, mono_user_id: mono_user_id})"
+						@change="getPaymentsPeriod({ year: year, month: month, mono_user_id: mono_user_id })"
 					>
 						<option value="">All</option>
-						<option
-							v-for="mono_user in mono_users" :key="mono_user.id"
-							:value="mono_user.id"
-						>{{ mono_user.name }}
+						<option v-for="mono_user in mono_users" :key="mono_user.id" :value="mono_user.id">
+							{{ mono_user.name }}
 						</option>
 					</select>
-					&nbsp;
 				</div>
 			</div>
 
-			<b-table-simple hover small caption-top responsive>
-				<!--			<caption>List expenses</caption>-->
+			<b-table-simple caption-top hover responsive small>
 				<colgroup>
 					<col />
 					<col />
@@ -66,26 +60,22 @@
 					</b-tr>
 				</b-thead>
 				<b-tbody>
-					<b-tr
-						v-for="(category, index) in catcosts"
-						:key="index">
+					<b-tr v-for="(category, index) in catcosts" :key="index">
 						<b-td>
 							<router-link
 								:to="{
-        name: 'payments', 
-        params: { action: 'show', year: year, month: month, category_id: category.category_id} 
-        }"
+                  name: 'payments',
+                  params: { action: 'show', year: year, month: month, category_id: category.category_id }
+                }"
 							>
 								{{ category.name }}
 							</router-link>
 						</b-td>
 						<b-td>{{ category.amount.toLocaleString() }}</b-td>
 						<b-td>{{ category.cnt }}</b-td>
-
 					</b-tr>
 				</b-tbody>
 			</b-table-simple>
-
 		</div>
 	</div>
 </template>
@@ -123,13 +113,14 @@ export default {
 			total_cnt: 0,
 			mono_users: [],
 			mono_user_id: undefined,
+			selectedPivot: "PivotData",
 		};
 	},
 	methods: {
 		async getPaymentsPeriod(data) {
 			data["currency"] = this.$store.state.sprs.selectedCurrency || "UAH";
 			if (data.month === 99) {
-				this.$router.push({ name: 'payments_year', params: {year: data.year} });
+				this.$router.push({ name: "payments_year", params: { year: data.year } });
 				return;
 			}
 			PaymentService.getPaymentsPeriod(data)
@@ -141,7 +132,6 @@ export default {
 					this.catcosts.forEach((val) => {
 						total += Number(val.amount);
 						total_cnt += Number(val.cnt);
-						//or if you pass float numbers , use parseFloat()
 					});
 					this.total = total;
 					this.total_cnt = total_cnt;
@@ -152,7 +142,7 @@ export default {
 				});
 		},
 		async getPaymentsYears() {
-			PaymentService.getPaymentsYears({ currency: store.state.sprs.selectedCurrency || "UAH", "grouped": true })
+			PaymentService.getPaymentsYears({ currency: store.state.sprs.selectedCurrency || "UAH", grouped: true })
 				.then((response) => {
 					let filteredYears = response.data.filter(obj => obj.year > 1900);
 					this.years = filteredYears.map(obj => obj.year);
@@ -172,12 +162,16 @@ export default {
 					console.log(e);
 				});
 		},
+		handleSelectChange() {
+			this.$router.push({ name: "payments_year_month", params: { year: this.year, month: this.month } });
+			this.getPaymentsPeriod({ year: this.year, month: this.month, mono_user_id: this.mono_user_id });
+		},
 	},
 	mounted() {
 		let data = {
-			"year": this.$route.params.year || new Date().getFullYear(),
-			"month": this.$route.params.month || new Date().getMonth() + 1,
-			"currency": this.$store.state.sprs.selectedCurrency || "UAH",
+			year: this.$route.params.year || new Date().getFullYear(),
+			month: this.$route.params.month || new Date().getMonth() + 1,
+			currency: this.$store.state.sprs.selectedCurrency || "UAH",
 		};
 		this.getPaymentsYears();
 		console.log("mounted: ", data);
@@ -186,11 +180,3 @@ export default {
 	},
 };
 </script>
-
-<style>
-.list {
-	text-align: left;
-	max-width: 750px;
-	margin: auto;
-}
-</style>

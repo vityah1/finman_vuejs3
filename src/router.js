@@ -1,6 +1,5 @@
 import { createWebHistory, createRouter } from "vue-router";
 
-
 const routes = [
     {
         path: "/",
@@ -15,7 +14,6 @@ const routes = [
     {
         path: "/login",
         name: "login",
-        // component: Login,
         component: () => import("./components/User/UserLogin.vue"),
     },
     {
@@ -27,27 +25,27 @@ const routes = [
         path: "/profile",
         name: "profile",
         component: () => import("./components/User/UserProfile.vue"),
-    },           
+    },
     {
         path: "/config",
         name: "config",
         component: () => import("./components/User/ConfigUser.vue")
-    },           
+    },
     {
         path: "/category",
         name: "category",
         component: () => import("./components/User/UserCategory.vue")
-    },    
+    },
     {
         path: "/mono/user/token",
         name: "mono_user_token",
         component: () => import("./components/User/Mono/MonoSettings.vue")
-    }, 
+    },
     {
         path: "/mono/payments",
         name: "mono_payments",
         component: () => import("./components/Banks/Mono.vue")
-    },  
+    },
     {
         path: "/revolut/import",
         name: "revolut",
@@ -62,12 +60,47 @@ const routes = [
         path: "/mono/users",
         name: "mono_users",
         component: () => import("./components/User/Mono/MonoUsers.vue")
-    },        
+    },
     {
         path: "/payments/:year/:month/:category_id",
         name: "payments",
         component: () => import("./components/Payments/PmtYearMonCat.vue"),
-    },   
+    },
+    {
+        path: "/payments/:year/:month/pivot",
+        name: "pivot_payments",
+        component: () => import("./components/Payments/PivotData.vue"),
+    },
+    {
+        path: "/payments/:year/:month/pivot2",
+        name: "pivot_payments_2",
+        component: () => import("./components/Payments/PivotData2.vue"),
+    },
+    {
+        path: "/payments/:year/:month/pivot3",
+        name: "pivot_payments_3",
+        component: () => import("./components/Payments/PivotData3.vue"),
+    },
+    {
+        path: "/payments/:year/:month/pivot4",
+        name: "pivot_payments_4",
+        component: () => import("./components/Payments/PivotData4.vue"),
+    },
+    {
+        path: "/payments/:year/:month/pivot5",
+        name: "pivot_payments_5",
+        component: () => import("./components/Payments/PivotData5.vue"),
+    },
+    {
+        path: "/payments/:year/:month/pivot6",
+        name: "pivot_payments_6",
+        component: () => import("./components/Payments/PivotData6.vue"),
+    },
+    {
+        path: "/payments/:year/:month/pivot7",
+        name: "pivot_payments_7",
+        component: () => import("./components/Payments/PivotData7.vue"),
+    },
     {
         path: "/payments/years",
         name: "payments_years",
@@ -80,7 +113,6 @@ const routes = [
     },
     {
         path: "/payments/:year/:month",
-        // alias: "/catpayments",
         name: "payments_year_month",
         component: () => import("./components/Payments/PmtYearMon.vue")
     },
