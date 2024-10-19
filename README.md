@@ -9,8 +9,8 @@
 8.15.1
 ```
 
-**select node 11.15.0**
-```nvm use 11.15.0```
+**select node 18.12.1**
+```nvm use 18.12.1```
 
 ## Project setup
 ```
@@ -37,5 +37,28 @@ npm run build
 npm run lint
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Deploy
+
+create user www
+
+```
+sudo useradd -r -s /usr/sbin/nologin www
+sudo mkdir -p /home/www/finman/htdocs
+sudo chown -R www:www /home/www
+sudo chmod -R 755 /home/www
+```
+
+```
+sudo -u www ssh-keygen -t rsa -b 4096 -C "www@yourserver.com"
+```
+
+```
+sudo -u www mkdir -p /home/www/.ssh
+sudo -u www touch /home/www/.ssh/authorized_keys
+sudo -u www cat /home/www/.ssh/id_rsa.pub >> /home/www/.ssh/authorized_keys
+sudo -u www chmod 600 /home/www/.ssh/authorized_keys
+```
+
+add (/home/www/.ssh/id_rsa) as secret SSH_PRIVATE_KEY to your GitHub repo.
+add IP or domain your server as secret to your GITHUB repo
+
