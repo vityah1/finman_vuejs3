@@ -1,4 +1,4 @@
-# rozhody
+# FinMan (Financial Manager) v.0.2
 
 ## setup node
 ```nvm list```
