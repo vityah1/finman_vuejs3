@@ -99,7 +99,7 @@ const routes = [
 ];
 
 const router = createRouter({
-    base: "/finman",
+    base: "/",
     history: createWebHistory(process.env.BASE_URL),
     routes,
 });
