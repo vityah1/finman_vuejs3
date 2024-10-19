@@ -9,8 +9,8 @@
 8.15.1
 ```
 
-**select node 11.15.0**
-```nvm use 11.15.0```
+**select node 18.12.1**
+```nvm use 18.12.1```
 
 ## Project setup
 ```
