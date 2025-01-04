@@ -49,17 +49,20 @@ const routes = [
     {
         path: "/revolut/import",
         name: "revolut",
-        component: () => import("./components/Banks/Revolut.vue")
+        component: () => import("./components/Banks/BankForm.vue"),
+        meta: { bankName: 'revolut' }
     },
     {
         path: "/wise/import",
         name: "wise",
-        component: () => import("./components/Banks/Wise.vue")
+        component: () => import("./components/Banks/BankForm.vue"),
+        meta: { bankName: 'wise' }
     },
     {
         path: "/p24/import",
         name: "p24",
-        component: () => import("./components/Banks/P24.vue")
+        component: () => import("./components/Banks/BankForm.vue"),
+        meta: { bankName: 'p24' }
     },
     {
         path: "/mono/users",
