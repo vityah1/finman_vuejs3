@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import WiseService from "@/services/WiseService";
+import ImportService from "@/services/ImportService";
 export default {
   name: "WiseForm",
   data() {
@@ -82,7 +82,7 @@ export default {
       console.log('this.file = event.target.files[0];', this.file, event.target.files[0]);
     },
     handleButtonClick() {
-        WiseService.UploadFile(this.file, this.selectedOption)
+        ImportService.UploadFile(this.file, this.selectedOption, 'wise')
         .then((response) => {
           this.payments = response.data;
 // Поєднання списку платежів зі списком категорій

@@ -57,6 +57,11 @@ const routes = [
         component: () => import("./components/Banks/Wise.vue")
     },
     {
+        path: "/p24/import",
+        name: "p24",
+        component: () => import("./components/Banks/P24.vue")
+    },
+    {
         path: "/mono/users",
         name: "mono_users",
         component: () => import("./components/User/Mono/MonoUsers.vue")

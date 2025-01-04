@@ -59,9 +59,9 @@
 </template>
 
 <script>
-import ImportService from "../../services/ImportService";
+import ImportService from "@/services/ImportService";
 export default {
-  name: "RevolutForm",
+  name: "P24Form",
   data() {
     return {
       user: this.$route.query.user,
@@ -82,7 +82,7 @@ export default {
       console.log('this.file = event.target.files[0];', this.file, event.target.files[0]);
     },
     handleButtonClick() {
-        ImportService.UploadFile(this.file, this.selectedOption, 'revolut')
+        ImportService.UploadFile(this.file, this.selectedOption, 'p24')
         .then((response) => {
           this.payments = response.data;
 // Поєднання списку платежів зі списком категорій

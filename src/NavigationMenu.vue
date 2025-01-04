@@ -63,6 +63,11 @@
 							<i class="fas fa-euro-sign"></i> Wise
 						</router-link>
 					</b-dropdown-item>
+					<b-dropdown-item>
+						<router-link :to="{ name: 'p24' }" class="nav-link">
+							<i class="fas fa-uah-sign"></i> P24
+						</router-link>
+					</b-dropdown-item>
 				</b-nav-item-dropdown>
 
 				<b-nav-item-dropdown text="User">
