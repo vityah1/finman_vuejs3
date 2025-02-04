@@ -7,7 +7,6 @@
     >
 		<option value="" selected>None</option>
       <option value="PivotData">Pivot Data</option>
-      <option value="PivotData3">Pivot Data 3</option>
       <option value="PivotData7">Pivot Data 7</option>
     </select>
   </div>

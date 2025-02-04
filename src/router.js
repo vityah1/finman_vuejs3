@@ -80,11 +80,6 @@ const routes = [
         component: () => import("./components/Payments/PivotData.vue"),
     },
     {
-        path: "/payments/:year/:month/pivot3",
-        name: "pivot_payments_3",
-        component: () => import("./components/Payments/PivotData3.vue"),
-    },
-    {
         path: "/payments/:year/:month/pivot7",
         name: "pivot_payments_7",
         component: () => import("./components/Payments/PivotData7.vue"),

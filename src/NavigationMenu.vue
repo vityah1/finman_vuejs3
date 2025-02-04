@@ -65,7 +65,7 @@
 					</b-dropdown-item>
 					<b-dropdown-item>
     <router-link :to="{ name: 'p24' }" class="nav-link">
-        <img src="/symbol.png" alt="P24" style="width: 25px; margin-right: 5px;"/> P24
+        <img src="/p24.png" alt="P24" style="width: 25px; margin-right: 5px;"/> P24
     </router-link>
 </b-dropdown-item>
 				</b-nav-item-dropdown>
