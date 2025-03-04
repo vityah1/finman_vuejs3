@@ -10,7 +10,12 @@
 				<button class="btn btn-sm custom-button" @click.prevent="GoToAddPayment()">
 					<i class="fas fa-plus" style="color: #555;"></i>
 				</button>
-				<PivotSelect v-if="showPivotSelect" :year="year" :month="month" :mono-user-id="mono_user_id" />
+				<PivotSelect
+					v-if="showPivotSelect"
+					:year="parseInt(year)"
+					:month="parseInt(month)"
+					:mono-user-id="mono_user_id"
+				/>
 			</div>
 		</b-navbar-brand>
 
