@@ -61,5 +61,11 @@ export default {
   mounted() {
     this.retrieveYears();
   },
+	watch: {
+    // Якщо блок watch відсутній, створіть його
+    '$store.state.sprs.selectedCurrency'() {
+        this.retrieveYears();
+    }
+}
 };
 </script>

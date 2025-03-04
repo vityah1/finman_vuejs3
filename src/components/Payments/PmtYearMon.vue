@@ -61,71 +61,59 @@ export default {
       isRequestInProgress: false // Запобігання паралельним запитам
     };
   },
-  methods: {
-    // Метод для перевірки, чи параметри змінилися
-    areParamsValid(params) {
-      return params && params.year && params.month; // Перевіряємо мінімальний набір параметрів
-    },
+  methods: { areParamsValid(params) {
+    return params && params.year && params.month;
+  },
 
-    // Метод для контролю запиту API
-    async safeApiRequest(params) {
-      console.log("Планується запит з параметрами:", params);
+  // У методі safeApiRequest зробіть валюту частиною унікального ідентифікатора запиту
+  async safeApiRequest(params) {
+    console.log("Планується запит з параметрами:", params);
 
-      // Перевіряємо валідність параметрів
-      if (!this.areParamsValid(params)) {
-        console.warn("Пропуск запиту з невалідними параметрами", params);
-        return null;
-      }
+    if (!this.areParamsValid(params)) {
+      console.warn("Пропуск запиту з невалідними параметрами", params);
+      return null;
+    }
 
-      // Перевіряємо, чи змінилися параметри
-      const requestKey = JSON.stringify(params);
-      if (this.lastRequest === requestKey) {
-        console.warn("Пропуск повторного запиту з тими самими параметрами");
-        return null;
-      }
+    // Додайте валюту до параметрів для формування унікального ключа
+    const fullParams = {
+      ...params,
+      currency: params.currency || this.$store.state.sprs.selectedCurrency
+    };
 
-      // Перевіряємо, чи вже виконується запит
-      if (this.isRequestInProgress) {
-        console.warn("Пропуск запиту, оскільки інший запит вже виконується");
-        return null;
-      }
+    // Включіть валюту в requestKey
+    const requestKey = JSON.stringify(fullParams);
 
-      // Встановлюємо блокування і зберігаємо ключ запиту
-      this.isRequestInProgress = true;
-      this.lastRequest = requestKey;
+    // Перезаписуйте lastRequest якщо валюта змінилася
+    if (this.lastRequest === requestKey && !params.forceUpdate) {
+      console.warn("Пропуск повторного запиту з тими самими параметрами");
+      return null;
+    }
 
-      try {
-        // Додаємо валюту, якщо її немає
-        const fullParams = { ...params };
-        if (!fullParams.currency) {
-          fullParams.currency = this.$store.state.sprs.selectedCurrency || "UAH";
-        }
+    this.isRequestInProgress = true;
+    this.lastRequest = requestKey;
 
-        console.log("Виконується реальний API запит:", fullParams);
+    try {
+      const response = await PaymentService.getPaymentsPeriod(fullParams);
 
-        // Викликаємо API
-        const response = await PaymentService.getPaymentsPeriod(fullParams);
+      // Обробка результату як і раніше...
+      this.catcosts = response.data;
+      let total = 0;
+      let total_cnt = 0;
+      this.catcosts.forEach((val) => {
+        total += Number(val.amount);
+        total_cnt += Number(val.cnt);
+      });
+      this.total = total;
+      this.total_cnt = total_cnt;
 
-        // Обробляємо результат
-        this.catcosts = response.data;
-        let total = 0;
-        let total_cnt = 0;
-        this.catcosts.forEach((val) => {
-          total += Number(val.amount);
-          total_cnt += Number(val.cnt);
-        });
-        this.total = total;
-        this.total_cnt = total_cnt;
-
-        return response;
-      } catch (error) {
-        console.error("Помилка API запиту:", error);
-        throw error;
-      } finally {
-        // Розблоковуємо наступні запити
-        this.isRequestInProgress = false;
-      }
-    },
+      return response;
+    } catch (error) {
+      console.error("Помилка API запиту:", error);
+      throw error;
+    } finally {
+      this.isRequestInProgress = false;
+    }
+  },
 
     // Обробник події зміни фільтрів
     handleSelectChange(eventData) {
@@ -177,6 +165,18 @@ export default {
       month: this.month,
       group_user_id: this.group_user_id
     });
+  },
+	watch: {
+  '$store.state.sprs.selectedCurrency'(newCurrency) {
+    // Передайте forceUpdate: true, щоб обійти перевірку на повторний запит
+    this.safeApiRequest({
+      year: this.year,
+      month: this.month,
+      group_user_id: this.group_user_id,
+      currency: newCurrency,
+      forceUpdate: true
+    });
   }
+},
 };
 </script>

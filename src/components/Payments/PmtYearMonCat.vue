@@ -196,6 +196,9 @@ export default {
 				this.currentPayment.refuel_data.station_name = this.currentPayment.mydesc;
 			}
 		},
+		'$store.state.sprs.selectedCurrency'() {
+        this.getPayments();
+    },
 		"$route.query.action"(newAction) {
 			if (newAction === "add") {
 				this.openFormAddPayment();

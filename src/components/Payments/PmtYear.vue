@@ -126,6 +126,12 @@ export default {
 	mounted() {
 		this.retrieveMonths(this.$route.params.year);
 	},
+	watch: {
+    // Якщо блок watch відсутній, створіть його
+    '$store.state.sprs.selectedCurrency'() {
+        this.retrieveMonths(this.year);
+    }
+}
 };
 </script>
 
