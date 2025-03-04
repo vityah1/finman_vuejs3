@@ -317,24 +317,24 @@ export default {
 			}
 		},
 		async getPayments() {
-			let data = {
-				sort: this.$route.query.sort || "",
-				year: this.$route.params.year || "",
-				month: this.$route.params.month || "",
-				category_id: this.$route.params.category_id || "",
-				q: this.$route.query.q || "",
-				currency: store.state.sprs.selectedCurrency || "UAH",
-			};
-			try {
-				const response = await PaymentService.getPayments(data);
-				this.payments = response.data;
-				this.total = this.payments.reduce((sum, val) => sum + Number(val.amount), 0);
-				this.total_cnt = this.payments.length;
-				this.sortBy(this.sortKey);
-			} catch (e) {
-				console.log(e);
-			}
-		},
+    let data = {
+        sort: this.$route.query.sort || "",
+        year: this.$route.params.year || "",
+        month: this.$route.params.month || "",
+        category_id: this.$route.params.category_id || "",
+        q: this.$route.query.q || "",
+        currency: store.state.sprs.selectedCurrency || "UAH",
+        group_user_id: this.$route.query.group_user_id || ""
+    };
+    try {
+        const response = await PaymentService.getPayments(data);
+        this.payments = response.data;
+        this.total = this.payments.reduce((sum, val) => sum + Number(val.amount), 0);
+        this.total_cnt = this.payments.length;
+    } catch (e) {
+        console.log(e);
+    }
+},
 		sortBy(key) {
 			if (this.sortKey === key) {
 				this.sortOrder *= -1;

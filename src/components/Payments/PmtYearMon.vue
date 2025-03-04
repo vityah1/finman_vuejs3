@@ -23,7 +23,8 @@
 							<router-link
 								:to="{
                   name: 'payments',
-                  params: { action: 'show', year: year, month: month, category_id: category.category_id }
+                  params: { action: 'show', year: year, month: month, category_id: category.category_id },
+                  query: { group_user_id: group_user_id }
                 }"
 							>
 								{{ category.name }}
@@ -43,64 +44,139 @@ import SelectorComponent from "../SelectorComponent.vue";
 import PaymentService from "../../services/PaymentService";
 
 export default {
-	name: "PaymentYearMonth",
-	components: {
-		SelectorComponent,
-	},
-	data() {
-		return {
-			catcosts: [],
-			q: "",
-			year: this.$route.params.year || new Date().getFullYear(),
-			month: this.$route.params.month || new Date().getMonth() + 1,
-			total: 0,
-			total_cnt: 0,
-			mono_user_id: this.$route.params.mono_user_id || undefined,
-			initialLoad: true,
-		};
-	},
-	methods: {
-		async getPaymentsPeriod(data) {
-			data["currency"] = this.$store.state.sprs.selectedCurrency || "UAH";
-			if (data.month === 99) {
-				this.$router.push({ name: "payments_year", params: { year: data.year } });
-				return;
-			}
-			PaymentService.getPaymentsPeriod(data)
-				.then((response) => {
-					this.catcosts = response.data;
-					let total = 0;
-					let total_cnt = 0;
-					this.catcosts.forEach((val) => {
-						total += Number(val.amount);
-						total_cnt += Number(val.cnt);
-					});
-					this.total = total;
-					this.total_cnt = total_cnt;
-				})
-				.catch((e) => {
-					console.log(e);
-				});
-		},
-		handleSelectChange({ year, month, mono_user_id }) {
-			this.year = year;
-			this.month = month;
-			this.mono_user_id = mono_user_id;
-			this.getPaymentsPeriod({ year: year, month: month, mono_user_id: mono_user_id });
-			this.$router.push({
-				name: "payments_year_month",
-				params: { year: this.year, month: this.month, mono_user_id: this.mono_user_id },
-			});
-		},
-	},
-	mounted() {
-		let data = {
-			year: this.$route.params.year || new Date().getFullYear(),
-			month: this.$route.params.month || new Date().getMonth() + 1,
-			currency: this.$store.state.sprs.selectedCurrency || "UAH",
-		};
-		this.initialLoad = false;
-		this.getPaymentsPeriod(data);
-	},
+  name: "PaymentYearMonth",
+  components: {
+    SelectorComponent,
+  },
+  data() {
+    return {
+      catcosts: [],
+      q: "",
+      year: this.$route.params.year || new Date().getFullYear(),
+      month: this.$route.params.month || new Date().getMonth() + 1,
+      total: 0,
+      total_cnt: 0,
+      group_user_id: this.$route.query.group_user_id || localStorage.getItem('selectedGroupUserId') || undefined,
+      lastRequest: null, // Для відстеження останнього запиту
+      isRequestInProgress: false // Запобігання паралельним запитам
+    };
+  },
+  methods: {
+    // Метод для перевірки, чи параметри змінилися
+    areParamsValid(params) {
+      return params && params.year && params.month; // Перевіряємо мінімальний набір параметрів
+    },
+
+    // Метод для контролю запиту API
+    async safeApiRequest(params) {
+      console.log("Планується запит з параметрами:", params);
+
+      // Перевіряємо валідність параметрів
+      if (!this.areParamsValid(params)) {
+        console.warn("Пропуск запиту з невалідними параметрами", params);
+        return null;
+      }
+
+      // Перевіряємо, чи змінилися параметри
+      const requestKey = JSON.stringify(params);
+      if (this.lastRequest === requestKey) {
+        console.warn("Пропуск повторного запиту з тими самими параметрами");
+        return null;
+      }
+
+      // Перевіряємо, чи вже виконується запит
+      if (this.isRequestInProgress) {
+        console.warn("Пропуск запиту, оскільки інший запит вже виконується");
+        return null;
+      }
+
+      // Встановлюємо блокування і зберігаємо ключ запиту
+      this.isRequestInProgress = true;
+      this.lastRequest = requestKey;
+
+      try {
+        // Додаємо валюту, якщо її немає
+        const fullParams = { ...params };
+        if (!fullParams.currency) {
+          fullParams.currency = this.$store.state.sprs.selectedCurrency || "UAH";
+        }
+
+        console.log("Виконується реальний API запит:", fullParams);
+
+        // Викликаємо API
+        const response = await PaymentService.getPaymentsPeriod(fullParams);
+
+        // Обробляємо результат
+        this.catcosts = response.data;
+        let total = 0;
+        let total_cnt = 0;
+        this.catcosts.forEach((val) => {
+          total += Number(val.amount);
+          total_cnt += Number(val.cnt);
+        });
+        this.total = total;
+        this.total_cnt = total_cnt;
+
+        return response;
+      } catch (error) {
+        console.error("Помилка API запиту:", error);
+        throw error;
+      } finally {
+        // Розблоковуємо наступні запити
+        this.isRequestInProgress = false;
+      }
+    },
+
+    // Обробник події зміни фільтрів
+    handleSelectChange(eventData) {
+      if (!eventData || !eventData.year || !eventData.month) {
+        console.warn("Пропуск обробки події з неповними даними", eventData);
+        return;
+      }
+
+      console.log("Обробка події зміни фільтрів:", eventData);
+
+      // Оновлення локальних параметрів
+      this.year = eventData.year;
+      this.month = eventData.month;
+      this.group_user_id = eventData.group_user_id;
+
+      // Зберігаємо у localStorage
+      if (eventData.group_user_id) {
+        localStorage.setItem('selectedGroupUserId', eventData.group_user_id);
+      } else {
+        localStorage.removeItem('selectedGroupUserId');
+      }
+
+      // Виконуємо запит
+      this.safeApiRequest({
+        year: this.year,
+        month: this.month,
+        group_user_id: this.group_user_id
+      }).then(() => {
+        // Оновлюємо URL ТІЛЬКИ після успішного запиту
+        const query = {};
+        if (this.group_user_id) query.group_user_id = this.group_user_id;
+
+        // Використовуємо replace, щоб не створювати нову запись в історії
+        this.$router.replace({
+          name: 'payments_year_month',
+          params: { year: this.year, month: this.month },
+          query
+        }).catch(err => {
+          // Ігноруємо помилки навігації
+          console.warn("Ігнорована помилка навігації:", err);
+        });
+      });
+    }
+  },
+  mounted() {
+    // При монтуванні компонента виконуємо початковий запит
+    this.safeApiRequest({
+      year: this.year,
+      month: this.month,
+      group_user_id: this.group_user_id
+    });
+  }
 };
 </script>
