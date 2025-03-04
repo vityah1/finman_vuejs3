@@ -7,7 +7,7 @@ class GroupService {
   }
 
   getGroupUsers(groupId) {
-    return https.get(`/groups/${groupId}/users`, { headers: authHeader() });
+    return https.get(`/groups/${groupId}/users?include_current=true`, { headers: authHeader() });
   }
 }
 

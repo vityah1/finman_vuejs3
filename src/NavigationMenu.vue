@@ -10,10 +10,9 @@
 				<button class="btn btn-sm custom-button" @click.prevent="GoToAddPayment()">
 					<i class="fas fa-plus" style="color: #555;"></i>
 				</button>
-				<PivotSelect v-if="showPivotSelect" :year="year" :month="month" :monoUserId="mono_user_id" />
+				<PivotSelect v-if="showPivotSelect" :year="year" :month="month" :mono-user-id="mono_user_id" />
 			</div>
 		</b-navbar-brand>
-
 
 		<b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
 
@@ -64,54 +63,68 @@
 						</router-link>
 					</b-dropdown-item>
 					<b-dropdown-item>
-    <router-link :to="{ name: 'p24' }" class="nav-link">
-        <img src="/p24.png" alt="P24" style="width: 25px; margin-right: 5px;"/> P24
-    </router-link>
-</b-dropdown-item>
+						<router-link :to="{ name: 'p24' }" class="nav-link">
+							<img src="/p24.png" alt="P24" style="width: 25px; margin-right: 5px;" /> P24
+						</router-link>
+					</b-dropdown-item>
 				</b-nav-item-dropdown>
 
 				<b-nav-item-dropdown text="User">
 					<template #button-content>
 						<i class="fas fa-user"></i> User
 					</template>
-					<b-dropdown-item>
-						<router-link :to="{ name: 'login' }" class="nav-link">
-							<i class="fas fa-sign-in-alt"></i> Login
-						</router-link>
-					</b-dropdown-item>
-					<b-dropdown-item>
-						<router-link :to="{ name: 'register' }" class="nav-link">
-							<i class="fas fa-user-plus"></i> SignUp
-						</router-link>
-					</b-dropdown-item>
-					<b-dropdown-divider v-if="currentUser"></b-dropdown-divider>
-					<b-dropdown-item v-if="currentUser">
-						<router-link :to="{ name: 'mono_user_token' }" class="nav-link">
-							<i class="fas fa-paw"></i> Mono: tokens
-						</router-link>
-					</b-dropdown-item>
-					<b-dropdown-item v-if="currentUser">
-						<router-link :to="{ name: 'mono_users' }" class="nav-link">
-							<i class="fas fa-paw"></i> Mono: users
-						</router-link>
+
+					<template v-if="!currentUser">
+						<b-dropdown-item>
+							<router-link :to="{ name: 'login' }" class="nav-link">
+								<i class="fas fa-sign-in-alt"></i> Login
+							</router-link>
+						</b-dropdown-item>
+						<b-dropdown-item>
+							<router-link :to="{ name: 'register' }" class="nav-link">
+								<i class="fas fa-user-plus"></i> SignUp
+							</router-link>
+						</b-dropdown-item>
+					</template>
+
+					<template v-else>
+						<b-dropdown-item>
+							<router-link :to="{ name: 'profile' }" class="nav-link">
+								<i class="fas fa-user"></i> Profile
+							</router-link>
+						</b-dropdown-item>
+
+						<b-dropdown-divider></b-dropdown-divider>
+						<b-dropdown-item v-if="currentUser">
+							<router-link :to="{ name: 'mono_user_token' }" class="nav-link">
+								<i class="fas fa-paw"></i> Mono: tokens
+							</router-link>
+						</b-dropdown-item>
+						<b-dropdown-item v-if="currentUser">
+							<router-link :to="{ name: 'mono_users' }" class="nav-link">
+								<i class="fas fa-paw"></i> Mono: users
+							</router-link>
 						</b-dropdown-item>
 						<b-dropdown-divider></b-dropdown-divider>
-					<b-dropdown-item v-if="currentUser">
-						<router-link :to="{ name: 'config' }" class="nav-link">
-							<i class="fas fa-cog"></i> Settings
-						</router-link>
-					</b-dropdown-item>
-					<b-dropdown-item v-if="currentUser">
-						<router-link :to="{ name: 'category' }" class="nav-link">
-							<i class="fas fa-cog"></i> Categories
-						</router-link>
-					</b-dropdown-item>
-					<b-dropdown-item v-if="currentUser">
-						<a class="nav-link" @click.prevent="logOut">
-							<i class="fas fa-sign-out-alt"></i> Logout
-						</a>
-					</b-dropdown-item>
+						<b-dropdown-item v-if="currentUser">
+							<router-link :to="{ name: 'config' }" class="nav-link">
+								<i class="fas fa-cog"></i> Settings
+							</router-link>
+						</b-dropdown-item>
+						<b-dropdown-item v-if="currentUser">
+							<router-link :to="{ name: 'category' }" class="nav-link">
+								<i class="fas fa-cog"></i> Categories
+							</router-link>
+						</b-dropdown-item>
+						<b-dropdown-divider></b-dropdown-divider>
+						<b-dropdown-item>
+							<a class="nav-link" @click.prevent="logOut">
+								<i class="fas fa-sign-out-alt"></i> Logout
+							</a>
+						</b-dropdown-item>
+					</template>
 				</b-nav-item-dropdown>
+
 				<b-nav-item>
 					<router-link :to="{ name: 'about' }" class="nav-link">About</router-link>
 				</b-nav-item>
@@ -126,7 +139,7 @@ import PivotSelect from "@/components/PivotSelect.vue";
 export default {
 	name: "NavigationMenu",
 	components: {
-		PivotSelect
+		PivotSelect,
 	},
 	computed: {
 		currentUser() {
@@ -134,7 +147,7 @@ export default {
 				return this.$store.state.auth.user;
 			} catch {
 				this.logOut();
-				return "";
+				return null;
 			}
 		},
 		currentYear() {
@@ -149,7 +162,7 @@ export default {
 			if (this.$route.params.category_id) {
 				return this.$route.params.category_id;
 			} else {
-				return this.$store.state.sprs.categories[0].id;
+				return this.$store.state.sprs.categories?.[0]?.id;
 			}
 		},
 		selectedCurrency: {
@@ -193,8 +206,13 @@ export default {
 	},
 	methods: {
 		logOut() {
-			this.$store.dispatch("auth/logout");
-			this.$router.push({ name: "login" });
+			try {
+				this.$store.dispatch("auth/logout");
+				this.$router.push({ name: "login" });
+			} catch (error) {
+				console.error("Logout error:", error);
+				this.$router.push({ name: "login" });
+			}
 		},
 		GoToAddPayment() {
 			const currentPath = this.$route.path;
@@ -208,11 +226,11 @@ export default {
 					params: {
 						year: this.currentYear,
 						month: this.currentMonth,
-						category_id: this.category_id
+						category_id: this.category_id,
 					},
 					query: {
-						action: "add"
-					}
+						action: "add",
+					},
 				});
 			}
 		},

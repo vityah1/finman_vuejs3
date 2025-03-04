@@ -25,6 +25,7 @@ const routes = [
         path: "/profile",
         name: "profile",
         component: () => import("./components/User/UserProfile.vue"),
+        meta: { requiresAuth: true } // Додаємо мета-тег для авторизації
     },
     {
         path: "/config",
@@ -105,6 +106,17 @@ const router = createRouter({
     base: "/",
     history: createWebHistory(process.env.BASE_URL),
     routes,
+});
+
+// Додаємо навігаційний захист
+router.beforeEach((to, from, next) => {
+    const loggedIn = localStorage.getItem('user');
+    const authRequired = to.matched.some(record => record.meta.requiresAuth);
+
+    if (authRequired && !loggedIn) {
+        return next('/login');
+    }
+    next();
 });
 
 export default router;
