@@ -59,6 +59,15 @@ class GroupService {
   acceptInvitation(code) {
     return https.post(`/invitations/${code}/accept`, {}, { headers: authHeader() });
   }
+
+  getUserInvitations() {
+  return https.get("/users/invitations", { headers: authHeader() });
+}
+
+ignoreInvitation(invitationId) {
+  return https.post(`/invitations/${invitationId}/ignore`, {}, { headers: authHeader() });
+}
+
 }
 
 export default new GroupService();
