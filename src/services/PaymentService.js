@@ -49,6 +49,10 @@ class PaymentService {
         // const params = {...data, currency: selectedCurrency};
         return https.get('/payments', {params: data, headers: authHeader()});
     }
+
+    changePaymentsCategory(data) {
+        return https.post("/payments/change-category", data, { headers: authHeader()});
+    }
 }
 
 export default new PaymentService();
