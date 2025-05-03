@@ -284,7 +284,8 @@ export default {
 			return moment(date).format('DD.MM.YYYY');
 		},
 		parseDate(date) {
-			return moment(date, 'YYYY-MM-DD').toDate();
+			// Використовуємо moment без вказання формату, щоб він ідентифікував формат автоматично
+			return moment(date).toDate();
 		},
 		formatCategories(categories, parentId = null, prefix = "") {
 			return categories.reduce((acc, category) => {
