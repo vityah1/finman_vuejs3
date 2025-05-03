@@ -53,6 +53,10 @@ class PaymentService {
     changePaymentsCategory(data) {
         return https.post("/payments/change-category", data, { headers: authHeader()});
     }
+
+    bulkDeletePayments(data) {
+        return https.post("/payments/bulk-delete", data, { headers: authHeader()});
+    }
 }
 
 export default new PaymentService();

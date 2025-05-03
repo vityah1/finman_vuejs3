@@ -91,9 +91,14 @@
 		<div v-if="hasSelectedPayments" class="row mb-3">
 			<div class="col-md-8">
 				<div class="d-flex">
-					<b-button variant="primary" @click="showChangeCategoryModal">
-						Змінити категорію для вибраних ({{ selectedPaymentsCount }})
-					</b-button>
+					<b-dropdown :text="`Операції з вибраними (${selectedPaymentsCount})`" variant="primary" class="mr-2">
+						<b-dropdown-item @click="showChangeCategoryModal">
+							<i class="fas fa-tag mr-2"></i> Змінити категорію
+						</b-dropdown-item>
+						<b-dropdown-item @click="showBulkDeleteConfirmModal">
+							<i class="fas fa-trash-alt mr-2"></i> Видалити
+						</b-dropdown-item>
+					</b-dropdown>
 				</div>
 			</div>
 		</div>
@@ -127,6 +132,40 @@
 						</li>
 					</ul>
 				</div>
+			</template>
+		</b-modal>
+
+		<!-- Модальне вікно для підтвердження масового видалення платежів -->
+		<b-modal v-model="showDeleteModal" title="Підтвердження видалення" @ok="bulkDeletePayments">
+			<template #modal-header>
+				<h5 class="modal-title text-danger">Підтвердження видалення платежів</h5>
+			</template>
+			<template #default>
+				<div class="alert alert-warning">
+					<i class="fas fa-exclamation-triangle mr-2"></i> Ви дійсно бажаєте видалити {{ selectedPaymentsCount }} платежів? Ця дія безворотна.
+				</div>
+				<div class="mb-3">
+					<h6>Вибрані платежі для видалення:</h6>
+					<ul class="list-group">
+						<li v-for="payment in selectedPaymentsList" :key="payment.id" class="list-group-item d-flex justify-content-between align-items-center">
+							<div>
+								<small>{{ formatDate(payment.rdate) }}</small>: 
+								{{ payment.mydesc || payment.category_name }}
+							</div>
+							<span class="badge bg-danger rounded-pill">
+								{{ payment.amount ? payment.amount.toLocaleString() : '0' }}
+							</span>
+						</li>
+					</ul>
+				</div>
+			</template>
+			<template #modal-footer="{ ok, cancel }">
+				<b-button variant="secondary" @click="cancel()">
+					Скасувати
+				</b-button>
+				<b-button variant="danger" @click="ok()">
+					Видалити
+				</b-button>
 			</template>
 		</b-modal>
 
@@ -185,6 +224,7 @@ export default {
 			okTitle: "",
 			showModal: false,
 			showCategoryModal: false,
+			showDeleteModal: false,
 			newCategoryId: "",
 			payments: [],
 			q: this.$route.query.q || "",
@@ -441,6 +481,32 @@ export default {
 		showChangeCategoryModal() {
 			this.newCategoryId = "";
 			this.showCategoryModal = true;
+		},
+		showBulkDeleteConfirmModal() {
+			this.showDeleteModal = true;
+		},
+		bulkDeletePayments() {
+			const payload = {
+				payment_ids: this.selectedPaymentIds
+			};
+
+			PaymentService.bulkDeletePayments(payload)
+				.then(response => {
+					if (response.data.status === "ok") {
+						this.$refs.myAlert.showAlert('success', response.data.message);
+						// Оновлюємо список платежів
+						this.getPayments();
+						// Скидаємо вибрані платежі
+						this.selectedPayments = {};
+						this.selectAll = false;
+					} else {
+						this.$refs.myAlert.showAlert('danger', 'Не вдалося видалити платежі');
+					}
+				})
+				.catch(error => {
+					console.error("Error deleting payments:", error);
+					this.$refs.myAlert.showAlert('danger', 'Не вдалося видалити платежі: ' + error.message);
+				});
 		},
 		changeCategory() {
 			if (!this.newCategoryId) {

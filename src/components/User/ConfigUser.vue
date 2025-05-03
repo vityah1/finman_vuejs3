@@ -24,7 +24,8 @@
 						<label for="description"><strong>Add value:</strong></label>
 						<template v-if="currentConfig.type_data === 'category_replace'">
 							<select v-model="currentConfig.add_value" class="form-select">
-								<option v-for="category in categories" :value=category.id :key=category.id
+								<option disabled value="">Оберіть категорію...</option>
+								<option v-for="category in formattedCategories" :value=category.id :key=category.id
 								>{{ category.name }}
 								</option>
 							</select>
@@ -107,10 +108,14 @@ export default {
 		currentUser() {
 			return this.$store.state.auth.user;
 		},
-	filteredConfigs() {return (type_data) => {
-      return this.configs.filter(config => config.type_data === type_data);
-    };
-  }
+		filteredConfigs() {
+			return (type_data) => {
+				return this.configs.filter(config => config.type_data === type_data);
+			};
+		},
+		formattedCategories() {
+			return this.formatCategories(this.categories);
+		}
 	},
 	methods: {
 		handleOk() {
@@ -161,12 +166,17 @@ export default {
 					console.log(`user config: ${response}`);
 					this.getUserConfig();
 					this.$refs.myAlert.showAlert("success", "config updated");
+					this.showModal = false;
 				})
 				.catch((e) => {
 					console.log(e);
-					this.$refs.myAlert.showAlert("danger", "config update failed");
+					let errorMessage = "config update failed";
+					if (e.response && e.response.data && e.response.data.message) {
+						errorMessage = e.response.data.message;
+					}
+					this.$refs.myAlert.showAlert("danger", errorMessage);
+					this.showModal = false;
 				});
-			this.showModal = false;
 		},
 		async addConfig() {
 			ConfigService.addConfig(this.currentConfig)
@@ -174,12 +184,17 @@ export default {
 					console.log(`user config: ${response}`);
 					this.getUserConfig();
 					this.$refs.myAlert.showAlert("success", "config added");
+					this.showModal = false;
 				})
 				.catch((e) => {
 					console.log(e);
-					this.$refs.myAlert.showAlert("danger", "config add failed");
+					let errorMessage = "config add failed";
+					if (e.response && e.response.data && e.response.data.message) {
+						errorMessage = e.response.data.message;
+					}
+					this.$refs.myAlert.showAlert("danger", errorMessage);
+					this.showModal = false;
 				});
-			this.showModal = false;
 		},
 		async deleteConfig() {
 			ConfigService.deleteConfig(this.currentConfig.id)
@@ -212,9 +227,19 @@ export default {
 				});
 		},
 		findCategoryNameById(categoryId) {
-            const category = this.categories.find(category => category.id === parseInt(categoryId));
-            return category ? category.name : null;
-        }
+            const category = this.categories.find(c => c.id === parseInt(categoryId));
+            return category ? category.name : '';
+        },
+		formatCategories(categories, parentId = null, prefix = "") {
+			return categories.reduce((acc, category) => {
+				if (category.parent_id === parentId || (parentId === null && !category.parent_id)) {
+					acc.push({ ...category, name: prefix + category.name });
+					const children = this.formatCategories(categories, category.id, prefix + "--");
+					acc = acc.concat(children);
+				}
+				return acc;
+			}, []);
+		}
 	},
 	mounted() {
 		if (!this.currentUser) {
