@@ -48,22 +48,9 @@ const routes = [
 		component: () => import("./components/Banks/Mono.vue"),
 	},
 	{
-		path: "/revolut/import",
-		name: "revolut",
+		path: "/api/import",
+		name: "import",
 		component: () => import("./components/Banks/BankForm.vue"),
-		meta: { bankName: "revolut" },
-	},
-	{
-		path: "/wise/import",
-		name: "wise",
-		component: () => import("./components/Banks/BankForm.vue"),
-		meta: { bankName: "wise" },
-	},
-	{
-		path: "/p24/import",
-		name: "p24",
-		component: () => import("./components/Banks/BankForm.vue"),
-		meta: { bankName: "p24" },
 	},
 	{
 		path: "/mono/users",

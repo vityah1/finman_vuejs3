@@ -57,19 +57,10 @@
 							<i class="fas fa-paw"></i> Mono
 						</router-link>
 					</b-dropdown-item>
+
 					<b-dropdown-item>
-						<router-link :to="{ name: 'revolut' }" class="nav-link">
-							<i class="fas fa-euro-sign"></i> Revolut
-						</router-link>
-					</b-dropdown-item>
-					<b-dropdown-item>
-						<router-link :to="{ name: 'wise' }" class="nav-link">
-							<i class="fas fa-euro-sign"></i> Wise
-						</router-link>
-					</b-dropdown-item>
-					<b-dropdown-item>
-						<router-link :to="{ name: 'p24' }" class="nav-link">
-							<img src="/p24.png" alt="P24" style="width: 25px; margin-right: 5px;" /> P24
+						<router-link :to="{ name: 'import' }" class="nav-link">
+							<i class="fas fa-file-import"></i> Import
 						</router-link>
 					</b-dropdown-item>
 				</b-nav-item-dropdown>

@@ -66,9 +66,9 @@ export default {
   methods: {
     async getMonoPayments() {
       var data = {
-        user: this.currentUser.id,
-        start_date: this.start_date,
-        end_date: this.end_date,
+        user_id: this.currentUser.id,
+        from_date: this.start_date,
+        to_date: this.end_date,
         mode: this.mode,
         mono_user_id: this.mono_user_id,
       };
