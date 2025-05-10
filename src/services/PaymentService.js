@@ -49,6 +49,14 @@ class PaymentService {
         // const params = {...data, currency: selectedCurrency};
         return https.get('/payments', {params: data, headers: authHeader()});
     }
+
+    changePaymentsCategory(data) {
+        return https.post("/payments/change-category", data, { headers: authHeader()});
+    }
+
+    bulkDeletePayments(data) {
+        return https.post("/payments/bulk-delete", data, { headers: authHeader()});
+    }
 }
 
 export default new PaymentService();

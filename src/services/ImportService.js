@@ -8,10 +8,11 @@ class ImportService {
         const formData = new FormData();
         formData.append('file', file);
         formData.append('action', action);
+        formData.append('mode', bank);
         const headers = {
             'Content-Type': 'multipart/form-data',
           }
-            return https.post(`/${bank}/import`, formData, { headers: {...authHeader(), ...headers}});
+            return https.post(`/import`, formData, { headers: {...authHeader(), ...headers}});
         }
     }
 

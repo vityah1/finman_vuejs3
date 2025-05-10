@@ -1,10 +1,10 @@
 <template>
 	<div class="container">
 		<alert-component ref="myAlert"></alert-component>
-		<b-form v-model="showModal" :title="`Upload ${bankName} file`">
+		<b-form v-model="showModal" :title="`Upload ${selectedBankType} file`">
 			<template #modal-header>
 				<h5 class="modal-title text-danger">
-					Upload {{ bankName }} xlsx file statements...
+					Upload {{ selectedBankType }} xlsx file statements...
 				</h5>
 			</template>
 			<template #default>
@@ -13,13 +13,25 @@
 						<label>{{ currentUser.login }}</label>
 					</div>
 					<div class="form-group">
-						<label>Select file from <strong>{{ bankName.charAt(0).toUpperCase() + bankName.slice(1) }}:</strong></label>
+						<label>Select bank type:</label>
+						<div class="bank-selector mb-2">
+							<div class="bank-option" :class="{ active: selectedBankType === 'revolut' }" @click="selectedBankType = 'revolut'">
+								<i class="fas fa-euro-sign"></i> Revolut
+							</div>
+							<div class="bank-option" :class="{ active: selectedBankType === 'wise' }" @click="selectedBankType = 'wise'">
+								<i class="fas fa-euro-sign"></i> Wise
+							</div>
+							<div class="bank-option" :class="{ active: selectedBankType === 'p24' }" @click="selectedBankType = 'p24'">
+								<img src="/p24.png" alt="P24" style="width: 25px; margin-right: 5px;" /> P24
+							</div>
+						</div>
+						<label>Select file from <strong>{{ selectedBankType.charAt(0).toUpperCase() + selectedBankType.slice(1) }}:</strong></label>
 						<input type="file" class="form-control" id="amount" @change="handleFileChange" />
-						<select class="form-control" v-model="selectedOption">
+						<select class="form-control mt-2" v-model="selectedOption">
 							<option value="import">Import</option>
 							<option value="show">Show</option>
 						</select>
-						<b-button variant="primary" @click="handleButtonClick">Submit</b-button>
+						<b-button variant="primary" class="mt-2" @click="handleButtonClick">Submit</b-button>
 					</div>
 				</b-form>
 				<div></div>
@@ -53,10 +65,10 @@ export default {
 		return {
 			user: this.$route.query.user,
 			selectedOption: "show",
+			selectedBankType: "revolut",
 			file: null,
 			payments: [],
 			paymentsWithCategories: [],
-			bankName: this.$route.meta.bankName,
 		};
 	},
 	computed: {
@@ -70,7 +82,7 @@ export default {
 			console.log("this.file = event.target.files[0];", this.file, event.target.files[0]);
 		},
 		handleButtonClick() {
-			ImportService.UploadFile(this.file, this.selectedOption, this.bankName)
+			ImportService.UploadFile(this.file, this.selectedOption, this.selectedBankType)
 				.then((response) => {
 					this.payments = response.data;
 					this.paymentsWithCategories = this.payments.map((payment) => {
@@ -97,3 +109,32 @@ export default {
 	},
 };
 </script>
+
+<style scoped>
+.bank-selector {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 15px;
+}
+
+.bank-option {
+	padding: 10px 15px;
+	border: 1px solid #ccc;
+	border-radius: 5px;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	transition: all 0.2s ease;
+}
+
+.bank-option:hover {
+	background-color: #f5f5f5;
+}
+
+.bank-option.active {
+	background-color: #e7f4ff;
+	border-color: #007bff;
+	color: #007bff;
+}
+</style>

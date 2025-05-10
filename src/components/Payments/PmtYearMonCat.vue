@@ -88,6 +88,87 @@
 			<div class="col-4 h4 text-danger">{{ total.toLocaleString() }} {{ selectedCurrency || "" }}</div>
 			<div class="col-4">{{ total_cnt }}</div>
 		</div>
+		<div v-if="hasSelectedPayments" class="row mb-3">
+			<div class="col-md-8">
+				<div class="d-flex">
+					<b-dropdown :text="`Операції з вибраними (${selectedPaymentsCount})`" variant="primary" class="mr-2">
+						<b-dropdown-item @click="showChangeCategoryModal">
+							<i class="fas fa-tag mr-2"></i> Змінити категорію
+						</b-dropdown-item>
+						<b-dropdown-item @click="showBulkDeleteConfirmModal">
+							<i class="fas fa-trash-alt mr-2"></i> Видалити
+						</b-dropdown-item>
+					</b-dropdown>
+				</div>
+			</div>
+		</div>
+
+		<!-- Модальне вікно для зміни категорії вибраних платежів -->
+		<b-modal v-model="showCategoryModal" title="Зміна категорії для платежів" @ok="changeCategory">
+			<template #modal-header>
+				<h5 class="modal-title">Зміна категорії для платежів ({{ selectedPaymentsCount }})</h5>
+			</template>
+			<template #default>
+				<div class="mb-3">
+					<label class="form-label">Виберіть нову категорію:</label>
+					<select v-model="newCategoryId" class="form-control">
+						<option disabled value="">Оберіть категорію...</option>
+						<template v-for="category in formattedCategories" :key="category.id">
+							<option :value="category.id">{{ category.name }}</option>
+						</template>
+					</select>
+				</div>
+				<div class="mb-3">
+					<h6>Вибрані платежі:</h6>
+					<ul class="list-group">
+						<li v-for="payment in selectedPaymentsList" :key="payment.id" class="list-group-item d-flex justify-content-between align-items-center">
+							<div>
+								<small>{{ formatDate(payment.rdate) }}</small>: 
+								{{ payment.mydesc || payment.category_name }}
+							</div>
+							<span class="badge bg-primary rounded-pill">
+								{{ payment.amount ? payment.amount.toLocaleString() : '0' }}
+							</span>
+						</li>
+					</ul>
+				</div>
+			</template>
+		</b-modal>
+
+		<!-- Модальне вікно для підтвердження масового видалення платежів -->
+		<b-modal v-model="showDeleteModal" title="Підтвердження видалення" @ok="bulkDeletePayments">
+			<template #modal-header>
+				<h5 class="modal-title text-danger">Підтвердження видалення платежів</h5>
+			</template>
+			<template #default>
+				<div class="alert alert-warning">
+					<i class="fas fa-exclamation-triangle mr-2"></i> Ви дійсно бажаєте видалити {{ selectedPaymentsCount }} платежів? Ця дія безворотна.
+				</div>
+				<div class="mb-3">
+					<h6>Вибрані платежі для видалення:</h6>
+					<ul class="list-group">
+						<li v-for="payment in selectedPaymentsList" :key="payment.id" class="list-group-item d-flex justify-content-between align-items-center">
+							<div>
+								<small>{{ formatDate(payment.rdate) }}</small>: 
+								{{ payment.mydesc || payment.category_name }}
+							</div>
+							<span class="badge bg-danger rounded-pill">
+								{{ payment.amount ? payment.amount.toLocaleString() : '0' }}
+							</span>
+						</li>
+					</ul>
+				</div>
+			</template>
+			<template #modal-footer="{ ok, cancel }">
+				<b-button variant="secondary" @click="cancel()">
+					Скасувати
+				</b-button>
+				<b-button variant="danger" @click="ok()">
+					Видалити
+				</b-button>
+			</template>
+		</b-modal>
+
 		<div class="row">
 			<div class="col-md-8">
 				<b-table-simple caption-top hover responsive small>
@@ -99,22 +180,27 @@
 					</colgroup>
 					<b-thead head-variant="dark">
 						<b-tr>
+<b-th style="width: 40px;">
+	<input type="checkbox" v-model="selectAll" @change="toggleSelectAll" />
+</b-th>
 <b-th @click="sortBy('rdate')">Date&nbsp;↑↓</b-th>
 <b-th>Sub Category</b-th>
-<b-th>Description</b-th>
+<b-th @click="sortBy('mydesc')">Description&nbsp;↑↓</b-th>
 <b-th @click="sortBy('amount')">Amount&nbsp;↑↓</b-th>
-<b-th>Mono user</b-th>
-
+<b-th>User</b-th>
 						</b-tr>
 					</b-thead>
 					<b-tbody v-if="payments.length > 0">
-						<b-tr v-for="(payment, index) in sortedPayments" :key="index" @click="openFormEditPayment(payment.id)">
-							<b-td>{{ formatDate(payment.rdate) }}</b-td>
-							<b-td><span v-if="payment.category_name !== category_name">{{ payment.category_name
+						<b-tr v-for="(payment, index) in sortedPayments" :key="index">
+							<b-td style="width: 40px;" @click.stop>
+								<input type="checkbox" v-model="selectedPayments[payment.id]" />
+							</b-td>
+							<b-td @click="openFormEditPayment(payment.id)">{{ formatDate(payment.rdate) }}</b-td>
+							<b-td @click="openFormEditPayment(payment.id)"><span v-if="payment.category_name !== category_name">{{ payment.category_name
 								}}</span></b-td>
-							<b-td>{{ payment.mydesc }}</b-td>
-							<b-td>{{ payment.amount.toLocaleString() || 0 }}</b-td>
-							<b-td>{{ payment.mono_user_name }}</b-td>
+							<b-td @click="openFormEditPayment(payment.id)">{{ payment.mydesc }}</b-td>
+							<b-td @click="openFormEditPayment(payment.id)">{{ payment.amount ? payment.amount.toLocaleString() : '0' }}</b-td>
+							<b-td @click="openFormEditPayment(payment.id)">{{ payment.user_login }}</b-td>
 						</b-tr>
 					</b-tbody>
 				</b-table-simple>
@@ -137,6 +223,9 @@ export default {
 			selectedCategoryId: "",
 			okTitle: "",
 			showModal: false,
+			showCategoryModal: false,
+			showDeleteModal: false,
+			newCategoryId: "",
 			payments: [],
 			q: this.$route.query.q || "",
 			total: 0,
@@ -157,6 +246,8 @@ export default {
 			category_name: "",
 			sortKey: "",
 			sortOrder: 1,
+			selectedPayments: {},
+			selectAll: false,
 		};
 	},
 	computed: {
@@ -187,6 +278,20 @@ export default {
       return result * this.sortOrder;
     });
   },
+		hasSelectedPayments() {
+			return this.selectedPaymentsCount > 0;
+		},
+		selectedPaymentsCount() {
+			return Object.values(this.selectedPayments).filter(value => value).length;
+		},
+		selectedPaymentsList() {
+			return this.payments.filter(payment => this.selectedPayments[payment.id]);
+		},
+		selectedPaymentIds() {
+			return Object.keys(this.selectedPayments)
+				.filter(key => this.selectedPayments[key])
+				.map(key => parseInt(key));
+		},
 	},
 	watch: {
 		selectedCategoryId(newCategoryId) {
@@ -212,15 +317,16 @@ export default {
 				this.openFormAddPayment();
 				this.$store.commit("setButtonClicked", false);
 			}
+		}
 		},
-	},
 	methods: {
 		formatDate(date) {
-    return moment(date).format('DD');
-  },
-  parseDate(date) {
-    return moment(date).toDate();
-  },
+			return moment(date).format('DD.MM.YYYY');
+		},
+		parseDate(date) {
+			// Використовуємо moment без вказання формату, щоб він ідентифікував формат автоматично
+			return moment(date).toDate();
+		},
 		formatCategories(categories, parentId = null, prefix = "") {
 			return categories.reduce((acc, category) => {
 				if (category.parent_id === parentId || (parentId === null && !category.parent_id)) {
@@ -301,10 +407,25 @@ export default {
 		},
 		async doUpdatePayment() {
 			try {
+				// Зберігаємо стару категорію для порівняння
+				const oldCategoryId = this.$route.params.category_id;
+				
 				await PaymentService.updatePayment(this.currentPayment.id, this.currentPayment);
-				this.payments = this.payments.map(c => (c.id === this.currentPayment.id ? this.currentPayment : c));
-				this.$refs.myAlert.showAlert("success", "Payment updated");
-				this.showModal = false;
+				
+				// Перевіряємо, чи змінилася категорія
+				if (oldCategoryId && this.currentPayment.category_id.toString() !== oldCategoryId.toString()) {
+					// Якщо категорія змінилася і ми знаходимося в списку конкретної категорії,
+					// потрібно оновити весь список
+					this.$refs.myAlert.showAlert("success", "Payment updated");
+					this.showModal = false;
+					// Оновлюємо список платежів
+					this.getPayments();
+				} else {
+					// Якщо категорія не змінилася, просто оновлюємо платіж у списку
+					this.payments = this.payments.map(c => (c.id === this.currentPayment.id ? this.currentPayment : c));
+					this.$refs.myAlert.showAlert("success", "Payment updated");
+					this.showModal = false;
+				}
 			} catch (e) {
 				console.log(e);
 				this.$refs.myAlert.showAlert("danger", "Payment update failed");
@@ -349,6 +470,72 @@ export default {
 		findCategoryNameById(categoryId) {
 			const category = this.categories.find(category => category.id === parseInt(categoryId));
 			return category ? category.name : null;
+		},
+		toggleSelectAll() {
+			const newSelectedPayments = {};
+			this.payments.forEach(payment => {
+				newSelectedPayments[payment.id] = this.selectAll;
+			});
+			this.selectedPayments = newSelectedPayments;
+		},
+		showChangeCategoryModal() {
+			this.newCategoryId = "";
+			this.showCategoryModal = true;
+		},
+		showBulkDeleteConfirmModal() {
+			this.showDeleteModal = true;
+		},
+		bulkDeletePayments() {
+			const payload = {
+				payment_ids: this.selectedPaymentIds
+			};
+
+			PaymentService.bulkDeletePayments(payload)
+				.then(response => {
+					if (response.data.status === "ok") {
+						this.$refs.myAlert.showAlert('success', response.data.message);
+						// Оновлюємо список платежів
+						this.getPayments();
+						// Скидаємо вибрані платежі
+						this.selectedPayments = {};
+						this.selectAll = false;
+					} else {
+						this.$refs.myAlert.showAlert('danger', 'Не вдалося видалити платежі');
+					}
+				})
+				.catch(error => {
+					console.error("Error deleting payments:", error);
+					this.$refs.myAlert.showAlert('danger', 'Не вдалося видалити платежі: ' + error.message);
+				});
+		},
+		changeCategory() {
+			if (!this.newCategoryId) {
+				this.$refs.myAlert.showAlert('danger', 'Виберіть категорію');
+				return;
+			}
+
+			const payload = {
+				payment_ids: this.selectedPaymentIds,
+				category_id: parseInt(this.newCategoryId)
+			};
+
+			PaymentService.changePaymentsCategory(payload)
+				.then(response => {
+					if (response.data.status === "ok") {
+						this.$refs.myAlert.showAlert('success', response.data.message);
+						// Оновлення даних після зміни категорії
+						this.getPayments();
+						// Скидаємо вибрані платежі
+						this.selectedPayments = {};
+						this.selectAll = false;
+					} else {
+						this.$refs.myAlert.showAlert('danger', 'Не вдалося змінити категорію');
+					}
+				})
+				.catch(error => {
+					console.error("Error changing category:", error);
+					this.$refs.myAlert.showAlert('danger', 'Не вдалося змінити категорію: ' + error.message);
+				});
 		},
 	},
 	async mounted() {
