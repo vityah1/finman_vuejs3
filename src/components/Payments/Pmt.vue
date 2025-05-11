@@ -39,6 +39,13 @@
 import PaymentService from "../../services/PaymentService";
 import store from "@/store";
 
+/**
+ * @typedef {Object} YearData
+ * @property {number} year
+ * @property {number} amount
+ * @property {number} cnt
+ */
+
 export default {
   name: "PaymentsYear",
   data() {
@@ -48,24 +55,22 @@ export default {
   },
   methods: {
     async retrieveYears() {
-      PaymentService.getPaymentsYears({currency: store.state.sprs.selectedCurrency || "UAH"})
-        .then((response) => {
-          this.years = response.data;
-          console.log(response.data);
-        })
-        .catch((e) => {
-          console.log(e);
-        });
+      try {
+        const response = await PaymentService.getPaymentsYears({currency: store.state.sprs.selectedCurrency || "UAH"});
+        this.years = response.data;
+        console.log(response.data);
+      } catch (e) {
+        console.log(e);
+      }
     },
   },
   mounted() {
     this.retrieveYears();
   },
 	watch: {
-    // Якщо блок watch відсутній, створіть його
     '$store.state.sprs.selectedCurrency'() {
-        this.retrieveYears();
+      this.retrieveYears();
     }
+  }
 }
-};
 </script>

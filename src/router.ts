@@ -1,15 +1,15 @@
-import { createRouter, createWebHistory } from "vue-router";
+import { createRouter, createWebHistory, RouteRecordRaw } from "vue-router";
 
-const routes = [
+const routes: Array<RouteRecordRaw> = [
 	{
 		path: "/",
 		name: "home",
-		component: () => import("./components/AboutPage"),
+		component: () => import("./components/AboutPage.vue"),
 	},
 	{
 		path: "/about",
 		name: "about",
-		component: () => import("./components/AboutPage"),
+		component: () => import("./components/AboutPage.vue"),
 	},
 	{
 		path: "/login",
@@ -63,16 +63,6 @@ const routes = [
 		component: () => import("./components/Payments/PmtYearMonCat.vue"),
 	},
 	{
-		path: "/payments/:year/:month/pivot",
-		name: "pivot_payments",
-		component: () => import("./components/Payments/PivotData.vue"),
-	},
-	{
-		path: "/payments/:year/:month/pivot7",
-		name: "pivot_payments_7",
-		component: () => import("./components/Payments/PivotData7.vue"),
-	},
-	{
 		path: "/payments/years",
 		name: "payments_years",
 		component: () => import("./components/Payments/Pmt.vue"),
@@ -96,7 +86,6 @@ const routes = [
 ];
 
 const router = createRouter({
-	base: "/",
 	history: createWebHistory(process.env.BASE_URL),
 	routes,
 });

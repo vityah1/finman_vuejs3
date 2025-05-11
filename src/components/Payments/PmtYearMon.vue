@@ -43,6 +43,23 @@
 import SelectorComponent from "../SelectorComponent.vue";
 import PaymentService from "../../services/PaymentService";
 
+/**
+ * @typedef {Object} CategoryCost
+ * @property {number} category_id
+ * @property {string} name
+ * @property {number} amount
+ * @property {number} cnt
+ */
+
+/**
+ * @typedef {Object} RequestParams
+ * @property {(number|string)} year
+ * @property {(number|string)} month
+ * @property {string} [group_user_id]
+ * @property {string} [currency]
+ * @property {boolean} [forceUpdate]
+ */
+
 export default {
   name: "PaymentYearMonth",
   components: {
@@ -61,59 +78,60 @@ export default {
       isRequestInProgress: false // Запобігання паралельним запитам
     };
   },
-  methods: { areParamsValid(params) {
-    return params && params.year && params.month;
-  },
+  methods: { 
+    areParamsValid(params) {
+      return !!params && !!params.year && !!params.month;
+    },
 
-  // У методі safeApiRequest зробіть валюту частиною унікального ідентифікатора запиту
-  async safeApiRequest(params) {
-    console.log("Планується запит з параметрами:", params);
+    // У методі safeApiRequest зробіть валюту частиною унікального ідентифікатора запиту
+    async safeApiRequest(params) {
+      console.log("Планується запит з параметрами:", params);
 
-    if (!this.areParamsValid(params)) {
-      console.warn("Пропуск запиту з невалідними параметрами", params);
-      return null;
-    }
+      if (!this.areParamsValid(params)) {
+        console.warn("Пропуск запиту з невалідними параметрами", params);
+        return null;
+      }
 
-    // Додайте валюту до параметрів для формування унікального ключа
-    const fullParams = {
-      ...params,
-      currency: params.currency || this.$store.state.sprs.selectedCurrency
-    };
+      // Додайте валюту до параметрів для формування унікального ключа
+      const fullParams = {
+        ...params,
+        currency: params.currency || this.$store.state.sprs.selectedCurrency
+      };
 
-    // Включіть валюту в requestKey
-    const requestKey = JSON.stringify(fullParams);
+      // Включіть валюту в requestKey
+      const requestKey = JSON.stringify(fullParams);
 
-    // Перезаписуйте lastRequest якщо валюта змінилася
-    if (this.lastRequest === requestKey && !params.forceUpdate) {
-      console.warn("Пропуск повторного запиту з тими самими параметрами");
-      return null;
-    }
+      // Перезаписуйте lastRequest якщо валюта змінилася
+      if (this.lastRequest === requestKey && !params.forceUpdate) {
+        console.warn("Пропуск повторного запиту з тими самими параметрами");
+        return null;
+      }
 
-    this.isRequestInProgress = true;
-    this.lastRequest = requestKey;
+      this.isRequestInProgress = true;
+      this.lastRequest = requestKey;
 
-    try {
-      const response = await PaymentService.getPaymentsPeriod(fullParams);
+      try {
+        const response = await PaymentService.getPaymentsPeriod(fullParams);
 
-      // Обробка результату як і раніше...
-      this.catcosts = response.data;
-      let total = 0;
-      let total_cnt = 0;
-      this.catcosts.forEach((val) => {
-        total += Number(val.amount);
-        total_cnt += Number(val.cnt);
-      });
-      this.total = total;
-      this.total_cnt = total_cnt;
+        // Обробка результату як і раніше...
+        this.catcosts = response.data;
+        let total = 0;
+        let total_cnt = 0;
+        this.catcosts.forEach((val) => {
+          total += Number(val.amount);
+          total_cnt += Number(val.cnt);
+        });
+        this.total = total;
+        this.total_cnt = total_cnt;
 
-      return response;
-    } catch (error) {
-      console.error("Помилка API запиту:", error);
-      throw error;
-    } finally {
-      this.isRequestInProgress = false;
-    }
-  },
+        return response;
+      } catch (error) {
+        console.error("Помилка API запиту:", error);
+        throw error;
+      } finally {
+        this.isRequestInProgress = false;
+      }
+    },
 
     // Обробник події зміни фільтрів
     handleSelectChange(eventData) {
@@ -151,7 +169,7 @@ export default {
           name: 'payments_year_month',
           params: { year: this.year, month: this.month },
           query
-        }).catch(err => {
+        }).catch((err) => {
           // Ігноруємо помилки навігації
           console.warn("Ігнорована помилка навігації:", err);
         });
@@ -177,6 +195,6 @@ export default {
       forceUpdate: true
     });
   }
-},
+}
 };
 </script>

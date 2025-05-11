@@ -56,58 +56,119 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 import ImportService from "@/services/ImportService";
+import { ref, computed, onMounted, defineComponent } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+import { useMutation } from '@tanstack/vue-query';
 
-export default {
+interface Payment {
+	id: number;
+	amount: number;
+	description?: string;
+	mydesc?: string;
+	category_id?: number;
+	rdate: string;
+	sql?: boolean;
+	[key: string]: any;
+}
+
+interface PaymentWithCategory extends Payment {
+	category_name: string;
+}
+
+interface AlertComponent {
+	showAlert: (type: string, message: string) => void;
+	[key: string]: any;
+}
+
+export default defineComponent({
 	name: "BankForm",
-	data() {
+	setup() {
+		const store = useStore();
+		const router = useRouter();
+		const myAlert = ref<AlertComponent | null>(null);
+
+		const user = ref<string | undefined>(router.currentRoute.value.query.user as string | undefined);
+		const selectedOption = ref<string>("show");
+		const selectedBankType = ref<string>("revolut");
+		const file = ref<File | null>(null);
+		const payments = ref<Payment[]>([]);
+		const paymentsWithCategories = ref<PaymentWithCategory[]>([]);
+
+		const currentUser = computed(() => store.state.auth.user);
+
+		// Використовуємо useMutation для завантаження файлу
+		const uploadMutation = useMutation({
+			mutationFn: async () => {
+				if (!file.value) {
+					throw new Error('Файл не вибрано');
+				}
+				// Перетворюємо відповідь у формат, очікуваний useMutation
+				const axiosResponse = await ImportService.UploadFile(
+					file.value, 
+					selectedOption.value, 
+					selectedBankType.value
+				);
+				return { data: axiosResponse.data };
+			},
+			onSuccess: (response: { data: Payment[] }) => {
+				payments.value = response.data;
+				paymentsWithCategories.value = payments.value.map((payment: Payment) => {
+					const category = store.state.sprs.categories.find(
+						(category) => category.id === payment.category_id
+					);
+					return {
+						...payment,
+						category_name: category ? category.name : "Unknown Category",
+					};
+				});
+				if (myAlert.value) {
+					myAlert.value.showAlert("success", "File upload success");
+				}
+			},
+			onError: (error) => {
+				console.log(error);
+				if (myAlert.value) {
+					myAlert.value.showAlert("danger", "File upload failed");
+				}
+			}
+		});
+
+		const handleFileChange = (event: Event) => {
+			const target = event.target as HTMLInputElement;
+			if (target.files && target.files.length > 0) {
+				file.value = target.files[0];
+				console.log("File selected:", file.value);
+			}
+		};
+
+		const handleButtonClick = (): void => {
+			uploadMutation.mutate();
+		};
+
+		onMounted((): void => {
+			if (!currentUser.value) {
+				router.push({ name: "login" });
+			}
+		});
+
 		return {
-			user: this.$route.query.user,
-			selectedOption: "show",
-			selectedBankType: "revolut",
-			file: null,
-			payments: [],
-			paymentsWithCategories: [],
+			myAlert,
+			user,
+			selectedOption,
+			selectedBankType,
+			file,
+			payments,
+			paymentsWithCategories,
+			currentUser,
+			handleFileChange,
+			handleButtonClick,
+			isLoading: computed<boolean>(() => uploadMutation.isPending.value)
 		};
 	},
-	computed: {
-		currentUser() {
-			return this.$store.state.auth.user;
-		},
-	},
-	methods: {
-		handleFileChange(event) {
-			this.file = event.target.files[0];
-			console.log("this.file = event.target.files[0];", this.file, event.target.files[0]);
-		},
-		handleButtonClick() {
-			ImportService.UploadFile(this.file, this.selectedOption, this.selectedBankType)
-				.then((response) => {
-					this.payments = response.data;
-					this.paymentsWithCategories = this.payments.map((payment) => {
-						const category = this.$store.state.sprs.categories.find(
-							(category) => category.id === payment.category_id,
-						);
-						return {
-							...payment,
-							category_name: category ? category.name : "Unknown Category",
-						};
-					});
-					this.$refs.myAlert.showAlert("success", "File upload success");
-				})
-				.catch((e) => {
-					console.log(e);
-					this.$refs.myAlert.showAlert("danger", "File upload failed");
-				});
-		},
-	},
-	mounted() {
-		if (!this.currentUser) {
-			this.$router.push({ name: "login" });
-		}
-	},
-};
+})
 </script>
 
 <style scoped>

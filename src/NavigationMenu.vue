@@ -10,12 +10,6 @@
 				<button class="btn btn-sm custom-button" @click.prevent="GoToAddPayment()">
 					<i class="fas fa-plus" style="color: #555;"></i>
 				</button>
-				<PivotSelect
-					v-if="showPivotSelect"
-					:year="parseInt(year)"
-					:month="parseInt(month)"
-					:mono-user-id="mono_user_id"
-				/>
 			</div>
 		</b-navbar-brand>
 
@@ -129,14 +123,12 @@
 	</b-navbar>
 </template>
 
-<script>
-import PivotSelect from "@/components/PivotSelect.vue";
+<script lang="ts">
+import { defineComponent } from 'vue';
 
-export default {
+export default defineComponent({
 	name: "NavigationMenu",
-	components: {
-		PivotSelect,
-	},
+	components: {},
 	computed: {
 		currentUser() {
 			try {
@@ -169,32 +161,29 @@ export default {
 				this.$store.dispatch("sprs/updateSelectedCurrency", value);
 			},
 		},
-		showPivotSelect() {
-			return this.year && this.month;
-		},
 	},
 	data() {
 		return {
-			year: null,
-			month: null,
-			mono_user_id: null,
+			year: null as string | null,
+			month: null as string | null,
+			mono_user_id: null as string | null,
 		};
 	},
 	watch: {
 		"$route.params.year": {
-			handler(newYear) {
+			handler(newYear: string) {
 				this.year = newYear;
 			},
 			immediate: true,
 		},
 		"$route.params.month": {
-			handler(newMonth) {
+			handler(newMonth: string) {
 				this.month = newMonth;
 			},
 			immediate: true,
 		},
 		"$route.params.mono_user_id": {
-			handler(newMonoUserId) {
+			handler(newMonoUserId: string) {
 				this.mono_user_id = newMonoUserId;
 			},
 			immediate: true,
@@ -206,7 +195,7 @@ export default {
 				this.$store.dispatch("auth/logout");
 				this.$router.push({ name: "login" });
 			} catch (error) {
-				console.error("Logout error:", error);
+				console.error("Помилка виходу:", error);
 				this.$router.push({ name: "login" });
 			}
 		},
@@ -231,7 +220,7 @@ export default {
 			}
 		},
 	},
-};
+});
 </script>
 
 <style scoped>

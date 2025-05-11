@@ -1,16 +1,23 @@
-<script>
-import PaymentService from "../services/PaymentService"
+<script lang="ts">
+import { defineComponent } from 'vue';
+import PaymentService from "../services/PaymentService";
+import type { AxiosResponse } from 'axios';
 
-export default {
+interface AboutResponse {
+  data: string;
+}
+
+export default defineComponent({
   name: "AboutPage",
   data() {
     return {
       htmlContent: "",
+      content: "",
     };
   },
   mounted() {
     PaymentService.getAbout().then(
-      (response) => {
+      (response: AxiosResponse<AboutResponse>) => {
         this.htmlContent = response.data.data;
         console.log(this.htmlContent);
       },
@@ -24,7 +31,7 @@ export default {
       }
     );
   },
-};
+});
 </script>
 
 <template>

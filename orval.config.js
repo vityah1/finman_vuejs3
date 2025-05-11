@@ -1,7 +1,7 @@
 module.exports = {
   finman: {
     input: {
-      target: 'http://localhost:8090/api/v3/api-docs',
+      target: 'http://localhost:8090/openapi.json',
     },
     output: {
       mode: 'tags-split',
@@ -12,10 +12,6 @@ module.exports = {
       clean: true,
       prettier: true,
       override: {
-        mutator: {
-          path: './src/api/mutator/custom-instance.ts',
-          name: 'customInstance',
-        },
         query: {
           useQuery: true,
           useMutation: true,
@@ -26,4 +22,4 @@ module.exports = {
       afterAllFilesWrite: 'prettier --write',
     },
   },
-}; 
+};

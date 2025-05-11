@@ -123,7 +123,7 @@
 					<ul class="list-group">
 						<li v-for="payment in selectedPaymentsList" :key="payment.id" class="list-group-item d-flex justify-content-between align-items-center">
 							<div>
-								<small>{{ formatDate(payment.rdate) }}</small>: 
+								<small>{{ formatDate(payment.rdate) }}</small>:
 								{{ payment.mydesc || payment.category_name }}
 							</div>
 							<span class="badge bg-primary rounded-pill">
@@ -149,7 +149,7 @@
 					<ul class="list-group">
 						<li v-for="payment in selectedPaymentsList" :key="payment.id" class="list-group-item d-flex justify-content-between align-items-center">
 							<div>
-								<small>{{ formatDate(payment.rdate) }}</small>: 
+								<small>{{ formatDate(payment.rdate) }}</small>:
 								{{ payment.mydesc || payment.category_name }}
 							</div>
 							<span class="badge bg-danger rounded-pill">
@@ -193,7 +193,7 @@
 					<b-tbody v-if="payments.length > 0">
 						<b-tr v-for="(payment, index) in sortedPayments" :key="index">
 							<b-td style="width: 40px;" @click.stop>
-								<input type="checkbox" v-model="selectedPayments[payment.id]" />
+								<input type="checkbox" :checked="isPaymentSelected(payment.id)" @change="togglePaymentSelection(payment.id)" />
 							</b-td>
 							<b-td @click="openFormEditPayment(payment.id)">{{ formatDate(payment.rdate) }}</b-td>
 							<b-td @click="openFormEditPayment(payment.id)"><span v-if="payment.category_name !== category_name">{{ payment.category_name
@@ -231,7 +231,7 @@ export default {
 			total: 0,
 			total_cnt: 0,
 			currentPayment: {
-				category_id: this.$store.state.sprs.categories[0].id,
+				category_id: this.$store.state.sprs.categories && this.$store.state.sprs.categories.length > 0 ? this.$store.state.sprs.categories[0].id : null,
 				rdate: this.getCurrentDate(),
 				refuel_data: { km: "", litres: "", price_val: "", station_name: "" },
 				currency_amount: 0,
@@ -296,7 +296,13 @@ export default {
 	watch: {
 		selectedCategoryId(newCategoryId) {
 			this.currentPayment.category_id = parseInt(newCategoryId);
-			this.selectedCategory = this.categories.find(category => category.id === parseInt(newCategoryId));
+			// Перевіряємо, чи categories є масивом перед викликом find
+			if (Array.isArray(this.categories)) {
+				this.selectedCategory = this.categories.find(category => category.id === parseInt(newCategoryId)) || { name: "" };
+			} else {
+				console.error('categories не є масивом:', this.categories);
+				this.selectedCategory = { name: "" };
+			}
 			if (this.isFuel && !this.currentPayment.refuel_data.km && this.currentPayment.mydesc) {
 				this.currentPayment.refuel_data.station_name = this.currentPayment.mydesc;
 			}
@@ -328,6 +334,9 @@ export default {
 			return moment(date).toDate();
 		},
 		formatCategories(categories, parentId = null, prefix = "") {
+			if (!Array.isArray(categories)) {
+				return [];
+			}
 			return categories.reduce((acc, category) => {
 				if (category.parent_id === parentId || (parentId === null && !category.parent_id)) {
 					acc.push({ ...category, name: prefix + category.name });
@@ -342,12 +351,21 @@ export default {
 			return date.toISOString().split("T")[0];
 		},
 		setCategory() {
-			if (!this.categories) {
-				this.categories = this.$store.state.sprs.categories;
-			}
+			// Просто використовуємо категорії зі store
+			this.categories = this.$store.state.sprs.categories;
+			console.log('Категорії отримано зі store:', this.categories.length);
 		},
 		openFormAddPayment() {
+			// Отримуємо категорії зі store
 			this.setCategory();
+
+			// Перевіряємо, чи є категорії
+			if (this.categories.length === 0) {
+				console.error('Немає доступних категорій для вибору');
+				this.$refs.myAlert.showAlert('danger', 'Немає доступних категорій. Спробуйте оновити сторінку.');
+				return;
+			}
+
 			this.okTitle = "Add";
 			this.currentPayment = {
 				category_id: this.categories[0].id,
@@ -359,10 +377,19 @@ export default {
 				source: "pwa",
 				action: "add",
 			};
+
+			// Встановлюємо початкову категорію в селекторі
+			this.selectedCategoryId = this.categories[0].id.toString();
+			console.log('Встановлено початкову категорію:', this.selectedCategoryId);
+
 			this.showModal = true;
 		},
 		async openFormEditPayment(id) {
 			try {
+				// Отримуємо категорії зі store
+				this.setCategory();
+
+				// Отримуємо дані платежу
 				const response = await PaymentService.getPayment(id);
 				this.currentPayment = {
 					...response.data,
@@ -372,12 +399,16 @@ export default {
 				if (!this.currentPayment.refuel_data) {
 					this.currentPayment.refuel_data = { km: "", litres: "", price_val: "", station_name: "" };
 				}
-				this.setCategory();
-				this.selectedCategoryId = this.currentPayment.category_id;
+
+				// Встановлюємо ID категорії для вибору в селекторі
+				const categoryId = this.currentPayment.category_id;
+				console.log('Встановлюємо категорію:', categoryId);
+				this.selectedCategoryId = categoryId ? categoryId.toString() : "";
+
 				this.okTitle = "Edit";
 				this.showModal = true;
 			} catch (e) {
-				console.log(e);
+				console.error('Помилка відкриття форми редагування:', e);
 			}
 		},
 		async doFormAction() {
@@ -409,9 +440,9 @@ export default {
 			try {
 				// Зберігаємо стару категорію для порівняння
 				const oldCategoryId = this.$route.params.category_id;
-				
+
 				await PaymentService.updatePayment(this.currentPayment.id, this.currentPayment);
-				
+
 				// Перевіряємо, чи змінилася категорія
 				if (oldCategoryId && this.currentPayment.category_id.toString() !== oldCategoryId.toString()) {
 					// Якщо категорія змінилася і ми знаходимося в списку конкретної категорії,
@@ -468,15 +499,31 @@ export default {
 			}
 		},
 		findCategoryNameById(categoryId) {
-			const category = this.categories.find(category => category.id === parseInt(categoryId));
-			return category ? category.name : null;
+			if (!Array.isArray(this.categories) || !this.categories.length) {
+				return "";
+			}
+			return this.categories.find(category => category.id === parseInt(categoryId))?.name || "";
 		},
+		isPaymentSelected(paymentId) {
+			return Boolean(this.selectedPayments[paymentId]);
+		},
+
+		togglePaymentSelection(paymentId) {
+			// У Vue 3 ми можемо просто присвоїти значення
+			const newValue = !this.isPaymentSelected(paymentId);
+			// Створюємо новий об'єкт для реактивності
+			this.selectedPayments = { ...this.selectedPayments, [paymentId]: newValue };
+			console.log(`Платіж ${paymentId} ${newValue ? 'вибрано' : 'знято'}`);
+		},
+
 		toggleSelectAll() {
+			const newValue = this.selectAll;
 			const newSelectedPayments = {};
 			this.payments.forEach(payment => {
-				newSelectedPayments[payment.id] = this.selectAll;
+				newSelectedPayments[payment.id] = newValue;
 			});
 			this.selectedPayments = newSelectedPayments;
+			console.log(`${newValue ? 'Вибрано' : 'Знято'} всі платежі`);
 		},
 		showChangeCategoryModal() {
 			this.newCategoryId = "";
@@ -542,9 +589,18 @@ export default {
 		if (!this.currentUser) {
 			this.$router.push({ name: "login" });
 		}
-		this.categories = this.$store.state.sprs.categories;
-		this.currencies = this.$store.state.sprs.currencies;
-		this.sources = this.$store.state.sprs.sources;
+		// Перевіряємо, чи дані з store є масивами
+		const storeCategories = this.$store.state.sprs.categories;
+		this.categories = Array.isArray(storeCategories) ? storeCategories : [];
+
+		const storeCurrencies = this.$store.state.sprs.currencies;
+		this.currencies = Array.isArray(storeCurrencies) ? storeCurrencies : [];
+
+		const storeSources = this.$store.state.sprs.sources;
+		this.sources = Array.isArray(storeSources) ? storeSources : [];
+
+		console.log('Категорії завантажено:', this.categories.length);
+
 		this.category_name = this.findCategoryNameById(this.$route.params.category_id);
 		await this.getPayments();
 		if (this.$route.query.action === "add") {
