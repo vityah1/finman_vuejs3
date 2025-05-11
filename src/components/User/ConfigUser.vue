@@ -88,7 +88,7 @@
 <script lang="ts">
 import ConfigService from "../../services/ConfigService";
 import { defineComponent } from 'vue';
-import type { ConfigCreate, ConfigUpdate, Category, CategoryCreate, CategoryUpdate } from '../../api/model';
+import type { ConfigCreate, ConfigUpdate, CategoryCreate, CategoryUpdate } from '../../api/model';
 
 // Використовуємо інтерфейс для типів конфігурацій, які повертає API
 interface ConfigType {
@@ -96,6 +96,14 @@ interface ConfigType {
 	name: string;
 	is_need_add_value: boolean;
 	is_multiple: boolean;
+}
+
+// Локальний інтерфейс для категорій
+interface Category {
+	id: number;
+	name: string;
+	parent_id?: number | null;
+	children?: Category[];
 }
 
 // Використовуємо типи з Orval безпосередньо
@@ -147,8 +155,8 @@ export default defineComponent({
                 this.addConfig();
             }
         },
-		async getConfigTypes(mode) {
-			ConfigService.getConfigTypes(mode)
+		async getConfigTypes() {
+			ConfigService.getConfigTypes()
 				.then((response) => {
 					this.config_types = response.data;
 				})
@@ -268,7 +276,8 @@ export default defineComponent({
 				});
 		},
 		findCategoryNameById(categoryId: number | string): string {
-            const category = this.categories.find(c => c.id === parseInt(categoryId));
+            const catId = typeof categoryId === 'string' ? parseInt(categoryId, 10) : categoryId;
+            const category = this.categories.find(c => c.id === catId);
             return category ? category.name : '';
         },
 		formatCategories(categories: Category[], parentId: number | null = null, prefix = ""): Category[] {

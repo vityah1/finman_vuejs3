@@ -10,7 +10,8 @@ import {
   updateUserRelationApiGroupsGroupIdUsersUserIdPatch,
   removeUserFromGroupApiGroupsGroupIdUsersUserIdToRemoveDelete,
   getGroupInvitationsApiGroupsGroupIdInvitationsGet,
-  createGroupInvitationApiGroupsGroupIdInvitationsPost
+  createGroupInvitationApiGroupsGroupIdInvitationsPost,
+  leaveGroupApiGroupsGroupIdLeavePost
 } from '../api/groups/groups';
 
 // Імпортуємо API хуки для роботи з запрошеннями
@@ -22,7 +23,7 @@ import {
   deleteInvitationApiInvitationsInvitationIdDelete
 } from '../api/invitations/invitations';
 
-import type { GroupUserUpdate } from '../api/model';
+import type { GroupUserUpdate, GroupInvitationCreate } from '../api/model';
 
 // Інтерфейси для типізації
 interface GroupData {
@@ -34,12 +35,14 @@ interface GroupData {
 interface GroupUserData {
   user_id: number;
   role?: string;
+  relation_type?: string;
   [key: string]: any;
 }
 
+// Адаптуємо інтерфейс до нової схеми API
 interface GroupInvitationData {
-  email: string;
-  role?: string;
+  email?: string | null;
+  expires?: string | null;
   [key: string]: any;
 }
 
@@ -111,14 +114,20 @@ class GroupService {
     const numericGroupId = typeof groupId === 'string' ? parseInt(groupId, 10) : groupId;
     const numericUserId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
     
+    // Використовуємо relation_type з даних, що передаються
+    const relationType = data.relation_type || data.role || '';
+    
+    // Не викидаємо помилку, якщо поле не заповнене, бо на бекенді воно необов'язкове
+    
     // Перетворюємо дані у відповідний формат API
-    const apiData: GroupUserUpdate = {
-      role: data.role || ''
+    // Бекенд очікує relation_type
+    const apiData = {
+      relation_type: relationType
     };
     
-    return updateUserRelationApiGroupsGroupIdUsersUserIdPatch(numericGroupId, numericUserId, apiData, { headers: authHeader() })
+    return updateUserRelationApiGroupsGroupIdUsersUserIdPatch(numericGroupId, numericUserId, apiData as any, { headers: authHeader() })
       .catch(error => {
-        console.error(`Помилка оновлення ролі користувача ${userId} в групі ${groupId}:`, error.response?.data || error.message);
+        console.error(`Помилка оновлення зв'язку користувача ${userId} в групі ${groupId}:`, error.response?.data || error.message);
         throw error;
       });
   }
@@ -135,7 +144,9 @@ class GroupService {
   }
 
   leaveGroup(groupId: number | string) {
-    return axios.post(`/groups/${groupId}/leave`, {}, { headers: authHeader() })
+    // Перетворюємо groupId на number для API функції
+    const numericGroupId = typeof groupId === 'string' ? parseInt(groupId, 10) : groupId;
+    return leaveGroupApiGroupsGroupIdLeavePost(numericGroupId, { headers: authHeader() })
       .catch(error => {
         console.error(`Помилка виходу з групи ${groupId}:`, error.response?.data || error.message);
         throw error;
@@ -156,7 +167,14 @@ class GroupService {
   createGroupInvitation(groupId: number | string, data: GroupInvitationData) {
     // Перетворюємо groupId на number для API функції
     const numericGroupId = typeof groupId === 'string' ? parseInt(groupId, 10) : groupId;
-    return createGroupInvitationApiGroupsGroupIdInvitationsPost(numericGroupId, data, { headers: authHeader() })
+    
+    // Форматуємо дані відповідно до нової схеми API
+    const invitationData: GroupInvitationCreate = {
+      email: data.email,
+      expires: data.expires
+    };
+    
+    return createGroupInvitationApiGroupsGroupIdInvitationsPost(numericGroupId, invitationData, { headers: authHeader() })
       .catch(error => {
         console.error(`Помилка створення запрошення до групи ${groupId}:`, error.response?.data || error.message);
         throw error;

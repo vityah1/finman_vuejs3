@@ -4,8 +4,13 @@
  * FinMan API
  * OpenAPI spec version: 1.0.0
  */
+import type { GroupUserUpdateRole } from "./groupUserUpdateRole";
+import type { GroupUserUpdateRelationType } from "./groupUserUpdateRelationType";
 
+/**
+ * Схема для оновлення інформації про користувача в групі
+ */
 export interface GroupUserUpdate {
-  /** Нова роль користувача в групі */
-  role: string;
+  role?: GroupUserUpdateRole;
+  relation_type?: GroupUserUpdateRelationType;
 }

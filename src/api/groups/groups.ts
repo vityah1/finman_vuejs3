@@ -24,7 +24,7 @@ import type { MaybeRef } from "vue";
 
 import type {
   GroupCreate,
-  GroupInvitation,
+  GroupInvitationCreate,
   GroupUpdate,
   GroupUserAdd,
   GroupUserUpdate,
@@ -270,15 +270,15 @@ export function useGetGroupInvitationsApiGroupsGroupIdInvitationsGet<
  */
 export const createGroupInvitationApiGroupsGroupIdInvitationsPost = (
   groupId: MaybeRef<number>,
-  groupInvitation: MaybeRef<GroupInvitation>,
+  groupInvitationCreate: MaybeRef<GroupInvitationCreate>,
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse<unknown>> => {
   groupId = unref(groupId);
-  groupInvitation = unref(groupInvitation);
+  groupInvitationCreate = unref(groupInvitationCreate);
 
   return axios.post(
     `/api/groups/${groupId}/invitations`,
-    groupInvitation,
+    groupInvitationCreate,
     options
   );
 };
@@ -290,7 +290,7 @@ export const getCreateGroupInvitationApiGroupsGroupIdInvitationsPostMutationOpti
         ReturnType<typeof createGroupInvitationApiGroupsGroupIdInvitationsPost>
       >,
       TError,
-      { groupId: number; data: GroupInvitation },
+      { groupId: number; data: GroupInvitationCreate },
       TContext
     >;
     axios?: AxiosRequestConfig;
@@ -299,7 +299,7 @@ export const getCreateGroupInvitationApiGroupsGroupIdInvitationsPostMutationOpti
       ReturnType<typeof createGroupInvitationApiGroupsGroupIdInvitationsPost>
     >,
     TError,
-    { groupId: number; data: GroupInvitation },
+    { groupId: number; data: GroupInvitationCreate },
     TContext
   > => {
     const mutationKey = [
@@ -317,7 +317,7 @@ export const getCreateGroupInvitationApiGroupsGroupIdInvitationsPostMutationOpti
       Awaited<
         ReturnType<typeof createGroupInvitationApiGroupsGroupIdInvitationsPost>
       >,
-      { groupId: number; data: GroupInvitation }
+      { groupId: number; data: GroupInvitationCreate }
     > = (props) => {
       const { groupId, data } = props ?? {};
 
@@ -338,7 +338,7 @@ export type CreateGroupInvitationApiGroupsGroupIdInvitationsPostMutationResult =
     >
   >;
 export type CreateGroupInvitationApiGroupsGroupIdInvitationsPostMutationBody =
-  GroupInvitation;
+  GroupInvitationCreate;
 export type CreateGroupInvitationApiGroupsGroupIdInvitationsPostMutationError =
   AxiosError<HTTPValidationError>;
 
@@ -354,7 +354,7 @@ export const useCreateGroupInvitationApiGroupsGroupIdInvitationsPost = <
       ReturnType<typeof createGroupInvitationApiGroupsGroupIdInvitationsPost>
     >,
     TError,
-    { groupId: number; data: GroupInvitation },
+    { groupId: number; data: GroupInvitationCreate },
     TContext
   >;
   axios?: AxiosRequestConfig;
@@ -363,7 +363,7 @@ export const useCreateGroupInvitationApiGroupsGroupIdInvitationsPost = <
     ReturnType<typeof createGroupInvitationApiGroupsGroupIdInvitationsPost>
   >,
   TError,
-  { groupId: number; data: GroupInvitation },
+  { groupId: number; data: GroupInvitationCreate },
   TContext
 > => {
   const mutationOptions =
@@ -806,6 +806,89 @@ export function useGetGroupApiGroupsGroupIdGet<
   return query;
 }
 
+/**
+ * Вихід користувача з групи
+ * @summary Leave Group
+ */
+export const leaveGroupApiGroupsGroupIdLeavePost = (
+  groupId: MaybeRef<number>,
+  options?: AxiosRequestConfig
+): Promise<AxiosResponse<unknown>> => {
+  groupId = unref(groupId);
+
+  return axios.post(`/api/groups/${groupId}/leave`, undefined, options);
+};
+
+export const getLeaveGroupApiGroupsGroupIdLeavePostMutationOptions = <
+  TError = AxiosError<HTTPValidationError>,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof leaveGroupApiGroupsGroupIdLeavePost>>,
+    TError,
+    { groupId: number },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof leaveGroupApiGroupsGroupIdLeavePost>>,
+  TError,
+  { groupId: number },
+  TContext
+> => {
+  const mutationKey = ["leaveGroupApiGroupsGroupIdLeavePost"];
+  const { mutation: mutationOptions, axios: axiosOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey }, axios: undefined };
+
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof leaveGroupApiGroupsGroupIdLeavePost>>,
+    { groupId: number }
+  > = (props) => {
+    const { groupId } = props ?? {};
+
+    return leaveGroupApiGroupsGroupIdLeavePost(groupId, axiosOptions);
+  };
+
+  return { mutationFn, ...mutationOptions };
+};
+
+export type LeaveGroupApiGroupsGroupIdLeavePostMutationResult = NonNullable<
+  Awaited<ReturnType<typeof leaveGroupApiGroupsGroupIdLeavePost>>
+>;
+
+export type LeaveGroupApiGroupsGroupIdLeavePostMutationError =
+  AxiosError<HTTPValidationError>;
+
+/**
+ * @summary Leave Group
+ */
+export const useLeaveGroupApiGroupsGroupIdLeavePost = <
+  TError = AxiosError<HTTPValidationError>,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof leaveGroupApiGroupsGroupIdLeavePost>>,
+    TError,
+    { groupId: number },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationReturnType<
+  Awaited<ReturnType<typeof leaveGroupApiGroupsGroupIdLeavePost>>,
+  TError,
+  { groupId: number },
+  TContext
+> => {
+  const mutationOptions =
+    getLeaveGroupApiGroupsGroupIdLeavePostMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
 /**
  * Отримати список користувачів в групі
  * @summary Get Group Users
