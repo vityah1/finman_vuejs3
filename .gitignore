@@ -27,4 +27,7 @@ package.json.bak
 .env.production
 
 # Ігноруємо згенеровані Orval файли
-/src/api
+#/src/api
+
+# Ігноруємо завантажену OpenAPI специфікацію
+#openapi.json

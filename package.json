@@ -6,7 +6,8 @@
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
-    "generate-api": "orval"
+    "generate-api": "orval --config orval.config.js",
+    "generate-api:prod": "orval --config orval.config.prod.js"
   },
   "dependencies": {
     "@tanstack/vue-query": "^5.71.1",

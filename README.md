@@ -45,19 +45,35 @@ npm run lint
 
 ## API Client Generation
 
-This project uses [Orval](https://orval.dev/) to generate TypeScript API clients from OpenAPI specification. The generated files are located in the `src/api` directory.
+This project uses [Orval](https://orval.dev/) to generate TypeScript API clients from OpenAPI specification. The generated files are located in the `src/api` directory and are not included in the Git repository.
 
 ### Local Generation
 
-To generate API clients locally, run:
+To generate API clients for local development, run:
 
 ```bash
 npm run generate-api
 ```
 
+This uses the `orval.config.js` file, which points to your local API server.
+
+### Production Generation
+
+To generate API clients for production, run:
+
+```bash
+npm run generate-api:prod
+```
+
+This uses the `orval.config.prod.js` file, which expects an `openapi.json` file in the root directory.
+
 ### CI/CD Generation
 
-The GitHub Actions workflow automatically generates API clients during the build process. It uses the `API_ENDPOINT` secret to fetch the OpenAPI specification from the production API.
+The GitHub Actions workflow automatically generates API clients during the build process:
+
+1. It downloads the OpenAPI specification from the production API using the `API_ENDPOINT` secret
+2. It runs `npm run generate-api:prod` to generate the API clients
+3. The generated files are included in the build
 
 ## Deploy
 

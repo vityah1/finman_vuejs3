@@ -25,39 +25,16 @@ jobs:
       run: |
         echo "VUE_APP_API_ENDPOINT=${{ secrets.API_ENDPOINT }}" > .env.production
 
-    - name: Generate Orval API clients
-      run: |
-        # Створюємо тимчасовий конфіг для Orval з production API URL
-        cat > orval.config.prod.js << EOF
-        module.exports = {
-          finman: {
-            input: {
-              target: '${{ secrets.API_ENDPOINT }}/openapi.json',
-            },
-            output: {
-              mode: 'tags-split',
-              target: './src/api',
-              schemas: './src/api/model',
-              client: 'vue-query',
-              mock: false,
-              clean: true,
-              prettier: true,
-              override: {
-                query: {
-                  useQuery: true,
-                  useMutation: true,
-                },
-              },
-            },
-            hooks: {
-              afterAllFilesWrite: 'prettier --write',
-            },
-          },
-        };
-        EOF
-
-        # Запускаємо Orval з тимчасовим конфігом
-        npx orval --config orval.config.prod.js
+#    - name: Download OpenAPI specification
+#      run: |
+#        # Завантажуємо OpenAPI специфікацію з продакшн API
+#        curl -o openapi.json "${{ secrets.API_ENDPOINT }}/openapi.json"
+#        echo "OpenAPI специфікацію завантажено"
+#
+#    - name: Generate Orval API clients
+#      run: |
+#        # Запускаємо Orval з продакшн конфігом
+#        npm run generate-api:prod
 
     - name: Build project
       run: npm run build
