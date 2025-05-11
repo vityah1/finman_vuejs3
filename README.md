@@ -14,7 +14,13 @@
 
 ## Project setup
 ```
-npm install
+npm install --legacy-peer-deps
+```
+
+### Generate API clients
+The project uses Orval to generate API clients from OpenAPI specification. To generate API clients, run:
+```
+npm run generate-api
 ```
 
 ### Compiles and hot-reloads for development
@@ -37,7 +43,23 @@ npm run build
 npm run lint
 ```
 
-### Deploy
+## API Client Generation
+
+This project uses [Orval](https://orval.dev/) to generate TypeScript API clients from OpenAPI specification. The generated files are located in the `src/api` directory.
+
+### Local Generation
+
+To generate API clients locally, run:
+
+```bash
+npm run generate-api
+```
+
+### CI/CD Generation
+
+The GitHub Actions workflow automatically generates API clients during the build process. It uses the `API_ENDPOINT` secret to fetch the OpenAPI specification from the production API.
+
+## Deploy
 
 create user www
 
@@ -60,5 +82,6 @@ sudo -u www chmod 600 /home/www/.ssh/authorized_keys
 ```
 
 add (/home/www/.ssh/id_rsa) as secret SSH_PRIVATE_KEY to your GitHub repo.
-add IP or domain your server as secret to your GITHUB repo
+add IP or domain your server as secret HOST to your GITHUB repo.
+add your API endpoint URL as secret API_ENDPOINT to your GITHUB repo (e.g., https://your-domain/api).
 

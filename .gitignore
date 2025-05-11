@@ -2,7 +2,6 @@
 node_modules
 /dist
 
-
 # local env files
 .env.local
 .env.*.local
@@ -26,3 +25,6 @@ package.json.bak
 *.bak
 3.1.0
 .env.production
+
+# Ігноруємо згенеровані Orval файли
+/src/api
