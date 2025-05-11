@@ -16,7 +16,7 @@ import type {
   UseQueryReturnType,
 } from "@tanstack/vue-query";
 
-import * as axios from "axios";
+import axios from "axios";
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import { computed, unref } from "vue";
@@ -28,10 +28,6 @@ import type {
   IgnoreInvitationApiInvitationsInvitationIdIgnorePostBody,
 } from ".././model";
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 /**
  * Перевірка запрошення
  * @summary Check Invitation
@@ -42,7 +38,7 @@ export const checkInvitationApiInvitationsInvitationCodeGet = (
 ): Promise<AxiosResponse<unknown>> => {
   invitationCode = unref(invitationCode);
 
-  return axios.default.get(`/api/invitations/${invitationCode}`, options);
+  return axios.get(`/api/invitations/${invitationCode}`, options);
 };
 
 export const getCheckInvitationApiInvitationsInvitationCodeGetQueryKey = (
@@ -162,7 +158,7 @@ export const acceptInvitationApiInvitationsInvitationCodeAcceptPost = (
     acceptInvitationApiInvitationsInvitationCodeAcceptPostBody
   );
 
-  return axios.default.post(
+  return axios.post(
     `/api/invitations/${invitationCode}/accept`,
     acceptInvitationApiInvitationsInvitationCodeAcceptPostBody,
     options
@@ -288,7 +284,7 @@ export const getInvitationApiInvitationsInvitationIdGet = (
 ): Promise<AxiosResponse<unknown>> => {
   invitationId = unref(invitationId);
 
-  return axios.default.get(`/api/invitations/${invitationId}`, options);
+  return axios.get(`/api/invitations/${invitationId}`, options);
 };
 
 export const getGetInvitationApiInvitationsInvitationIdGetQueryKey = (
@@ -399,7 +395,7 @@ export const deleteInvitationApiInvitationsInvitationIdDelete = (
 ): Promise<AxiosResponse<unknown>> => {
   invitationId = unref(invitationId);
 
-  return axios.default.delete(`/api/invitations/${invitationId}`, options);
+  return axios.delete(`/api/invitations/${invitationId}`, options);
 };
 
 export const getDeleteInvitationApiInvitationsInvitationIdDeleteMutationOptions =
@@ -489,7 +485,7 @@ export const useDeleteInvitationApiInvitationsInvitationIdDelete = <
 export const checkUserInvitationsApiUsersInvitationsGet = (
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse<unknown>> => {
-  return axios.default.get(`/api/users/invitations`, options);
+  return axios.get(`/api/users/invitations`, options);
 };
 
 export const getCheckUserInvitationsApiUsersInvitationsGetQueryKey = () => {
@@ -584,7 +580,7 @@ export const ignoreInvitationApiInvitationsInvitationIdIgnorePost = (
     ignoreInvitationApiInvitationsInvitationIdIgnorePostBody
   );
 
-  return axios.default.post(
+  return axios.post(
     `/api/invitations/${invitationId}/ignore`,
     ignoreInvitationApiInvitationsInvitationIdIgnorePostBody,
     options

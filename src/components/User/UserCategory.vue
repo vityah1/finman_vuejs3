@@ -63,55 +63,83 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import CategoryService from "../../services/CategoryService";
+import { defineComponent } from 'vue';
 
-export default {
+interface Category {
+  id?: number;
+  name: string;
+  parent_id?: number | null;
+  is_fuel?: boolean;
+  action?: 'add' | 'edit';
+  [key: string]: any;
+}
+
+interface AlertComponent {
+  showAlert: (type: string, message: string) => void;
+  [key: string]: any;
+}
+
+export default defineComponent({
   name: "UserCategory",
   data() {
     return {
       okTitle: "",
       showModal: false,
-      categories: this.$store.state.sprs.categories || [],
-      currentCategory: {},
+      categories: (this.$store as any).state.sprs.categories || [] as Category[],
+      currentCategory: {} as Category,
       // formattedCategories: [],
     };
   },
   computed: {
     formattedCategories() {
-      return this.formatCategories(this.categories || []);
+      // Перевіряємо, що categories є масивом перед викликом reduce
+      if (!Array.isArray(this.categories)) {
+        console.warn('categories is not an array:', this.categories);
+        return [];
+      }
+      return this.formatCategories(this.categories);
     },
   },
   methods: {
-    formatCategories(categories, parentId = null, prefix = '') {
-			return categories.reduce((acc, category) => {
-				if ((category.parent_id === parentId) || (parentId === null && !category.parent_id)) {
-					acc.push({
-						...category,
-						name: prefix + category.name
-					});
-					const children = this.formatCategories(categories, category.id, prefix + '--');
-					acc = acc.concat(children);
-				}
-				return acc;
-			}, []);
-		},
-    do_form_action() {
+    formatCategories(categories: Category[], parentId: number | null = null, prefix = ''): Category[] {
+      // Додаткова перевірка, що categories є масивом
+      if (!Array.isArray(categories)) {
+        console.warn('formatCategories: categories is not an array:', categories);
+        return [];
+      }
+
+      return categories.reduce((acc, category) => {
+        if ((category.parent_id === parentId) || (parentId === null && !category.parent_id)) {
+          acc.push({
+            ...category,
+            name: prefix + category.name
+          });
+          const children = this.formatCategories(categories, category.id, prefix + '--');
+          acc = acc.concat(children);
+        }
+        return acc;
+      }, []);
+    },
+    do_form_action(): void {
       if (this.currentCategory.action === 'add') {
         this.addCategory();
       } else if (this.currentCategory.action === 'edit') {
         this.updateCategory();
       }
     },
-    open_form_add_category() {
+    open_form_add_category(): void {
       this.currentCategory = { parent_id: 0, name: '', is_fuel: false, action: 'add' };
       this.okTitle = 'Add';
       this.showModal = true;
     },
-    async open_form_edit_category(id) {
+    async open_form_edit_category(id: number): Promise<void> {
       CategoryService.getCategory(id)
         .then((response) => {
-          this.currentCategory = { ...response.data, action: 'edit' };
+          // Перевіряємо, що response.data є об'єктом перед використанням spread оператора
+          const categoryData = response.data && typeof response.data === 'object' ? response.data : {};
+          this.currentCategory = { ...categoryData, action: 'edit' };
           this.okTitle = 'Update';
           this.showModal = true;
         })
@@ -119,55 +147,61 @@ export default {
           console.error('Error loading category:', e);
         });
     },
-    async updateCategory() {
+    async updateCategory(): Promise<void> {
       CategoryService.updateCategory(this.currentCategory.id, this.currentCategory)
         .then(() => {
           this.refreshCategories();
-          this.$refs.myAlert.showAlert('success', 'Category updated');
+          (this.$refs.myAlert as AlertComponent).showAlert('success', 'Category updated');
         })
         .catch((e) => {
           console.error('Error updating category:', e);
-          this.$refs.myAlert.showAlert('danger', 'Update failed');
+          (this.$refs.myAlert as AlertComponent).showAlert('danger', 'Update failed');
         });
       this.showModal = false;
     },
-    async addCategory() {
+    async addCategory(): Promise<void> {
       CategoryService.addCategory(this.currentCategory)
         .then(() => {
           this.refreshCategories();
-          this.$refs.myAlert.showAlert('success', 'Category added');
+          (this.$refs.myAlert as AlertComponent).showAlert('success', 'Category added');
         })
         .catch((e) => {
           console.error('Error updating category:', e);
-          this.$refs.myAlert.showAlert('danger', 'Add failed');
+          (this.$refs.myAlert as AlertComponent).showAlert('danger', 'Add failed');
         });
       this.showModal = false;
     },
-    async deleteCategory() {
+    async deleteCategory(): Promise<void> {
       CategoryService.deleteCategory(this.currentCategory.id)
         .then(() => {
           this.refreshCategories();
-          this.$refs.myAlert.showAlert('success', 'Category deleted');
+          (this.$refs.myAlert as AlertComponent).showAlert('success', 'Category deleted');
         })
         .catch((e) => {
           console.error('Error updating category:', e);
-          this.$refs.myAlert.showAlert('danger', 'Delete failed');
+          (this.$refs.myAlert as AlertComponent).showAlert('danger', 'Delete failed');
         });
       this.showModal = false;
     },
-    refreshCategories() {
+    refreshCategories(): void {
       CategoryService.getCategories()
         .then(response => {
-          this.categories = response;
-          console.log('refreshCategories => response:', response.length);
+          if (response && response.data) {
+            this.categories = response.data;
+            console.log('refreshCategories => categories:', this.categories.length);
+          } else {
+            console.error('No data in response:', response);
+            this.categories = [];
+          }
         })
         .catch(e => {
           console.error('Error fetching categories:', e);
+          this.categories = [];
         });
     }
   },
-  mounted() {
+  mounted(): void {
     this.refreshCategories();
   },
-};
+});
 </script>

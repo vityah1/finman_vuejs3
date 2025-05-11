@@ -13,17 +13,13 @@ import type {
   UseQueryReturnType,
 } from "@tanstack/vue-query";
 
-import * as axios from "axios";
+import axios from "axios";
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import { computed, unref } from "vue";
 import type { MaybeRef } from "vue";
 
 import type { HTTPValidationError } from ".././model";
-
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
 /**
  * Отримання даних довідника
@@ -35,7 +31,7 @@ export const getDictApiSprsDictionaryGet = (
 ): Promise<AxiosResponse<unknown>> => {
   dictionary = unref(dictionary);
 
-  return axios.default.get(`/api/sprs/${dictionary}`, options);
+  return axios.get(`/api/sprs/${dictionary}`, options);
 };
 
 export const getGetDictApiSprsDictionaryGetQueryKey = (

@@ -5,7 +5,8 @@ import {
     getConfigApiConfigConfigIdGet,
     editConfigApiConfigConfigIdPatch,
     deleteConfigApiConfigConfigIdDelete
-} from '../api/config/config';
+} from "@/api/config/config";
+import type { ConfigCreate, ConfigUpdate } from '../api/model';
 
 import authHeader from './auth-header';
 
@@ -28,12 +29,18 @@ class ConfigService {
     }
 
     addConfig(data: any): Promise<any> {
-        return addConfigApiUsersConfigPost({
-            headers: authHeader()
-        }).catch(error => {
-            console.error('Помилка додавання конфігурації:', error.response?.data || error.message);
-            throw error;
-        });
+        // Виділяємо поля, які очікує API
+        const configData: ConfigCreate = {
+            type_data: data.type_data,
+            value_data: data.value_data,
+            add_value: data.add_value?.toString() || null
+        };
+
+        return addConfigApiUsersConfigPost(configData, { headers: authHeader() })
+            .catch(error => {
+                console.error('Помилка додавання конфігурації:', error.response?.data || error.message);
+                throw error;
+            });
     }
 
     getConfig(id: number): Promise<any> {
@@ -46,19 +53,25 @@ class ConfigService {
 
     updateConfig(id: number | undefined, data: any): Promise<any> {
         if (id === undefined) {
-            return addConfigApiUsersConfigPost({
-                headers: authHeader()
-            }).catch(error => {
-                console.error('Помилка створення конфігурації:', error.response?.data || error.message);
-                throw error;
-            });
+            // Використовуємо метод addConfig для створення нової конфігурації
+            return this.addConfig(data)
+                .catch(error => {
+                    console.error('Помилка створення конфігурації:', error.response?.data || error.message);
+                    throw error;
+                });
         } else {
-            return editConfigApiConfigConfigIdPatch(id, {
-                headers: authHeader()
-            }).catch(error => {
-                console.error(`Помилка оновлення конфігурації ${id}:`, error.response?.data || error.message);
-                throw error;
-            });
+            // Виділяємо поля, які очікує API
+            const configData: ConfigUpdate = {
+                type_data: data.type_data,
+                value_data: data.value_data,
+                add_value: data.add_value?.toString() || null
+            };
+
+            return editConfigApiConfigConfigIdPatch(id, configData, { headers: authHeader() })
+                .catch(error => {
+                    console.error(`Помилка оновлення конфігурації ${id}:`, error.response?.data || error.message);
+                    throw error;
+                });
         }
     }
 

@@ -16,7 +16,7 @@ import type {
   UseQueryReturnType,
 } from "@tanstack/vue-query";
 
-import * as axios from "axios";
+import axios from "axios";
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import { computed, unref } from "vue";
@@ -29,10 +29,6 @@ import type {
   MonoWebhookRequest,
 } from ".././model";
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 /**
  * Отримати інформацію про користувачів Monobank
  * @summary Get User Mono Users Info
@@ -43,7 +39,7 @@ export const getUserMonoUsersInfoApiUsersUserIdMonoInfoGet = (
 ): Promise<AxiosResponse<unknown>> => {
   userId = unref(userId);
 
-  return axios.default.get(`/api/users/${userId}/mono/info/`, options);
+  return axios.get(`/api/users/${userId}/mono/info/`, options);
 };
 
 export const getGetUserMonoUsersInfoApiUsersUserIdMonoInfoGetQueryKey = (
@@ -159,7 +155,7 @@ export const getMonoUserInfoApiMonoUsersMonoUserIdInfoGet = (
 ): Promise<AxiosResponse<unknown>> => {
   monoUserId = unref(monoUserId);
 
-  return axios.default.get(`/api/mono/users/${monoUserId}/info/`, options);
+  return axios.get(`/api/mono/users/${monoUserId}/info/`, options);
 };
 
 export const getGetMonoUserInfoApiMonoUsersMonoUserIdInfoGetQueryKey = (
@@ -277,7 +273,7 @@ export const setWebhookApiMonoUsersMonoUserIdWebhookPut = (
   monoUserId = unref(monoUserId);
   monoWebhookRequest = unref(monoWebhookRequest);
 
-  return axios.default.put(
+  return axios.put(
     `/api/mono/users/${monoUserId}/webhook`,
     monoWebhookRequest,
     options
@@ -370,7 +366,7 @@ export const monoWebhookTestHandlerApiMonoUsersMonoUserIdWebhookGet = (
 ): Promise<AxiosResponse<unknown>> => {
   monoUserId = unref(monoUserId);
 
-  return axios.default.get(`/api/mono/users/${monoUserId}/webhook`, options);
+  return axios.get(`/api/mono/users/${monoUserId}/webhook`, options);
 };
 
 export const getMonoWebhookTestHandlerApiMonoUsersMonoUserIdWebhookGetQueryKey =
@@ -506,7 +502,7 @@ export const monoWebhookHandlerApiMonoUsersMonoUserIdWebhookPost = (
     monoWebhookHandlerApiMonoUsersMonoUserIdWebhookPostBody
   );
 
-  return axios.default.post(
+  return axios.post(
     `/api/mono/users/${monoUserId}/webhook`,
     monoWebhookHandlerApiMonoUsersMonoUserIdWebhookPostBody,
     options
@@ -626,11 +622,7 @@ export const getMonoDataPmtsApiMonoPaymentsPost = (
 ): Promise<AxiosResponse<unknown>> => {
   monoPaymentProcessRequest = unref(monoPaymentProcessRequest);
 
-  return axios.default.post(
-    `/api/mono/payments`,
-    monoPaymentProcessRequest,
-    options
-  );
+  return axios.post(`/api/mono/payments`, monoPaymentProcessRequest, options);
 };
 
 export const getGetMonoDataPmtsApiMonoPaymentsPostMutationOptions = <

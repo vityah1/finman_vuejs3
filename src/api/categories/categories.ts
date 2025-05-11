@@ -16,7 +16,7 @@ import type {
   UseQueryReturnType,
 } from "@tanstack/vue-query";
 
-import * as axios from "axios";
+import axios from "axios";
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import { computed, unref } from "vue";
@@ -28,10 +28,6 @@ import type {
   HTTPValidationError,
 } from ".././model";
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 /**
  * Отримання списку категорій користувача
  * @summary Get Categories
@@ -39,7 +35,7 @@ type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 export const getCategoriesApiCategoriesGet = (
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse<unknown>> => {
-  return axios.default.get(`/api/categories`, options);
+  return axios.get(`/api/categories`, options);
 };
 
 export const getGetCategoriesApiCategoriesGetQueryKey = () => {
@@ -125,7 +121,7 @@ export const addCategoryApiCategoriesPost = (
 ): Promise<AxiosResponse<unknown>> => {
   categoryCreate = unref(categoryCreate);
 
-  return axios.default.post(`/api/categories`, categoryCreate, options);
+  return axios.post(`/api/categories`, categoryCreate, options);
 };
 
 export const getAddCategoryApiCategoriesPostMutationOptions = <
@@ -208,7 +204,7 @@ export const deleteCategoryApiCategoriesCategoryIdDelete = (
 ): Promise<AxiosResponse<unknown>> => {
   categoryId = unref(categoryId);
 
-  return axios.default.delete(`/api/categories/${categoryId}`, options);
+  return axios.delete(`/api/categories/${categoryId}`, options);
 };
 
 export const getDeleteCategoryApiCategoriesCategoryIdDeleteMutationOptions = <
@@ -297,11 +293,7 @@ export const editCategoryApiCategoriesCategoryIdPatch = (
   categoryId = unref(categoryId);
   categoryUpdate = unref(categoryUpdate);
 
-  return axios.default.patch(
-    `/api/categories/${categoryId}`,
-    categoryUpdate,
-    options
-  );
+  return axios.patch(`/api/categories/${categoryId}`, categoryUpdate, options);
 };
 
 export const getEditCategoryApiCategoriesCategoryIdPatchMutationOptions = <
@@ -390,7 +382,7 @@ export const getCategoryApiCategoriesCategoryIdGet = (
 ): Promise<AxiosResponse<unknown>> => {
   categoryId = unref(categoryId);
 
-  return axios.default.get(`/api/categories/${categoryId}`, options);
+  return axios.get(`/api/categories/${categoryId}`, options);
 };
 
 export const getGetCategoryApiCategoriesCategoryIdGetQueryKey = (

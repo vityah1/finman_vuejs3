@@ -85,28 +85,50 @@
 	</div>
 </template>
 
-<script>
+<script lang="ts">
 import ConfigService from "../../services/ConfigService";
+import { defineComponent } from 'vue';
+import type { ConfigCreate, ConfigUpdate, Category, CategoryCreate, CategoryUpdate } from '../../api/model';
 
-export default {
+// Використовуємо інтерфейс для типів конфігурацій, які повертає API
+interface ConfigType {
+	type_data: string;
+	name: string;
+	is_need_add_value: boolean;
+	is_multiple: boolean;
+}
+
+// Використовуємо типи з Orval безпосередньо
+type Config = ConfigCreate & {
+	id?: number;
+	is_need_add_value?: boolean;
+	name?: string;
+	action?: 'add' | 'edit';
+}
+
+interface AlertComponent {
+	showAlert: (type: string, message: string) => void;
+}
+
+export default defineComponent({
 	name: "ConfigUser",
 	data() {
 		return {
 			okTitle: "",
-			configs: [],
-			config_types: [],
+			configs: [] as Config[],
+			config_types: [] as ConfigType[],
 			q: this.$route.query.q || "",
-			currentConfig: {},
+			currentConfig: {} as Config,
 			// type_data: { name: '' },
 			// config: {is_need_add_value: null},
 			user: this.$route.query.user,
 			showModal: false,
-			categories: [],
+			categories: [] as Category[],
 		};
 	},
 	computed: {
 		currentUser() {
-			return this.$store.state.auth.user;
+			return (this.$store as any).state.auth.user;
 		},
 		filteredConfigs() {
 			return (type_data) => {
@@ -134,18 +156,21 @@ export default {
 					console.log(e);
 				});
 		},
-		async addConfigForm(type_data, is_need_add_value, name) {
-			this.currentConfig.id = null;
-			this.currentConfig.value_data = "";
-			this.currentConfig.type_data = type_data;
-			this.currentConfig.is_need_add_value = is_need_add_value;
-			this.currentConfig.name = name;
-			this.currentConfig.action = "add";
-			this.currentConfig.add_value = "";
+		async addConfigForm(type_data: string, is_need_add_value: boolean, name: string) {
+			// Створюємо новий об'єкт з правильними типами
+			this.currentConfig = {
+				id: null,
+				type_data: type_data,
+				value_data: "",
+				add_value: null,
+				is_need_add_value: is_need_add_value,
+				name: name,
+				action: "add"
+			};
 			this.okTitle = "Add";
 			this.showModal = true;
 		},
-		async editConfigForm(id, is_need_add_value, name) {
+		async editConfigForm(id: number, is_need_add_value: boolean, name: string) {
 			ConfigService.getConfig(id)
 				.then((response) => {
 					this.currentConfig = response.data;
@@ -161,11 +186,19 @@ export default {
 				});
 		},
 		async updateConfig() {
-			ConfigService.updateConfig(this.currentConfig.id, this.currentConfig)
+			// Створюємо об'єкт з необхідними полями
+			const configData = {
+				type_data: this.currentConfig.type_data,
+				value_data: this.currentConfig.value_data,
+				add_value: this.currentConfig.add_value,
+				action: this.currentConfig.action
+			};
+
+			ConfigService.updateConfig(this.currentConfig.id, configData)
 				.then((response) => {
 					console.log(`user config: ${response}`);
 					this.getUserConfig();
-					this.$refs.myAlert.showAlert("success", "config updated");
+					(this.$refs.myAlert as AlertComponent).showAlert("success", "config updated");
 					this.showModal = false;
 				})
 				.catch((e) => {
@@ -174,16 +207,24 @@ export default {
 					if (e.response && e.response.data && e.response.data.message) {
 						errorMessage = e.response.data.message;
 					}
-					this.$refs.myAlert.showAlert("danger", errorMessage);
+					(this.$refs.myAlert as AlertComponent).showAlert("danger", errorMessage);
 					this.showModal = false;
 				});
 		},
 		async addConfig() {
-			ConfigService.addConfig(this.currentConfig)
+			// Створюємо об'єкт з необхідними полями
+			const configData = {
+				type_data: this.currentConfig.type_data,
+				value_data: this.currentConfig.value_data,
+				add_value: this.currentConfig.add_value,
+				action: this.currentConfig.action
+			};
+
+			ConfigService.addConfig(configData as ConfigCreate)
 				.then((response) => {
 					console.log(`user config: ${response}`);
 					this.getUserConfig();
-					this.$refs.myAlert.showAlert("success", "config added");
+					(this.$refs.myAlert as AlertComponent).showAlert("success", "config added");
 					this.showModal = false;
 				})
 				.catch((e) => {
@@ -192,7 +233,7 @@ export default {
 					if (e.response && e.response.data && e.response.data.message) {
 						errorMessage = e.response.data.message;
 					}
-					this.$refs.myAlert.showAlert("danger", errorMessage);
+					(this.$refs.myAlert as AlertComponent).showAlert("danger", errorMessage);
 					this.showModal = false;
 				});
 		},
@@ -208,11 +249,11 @@ export default {
 						.indexOf(this.currentConfig.id);
 
 					this.configs.splice(index, 1);
-					this.$refs.myAlert.showAlert("success", "config deleted");
+					(this.$refs.myAlert as AlertComponent).showAlert("success", "config deleted");
 				})
 				.catch((e) => {
 					console.log(e);
-					this.$refs.myAlert.showAlert("danger", "config delete failed");
+					(this.$refs.myAlert as AlertComponent).showAlert("danger", "config delete failed");
 				});
 			this.showModal = false;
 		},
@@ -226,11 +267,11 @@ export default {
 					console.log(e);
 				});
 		},
-		findCategoryNameById(categoryId) {
+		findCategoryNameById(categoryId: number | string): string {
             const category = this.categories.find(c => c.id === parseInt(categoryId));
             return category ? category.name : '';
         },
-		formatCategories(categories, parentId = null, prefix = "") {
+		formatCategories(categories: Category[], parentId: number | null = null, prefix = ""): Category[] {
 			return categories.reduce((acc, category) => {
 				if (category.parent_id === parentId || (parentId === null && !category.parent_id)) {
 					acc.push({ ...category, name: prefix + category.name });
@@ -245,9 +286,9 @@ export default {
 		if (!this.currentUser) {
 			this.$router.push({ name: "login" });
 		}
-		this.categories = this.$store.state.sprs.categories;
+		this.categories = (this.$store as any).state.sprs.categories || [];
 		this.getConfigTypes();
 		this.getUserConfig();
 	},
-};
+});
 </script>

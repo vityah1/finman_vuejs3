@@ -16,7 +16,7 @@ import type {
   UseQueryReturnType,
 } from "@tanstack/vue-query";
 
-import * as axios from "axios";
+import axios from "axios";
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import { computed, unref } from "vue";
@@ -28,10 +28,6 @@ import type {
   MonoUserUpdate,
 } from ".././model";
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 /**
  * Отримання списку всіх користувачів Mono
  * @summary Get Mono Users
@@ -39,7 +35,7 @@ type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 export const getMonoUsersApiMonoUsersGet = (
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse<unknown>> => {
-  return axios.default.get(`/api/mono/users`, options);
+  return axios.get(`/api/mono/users`, options);
 };
 
 export const getGetMonoUsersApiMonoUsersGetQueryKey = () => {
@@ -124,7 +120,7 @@ export const addMonoUserApiMonoUsersPost = (
 ): Promise<AxiosResponse<unknown>> => {
   monoUserCreate = unref(monoUserCreate);
 
-  return axios.default.post(`/api/mono/users`, monoUserCreate, options);
+  return axios.post(`/api/mono/users`, monoUserCreate, options);
 };
 
 export const getAddMonoUserApiMonoUsersPostMutationOptions = <
@@ -207,7 +203,7 @@ export const deleteMonoUserApiMonoUsersMonoUserIdDelete = (
 ): Promise<AxiosResponse<unknown>> => {
   monoUserId = unref(monoUserId);
 
-  return axios.default.delete(`/api/mono/users/${monoUserId}`, options);
+  return axios.delete(`/api/mono/users/${monoUserId}`, options);
 };
 
 export const getDeleteMonoUserApiMonoUsersMonoUserIdDeleteMutationOptions = <
@@ -293,11 +289,7 @@ export const editMonoUserApiMonoUsersMonoUserIdPatch = (
   monoUserId = unref(monoUserId);
   monoUserUpdate = unref(monoUserUpdate);
 
-  return axios.default.patch(
-    `/api/mono/users/${monoUserId}`,
-    monoUserUpdate,
-    options
-  );
+  return axios.patch(`/api/mono/users/${monoUserId}`, monoUserUpdate, options);
 };
 
 export const getEditMonoUserApiMonoUsersMonoUserIdPatchMutationOptions = <
@@ -385,7 +377,7 @@ export const getMonoUserApiMonoUsersMonoUserIdGet = (
 ): Promise<AxiosResponse<unknown>> => {
   monoUserId = unref(monoUserId);
 
-  return axios.default.get(`/api/mono/users/${monoUserId}`, options);
+  return axios.get(`/api/mono/users/${monoUserId}`, options);
 };
 
 export const getGetMonoUserApiMonoUsersMonoUserIdGetQueryKey = (

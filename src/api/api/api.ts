@@ -13,7 +13,7 @@ import type {
   UseQueryReturnType,
 } from "@tanstack/vue-query";
 
-import * as axios from "axios";
+import axios from "axios";
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import { computed, unref } from "vue";
@@ -26,10 +26,6 @@ import type {
   PaymentsForPeriodApiPaymentsPeriodGetParams,
 } from ".././model";
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 /**
  * Повертає платежі згруповані за категоріями за певний період (рік, місяць)
  * @summary Payments For Period
@@ -40,7 +36,7 @@ export const paymentsForPeriodApiPaymentsPeriodGet = (
 ): Promise<AxiosResponse<unknown>> => {
   params = unref(params);
 
-  return axios.default.get(`/api/payments/period`, {
+  return axios.get(`/api/payments/period`, {
     ...options,
     params: { ...unref(params), ...options?.params },
   });
@@ -140,7 +136,7 @@ export const paymentsByYearsApiPaymentsYearsGet = (
 ): Promise<AxiosResponse<unknown>> => {
   params = unref(params);
 
-  return axios.default.get(`/api/payments/years`, {
+  return axios.get(`/api/payments/years`, {
     ...options,
     params: { ...unref(params), ...options?.params },
   });
@@ -242,7 +238,7 @@ export const paymentByMonthsApiPaymentsYearMonthsGet = (
   year = unref(year);
   params = unref(params);
 
-  return axios.default.get(`/api/payments/${year}/months`, {
+  return axios.get(`/api/payments/${year}/months`, {
     ...options,
     params: { ...unref(params), ...options?.params },
   });
@@ -360,7 +356,7 @@ export function usePaymentByMonthsApiPaymentsYearMonthsGet<
 export const aboutApiAboutGet = (
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse<unknown>> => {
-  return axios.default.get(`/api/about`, options);
+  return axios.get(`/api/about`, options);
 };
 
 export const getAboutApiAboutGetQueryKey = () => {

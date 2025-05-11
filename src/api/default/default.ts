@@ -11,7 +11,7 @@ import type {
   UseMutationReturnType,
 } from "@tanstack/vue-query";
 
-import * as axios from "axios";
+import axios from "axios";
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import { unref } from "vue";
@@ -21,10 +21,6 @@ import type {
   BodyImportBankStatementApiImportPost,
   HTTPValidationError,
 } from ".././model";
-
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
 /**
  * Універсальний імпорт банківських виписок
@@ -49,7 +45,7 @@ export const importBankStatementApiImportPost = (
     formData.append("action", bodyImportBankStatementApiImportPost.action);
   }
 
-  return axios.default.post(`/api/import`, formData, options);
+  return axios.post(`/api/import`, formData, options);
 };
 
 export const getImportBankStatementApiImportPostMutationOptions = <

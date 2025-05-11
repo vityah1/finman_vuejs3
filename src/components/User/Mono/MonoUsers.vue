@@ -2,11 +2,11 @@
   <div class="container">
     <alert-component ref="myAlert"></alert-component>
     <!-- Modal -->
-    <b-modal 
-    v-if="currentMonoUser" 
-    v-model="showModal" 
-    @ok="doFormAction()" 
-    :title="okTitle" 
+    <b-modal
+    v-if="currentMonoUser"
+    v-model="showModal"
+    @ok="doFormAction()"
+    :title="okTitle"
     :okTitle="okTitle"
     >
       <template #modal-header>
@@ -69,17 +69,39 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import MonoUsersService from "../../../services/MonoUsersService";
-export default {
+import { defineComponent } from 'vue';
+
+interface MonoUser {
+  id: number;
+  name: string;
+  token: string;
+  [key: string]: any;
+}
+
+interface CurrentMonoUser {
+  id?: number;
+  name?: string;
+  token?: string;
+  action?: 'add' | 'edit';
+  [key: string]: any;
+}
+
+interface AlertComponent {
+  showAlert: (type: string, message: string) => void;
+  [key: string]: any;
+}
+
+export default defineComponent({
   name: "MonoUsers",
   data() {
     return {
       okTitle: "",
       showModal: false,
-      mono_users: [],
-      currentMonoUser: {},
-      user: this.$route.query.user,
+      mono_users: [] as MonoUser[],
+      currentMonoUser: {} as CurrentMonoUser,
+      user: this.$route.query.user as string | undefined,
     };
   },
   computed: {
@@ -88,7 +110,7 @@ export default {
     },
   },
   methods: {
-    openFormAddMonoUser() {
+    openFormAddMonoUser(): void {
       this.okTitle = 'Add';
       this.currentMonoUser.token = '';
       this.currentMonoUser.name = '';
@@ -96,7 +118,7 @@ export default {
       this.showModal = true;
       console.log('this.currentMonoUser.action:', this.currentMonoUser.action)
     },
-    async openFormEditMonoUser(id) {
+    async openFormEditMonoUser(id: number): Promise<void> {
       this.okTitle = 'Edit';
       MonoUsersService.getMonoUser(id)
         .then((response) => {
@@ -107,17 +129,17 @@ export default {
         })
         .catch((e) => {
           console.log(e);
-          this.$refs.myAlert.showAlert('danger', 'get User failed');
+          (this.$refs.myAlert as AlertComponent).showAlert('danger', 'get User failed');
         });
     },
-    doFormAction() {
+    doFormAction(): void {
       console.log('this.currentMonoUser.action: ', this.currentMonoUser.action)
-      if (this.currentMonoUser.action == 'edit') 
-      {this.doUpdateMonoUser();} 
-      else if (this.currentMonoUser.action == 'add') 
+      if (this.currentMonoUser.action == 'edit')
+      {this.doUpdateMonoUser();}
+      else if (this.currentMonoUser.action == 'add')
       {this.doAddMonoUser();}
     },
-    async doUpdateMonoUser() {
+    async doUpdateMonoUser(): Promise<void> {
         MonoUsersService.updateMonoUser(this.currentMonoUser.id, this.currentMonoUser)
           .then((response) => {
             this.currentMonoUser = response.data;
@@ -131,27 +153,27 @@ export default {
               }
             });
             this.showModal = false;
-            this.$refs.myAlert.showAlert('success', 'User updated');
+            (this.$refs.myAlert as AlertComponent).showAlert('success', 'User updated');
           })
           .catch((e) => {
             console.log(e);
-            this.$refs.myAlert.showAlert('danger', 'User update failed');
+            (this.$refs.myAlert as AlertComponent).showAlert('danger', 'User update failed');
           });
     },
-    async doAddMonoUser() {
+    async doAddMonoUser(): Promise<void> {
         MonoUsersService.addMonoUser(this.currentMonoUser)
           .then((response) => {
             this.currentMonoUser = response.data;
             this.mono_users.push(this.currentMonoUser);
-            this.$refs.myAlert.showAlert('success', 'User added');
+            (this.$refs.myAlert as AlertComponent).showAlert('success', 'User added');
           })
           .catch((e) => {
             console.log(e);
-            this.$refs.myAlert.showAlert('danger', 'Add user failed');
+            (this.$refs.myAlert as AlertComponent).showAlert('danger', 'Add user failed');
           });
           this.showModal = false;
     },
-    async delMonoUser() {
+    async delMonoUser(): Promise<void> {
       MonoUsersService.deleteMonoUser(this.currentMonoUser.id)
         .then((response) => {
           console.log(response.data.data);
@@ -163,14 +185,14 @@ export default {
 
           this.mono_users.splice(index, 1);
           this.showModal = false;
-          this.$refs.myAlert.showAlert('success', 'User deleted');
+          (this.$refs.myAlert as AlertComponent).showAlert('success', 'User deleted');
         })
         .catch((e) => {
           console.log(e);
-          this.$refs.myAlert.showAlert('danger', 'User delete failed');
+          (this.$refs.myAlert as AlertComponent).showAlert('danger', 'User delete failed');
         });
     },
-    async getMonoUsers() {
+    async getMonoUsers(): Promise<void> {
       MonoUsersService.getMonoUsers()
         .then((response) => {
           this.mono_users = response.data;
@@ -181,11 +203,11 @@ export default {
         });
     },
   },
-  mounted() {
+  mounted(): void {
     if (!this.currentUser) {
       this.$router.push({ name: "login" });
     }
     this.getMonoUsers();
-  },
-};
+  }
+})
 </script>

@@ -5,11 +5,65 @@ import {
     monoWebhookTestHandlerApiMonoUsersMonoUserIdWebhookGet,
     monoWebhookHandlerApiMonoUsersMonoUserIdWebhookPost,
     getMonoDataPmtsApiMonoPaymentsPost
-} from '../api/mono/mono';
+} from "@/api/mono/mono";
+
+import {
+    getMonoUsersApiMonoUsersGet,
+    getMonoUserApiMonoUsersMonoUserIdGet,
+    addMonoUserApiMonoUsersPost,
+    editMonoUserApiMonoUsersMonoUserIdPatch,
+    deleteMonoUserApiMonoUsersMonoUserIdDelete
+} from "@/api/mono-users/mono-users";
 
 import authHeader from './auth-header';
 
 class MonoUsersService {
+
+    getMonoUsers(): Promise<any> {
+        return getMonoUsersApiMonoUsersGet({ headers: authHeader() })
+            .catch(error => {
+                console.error('Помилка отримання списку користувачів Monobank:', error.response?.data || error.message);
+                throw error;
+            });
+    }
+
+    getMonoUser(id: number | string): Promise<any> {
+        // Перетворюємо id на number, як очікує API функція
+        const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+        return getMonoUserApiMonoUsersMonoUserIdGet(numericId, { headers: authHeader() })
+            .catch(error => {
+                console.error(`Помилка отримання інформації про користувача Monobank ${id}:`, error.response?.data || error.message);
+                throw error;
+            });
+    }
+
+    addMonoUser(data: any): Promise<any> {
+        return addMonoUserApiMonoUsersPost(data, { headers: authHeader() })
+            .catch(error => {
+                console.error('Помилка додавання користувача Monobank:', error.response?.data || error.message);
+                throw error;
+            });
+    }
+
+    updateMonoUser(id: number | string, data: any): Promise<any> {
+        // Перетворюємо id на number, як очікує API функція
+        const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+        return editMonoUserApiMonoUsersMonoUserIdPatch(numericId, data, { headers: authHeader() })
+            .catch(error => {
+                console.error(`Помилка оновлення користувача Monobank ${id}:`, error.response?.data || error.message);
+                throw error;
+            });
+    }
+
+    deleteMonoUser(id: number | string): Promise<any> {
+        // Перетворюємо id на number, як очікує API функція
+        const numericId = typeof id === 'string' ? parseInt(id, 10) : id;
+        return deleteMonoUserApiMonoUsersMonoUserIdDelete(numericId, { headers: authHeader() })
+            .catch(error => {
+                console.error(`Помилка видалення користувача Monobank ${id}:`, error.response?.data || error.message);
+                throw error;
+            });
+    }
 
     async getUserMonoUsersInfo(userId: number): Promise<any> {
         return getUserMonoUsersInfoApiUsersUserIdMonoInfoGet(userId, { headers: authHeader() })

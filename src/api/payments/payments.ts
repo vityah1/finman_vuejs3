@@ -16,7 +16,7 @@ import type {
   UseQueryReturnType,
 } from "@tanstack/vue-query";
 
-import * as axios from "axios";
+import axios from "axios";
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import { computed, unref } from "vue";
@@ -31,10 +31,6 @@ import type {
   PaymentUpdate,
 } from ".././model";
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 /**
  * Додавання нового платежу
  * @summary Add Payment
@@ -45,7 +41,7 @@ export const addPaymentApiPaymentsPost = (
 ): Promise<AxiosResponse<unknown>> => {
   paymentCreate = unref(paymentCreate);
 
-  return axios.default.post(`/api/payments`, paymentCreate, options);
+  return axios.post(`/api/payments`, paymentCreate, options);
 };
 
 export const getAddPaymentApiPaymentsPostMutationOptions = <
@@ -129,7 +125,7 @@ export const getPaymentsApiPaymentsGet = (
 ): Promise<AxiosResponse<unknown>> => {
   params = unref(params);
 
-  return axios.default.get(`/api/payments`, {
+  return axios.get(`/api/payments`, {
     ...options,
     params: { ...unref(params), ...options?.params },
   });
@@ -229,7 +225,7 @@ export const getPaymentApiPaymentsPaymentIdGet = (
 ): Promise<AxiosResponse<unknown>> => {
   paymentId = unref(paymentId);
 
-  return axios.default.get(`/api/payments/${paymentId}`, options);
+  return axios.get(`/api/payments/${paymentId}`, options);
 };
 
 export const getGetPaymentApiPaymentsPaymentIdGetQueryKey = (
@@ -331,7 +327,7 @@ export const delPaymentApiPaymentsPaymentIdDelete = (
 ): Promise<AxiosResponse<unknown>> => {
   paymentId = unref(paymentId);
 
-  return axios.default.delete(`/api/payments/${paymentId}`, options);
+  return axios.delete(`/api/payments/${paymentId}`, options);
 };
 
 export const getDelPaymentApiPaymentsPaymentIdDeleteMutationOptions = <
@@ -416,11 +412,7 @@ export const updPaymentApiPaymentsPaymentIdPatch = (
   paymentId = unref(paymentId);
   paymentUpdate = unref(paymentUpdate);
 
-  return axios.default.patch(
-    `/api/payments/${paymentId}`,
-    paymentUpdate,
-    options
-  );
+  return axios.patch(`/api/payments/${paymentId}`, paymentUpdate, options);
 };
 
 export const getUpdPaymentApiPaymentsPaymentIdPatchMutationOptions = <
@@ -503,7 +495,7 @@ export const changePaymentsCategoryApiPaymentsChangeCategoryPost = (
 ): Promise<AxiosResponse<unknown>> => {
   paymentCategoryUpdate = unref(paymentCategoryUpdate);
 
-  return axios.default.post(
+  return axios.post(
     `/api/payments/change-category`,
     paymentCategoryUpdate,
     options
@@ -607,11 +599,7 @@ export const bulkDeletePaymentsApiPaymentsBulkDeletePost = (
 ): Promise<AxiosResponse<unknown>> => {
   paymentBulkDelete = unref(paymentBulkDelete);
 
-  return axios.default.post(
-    `/api/payments/bulk-delete`,
-    paymentBulkDelete,
-    options
-  );
+  return axios.post(`/api/payments/bulk-delete`, paymentBulkDelete, options);
 };
 
 export const getBulkDeletePaymentsApiPaymentsBulkDeletePostMutationOptions = <

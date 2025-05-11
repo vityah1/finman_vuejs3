@@ -132,7 +132,7 @@ export default defineComponent({
 	computed: {
 		currentUser() {
 			try {
-				return this.$store.state.auth.user;
+				return (this.$store as any).state.auth.user;
 			} catch {
 				this.logOut();
 				return null;
@@ -150,12 +150,12 @@ export default defineComponent({
 			if (this.$route.params.category_id) {
 				return this.$route.params.category_id;
 			} else {
-				return this.$store.state.sprs.categories?.[0]?.id;
+				return (this.$store as any).state.sprs.categories?.[0]?.id;
 			}
 		},
 		selectedCurrency: {
 			get() {
-				return this.$store.state.sprs.selectedCurrency;
+				return (this.$store as any).state.sprs.selectedCurrency;
 			},
 			set(value) {
 				this.$store.dispatch("sprs/updateSelectedCurrency", value);

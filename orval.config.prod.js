@@ -1,7 +1,7 @@
 module.exports = {
   finman: {
     input: {
-      target: 'https://finman.kt.if.ua/openapi.json', // Буде завантажено окремо
+      target: 'https://finman.kt.if.ua/api/openapi.json', // Буде завантажено окремо
     },
     output: {
       mode: 'tags-split',

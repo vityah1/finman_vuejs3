@@ -16,7 +16,7 @@ import type {
   UseQueryReturnType,
 } from "@tanstack/vue-query";
 
-import * as axios from "axios";
+import axios from "axios";
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import { computed, unref } from "vue";
@@ -29,10 +29,6 @@ import type {
   UserUpdate,
 } from ".././model";
 
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
-
 /**
  * Автентифікація користувача та отримання JWT токена
  * @summary User Login
@@ -43,7 +39,7 @@ export const userLoginApiAuthSigninPost = (
 ): Promise<AxiosResponse<unknown>> => {
   loginModel = unref(loginModel);
 
-  return axios.default.post(`/api/auth/signin`, loginModel, options);
+  return axios.post(`/api/auth/signin`, loginModel, options);
 };
 
 export const getUserLoginApiAuthSigninPostMutationOptions = <
@@ -125,7 +121,7 @@ export const createUserApiAuthSignupPost = (
 ): Promise<AxiosResponse<unknown>> => {
   userCreate = unref(userCreate);
 
-  return axios.default.post(`/api/auth/signup`, userCreate, options);
+  return axios.post(`/api/auth/signup`, userCreate, options);
 };
 
 export const getCreateUserApiAuthSignupPostMutationOptions = <
@@ -208,7 +204,7 @@ export const getUserApiUsersUserIdGet = (
 ): Promise<AxiosResponse<unknown>> => {
   userId = unref(userId);
 
-  return axios.default.get(`/api/users/${userId}`, options);
+  return axios.get(`/api/users/${userId}`, options);
 };
 
 export const getGetUserApiUsersUserIdGetQueryKey = (
@@ -307,7 +303,7 @@ export const deleteUserApiUsersUserIdDelete = (
 ): Promise<AxiosResponse<unknown>> => {
   userId = unref(userId);
 
-  return axios.default.delete(`/api/users/${userId}`, options);
+  return axios.delete(`/api/users/${userId}`, options);
 };
 
 export const getDeleteUserApiUsersUserIdDeleteMutationOptions = <
@@ -392,7 +388,7 @@ export const editUserApiUsersUserIdPatch = (
   userId = unref(userId);
   userUpdate = unref(userUpdate);
 
-  return axios.default.patch(`/api/users/${userId}`, userUpdate, options);
+  return axios.patch(`/api/users/${userId}`, userUpdate, options);
 };
 
 export const getEditUserApiUsersUserIdPatchMutationOptions = <
@@ -472,7 +468,7 @@ export const useEditUserApiUsersUserIdPatch = <
 export const getUsersApiUsersGet = (
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse<unknown>> => {
-  return axios.default.get(`/api/users`, options);
+  return axios.get(`/api/users`, options);
 };
 
 export const getGetUsersApiUsersGetQueryKey = () => {

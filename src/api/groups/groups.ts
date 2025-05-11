@@ -16,7 +16,7 @@ import type {
   UseQueryReturnType,
 } from "@tanstack/vue-query";
 
-import * as axios from "axios";
+import axios from "axios";
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import { computed, unref } from "vue";
@@ -30,10 +30,6 @@ import type {
   GroupUserUpdate,
   HTTPValidationError,
 } from ".././model";
-
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 
 /**
  * Оновити інформацію про користувача в групі
@@ -49,7 +45,7 @@ export const updateUserRelationApiGroupsGroupIdUsersUserIdPatch = (
   userId = unref(userId);
   groupUserUpdate = unref(groupUserUpdate);
 
-  return axios.default.patch(
+  return axios.patch(
     `/api/groups/${groupId}/users/${userId}`,
     groupUserUpdate,
     options
@@ -155,7 +151,7 @@ export const getGroupInvitationsApiGroupsGroupIdInvitationsGet = (
 ): Promise<AxiosResponse<unknown>> => {
   groupId = unref(groupId);
 
-  return axios.default.get(`/api/groups/${groupId}/invitations`, options);
+  return axios.get(`/api/groups/${groupId}/invitations`, options);
 };
 
 export const getGetGroupInvitationsApiGroupsGroupIdInvitationsGetQueryKey = (
@@ -280,7 +276,7 @@ export const createGroupInvitationApiGroupsGroupIdInvitationsPost = (
   groupId = unref(groupId);
   groupInvitation = unref(groupInvitation);
 
-  return axios.default.post(
+  return axios.post(
     `/api/groups/${groupId}/invitations`,
     groupInvitation,
     options
@@ -384,7 +380,7 @@ export const useCreateGroupInvitationApiGroupsGroupIdInvitationsPost = <
 export const getGroupsApiGroupsGet = (
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse<unknown>> => {
-  return axios.default.get(`/api/groups`, options);
+  return axios.get(`/api/groups`, options);
 };
 
 export const getGetGroupsApiGroupsGetQueryKey = () => {
@@ -468,7 +464,7 @@ export const createGroupApiGroupsPost = (
 ): Promise<AxiosResponse<unknown>> => {
   groupCreate = unref(groupCreate);
 
-  return axios.default.post(`/api/groups`, groupCreate, options);
+  return axios.post(`/api/groups`, groupCreate, options);
 };
 
 export const getCreateGroupApiGroupsPostMutationOptions = <
@@ -550,7 +546,7 @@ export const deleteGroupApiGroupsGroupIdDelete = (
 ): Promise<AxiosResponse<unknown>> => {
   groupId = unref(groupId);
 
-  return axios.default.delete(`/api/groups/${groupId}`, options);
+  return axios.delete(`/api/groups/${groupId}`, options);
 };
 
 export const getDeleteGroupApiGroupsGroupIdDeleteMutationOptions = <
@@ -635,7 +631,7 @@ export const updateGroupApiGroupsGroupIdPatch = (
   groupId = unref(groupId);
   groupUpdate = unref(groupUpdate);
 
-  return axios.default.patch(`/api/groups/${groupId}`, groupUpdate, options);
+  return axios.patch(`/api/groups/${groupId}`, groupUpdate, options);
 };
 
 export const getUpdateGroupApiGroupsGroupIdPatchMutationOptions = <
@@ -718,7 +714,7 @@ export const getGroupApiGroupsGroupIdGet = (
 ): Promise<AxiosResponse<unknown>> => {
   groupId = unref(groupId);
 
-  return axios.default.get(`/api/groups/${groupId}`, options);
+  return axios.get(`/api/groups/${groupId}`, options);
 };
 
 export const getGetGroupApiGroupsGroupIdGetQueryKey = (
@@ -820,7 +816,7 @@ export const getGroupUsersApiGroupsGroupIdUsersGet = (
 ): Promise<AxiosResponse<unknown>> => {
   groupId = unref(groupId);
 
-  return axios.default.get(`/api/groups/${groupId}/users`, options);
+  return axios.get(`/api/groups/${groupId}/users`, options);
 };
 
 export const getGetGroupUsersApiGroupsGroupIdUsersGetQueryKey = (
@@ -924,11 +920,7 @@ export const addUserToGroupApiGroupsGroupIdUsersPost = (
   groupId = unref(groupId);
   groupUserAdd = unref(groupUserAdd);
 
-  return axios.default.post(
-    `/api/groups/${groupId}/users`,
-    groupUserAdd,
-    options
-  );
+  return axios.post(`/api/groups/${groupId}/users`, groupUserAdd, options);
 };
 
 export const getAddUserToGroupApiGroupsGroupIdUsersPostMutationOptions = <
@@ -1013,7 +1005,7 @@ export const removeUserFromGroupApiGroupsGroupIdUsersUserIdToRemoveDelete = (
   groupId = unref(groupId);
   userIdToRemove = unref(userIdToRemove);
 
-  return axios.default.delete(
+  return axios.delete(
     `/api/groups/${groupId}/users/${userIdToRemove}`,
     options
   );

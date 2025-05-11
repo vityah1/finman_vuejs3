@@ -16,17 +16,17 @@ import type {
   UseQueryReturnType,
 } from "@tanstack/vue-query";
 
-import * as axios from "axios";
+import axios from "axios";
 import type { AxiosError, AxiosRequestConfig, AxiosResponse } from "axios";
 
 import { computed, unref } from "vue";
 import type { MaybeRef } from "vue";
 
-import type { HTTPValidationError } from ".././model";
-
-type AwaitedInput<T> = PromiseLike<T> | T;
-
-type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
+import type {
+  ConfigCreate,
+  ConfigUpdate,
+  HTTPValidationError,
+} from ".././model";
 
 /**
  * Отримання списку типів конфігурації
@@ -35,7 +35,7 @@ type Awaited<O> = O extends AwaitedInput<infer T> ? T : never;
 export const getConfigTypesApiConfigConfigTypesGet = (
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse<unknown>> => {
-  return axios.default.get(`/api/config/config_types`, options);
+  return axios.get(`/api/config/config_types`, options);
 };
 
 export const getGetConfigTypesApiConfigConfigTypesGetQueryKey = () => {
@@ -119,7 +119,7 @@ export function useGetConfigTypesApiConfigConfigTypesGet<
 export const getUserConfigApiUsersConfigGet = (
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse<unknown>> => {
-  return axios.default.get(`/api/users/config`, options);
+  return axios.get(`/api/users/config`, options);
 };
 
 export const getGetUserConfigApiUsersConfigGetQueryKey = () => {
@@ -200,9 +200,12 @@ export function useGetUserConfigApiUsersConfigGet<
  * @summary Add Config
  */
 export const addConfigApiUsersConfigPost = (
+  configCreate: MaybeRef<ConfigCreate>,
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse<unknown>> => {
-  return axios.default.post(`/api/users/config`, undefined, options);
+  configCreate = unref(configCreate);
+
+  return axios.post(`/api/users/config`, configCreate, options);
 };
 
 export const getAddConfigApiUsersConfigPostMutationOptions = <
@@ -212,14 +215,14 @@ export const getAddConfigApiUsersConfigPostMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof addConfigApiUsersConfigPost>>,
     TError,
-    void,
+    { data: ConfigCreate },
     TContext
   >;
   axios?: AxiosRequestConfig;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof addConfigApiUsersConfigPost>>,
   TError,
-  void,
+  { data: ConfigCreate },
   TContext
 > => {
   const mutationKey = ["addConfigApiUsersConfigPost"];
@@ -233,9 +236,11 @@ export const getAddConfigApiUsersConfigPostMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof addConfigApiUsersConfigPost>>,
-    void
-  > = () => {
-    return addConfigApiUsersConfigPost(axiosOptions);
+    { data: ConfigCreate }
+  > = (props) => {
+    const { data } = props ?? {};
+
+    return addConfigApiUsersConfigPost(data, axiosOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -244,7 +249,7 @@ export const getAddConfigApiUsersConfigPostMutationOptions = <
 export type AddConfigApiUsersConfigPostMutationResult = NonNullable<
   Awaited<ReturnType<typeof addConfigApiUsersConfigPost>>
 >;
-
+export type AddConfigApiUsersConfigPostMutationBody = ConfigCreate;
 export type AddConfigApiUsersConfigPostMutationError =
   AxiosError<HTTPValidationError>;
 
@@ -258,14 +263,14 @@ export const useAddConfigApiUsersConfigPost = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof addConfigApiUsersConfigPost>>,
     TError,
-    void,
+    { data: ConfigCreate },
     TContext
   >;
   axios?: AxiosRequestConfig;
 }): UseMutationReturnType<
   Awaited<ReturnType<typeof addConfigApiUsersConfigPost>>,
   TError,
-  void,
+  { data: ConfigCreate },
   TContext
 > => {
   const mutationOptions =
@@ -283,7 +288,7 @@ export const deleteConfigApiConfigConfigIdDelete = (
 ): Promise<AxiosResponse<unknown>> => {
   configId = unref(configId);
 
-  return axios.default.delete(`/api/config/${configId}`, options);
+  return axios.delete(`/api/config/${configId}`, options);
 };
 
 export const getDeleteConfigApiConfigConfigIdDeleteMutationOptions = <
@@ -362,11 +367,13 @@ export const useDeleteConfigApiConfigConfigIdDelete = <
  */
 export const editConfigApiConfigConfigIdPatch = (
   configId: MaybeRef<number>,
+  configUpdate: MaybeRef<ConfigUpdate>,
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse<unknown>> => {
   configId = unref(configId);
+  configUpdate = unref(configUpdate);
 
-  return axios.default.patch(`/api/config/${configId}`, undefined, options);
+  return axios.patch(`/api/config/${configId}`, configUpdate, options);
 };
 
 export const getEditConfigApiConfigConfigIdPatchMutationOptions = <
@@ -376,14 +383,14 @@ export const getEditConfigApiConfigConfigIdPatchMutationOptions = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof editConfigApiConfigConfigIdPatch>>,
     TError,
-    { configId: number },
+    { configId: number; data: ConfigUpdate },
     TContext
   >;
   axios?: AxiosRequestConfig;
 }): UseMutationOptions<
   Awaited<ReturnType<typeof editConfigApiConfigConfigIdPatch>>,
   TError,
-  { configId: number },
+  { configId: number; data: ConfigUpdate },
   TContext
 > => {
   const mutationKey = ["editConfigApiConfigConfigIdPatch"];
@@ -397,11 +404,11 @@ export const getEditConfigApiConfigConfigIdPatchMutationOptions = <
 
   const mutationFn: MutationFunction<
     Awaited<ReturnType<typeof editConfigApiConfigConfigIdPatch>>,
-    { configId: number }
+    { configId: number; data: ConfigUpdate }
   > = (props) => {
-    const { configId } = props ?? {};
+    const { configId, data } = props ?? {};
 
-    return editConfigApiConfigConfigIdPatch(configId, axiosOptions);
+    return editConfigApiConfigConfigIdPatch(configId, data, axiosOptions);
   };
 
   return { mutationFn, ...mutationOptions };
@@ -410,7 +417,7 @@ export const getEditConfigApiConfigConfigIdPatchMutationOptions = <
 export type EditConfigApiConfigConfigIdPatchMutationResult = NonNullable<
   Awaited<ReturnType<typeof editConfigApiConfigConfigIdPatch>>
 >;
-
+export type EditConfigApiConfigConfigIdPatchMutationBody = ConfigUpdate;
 export type EditConfigApiConfigConfigIdPatchMutationError =
   AxiosError<HTTPValidationError>;
 
@@ -424,14 +431,14 @@ export const useEditConfigApiConfigConfigIdPatch = <
   mutation?: UseMutationOptions<
     Awaited<ReturnType<typeof editConfigApiConfigConfigIdPatch>>,
     TError,
-    { configId: number },
+    { configId: number; data: ConfigUpdate },
     TContext
   >;
   axios?: AxiosRequestConfig;
 }): UseMutationReturnType<
   Awaited<ReturnType<typeof editConfigApiConfigConfigIdPatch>>,
   TError,
-  { configId: number },
+  { configId: number; data: ConfigUpdate },
   TContext
 > => {
   const mutationOptions =
@@ -449,7 +456,7 @@ export const getConfigApiConfigConfigIdGet = (
 ): Promise<AxiosResponse<unknown>> => {
   configId = unref(configId);
 
-  return axios.default.get(`/api/config/${configId}`, options);
+  return axios.get(`/api/config/${configId}`, options);
 };
 
 export const getGetConfigApiConfigConfigIdGetQueryKey = (
