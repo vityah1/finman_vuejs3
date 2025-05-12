@@ -23,7 +23,6 @@ pnpm-debug.log*
 package-lock.json
 package.json.bak
 *.bak
-3.1.0
 .env.production
 
 # Ігноруємо згенеровані Orval файли
@@ -31,3 +30,6 @@ package.json.bak
 
 # Ігноруємо завантажену OpenAPI специфікацію
 #openapi.json
+/public/*.eps
+
+/public/symbol_RGB.svg
