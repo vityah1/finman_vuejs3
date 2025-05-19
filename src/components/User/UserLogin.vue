@@ -73,16 +73,20 @@ export default {
   },
   created() {
     if (this.loggedIn) {
-      this.$router.push({name:"profile"});
+      // Перенаправляємо або на returnUrl, або на профіль
+      const returnUrl = this.$route.query.returnUrl || '/profile';
+      this.$router.push(returnUrl);
     }
   },
   methods: {
-    handleLogin(user) {
+    handleLogin(credentials) {
       this.loading = true;
 
-      this.$store.dispatch("auth/login", user).then(
+      this.$store.dispatch("auth/login", credentials).then(
         () => {
-          this.$router.push({name:"profile"});
+          // Перенаправляємо на сторінку, з якої прийшли, або на профіль
+          const returnUrl = this.$route.query.returnUrl || '/profile';
+          this.$router.push(returnUrl);
         },
         (error) => {
           this.loading = false;

@@ -38,13 +38,10 @@ interface PaymentParams {
     [key: string]: any;
 }
 
-// Імпортуємо функцію для отримання заголовка авторизації
-import authHeader from './auth-header';
-
 class PaymentService {
     getAbout() {
         return aboutApiAboutGet({
-            headers: authHeader()
+            
         }).catch(error => {
             console.error('Помилка отримання інформації About:', error.response?.data || error.message);
             throw error;
@@ -53,7 +50,7 @@ class PaymentService {
 
     getPaymentsPeriod(params: PaymentsForPeriodApiPaymentsPeriodGetParams) {
         return paymentsForPeriodApiPaymentsPeriodGet(params, {
-            headers: authHeader()
+            
         }).catch(error => {
             console.error('Помилка отримання платежів за період:', error.response?.data || error.message);
             throw error;
@@ -62,7 +59,7 @@ class PaymentService {
 
     categories(mode?: string) {
         return getCategoriesApiCategoriesGet({
-            headers: authHeader()
+            
         }).catch(error => {
             console.error('Помилка отримання категорій:', error.response?.data || error.message);
             throw error;
@@ -71,7 +68,7 @@ class PaymentService {
 
     getPaymentsYears(data: PaymentsByYearsApiPaymentsYearsGetParams) {
         return paymentsByYearsApiPaymentsYearsGet(data, {
-            headers: authHeader()
+            
         }).catch(error => {
             console.error('Помилка отримання платежів за роками:', error.response?.data || error.message);
             throw error;
@@ -86,7 +83,7 @@ class PaymentService {
         };
 
         return paymentByMonthsApiPaymentsYearMonthsGet(Number(year), params, {
-            headers: authHeader()
+            
         }).catch(error => {
             console.error(`Помилка отримання платежів за рік ${year}:`, error.response?.data || error.message);
             throw error;
@@ -95,7 +92,7 @@ class PaymentService {
 
     getPayment(id: number | string) {
         return getPaymentApiPaymentsPaymentIdGet(Number(id), {
-            headers: authHeader()
+            
         }).catch(error => {
             console.error(`Помилка отримання платежу ${id}:`, error.response?.data || error.message);
             throw error;
@@ -104,7 +101,7 @@ class PaymentService {
 
     addPayment(data: any) {
         return addPaymentApiPaymentsPost(data, {
-            headers: authHeader()
+            
         }).catch(error => {
             console.error('Помилка додавання платежу:', error.response?.data || error.message);
             throw error;
@@ -113,7 +110,7 @@ class PaymentService {
 
     updatePayment(id: number, data: any) {
         return updPaymentApiPaymentsPaymentIdPatch(id, data, {
-            headers: authHeader()
+            
         }).catch(error => {
             console.error('Помилка оновлення платежу:', error.response?.data || error.message);
             throw error;
@@ -122,7 +119,7 @@ class PaymentService {
 
     deletePayment(id: number) {
         return delPaymentApiPaymentsPaymentIdDelete(id, {
-            headers: authHeader()
+            
         }).catch(error => {
             console.error('Помилка видалення платежу:', error.response?.data || error.message);
             throw error;
@@ -131,7 +128,7 @@ class PaymentService {
 
     getPayments(params: any) {
         return getPaymentsApiPaymentsGet(params, {
-            headers: authHeader()
+            
         }).catch(error => {
             console.error('Помилка отримання платежів:', error.response?.data || error.message);
             throw error;
@@ -140,7 +137,7 @@ class PaymentService {
 
     changePaymentsCategory(data: any) {
         return changePaymentsCategoryApiPaymentsChangeCategoryPost(data, {
-            headers: authHeader()
+            
         }).catch(error => {
             console.error('Помилка зміни категорії платежів:', error.response?.data || error.message);
             throw error;
@@ -149,7 +146,7 @@ class PaymentService {
 
     bulkDeletePayments(data: any) {
         return bulkDeletePaymentsApiPaymentsBulkDeletePost(data, {
-            headers: authHeader()
+            
         }).catch(error => {
             console.error('Помилка масового видалення платежів:', error.response?.data || error.message);
             throw error;

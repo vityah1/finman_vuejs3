@@ -1,5 +1,4 @@
 import axios from "../axios-config";
-import authHeader from './auth-header';
 import {
   getGroupsApiGroupsGet,
   getGroupUsersApiGroupsGroupIdUsersGet,
@@ -48,7 +47,7 @@ interface GroupInvitationData {
 
 class GroupService {
   getGroups() {
-    return getGroupsApiGroupsGet({ headers: authHeader() })
+    return getGroupsApiGroupsGet()
       .catch(error => {
         console.error('Помилка отримання груп:', error.response?.data || error.message);
         throw error;
@@ -59,7 +58,7 @@ class GroupService {
     // Перетворюємо groupId на number для API функції
     const numericGroupId = typeof groupId === 'string' ? parseInt(groupId, 10) : groupId;
     return getGroupUsersApiGroupsGroupIdUsersGet(numericGroupId, { 
-      headers: authHeader(),
+      
       params: { include_current: true }
     }).catch(error => {
       console.error(`Помилка отримання користувачів групи ${groupId}:`, error.response?.data || error.message);
@@ -68,7 +67,7 @@ class GroupService {
   }
 
   createGroup(data: GroupData) {
-    return createGroupApiGroupsPost(data, { headers: authHeader() })
+    return createGroupApiGroupsPost(data)
       .catch(error => {
         console.error('Помилка створення групи:', error.response?.data || error.message);
         throw error;
@@ -78,7 +77,7 @@ class GroupService {
   updateGroup(groupId: number | string, data: GroupData) {
     // Перетворюємо groupId на number для API функції
     const numericGroupId = typeof groupId === 'string' ? parseInt(groupId, 10) : groupId;
-    return updateGroupApiGroupsGroupIdPatch(numericGroupId, data, { headers: authHeader() })
+    return updateGroupApiGroupsGroupIdPatch(numericGroupId, data)
       .catch(error => {
         console.error(`Помилка оновлення групи ${groupId}:`, error.response?.data || error.message);
         throw error;
@@ -88,7 +87,7 @@ class GroupService {
   deleteGroup(groupId: number | string) {
     // Перетворюємо groupId на number для API функції
     const numericGroupId = typeof groupId === 'string' ? parseInt(groupId, 10) : groupId;
-    return deleteGroupApiGroupsGroupIdDelete(numericGroupId, { headers: authHeader() })
+    return deleteGroupApiGroupsGroupIdDelete(numericGroupId)
       .catch(error => {
         console.error(`Помилка видалення групи ${groupId}:`, error.response?.data || error.message);
         throw error;
@@ -102,7 +101,7 @@ class GroupService {
     };
     // Перетворюємо groupId на number для API функції
     const numericGroupId = typeof groupId === 'string' ? parseInt(groupId, 10) : groupId;
-    return addUserToGroupApiGroupsGroupIdUsersPost(numericGroupId, data, { headers: authHeader() })
+    return addUserToGroupApiGroupsGroupIdUsersPost(numericGroupId, data)
       .catch(error => {
         console.error(`Помилка додавання користувача до групи ${groupId}:`, error.response?.data || error.message);
         throw error;
@@ -125,7 +124,7 @@ class GroupService {
       relation_type: relationType
     };
     
-    return updateUserRelationApiGroupsGroupIdUsersUserIdPatch(numericGroupId, numericUserId, apiData as any, { headers: authHeader() })
+    return updateUserRelationApiGroupsGroupIdUsersUserIdPatch(numericGroupId, numericUserId, apiData as any)
       .catch(error => {
         console.error(`Помилка оновлення зв'язку користувача ${userId} в групі ${groupId}:`, error.response?.data || error.message);
         throw error;
@@ -136,7 +135,7 @@ class GroupService {
     // Перетворюємо groupId та userId на number для API функції
     const numericGroupId = typeof groupId === 'string' ? parseInt(groupId, 10) : groupId;
     const numericUserId = typeof userId === 'string' ? parseInt(userId, 10) : userId;
-    return removeUserFromGroupApiGroupsGroupIdUsersUserIdToRemoveDelete(numericGroupId, numericUserId, { headers: authHeader() })
+    return removeUserFromGroupApiGroupsGroupIdUsersUserIdToRemoveDelete(numericGroupId, numericUserId)
       .catch(error => {
         console.error(`Помилка видалення користувача ${userId} з групи ${groupId}:`, error.response?.data || error.message);
         throw error;
@@ -146,7 +145,7 @@ class GroupService {
   leaveGroup(groupId: number | string) {
     // Перетворюємо groupId на number для API функції
     const numericGroupId = typeof groupId === 'string' ? parseInt(groupId, 10) : groupId;
-    return leaveGroupApiGroupsGroupIdLeavePost(numericGroupId, { headers: authHeader() })
+    return leaveGroupApiGroupsGroupIdLeavePost(numericGroupId)
       .catch(error => {
         console.error(`Помилка виходу з групи ${groupId}:`, error.response?.data || error.message);
         throw error;
@@ -157,7 +156,7 @@ class GroupService {
   getGroupInvitations(groupId: number | string) {
     // Перетворюємо groupId на number для API функції
     const numericGroupId = typeof groupId === 'string' ? parseInt(groupId, 10) : groupId;
-    return getGroupInvitationsApiGroupsGroupIdInvitationsGet(numericGroupId, { headers: authHeader() })
+    return getGroupInvitationsApiGroupsGroupIdInvitationsGet(numericGroupId)
       .catch(error => {
         console.error(`Помилка отримання запрошень групи ${groupId}:`, error.response?.data || error.message);
         throw error;
@@ -174,7 +173,7 @@ class GroupService {
       expires: data.expires
     };
     
-    return createGroupInvitationApiGroupsGroupIdInvitationsPost(numericGroupId, invitationData, { headers: authHeader() })
+    return createGroupInvitationApiGroupsGroupIdInvitationsPost(numericGroupId, invitationData)
       .catch(error => {
         console.error(`Помилка створення запрошення до групи ${groupId}:`, error.response?.data || error.message);
         throw error;
@@ -184,7 +183,7 @@ class GroupService {
   cancelInvitation(invitationId: number | string) {
     // Перетворюємо invitationId на number, як очікує API функція
     const numericInvitationId = typeof invitationId === 'string' ? parseInt(invitationId, 10) : invitationId;
-    return deleteInvitationApiInvitationsInvitationIdDelete(numericInvitationId, { headers: authHeader() })
+    return deleteInvitationApiInvitationsInvitationIdDelete(numericInvitationId)
       .catch(error => {
         console.error(`Помилка скасування запрошення ${invitationId}:`, error.response?.data || error.message);
         throw error;
@@ -192,7 +191,7 @@ class GroupService {
   }
 
   checkInvitation(code: string) {
-    return checkInvitationApiInvitationsInvitationCodeGet(code, { headers: authHeader() })
+    return checkInvitationApiInvitationsInvitationCodeGet(code)
       .catch(error => {
         console.error(`Помилка перевірки запрошення ${code}:`, error.response?.data || error.message);
         throw error;
@@ -201,7 +200,7 @@ class GroupService {
 
   acceptInvitation(code: string) {
     // API очікує порожній об'єкт для цього запиту
-    return acceptInvitationApiInvitationsInvitationCodeAcceptPost(code, {}, { headers: authHeader() })
+    return acceptInvitationApiInvitationsInvitationCodeAcceptPost(code, {})
       .catch(error => {
         console.error(`Помилка прийняття запрошення ${code}:`, error.response?.data || error.message);
         throw error;
@@ -209,7 +208,7 @@ class GroupService {
   }
 
   getUserInvitations() {
-    return checkUserInvitationsApiUsersInvitationsGet({ headers: authHeader() })
+    return checkUserInvitationsApiUsersInvitationsGet()
       .catch(error => {
         console.error('Помилка отримання запрошень користувача:', error.response?.data || error.message);
         throw error;
@@ -220,7 +219,7 @@ class GroupService {
     // Перетворюємо invitationId на number, як очікує API функція
     const numericInvitationId = typeof invitationId === 'string' ? parseInt(invitationId, 10) : invitationId;
     // API очікує порожній об'єкт для цього запиту
-    return ignoreInvitationApiInvitationsInvitationIdIgnorePost(numericInvitationId, {}, { headers: authHeader() })
+    return ignoreInvitationApiInvitationsInvitationIdIgnorePost(numericInvitationId, {})
       .catch(error => {
         console.error(`Помилка ігнорування запрошення ${invitationId}:`, error.response?.data || error.message);
         throw error;

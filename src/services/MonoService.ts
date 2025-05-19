@@ -1,4 +1,3 @@
-import authHeader from './auth-header';
 import { 
     getUserMonoUsersInfoApiUsersUserIdMonoInfoGet,
     setWebhookApiMonoUsersMonoUserIdWebhookPut,
@@ -22,12 +21,11 @@ class MonoService {
     GetMonoUsersInfo(user_id: string | number) {
         // Перетворюємо user_id на number, як очікує API функція
         const numericUserId = typeof user_id === 'string' ? parseInt(user_id, 10) : user_id;
-        return getUserMonoUsersInfoApiUsersUserIdMonoInfoGet(numericUserId, { 
-            headers: authHeader() 
-        }).catch(error => {
-            console.error(`Помилка отримання інформації Mono для користувача ${user_id}:`, error.response?.data || error.message);
-            throw error;
-        });
+        return getUserMonoUsersInfoApiUsersUserIdMonoInfoGet(numericUserId)
+            .catch(error => {
+                console.error(`Помилка отримання інформації Mono для користувача ${user_id}:`, error.response?.data || error.message);
+                throw error;
+            });
     }
 
     setWebhook(data: WebhookData) {
@@ -37,12 +35,11 @@ class MonoService {
         const webhookData: MonoWebhookRequest = {
             webhook_url: data.webhook_url || ''
         };
-        return setWebhookApiMonoUsersMonoUserIdWebhookPut(numericUserId, webhookData, { 
-            headers: authHeader() 
-        }).catch(error => {
-            console.error(`Помилка встановлення webhook для користувача Mono ${data.mono_user_id}:`, error.response?.data || error.message);
-            throw error;
-        });
+        return setWebhookApiMonoUsersMonoUserIdWebhookPut(numericUserId, webhookData)
+            .catch(error => {
+                console.error(`Помилка встановлення webhook для користувача Mono ${data.mono_user_id}:`, error.response?.data || error.message);
+                throw error;
+            });
     }
 
     getMonoPayments(data: MonoPaymentData) {
@@ -52,12 +49,11 @@ class MonoService {
             mono_user_id: typeof data.mono_user_id === 'string' ? parseInt(data.mono_user_id, 10) : (data.mono_user_id || 0),
             ...data
         };
-        return getMonoDataPmtsApiMonoPaymentsPost(paymentData, { 
-            headers: authHeader() 
-        }).catch(error => {
-            console.error('Помилка отримання платежів Mono:', error.response?.data || error.message);
-            throw error;
-        });
+        return getMonoDataPmtsApiMonoPaymentsPost(paymentData)
+            .catch(error => {
+                console.error('Помилка отримання платежів Mono:', error.response?.data || error.message);
+                throw error;
+            });
     }
 }
 

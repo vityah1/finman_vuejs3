@@ -8,8 +8,6 @@ import {
 } from "@/api/config/config";
 import type { ConfigCreate, ConfigUpdate } from '../api/model';
 
-import authHeader from './auth-header';
-
 class ConfigService {
 
     getConfigTypes(): Promise<any> {
@@ -21,7 +19,7 @@ class ConfigService {
     }
 
     getUserConfig(): Promise<any> {
-        return getUserConfigApiUsersConfigGet({ headers: authHeader() })
+        return getUserConfigApiUsersConfigGet()
             .catch(error => {
                 console.error('Помилка отримання конфігурації користувача:', error.response?.data || error.message);
                 throw error;
@@ -36,7 +34,7 @@ class ConfigService {
             add_value: data.add_value?.toString() || null
         };
 
-        return addConfigApiUsersConfigPost(configData, { headers: authHeader() })
+        return addConfigApiUsersConfigPost(configData)
             .catch(error => {
                 console.error('Помилка додавання конфігурації:', error.response?.data || error.message);
                 throw error;
@@ -44,7 +42,7 @@ class ConfigService {
     }
 
     getConfig(id: number): Promise<any> {
-        return getConfigApiConfigConfigIdGet(id, { headers: authHeader() })
+        return getConfigApiConfigConfigIdGet(id)
             .catch(error => {
                 console.error(`Помилка отримання конфігурації ${id}:`, error.response?.data || error.message);
                 throw error;
@@ -67,7 +65,7 @@ class ConfigService {
                 add_value: data.add_value?.toString() || null
             };
 
-            return editConfigApiConfigConfigIdPatch(id, configData, { headers: authHeader() })
+            return editConfigApiConfigConfigIdPatch(id, configData)
                 .catch(error => {
                     console.error(`Помилка оновлення конфігурації ${id}:`, error.response?.data || error.message);
                     throw error;
@@ -76,7 +74,7 @@ class ConfigService {
     }
 
     deleteConfig(id: number): Promise<any> {
-        return deleteConfigApiConfigConfigIdDelete(id, { headers: authHeader() })
+        return deleteConfigApiConfigConfigIdDelete(id)
             .catch(error => {
                 console.error(`Помилка видалення конфігурації ${id}:`, error.response?.data || error.message);
                 throw error;

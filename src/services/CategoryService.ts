@@ -1,4 +1,3 @@
-import authHeader from './auth-header';
 import {
     getCategoriesApiCategoriesGet,
     getCategoryApiCategoriesCategoryIdGet,
@@ -17,7 +16,7 @@ interface Category {
 
 class CategoryService {
     getCategories() {
-        return getCategoriesApiCategoriesGet({ headers: authHeader() })
+        return getCategoriesApiCategoriesGet()
             .then(response => {
                 if (response.data) {
                     localStorage.setItem('categories', JSON.stringify(response.data));
@@ -31,7 +30,7 @@ class CategoryService {
     }
 
     addCategory(data: Category) {
-        return addCategoryApiCategoriesPost(data, { headers: authHeader() })
+        return addCategoryApiCategoriesPost(data)
             .catch(error => {
                 console.error('Помилка додавання категорії:', error.response?.data || error.message);
                 throw error;
@@ -39,7 +38,7 @@ class CategoryService {
     }
 
     getCategory(id: number) {
-        return getCategoryApiCategoriesCategoryIdGet(id, { headers: authHeader() })
+        return getCategoryApiCategoriesCategoryIdGet(id)
             .catch(error => {
                 console.error(`Помилка отримання категорії ${id}:`, error.response?.data || error.message);
                 throw error;
@@ -47,7 +46,7 @@ class CategoryService {
     }
 
     updateCategory(id: number, data: Partial<Category>) {
-        return editCategoryApiCategoriesCategoryIdPatch(id, data, { headers: authHeader() })
+        return editCategoryApiCategoriesCategoryIdPatch(id, data)
             .catch(error => {
                 console.error(`Помилка оновлення категорії ${id}:`, error.response?.data || error.message);
                 throw error;
@@ -55,7 +54,7 @@ class CategoryService {
     }
 
     deleteCategory(id: number) {
-        return deleteCategoryApiCategoriesCategoryIdDelete(id, { headers: authHeader() })
+        return deleteCategoryApiCategoriesCategoryIdDelete(id)
             .catch(error => {
                 console.error(`Помилка видалення категорії ${id}:`, error.response?.data || error.message);
                 throw error;

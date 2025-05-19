@@ -1,4 +1,5 @@
 import AuthService from "../services/auth.service";
+import type { LoginModel, UserCreate, UserUpdate } from "@/api/model";
 
 // Інтерфейси для типізації
 interface User {
@@ -6,7 +7,15 @@ interface User {
   username?: string;
   email?: string;
   accessToken: string;
+  login: string;
+  fullname?: string;
+  phone?: string;
   [key: string]: any;
+}
+
+// Інтерфейс для редагування користувача
+interface UserEdit extends UserUpdate {
+  user_id: number | string;
 }
 
 interface AuthState {
@@ -26,18 +35,46 @@ export const auth = {
   namespaced: true,
   state: initialState,
   actions: {
-    login({ commit }: any, user: any) {
-      return AuthService.login(user).then(
-        (user: User) => {
-          commit("loginSuccess", user);
-          return Promise.resolve(user);
-        },
-        (error: any) => {
-          commit("loginFailure");
-          console.error("Помилка при спробі входу:", error.response?.data || error.message);
-          return Promise.reject(error);
-        },
-      );
+    // Перевіряємо валідність токена при завантаженні додатку
+    checkAuth({ commit, state }: any) {
+      const userStr = localStorage.getItem("user");
+      if (!userStr) {
+        commit("logout");
+        return false;
+      }
+      
+      try {
+        const user = JSON.parse(userStr);
+        if (!user || !user.accessToken) {
+          commit("logout");
+          return false;
+        }
+        
+        // Можна додати додаткові перевірки, наприклад, перевірка експірації токена
+        // if (user.expiresAt && new Date(user.expiresAt) < new Date()) {
+        //   commit("logout");
+        //   return false;
+        // }
+        
+        // Оновлюємо стан на основі збережених даних
+        commit("loginSuccess", user);
+        return true;
+      } catch (error) {
+        console.error("Помилка при перевірці авторизації:", error);
+        commit("logout");
+        return false;
+      }
+    },
+    async login({ commit }: any, credentials: LoginModel) {
+      try {
+        const user = await AuthService.login(credentials);
+        commit("loginSuccess", user);
+        return Promise.resolve(user);
+      } catch (error: any) {
+        commit("loginFailure");
+        console.error("Помилка при спробі входу:", error.response?.data || error.message);
+        return Promise.reject(error);
+      }
     },
     logout({ commit }: any) {
       try {
@@ -47,33 +84,29 @@ export const auth = {
         console.error("Помилка при виході:", error);
       }
     },
-    register({ commit }: any, user: any) {
-      return AuthService.register(user).then(
-        (response: any) => {
-          commit("registerSuccess");
-          return Promise.resolve(response.data);
-        },
-        (error: any) => {
-          commit("registerFailure");
-          console.error("Помилка при реєстрації:", error.response?.data || error.message);
-          return Promise.reject(error);
-        },
-      );
+    async register({ commit }: any, userData: UserCreate) {
+      try {
+        const response = await AuthService.register(userData);
+        commit("registerSuccess");
+        return Promise.resolve(response);
+      } catch (error: any) {
+        commit("registerFailure");
+        console.error("Помилка при реєстрації:", error.response?.data || error.message);
+        return Promise.reject(error);
+      }
     },
-    edit({ commit }: any, user: any) {
-      return AuthService.edit(user).then(
-        (response: any) => {
-          // Оновлюємо локальне сховище та стан
-          localStorage.setItem("user", JSON.stringify(response.data));
-          commit("editSuccess", response.data);
-          return response.data;
-        },
-        (error: any) => {
-          commit("editFailure");
-          console.error("Помилка при редагуванні профілю:", error.response?.data || error.message);
-          return Promise.reject(error);
-        },
-      );
+    async edit({ commit }: any, user: UserEdit) {
+      try {
+        const response = await AuthService.edit(user);
+        // Оновлюємо локальне сховище та стан
+        localStorage.setItem("user", JSON.stringify(response));
+        commit("editSuccess", response);
+        return response;
+      } catch (error: any) {
+        commit("editFailure");
+        console.error("Помилка при редагуванні профілю:", error.response?.data || error.message);
+        return Promise.reject(error);
+      }
     },
   },
   mutations: {

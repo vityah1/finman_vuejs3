@@ -4,6 +4,7 @@ import store from "./store"
 import router from './router'
 import moment from 'moment'
 import { VueQueryPlugin } from '@tanstack/vue-query'
+import { queryClient } from './query-client'
 // Імпортуємо налаштований axios перш ніж використовувати його
 import './axios-config'
 
@@ -18,14 +19,7 @@ const app = createApp(App)
 app.config.globalProperties.$moment = moment
 app.use(BootstrapVueNext)
 app.use(VueQueryPlugin, {
-  queryClientConfig: {
-    defaultOptions: {
-      queries: {
-        refetchOnWindowFocus: false,
-        retry: 1,
-      },
-    },
-  },
+  queryClient
 })
 
 app.use(router).use(store)
@@ -33,6 +27,9 @@ app.use(router).use(store)
 
 async function fetchDataFromApi(): Promise<void> {
     try {
+        // Перевіряємо авторизацію при завантаженні додатку
+        store.dispatch("auth/checkAuth");
+        
         await store.dispatch("sprs/get_sources")
         await store.dispatch("sprs/get_currencies")
         await store.dispatch("sprs/get_categories")
@@ -40,6 +37,8 @@ async function fetchDataFromApi(): Promise<void> {
     }
     catch(error) {
         console.error('Помилка завантаження початкових даних:', error)
+        // Все одно монтуємо додаток, навіть якщо є помилки з довідниками
+        app.mount('#app')
     }
 }
 

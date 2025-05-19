@@ -1,4 +1,3 @@
-import authHeader from './auth-header';
 import { importBankStatementApiImportPost } from '../api/default/default';
 import type { BodyImportBankStatementApiImportPost } from '../api/model';
 import axios from '../axios-config';
@@ -33,7 +32,6 @@ class ImportService {
         // але ми можемо передати FormData безпосередньо як data
         return importBankStatementApiImportPost(formData as any, {
             headers: {
-                ...authHeader(),
                 'Content-Type': 'multipart/form-data'
             }
         }).catch(error => handleRequestError(error, 'Помилка завантаження файлу:'));
