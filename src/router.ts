@@ -110,6 +110,11 @@ router.beforeEach((to, from, next) => {
 		try {
 			const user = JSON.parse(userStr);
 			isLoggedIn = user && user.accessToken;
+			
+			// Додаткова перевірка на валідність токена
+			if (!isLoggedIn && to.matched.some(record => record.meta.requiresAuth)) {
+				console.warn('Токен відсутній, але користувач намагається отримати доступ до захищеного маршруту');
+			}
 		} catch (error) {
 			console.error('Невалідні дані користувача в localStorage:', error);
 			// Видаляємо пошкоджені дані
@@ -122,6 +127,7 @@ router.beforeEach((to, from, next) => {
 	
 	// Якщо авторизація потрібна, але користувач не авторизований
 	if (authRequired && !isLoggedIn) {
+		console.log('Перенаправлення неавторизованого користувача на сторінку логіну');
 		return next({
 			name: 'login',
 			query: { returnUrl: to.fullPath }
@@ -130,6 +136,7 @@ router.beforeEach((to, from, next) => {
 	
 	// Якщо користувач авторизований і намагається зайти на login/register
 	if (isLoggedIn && (to.name === 'login' || to.name === 'register')) {
+		console.log('Авторизований користувач намагається зайти на сторінку логіну/реєстрації');
 		return next('/');
 	}
 	

@@ -28,17 +28,20 @@ app.use(router).use(store)
 async function fetchDataFromApi(): Promise<void> {
     try {
         // Перевіряємо авторизацію при завантаженні додатку
-        store.dispatch("auth/checkAuth");
+        const isAuthenticated = await store.dispatch("auth/checkAuth");
         
-        await store.dispatch("sprs/get_sources")
-        await store.dispatch("sprs/get_currencies")
-        await store.dispatch("sprs/get_categories")
-        app.mount('#app')
+        // Завантажуємо довідники тільки якщо користувач авторизований
+        if (isAuthenticated) {
+            await store.dispatch("sprs/get_sources");
+            await store.dispatch("sprs/get_currencies");
+            await store.dispatch("sprs/get_categories");
+        }
+        app.mount('#app');
     }
     catch(error) {
-        console.error('Помилка завантаження початкових даних:', error)
+        console.error('Помилка завантаження початкових даних:', error);
         // Все одно монтуємо додаток, навіть якщо є помилки з довідниками
-        app.mount('#app')
+        app.mount('#app');
     }
 }
 

@@ -35,8 +35,7 @@ export const auth = {
   namespaced: true,
   state: initialState,
   actions: {
-    // Перевіряємо валідність токена при завантаженні додатку
-    checkAuth({ commit, state }: any) {
+    async checkAuth({ commit, state }: any) {
       const userStr = localStorage.getItem("user");
       if (!userStr) {
         commit("logout");
@@ -50,15 +49,23 @@ export const auth = {
           return false;
         }
         
-        // Можна додати додаткові перевірки, наприклад, перевірка експірації токена
-        // if (user.expiresAt && new Date(user.expiresAt) < new Date()) {
-        //   commit("logout");
-        //   return false;
-        // }
-        
-        // Оновлюємо стан на основі збережених даних
-        commit("loginSuccess", user);
-        return true;
+        // Виконуємо перевірку валідності токену через запит до API
+        try {
+          // Використовуємо API для перевірки валідності токена
+          const isValid = await AuthService.validateToken();
+          if (!isValid) {
+            commit("logout");
+            return false;
+          }
+          
+          // Якщо токен валідний, встановлюємо користувача в state
+          commit("loginSuccess", user);
+          return true;
+        } catch (apiError) {
+          console.error("Токен недійсний:", apiError);
+          commit("logout");
+          return false;
+        }
       } catch (error) {
         console.error("Помилка при перевірці авторизації:", error);
         commit("logout");

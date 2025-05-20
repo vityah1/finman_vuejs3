@@ -30,6 +30,8 @@ const queryCache = new QueryCache({
 
 // Функція для обробки помилок авторизації
 function handleAuthError() {
+  console.log('Обробка помилки авторизації: виконується logout та перенаправлення на login');
+  
   // Виконуємо logout у store
   store.dispatch('auth/logout');
   
@@ -58,6 +60,7 @@ export const queryClient = new QueryClient({
         // Повторюємо інші запити максимум 1 раз
         return failureCount < 1;
       },
+      staleTime: 5 * 60 * 1000, // 5 хвилин (за замовчуванням)
     },
     mutations: {
       retry: (failureCount, error: any) => {
@@ -68,6 +71,31 @@ export const queryClient = new QueryClient({
         // Повторюємо інші мутації максимум 1 раз
         return failureCount < 1;
       },
+      onSuccess: () => {
+        // Після успішної мутації можна додати якісь дії
+        // Наприклад, оновити кеш запитів
+      }
     },
   },
 });
+
+// Функції для роботи з кешем
+export const refreshQueries = (queryKey: string[]) => {
+  return queryClient.invalidateQueries({ queryKey });
+};
+
+export const refreshAllData = async () => {
+  // Оновлюємо всі основні запити в додатку
+  const keysToRefresh = [
+    ['api', 'payments', 'years'],
+    ['api', 'categories'],
+    ['api', 'sources'],
+    ['api', 'currencies']
+  ];
+  
+  for (const key of keysToRefresh) {
+    await queryClient.invalidateQueries({ queryKey: key });
+  }
+  
+  console.log('Всі основні кеші запитів оновлено');
+};

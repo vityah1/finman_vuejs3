@@ -46,6 +46,8 @@
 <script>
 import { Form, Field, ErrorMessage } from "vee-validate";
 import * as yup from "yup";
+import PaymentService from "../../services/PaymentService";
+import { refreshAllData } from "../../query-client";
 
 export default {
   name: "UserLogin",
@@ -79,11 +81,39 @@ export default {
     }
   },
   methods: {
+    loadInitialData() {
+      // Завантажуємо довідники
+      this.$store.dispatch("sprs/get_sources");
+      this.$store.dispatch("sprs/get_currencies");
+      this.$store.dispatch("sprs/get_categories");
+      
+      // Завантажуємо роки з платежами
+      // Це критично важливо після авторизації, щоб дані були доступні в інтерфейсі
+      PaymentService.getPaymentsYears({currency: this.$store.state.sprs.selectedCurrency || "UAH"})
+        .then(() => {
+          console.log("Роки платежів успішно отримано після авторизації");
+        })
+        .catch(error => {
+          console.error("Помилка завантаження років платежів після авторизації:", error);
+        });
+        
+      // Оновлюємо всі кеші запитів
+      refreshAllData()
+        .then(() => {
+          console.log("Всі кеші запитів оновлено після авторизації");
+        })
+        .catch(error => {
+          console.error("Помилка оновлення кешів запитів:", error);
+        });
+    },
     handleLogin(credentials) {
       this.loading = true;
 
       this.$store.dispatch("auth/login", credentials).then(
         () => {
+          // Після успішної авторизації завантажуємо необхідні дані
+          this.loadInitialData();
+          
           // Перенаправляємо на сторінку, з якої прийшли, або на профіль
           const returnUrl = this.$route.query.returnUrl || '/profile';
           this.$router.push(returnUrl);
@@ -103,3 +133,41 @@ export default {
 };
 </script>
 
+<style scoped>
+label {
+  display: block;
+  margin-top: 10px;
+}
+
+.card-container.card {
+  max-width: 350px !important;
+  padding: 40px 40px;
+}
+
+.card {
+  background-color: #f7f7f7;
+  padding: 20px 25px 30px;
+  margin: 0 auto 25px;
+  margin-top: 50px;
+  -moz-border-radius: 2px;
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  -moz-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  -webkit-box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.3);
+}
+
+.profile-img-card {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto 10px;
+  display: block;
+  -moz-border-radius: 50%;
+  -webkit-border-radius: 50%;
+  border-radius: 50%;
+}
+
+.error-feedback {
+  color: red;
+}
+</style>

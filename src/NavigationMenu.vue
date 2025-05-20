@@ -37,7 +37,7 @@
 					</router-link>
 				</b-nav-item>
 				<b-nav-item v-if="currentUser">
-					<router-link :to="{ name: 'payments_years' }" class="nav-link">
+					<router-link :to="{ name: 'payments_years' }" class="nav-link" @click="refreshYears">
 						Years
 					</router-link>
 				</b-nav-item>
@@ -125,6 +125,8 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue';
+import AuthService from "./services/auth.service";
+import { refreshQueries } from "./query-client";
 
 export default defineComponent({
 	name: "NavigationMenu",
@@ -168,6 +170,23 @@ export default defineComponent({
 			month: null as string | null,
 			mono_user_id: null as string | null,
 		};
+	},
+	async created() {
+		// Виконуємо перевірку валідності токена при завантаженні
+		if (this.currentUser) {
+			try {
+				const isValid = await AuthService.validateToken();
+				if (!isValid) {
+					console.log("Токен виявився недійсним при завантаженні меню навігації");
+					this.logOut();
+				} else {
+					console.log("Токен підтверджено як валідний при завантаженні меню");
+				}
+			} catch (error) {
+				console.error("Помилка при валідації токена:", error);
+				this.logOut();
+			}
+		}
 	},
 	watch: {
 		"$route.params.year": {
@@ -217,6 +236,29 @@ export default defineComponent({
 						action: "add",
 					},
 				});
+			}
+		},
+		refreshYears() {
+			// Запускаємо оновлення років при кліку на посилання Years
+			if (this.currentUser) {
+				// Оновлюємо кеш запитів за роками
+				refreshQueries(['api', 'payments', 'years'])
+					.then(() => {
+						console.log("Кеш років платежів успішно оновлено при навігації");
+					})
+					.catch(error => {
+						console.error("Помилка оновлення кешу років при навігації:", error);
+					});
+				
+				// Також робимо додатковий запит для оновлення даних у компоненті
+				const PaymentService = require("./services/PaymentService").default;
+				PaymentService.getPaymentsYears({currency: this.$store.state.sprs.selectedCurrency || "UAH"})
+					.then(() => {
+						console.log("Роки платежів успішно оновлено при навігації");
+					})
+					.catch(error => {
+						console.error("Помилка оновлення років при навігації:", error);
+					});
 			}
 		},
 	},

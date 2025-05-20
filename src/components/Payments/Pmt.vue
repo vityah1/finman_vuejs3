@@ -56,16 +56,35 @@ export default {
   methods: {
     async retrieveYears() {
       try {
-        const response = await PaymentService.getPaymentsYears({currency: store.state.sprs.selectedCurrency || "UAH"});
-        this.years = response.data;
-        console.log(response.data);
+        // Перевіряємо чи користувач авторизований
+        if (this.$store.state.auth.status?.loggedIn) {
+          console.log('Завантажуємо роки платежів... (користувач авторизований)');
+          const response = await PaymentService.getPaymentsYears({currency: store.state.sprs.selectedCurrency || "UAH"});
+          this.years = response.data;
+          console.log('Роки платежів завантажено:', response.data);
+        } else {
+          console.log('Користувач не авторизований, не завантажуємо роки платежів');
+          this.years = [];
+        }
       } catch (e) {
-        console.log(e);
+        console.error('Помилка при завантаженні років платежів:', e);
+        this.years = [];
       }
     },
   },
   mounted() {
     this.retrieveYears();
+  },
+  created() {
+    // Підписуємося на зміну стану авторизації
+    this.$store.subscribe((mutation, state) => {
+      // Якщо зміна стосується авторизації
+      if (mutation.type === 'auth/loginSuccess') {
+        console.log('Користувач авторизувався, оновлюємо список років');
+        // Оновлюємо список років
+        this.retrieveYears();
+      }
+    });
   },
 	watch: {
     '$store.state.sprs.selectedCurrency'() {

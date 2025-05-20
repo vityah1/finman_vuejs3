@@ -1,7 +1,8 @@
 import { 
     userLoginApiAuthSigninPost, 
     createUserApiAuthSignupPost,
-    editUserApiUsersUserIdPatch 
+    editUserApiUsersUserIdPatch,
+    getUsersApiUsersGet
 } from "@/api/auth/auth";
 import type { LoginModel, UserCreate, UserUpdate } from "@/api/model";
 
@@ -50,6 +51,18 @@ class AuthService {
         } catch (error) {
             console.error('Помилка реєстрації:', error);
             throw error;
+        }
+    }
+
+    async validateToken(): Promise<boolean> {
+        try {
+            // Спробуємо отримати список користувачів, що вимагає авторизації
+            const response = await getUsersApiUsersGet();
+            return !!response.data;
+        } catch (error) {
+            console.error('Токен недійсний або протух:', error);
+            this.logout();
+            return false;
         }
     }
 
