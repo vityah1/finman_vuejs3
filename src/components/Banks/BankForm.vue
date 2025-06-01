@@ -1,6 +1,17 @@
 <template>
 	<div class="container">
 		<alert-component ref="myAlert"></alert-component>
+
+		<!-- Індикатор завантаження -->
+		<div v-if="isLoading" class="loading-overlay">
+			<div class="loading-content">
+				<div class="spinner-border text-primary" role="status">
+					<span class="visually-hidden">Завантаження...</span>
+				</div>
+				<p class="mt-2 mb-0">Обробка файлу...</p>
+			</div>
+		</div>
+
 		<b-form v-model="showModal" :title="`Upload ${selectedBankType} file`">
 			<template #modal-header>
 				<h5 class="modal-title text-danger">
@@ -15,16 +26,32 @@
 					<div class="form-group">
 						<label>Select bank type:</label>
 						<div class="bank-selector mb-2">
-							<div class="bank-option" :class="{ active: selectedBankType === 'revolut' }" @click="selectedBankType = 'revolut'">
+							<div
+								class="bank-option"
+								:class="{ active: selectedBankType === 'revolut', disabled: isLoading }"
+								@click="!isLoading && (selectedBankType = 'revolut')"
+							>
 								<i class="fas fa-euro-sign"></i> Revolut
 							</div>
-							<div class="bank-option" :class="{ active: selectedBankType === 'wise' }" @click="selectedBankType = 'wise'">
+							<div
+								class="bank-option"
+								:class="{ active: selectedBankType === 'wise', disabled: isLoading }"
+								@click="!isLoading && (selectedBankType = 'wise')"
+							>
 								<i class="fas fa-euro-sign"></i> Wise
 							</div>
-							<div class="bank-option" :class="{ active: selectedBankType === 'p24' }" @click="selectedBankType = 'p24'">
+							<div
+								class="bank-option"
+								:class="{ active: selectedBankType === 'p24', disabled: isLoading }"
+								@click="!isLoading && (selectedBankType = 'p24')"
+							>
 								<img src="/p24.png" alt="P24" style="width: 25px; margin-right: 5px;" /> P24
 							</div>
-							<div class="bank-option" :class="{ active: selectedBankType === 'pumb' }" @click="selectedBankType = 'pumb'">
+							<div
+								class="bank-option"
+								:class="{ active: selectedBankType === 'pumb', disabled: isLoading }"
+								@click="!isLoading && (selectedBankType = 'pumb')"
+							>
 								<img
 									src="https://cdn.brandfetch.io/id_oJO480-/w/820/h/322/theme/dark/logo.png?c=1bxid64Mup7aczewSAYMX&t=1742726827527"
 									alt="Логотип ПУМБ"
@@ -32,12 +59,30 @@
 							</div>
 						</div>
 						<label>Select file from <strong>{{ selectedBankType.charAt(0).toUpperCase() + selectedBankType.slice(1) }}:</strong></label>
-						<input type="file" class="form-control" id="amount" @change="handleFileChange" />
-						<select class="form-control mt-2" v-model="selectedOption">
+						<input
+							type="file"
+							class="form-control"
+							id="amount"
+							@change="handleFileChange"
+							:disabled="isLoading"
+						/>
+						<select
+							class="form-control mt-2"
+							v-model="selectedOption"
+							:disabled="isLoading"
+						>
 							<option value="import">Import</option>
 							<option value="show">Show</option>
 						</select>
-						<b-button variant="primary" class="mt-2" @click="handleButtonClick">Submit</b-button>
+						<b-button
+							variant="primary"
+							class="mt-2"
+							@click="handleButtonClick"
+							:disabled="isLoading"
+						>
+							<span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+							{{ isLoading ? 'Обробка...' : 'Submit' }}
+						</b-button>
 					</div>
 				</b-form>
 				<div></div>
@@ -104,6 +149,7 @@ export default defineComponent({
 		const file = ref<File | null>(null);
 		const payments = ref<Payment[]>([]);
 		const paymentsWithCategories = ref<PaymentWithCategory[]>([]);
+		const showModal = ref<boolean>(true);
 
 		const currentUser = computed(() => store.state.auth.user);
 
@@ -124,7 +170,7 @@ export default defineComponent({
 						};
 					});
 					if (myAlert.value) {
-						myAlert.value.showAlert("success", "File upload success");
+						myAlert.value.showAlert("success", "Файл успішно завантажено та оброблено");
 					}
 				},
 				onError: (error: AxiosError<HTTPValidationError | any>) => {
@@ -177,6 +223,7 @@ export default defineComponent({
 			payments,
 			paymentsWithCategories,
 			currentUser,
+			showModal,
 			handleFileChange,
 			handleButtonClick,
 			isLoading: computed<boolean>(() => uploadMutation.isPending.value)
@@ -211,5 +258,41 @@ export default defineComponent({
 	background-color: #e7f4ff;
 	border-color: #007bff;
 	color: #007bff;
+}
+
+.bank-option.disabled {
+	opacity: 0.6;
+	cursor: not-allowed;
+	pointer-events: none;
+}
+
+.bank-option.disabled:hover {
+	background-color: inherit;
+}
+
+.loading-overlay {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0, 0, 0, 0.5);
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	z-index: 9999;
+}
+
+.loading-content {
+	background-color: white;
+	padding: 30px;
+	border-radius: 10px;
+	text-align: center;
+	box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.loading-content p {
+	color: #6c757d;
+	font-weight: 500;
 }
 </style>
