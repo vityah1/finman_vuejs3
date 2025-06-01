@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { getErrorMessage, logError, isAuthError, isNetworkError } from '@/utils/errorHandler';
 
 // Отримуємо базовий URL
 const API_BASE = process.env.VUE_APP_API_ENDPOINT;
@@ -41,47 +42,48 @@ axios.interceptors.request.use(
   }
 );
 
-// Додаємо response interceptor для обробки помилок авторизації
+// Додаємо response interceptor для обробки помилок
 axios.interceptors.response.use(
   (response) => {
     return response;
   },
   (error) => {
-    if (error.response) {
-      const status = error.response.status;
-      
-      if (status === 401 || status === 403) {
-        console.error('Помилка авторизації:', status, error.response.data);
-        
-        // Логування URL, який викликав помилку
-        console.error('URL запиту з помилкою авторизації:', error.config.url);
-        
-        // Видаляємо токен, якщо він протух
-        const userStr = localStorage.getItem('user');
-        if (userStr) {
-          try {
-            JSON.parse(userStr);
-            // Якщо у нас є дані користувача і виникла помилка авторизації,
-            // це означає, що токен недійсний
-            localStorage.removeItem('user');
-            console.log('Токен видалено через помилку авторизації');
-            
-            // Перезавантажуємо сторінку, щоб примусово оновити стан додатку
-            // Це гарантує, що користувач буде перенаправлений на /login
-            console.log('Перезавантаження сторінки для оновлення стану авторизації...');
-            setTimeout(() => {
-              window.location.href = '/login';
-            }, 500);
-          } catch (e) {
-            console.error('Помилка при обробці даних користувача:', e);
-          }
+    // Логуємо помилку з зрозумілим повідомленням
+    logError(error, "Axios interceptor");
+
+    if (isAuthError(error)) {
+      console.error('Помилка авторизації:', error.response?.status, error.response?.data);
+
+      // Логування URL, який викликав помилку
+      console.error('URL запиту з помилкою авторизації:', error.config?.url);
+
+      // Видаляємо токен, якщо він протух
+      const userStr = localStorage.getItem('user');
+      if (userStr) {
+        try {
+          JSON.parse(userStr);
+          // Якщо у нас є дані користувача і виникла помилка авторизації,
+          // це означає, що токен недійсний
+          localStorage.removeItem('user');
+          console.log('Токен видалено через помилку авторизації');
+
+          // Перезавантажуємо сторінку, щоб примусово оновити стан додатку
+          // Це гарантує, що користувач буде перенаправлений на /login
+          console.log('Перезавантаження сторінки для оновлення стану авторизації...');
+          setTimeout(() => {
+            window.location.href = '/login';
+          }, 500);
+        } catch (e) {
+          console.error('Помилка при обробці даних користувача:', e);
         }
-        
-        // Додаткова діагностика
-        console.error('Заголовки запиту:', error.config.headers);
       }
+
+      // Додаткова діагностика
+      console.error('Заголовки запиту:', error.config?.headers);
+    } else if (isNetworkError(error)) {
+      console.warn('Мережева помилка:', getErrorMessage(error));
     }
-    
+
     return Promise.reject(error);
   }
 );

@@ -1,6 +1,7 @@
 <template>
 	<div class="row">
 		<div class="col-md-8">
+			<alert-component ref="myAlert"></alert-component>
 			<selector-component
 				@change="handleSelectChange"
 			/>
@@ -42,6 +43,7 @@
 <script>
 import SelectorComponent from "../SelectorComponent.vue";
 import PaymentService from "../../services/PaymentService";
+import { getErrorMessage, logError } from '@/utils/errorHandler';
 
 /**
  * @typedef {Object} CategoryCost
@@ -78,7 +80,7 @@ export default {
       isRequestInProgress: false // Запобігання паралельним запитам
     };
   },
-  methods: { 
+  methods: {
     areParamsValid(params) {
       return !!params && !!params.year && !!params.month;
     },
@@ -126,7 +128,15 @@ export default {
 
         return response;
       } catch (error) {
-        console.error("Помилка API запиту:", error);
+        logError(error, "PmtYearMon API request");
+        const errorMessage = getErrorMessage(error, "Помилка завантаження даних");
+        if (this.$refs.myAlert) {
+          this.$refs.myAlert.showAlert("danger", errorMessage);
+        }
+        // Очищуємо дані при помилці
+        this.catcosts = [];
+        this.total = 0;
+        this.total_cnt = 0;
         throw error;
       } finally {
         this.isRequestInProgress = false;
@@ -173,6 +183,9 @@ export default {
           // Ігноруємо помилки навігації
           console.warn("Ігнорована помилка навігації:", err);
         });
+      }).catch((error) => {
+        // Помилка вже оброблена в safeApiRequest, просто логуємо
+        console.warn("Запит не вдався, URL не оновлено");
       });
     }
   },
@@ -182,6 +195,9 @@ export default {
       year: this.year,
       month: this.month,
       group_user_id: this.group_user_id
+    }).catch((error) => {
+      // Помилка вже оброблена в safeApiRequest
+      console.warn("Початковий запит не вдався");
     });
   },
 	watch: {
@@ -193,6 +209,9 @@ export default {
       group_user_id: this.group_user_id,
       currency: newCurrency,
       forceUpdate: true
+    }).catch((error) => {
+      // Помилка вже оброблена в safeApiRequest
+      console.warn("Запит при зміні валюти не вдався");
     });
   }
 }

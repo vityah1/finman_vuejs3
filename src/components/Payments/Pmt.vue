@@ -1,12 +1,13 @@
 <template>
   <div class="container">
+    <alert-component ref="myAlert"></alert-component>
     <b-table-simple hover small caption-top responsive>
 <!--      <caption>Table Head</caption>-->
       <colgroup>
     <col />
     <col />
     <col />
-  </colgroup>      
+  </colgroup>
       <b-thead head-variant="dark">
     <b-tr>
       <b-th>Year</b-th>
@@ -17,9 +18,9 @@
   <b-tbody v-if="(years.length > 0)">
     <b-tr v-for="(year, index) in years" :key="index">
       <b-td>
-      <router-link 
-        v-if="year.year" 
-        class="col-2" 
+      <router-link
+        v-if="year.year"
+        class="col-2"
         :to="{ name: 'payments_months', params: { year: year.year } }"
         >
         {{ year.year }}
@@ -38,6 +39,7 @@
 <script>
 import PaymentService from "../../services/PaymentService";
 import store from "@/store";
+import { getErrorMessage, logError } from '@/utils/errorHandler';
 
 /**
  * @typedef {Object} YearData
@@ -67,7 +69,11 @@ export default {
           this.years = [];
         }
       } catch (e) {
-        console.error('Помилка при завантаженні років платежів:', e);
+        logError(e, "Pmt retrieveYears");
+        const errorMessage = getErrorMessage(e, "Помилка завантаження років платежів");
+        if (this.$refs.myAlert) {
+          this.$refs.myAlert.showAlert("danger", errorMessage);
+        }
         this.years = [];
       }
     },

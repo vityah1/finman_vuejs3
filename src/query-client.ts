@@ -1,16 +1,21 @@
 import { QueryClient, MutationCache, QueryCache } from '@tanstack/vue-query';
 import store from './store';
 import router from './router';
+import { getErrorMessage, logError, isAuthError, isNetworkError } from '@/utils/errorHandler';
 
 // Створюємо кастомний mutation cache для обробки помилок
 const mutationCache = new MutationCache({
   onError: (error) => {
     const axiosError = error as any;
-    const status = axiosError?.response?.status;
-    
-    if (status === 401 || status === 403) {
+
+    // Логуємо помилку з зрозумілим повідомленням
+    logError(axiosError, "Mutation error");
+
+    if (isAuthError(axiosError)) {
       console.log('Токен авторизації недійсний або протух');
       handleAuthError();
+    } else if (isNetworkError(axiosError)) {
+      console.warn('Мережева помилка в мутації:', getErrorMessage(axiosError));
     }
   },
 });
@@ -19,11 +24,15 @@ const mutationCache = new MutationCache({
 const queryCache = new QueryCache({
   onError: (error) => {
     const axiosError = error as any;
-    const status = axiosError?.response?.status;
-    
-    if (status === 401 || status === 403) {
+
+    // Логуємо помилку з зрозумілим повідомленням
+    logError(axiosError, "Query error");
+
+    if (isAuthError(axiosError)) {
       console.log('Токен авторизації недійсний або протух');
       handleAuthError();
+    } else if (isNetworkError(axiosError)) {
+      console.warn('Мережева помилка в запиті:', getErrorMessage(axiosError));
     }
   },
 });
@@ -31,10 +40,10 @@ const queryCache = new QueryCache({
 // Функція для обробки помилок авторизації
 function handleAuthError() {
   console.log('Обробка помилки авторизації: виконується logout та перенаправлення на login');
-  
+
   // Виконуємо logout у store
   store.dispatch('auth/logout');
-  
+
   // Перенаправляємо на сторінку входу, зберігаючи intended URL
   const currentPath = router.currentRoute.value.fullPath;
   if (currentPath !== '/login' && currentPath !== '/register') {
@@ -54,7 +63,11 @@ export const queryClient = new QueryClient({
       refetchOnWindowFocus: false,
       retry: (failureCount, error: any) => {
         // Не повторюємо запити при помилках авторизації
-        if (error?.response?.status === 401 || error?.response?.status === 403) {
+        if (isAuthError(error)) {
+          return false;
+        }
+        // Не повторюємо мережеві помилки
+        if (isNetworkError(error)) {
           return false;
         }
         // Повторюємо інші запити максимум 1 раз
@@ -65,7 +78,11 @@ export const queryClient = new QueryClient({
     mutations: {
       retry: (failureCount, error: any) => {
         // Не повторюємо мутації при помилках авторизації
-        if (error?.response?.status === 401 || error?.response?.status === 403) {
+        if (isAuthError(error)) {
+          return false;
+        }
+        // Не повторюємо мережеві помилки
+        if (isNetworkError(error)) {
           return false;
         }
         // Повторюємо інші мутації максимум 1 раз
@@ -92,10 +109,10 @@ export const refreshAllData = async () => {
     ['api', 'sources'],
     ['api', 'currencies']
   ];
-  
+
   for (const key of keysToRefresh) {
     await queryClient.invalidateQueries({ queryKey: key });
   }
-  
+
   console.log('Всі основні кеші запитів оновлено');
 };

@@ -24,6 +24,12 @@
 							<div class="bank-option" :class="{ active: selectedBankType === 'p24' }" @click="selectedBankType = 'p24'">
 								<img src="/p24.png" alt="P24" style="width: 25px; margin-right: 5px;" /> P24
 							</div>
+							<div class="bank-option" :class="{ active: selectedBankType === 'pumb' }" @click="selectedBankType = 'pumb'">
+								<img
+									src="https://cdn.brandfetch.io/id_oJO480-/w/820/h/322/theme/dark/logo.png?c=1bxid64Mup7aczewSAYMX&t=1742726827527"
+									alt="Логотип ПУМБ"
+									style="width: 75px; margin-right: 5px;">
+							</div>
 						</div>
 						<label>Select file from <strong>{{ selectedBankType.charAt(0).toUpperCase() + selectedBankType.slice(1) }}:</strong></label>
 						<input type="file" class="form-control" id="amount" @change="handleFileChange" />
@@ -61,7 +67,9 @@ import { ref, computed, onMounted, defineComponent } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { useImportBankStatementApiImportPost } from '@/api/default/default';
-import type { BodyImportBankStatementApiImportPost, BodyImportBankStatementApiImportPostMode } from '@/api/model';
+import type { BodyImportBankStatementApiImportPost, BodyImportBankStatementApiImportPostMode, HTTPValidationError } from '@/api/model';
+import type { AxiosError } from 'axios';
+import { getErrorMessage, logError } from '@/utils/errorHandler';
 
 interface Payment {
 	id: number;
@@ -99,6 +107,8 @@ export default defineComponent({
 
 		const currentUser = computed(() => store.state.auth.user);
 
+
+
 		// Використовуємо Orval-генерований хук для завантаження файлу
 		const uploadMutation = useImportBankStatementApiImportPost({
 			mutation: {
@@ -117,10 +127,11 @@ export default defineComponent({
 						myAlert.value.showAlert("success", "File upload success");
 					}
 				},
-				onError: (error) => {
-					console.log(error);
+				onError: (error: AxiosError<HTTPValidationError | any>) => {
+					logError(error, "BankForm file upload");
+					const errorMessage = getErrorMessage(error, "Помилка завантаження файлу");
 					if (myAlert.value) {
-						myAlert.value.showAlert("danger", "File upload failed");
+						myAlert.value.showAlert("danger", errorMessage);
 					}
 				}
 			}
