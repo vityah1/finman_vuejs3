@@ -57,6 +57,13 @@
 									alt="Логотип ПУМБ"
 									style="width: 75px; margin-right: 5px;">
 							</div>
+							<div
+								class="bank-option"
+								:class="{ active: selectedBankType === 'erste', disabled: isLoading }"
+								@click="!isLoading && (selectedBankType = 'erste')"
+							>
+								<i class="fas fa-euro-sign"></i> ERSTE Bank
+							</div>
 						</div>
 						<label>Select file from <strong>{{ selectedBankType.charAt(0).toUpperCase() + selectedBankType.slice(1) }}:</strong></label>
 						<input
