@@ -8,7 +8,7 @@ import type { BodyImportBankStatementApiImportPostMode } from "./bodyImportBankS
 
 export interface BodyImportBankStatementApiImportPost {
   file: Blob;
-  /** Тип банку: 'wise', 'p24', 'revolut' */
+  /** Тип банку: 'wise', 'p24', 'revolut', 'pumb', 'erste' */
   mode: BodyImportBankStatementApiImportPostMode;
   /** Дія: 'show' для перегляду або 'import' для імпорту */
   action?: string;

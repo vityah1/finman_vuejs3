@@ -6,7 +6,7 @@
  */
 
 /**
- * Тип банку: 'wise', 'p24', 'revolut'
+ * Тип банку: 'wise', 'p24', 'revolut', 'pumb', 'erste'
  */
 export type BodyImportBankStatementApiImportPostMode =
   (typeof BodyImportBankStatementApiImportPostMode)[keyof typeof BodyImportBankStatementApiImportPostMode];
@@ -16,4 +16,6 @@ export const BodyImportBankStatementApiImportPostMode = {
   wise: "wise",
   p24: "p24",
   revolut: "revolut",
+  pumb: "pumb",
+  erste: "erste",
 } as const;

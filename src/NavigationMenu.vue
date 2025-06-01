@@ -59,6 +59,27 @@
 					</b-dropdown-item>
 				</b-nav-item-dropdown>
 
+				<b-nav-item-dropdown v-if="currentUser" text="Utilities">
+					<template #button-content>
+						<i class="fas fa-home"></i> Комунальні
+					</template>
+					<b-dropdown-item>
+						<router-link :to="{ name: 'utilities' }" class="nav-link">
+							<i class="fas fa-chart-line"></i> Головна
+						</router-link>
+					</b-dropdown-item>
+					<b-dropdown-item>
+						<router-link :to="{ name: 'utilities_addresses' }" class="nav-link">
+							<i class="fas fa-map-marker-alt"></i> Адреси
+						</router-link>
+					</b-dropdown-item>
+					<b-dropdown-item>
+						<router-link :to="{ name: 'utilities_add_reading' }" class="nav-link">
+							<i class="fas fa-plus"></i> Додати показники
+						</router-link>
+					</b-dropdown-item>
+				</b-nav-item-dropdown>
+
 				<b-nav-item-dropdown text="User">
 					<template #button-content>
 						<i class="fas fa-user"></i> User

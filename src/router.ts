@@ -93,6 +93,43 @@ const routes: Array<RouteRecordRaw> = [
 		component: () => import("./components/User/JoinGroupPage.vue"),
 		meta: { requiresAuth: true },
 	},
+	// Utilities routes
+	{
+		path: "/utilities",
+		name: "utilities",
+		component: () => import("./components/Utilities/UtilitiesMain.vue"),
+		meta: { requiresAuth: true },
+	},
+	{
+		path: "/utilities/addresses",
+		name: "utilities_addresses",
+		component: () => import("./components/Utilities/AddressList.vue"),
+		meta: { requiresAuth: true },
+	},
+	{
+		path: "/utilities/addresses/:addressId/services",
+		name: "utilities_services",
+		component: () => import("./components/Utilities/ServiceList.vue"),
+		meta: { requiresAuth: true },
+	},
+	{
+		path: "/utilities/services/:serviceId/tariffs",
+		name: "utilities_tariffs",
+		component: () => import("./components/Utilities/TariffList.vue"),
+		meta: { requiresAuth: true },
+	},
+	{
+		path: "/utilities/addresses/:addressId/readings",
+		name: "utilities_readings",
+		component: () => import("./components/Utilities/ReadingList.vue"),
+		meta: { requiresAuth: true },
+	},
+	{
+		path: "/utilities/readings/add",
+		name: "utilities_add_reading",
+		component: () => import("./components/Utilities/AddReading.vue"),
+		meta: { requiresAuth: true },
+	},
 ];
 
 const router = createRouter({

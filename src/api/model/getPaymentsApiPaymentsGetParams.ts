@@ -22,4 +22,12 @@ export type GetPaymentsApiPaymentsGetParams = {
    * ID категорії для фільтрації. Спеціальне значення '_' для останніх платежів
    */
   category_id?: string | null;
+  /**
+   * Валюта для відображення сум
+   */
+  currency?: string | null;
+  /**
+   * ID користувача групи
+   */
+  group_user_id?: string | null;
 };
