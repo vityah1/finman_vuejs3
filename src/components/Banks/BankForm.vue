@@ -46,7 +46,7 @@
 					<b-td>{{ payment.category_id }}</b-td>
 					<b-td>{{ payment.category_name }}</b-td>
 					<b-td>{{ payment.mydesc }}</b-td>
-					<b-td>{{ payment.amount.toLocaleString() }}</b-td>
+					<b-td>{{ payment.currency_amount.toLocaleString() }}</b-td>
 					<b-td><span v-if="payment.sql" style="color: green;">✔</span><span v-else style="color: red;">✘</span>
 					</b-td>
 				</b-tr>
@@ -57,11 +57,11 @@
 </template>
 
 <script lang="ts">
-import ImportService from "@/services/ImportService";
 import { ref, computed, onMounted, defineComponent } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
-import { useMutation } from '@tanstack/vue-query';
+import { useImportBankStatementApiImportPost } from '@/api/default/default';
+import type { BodyImportBankStatementApiImportPost, BodyImportBankStatementApiImportPostMode } from '@/api/model';
 
 interface Payment {
 	id: number;
@@ -99,39 +99,29 @@ export default defineComponent({
 
 		const currentUser = computed(() => store.state.auth.user);
 
-		// Використовуємо useMutation для завантаження файлу
-		const uploadMutation = useMutation({
-			mutationFn: async () => {
-				if (!file.value) {
-					throw new Error('Файл не вибрано');
-				}
-				// Перетворюємо відповідь у формат, очікуваний useMutation
-				const axiosResponse = await ImportService.UploadFile(
-					file.value, 
-					selectedOption.value, 
-					selectedBankType.value
-				);
-				return { data: axiosResponse.data };
-			},
-			onSuccess: (response: { data: Payment[] }) => {
-				payments.value = response.data;
-				paymentsWithCategories.value = payments.value.map((payment: Payment) => {
-					const category = store.state.sprs.categories.find(
-						(category) => category.id === payment.category_id
-					);
-					return {
-						...payment,
-						category_name: category ? category.name : "Unknown Category",
-					};
-				});
-				if (myAlert.value) {
-					myAlert.value.showAlert("success", "File upload success");
-				}
-			},
-			onError: (error) => {
-				console.log(error);
-				if (myAlert.value) {
-					myAlert.value.showAlert("danger", "File upload failed");
+		// Використовуємо Orval-генерований хук для завантаження файлу
+		const uploadMutation = useImportBankStatementApiImportPost({
+			mutation: {
+				onSuccess: (response) => {
+					payments.value = response.data as Payment[];
+					paymentsWithCategories.value = payments.value.map((payment: Payment) => {
+						const category = store.state.sprs.categories.find(
+							(category) => category.id === payment.category_id
+						);
+						return {
+							...payment,
+							category_name: category ? category.name : "Unknown Category",
+						};
+					});
+					if (myAlert.value) {
+						myAlert.value.showAlert("success", "File upload success");
+					}
+				},
+				onError: (error) => {
+					console.log(error);
+					if (myAlert.value) {
+						myAlert.value.showAlert("danger", "File upload failed");
+					}
 				}
 			}
 		});
@@ -145,7 +135,20 @@ export default defineComponent({
 		};
 
 		const handleButtonClick = (): void => {
-			uploadMutation.mutate();
+			if (!file.value) {
+				if (myAlert.value) {
+					myAlert.value.showAlert("danger", "Файл не вибрано");
+				}
+				return;
+			}
+
+			const requestData: BodyImportBankStatementApiImportPost = {
+				file: file.value,
+				mode: selectedBankType.value as BodyImportBankStatementApiImportPostMode,
+				action: selectedOption.value
+			};
+
+			uploadMutation.mutate({ data: requestData });
 		};
 
 		onMounted((): void => {
