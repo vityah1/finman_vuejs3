@@ -4,6 +4,7 @@
  * FinMan API
  * OpenAPI spec version: 1.0.0
  */
+import type { UtilityTariffCreateSubscriptionFee } from "./utilityTariffCreateSubscriptionFee";
 import type { UtilityTariffCreateCurrency } from "./utilityTariffCreateCurrency";
 import type { UtilityTariffCreateValidTo } from "./utilityTariffCreateValidTo";
 import type { UtilityTariffCreateIsActive } from "./utilityTariffCreateIsActive";
@@ -15,6 +16,7 @@ export interface UtilityTariffCreate {
   service_id: number;
   name: string;
   rate: number;
+  subscription_fee?: UtilityTariffCreateSubscriptionFee;
   currency?: UtilityTariffCreateCurrency;
   valid_from: string;
   valid_to?: UtilityTariffCreateValidTo;

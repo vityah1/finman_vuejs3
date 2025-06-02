@@ -165,7 +165,7 @@
 											<span v-else class="text-muted">Не вказано</span>
 										</td>
 										<td>
-											<strong v-if="reading.cost">{{ formatCurrency(reading.cost) }}</strong>
+											<strong v-if="reading.amount">{{ formatCurrency(reading.amount) }}</strong>
 											<span v-else class="text-muted">-</span>
 										</td>
 										<td>
@@ -228,7 +228,7 @@
 	</div>
 </template><script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { 
 	useGetAddressApiUtilitiesAddressesAddressIdGet,
 	useGetServicesApiUtilitiesServicesGet,
@@ -255,7 +255,7 @@ interface ReadingData {
 	current_reading: number;
 	previous_reading?: number;
 	consumption?: number;
-	cost?: number;
+	amount?: number;
 	is_paid: boolean;
 	tariff_id?: number;
 }
@@ -264,6 +264,7 @@ export default defineComponent({
 	name: 'ReadingList',
 	setup() {
 		const route = useRoute();
+		const router = useRouter();
 		const addressId = computed(() => parseInt(route.params.addressId as string));
 
 		// Filters
@@ -312,7 +313,7 @@ export default defineComponent({
 		const totalReadings = computed(() => filteredReadings.value.length);
 		const paidReadings = computed(() => filteredReadings.value.filter(r => r.is_paid).length);
 		const unpaidReadings = computed(() => filteredReadings.value.filter(r => !r.is_paid).length);
-		const totalCost = computed(() => filteredReadings.value.reduce((sum, r) => sum + (r.cost || 0), 0));
+		const totalCost = computed(() => filteredReadings.value.reduce((sum, r) => sum + (r.amount || 0), 0));
 
 		const hasFilters = computed(() => 
 			selectedPeriod.value || selectedService.value || selectedPaymentStatus.value
@@ -376,8 +377,16 @@ export default defineComponent({
 		};
 
 		const editReading = (reading: ReadingData) => {
-			// TODO: Implement edit functionality
-			console.log('Edit reading:', reading);
+			// Перенаправляємо на форму додавання показників з параметрами для редагування
+			router.push({
+				name: 'utilities_add_reading',
+				query: {
+					addressId: addressId.value,
+					serviceId: reading.service_id,
+					editReadingId: reading.id,
+					period: reading.period
+				}
+			});
 		};
 
 		const confirmDelete = (reading: ReadingData) => {

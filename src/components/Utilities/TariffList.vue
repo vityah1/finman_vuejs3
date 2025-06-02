@@ -38,6 +38,7 @@
 							<tr>
 								<th>Назва</th>
 								<th>Ставка</th>
+								<th>Абонплата</th>
 								<th>Валюта</th>
 								<th>Період дії</th>
 								<th>Статус</th>
@@ -51,6 +52,10 @@
 								</td>
 								<td>
 									<strong>{{ formatRate(tariff.rate) }}</strong>
+								</td>
+								<td>
+									<span v-if="tariff.subscription_fee">{{ formatRate(tariff.subscription_fee) }}</span>
+									<span v-else class="text-muted">-</span>
 								</td>
 								<td>{{ tariff.currency || 'UAH' }}</td>
 								<td>
@@ -104,7 +109,7 @@
 									   placeholder="Наприклад: Денний тариф, Нічний тариф">
 							</div>
 							<div class="row">
-								<div class="col-md-8">
+								<div class="col-md-6">
 									<div class="mb-3">
 										<label for="tariffRate" class="form-label">Ставка <span class="text-danger">*</span></label>
 										<input type="number" step="0.01" class="form-control" id="tariffRate" 
@@ -112,7 +117,18 @@
 											   placeholder="0.00">
 									</div>
 								</div>
-								<div class="col-md-4">
+								<div class="col-md-6">
+									<div class="mb-3">
+										<label for="subscriptionFee" class="form-label">Абонплата</label>
+										<input type="number" step="0.01" class="form-control" id="subscriptionFee" 
+											   v-model="tariffForm.subscription_fee" 
+											   placeholder="0.00">
+										<small class="form-text text-muted">Фіксована щомісячна плата (опціонально)</small>
+									</div>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-12">
 									<div class="mb-3">
 										<label for="tariffCurrency" class="form-label">Валюта</label>
 										<select class="form-control" id="tariffCurrency" v-model="tariffForm.currency">
@@ -200,6 +216,7 @@ interface TariffData {
 	service_id: number;
 	name: string;
 	rate: number;
+	subscription_fee?: number | null;
 	currency: string;
 	valid_from: string;
 	valid_to?: string;
@@ -225,6 +242,7 @@ export default defineComponent({
 		const tariffForm = reactive({
 			name: '',
 			rate: 0,
+			subscription_fee: 0,
 			currency: 'UAH',
 			valid_from: '',
 			valid_to: '',
@@ -249,6 +267,7 @@ export default defineComponent({
 		const resetForm = () => {
 			tariffForm.name = '';
 			tariffForm.rate = 0;
+			tariffForm.subscription_fee = 0;
 			tariffForm.currency = 'UAH';
 			tariffForm.valid_from = '';
 			tariffForm.valid_to = '';
@@ -260,6 +279,7 @@ export default defineComponent({
 			editingTariff.value = tariff;
 			tariffForm.name = tariff.name;
 			tariffForm.rate = tariff.rate;
+			tariffForm.subscription_fee = tariff.subscription_fee || 0;
 			tariffForm.currency = tariff.currency;
 			tariffForm.valid_from = tariff.valid_from;
 			tariffForm.valid_to = tariff.valid_to || '';
@@ -276,8 +296,19 @@ export default defineComponent({
 			isSaving.value = true;
 			
 			try {
-				// TODO: Implement save logic
-				console.log('Save tariff:', tariffForm);
+				const tariffData = {
+					service_id: serviceId.value,
+					name: tariffForm.name,
+					rate: tariffForm.rate,
+					subscription_fee: tariffForm.subscription_fee || null,
+					currency: tariffForm.currency,
+					valid_from: tariffForm.valid_from,
+					valid_to: tariffForm.valid_to || undefined,
+					is_active: tariffForm.is_active
+				};
+
+				// TODO: Implement save logic with real API
+				console.log('Save tariff:', tariffData);
 				closeModal();
 			} catch (error) {
 				console.error('Помилка збереження тарифу:', error);

@@ -6,6 +6,7 @@
  */
 import type { UtilityTariffUpdateName } from "./utilityTariffUpdateName";
 import type { UtilityTariffUpdateRate } from "./utilityTariffUpdateRate";
+import type { UtilityTariffUpdateSubscriptionFee } from "./utilityTariffUpdateSubscriptionFee";
 import type { UtilityTariffUpdateCurrency } from "./utilityTariffUpdateCurrency";
 import type { UtilityTariffUpdateValidFrom } from "./utilityTariffUpdateValidFrom";
 import type { UtilityTariffUpdateValidTo } from "./utilityTariffUpdateValidTo";
@@ -17,6 +18,7 @@ import type { UtilityTariffUpdateIsActive } from "./utilityTariffUpdateIsActive"
 export interface UtilityTariffUpdate {
   name?: UtilityTariffUpdateName;
   rate?: UtilityTariffUpdateRate;
+  subscription_fee?: UtilityTariffUpdateSubscriptionFee;
   currency?: UtilityTariffUpdateCurrency;
   valid_from?: UtilityTariffUpdateValidFrom;
   valid_to?: UtilityTariffUpdateValidTo;
