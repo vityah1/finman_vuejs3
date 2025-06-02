@@ -150,8 +150,8 @@
 										</td>
 										<td>
 											<strong>{{ reading.current_reading }}</strong>
-											<small v-if="reading.previous_reading" class="text-muted d-block">
-												попередній: {{ reading.previous_reading }}
+											<small v-if="getPreviousReading(reading)" class="text-muted d-block">
+												попередній: {{ getPreviousReading(reading) }}
 											</small>
 										</td>
 										<td>
@@ -394,6 +394,20 @@ export default defineComponent({
 			console.log('Delete reading:', reading);
 		};
 
+		const getPreviousReading = (reading: ReadingData): number | null => {
+			// Спочатку перевіряємо, чи є попередній показник в самому об'єкті
+			if (reading.previous_reading !== undefined && reading.previous_reading !== null) {
+				return reading.previous_reading;
+			}
+
+			// Шукаємо попередній показник в історії для тієї ж служби
+			const serviceReadings = readings.value
+				.filter(r => r.service_id === reading.service_id && r.period < reading.period)
+				.sort((a, b) => new Date(b.period).getTime() - new Date(a.period).getTime());
+
+			return serviceReadings.length > 0 ? serviceReadings[0].current_reading : null;
+		};
+
 		return {
 			// Data
 			addressId,
@@ -424,7 +438,8 @@ export default defineComponent({
 			resetFilters,
 			markAsPaid,
 			editReading,
-			confirmDelete
+			confirmDelete,
+			getPreviousReading
 		};
 	}
 });

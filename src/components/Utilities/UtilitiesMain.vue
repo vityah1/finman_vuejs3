@@ -90,7 +90,7 @@
 											<td>{{ formatPeriod(reading.period) }}</td>
 											<td>{{ reading.current_reading }}</td>
 											<td>{{ reading.consumption || '-' }}</td>
-											<td>{{ formatCurrency(reading.cost) }}</td>
+											<td>{{ formatCurrency(reading.amount) }}</td>
 										</tr>
 									</tbody>
 								</table>
@@ -147,7 +147,7 @@ interface ReadingData {
 	period: string;
 	current_reading: number;
 	consumption?: number;
-	cost?: number;
+	amount?: number;
 }
 
 interface AddressData {
@@ -192,7 +192,7 @@ export default defineComponent({
 
 		const currentMonthCost = computed(() => {
 			const totalCost = latestReadings.value.reduce((sum, reading) => {
-				return sum + (reading.cost || 0);
+				return sum + (reading.amount || 0);
 			}, 0);
 			return formatCurrency(totalCost);
 		});

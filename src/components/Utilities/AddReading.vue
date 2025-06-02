@@ -14,8 +14,8 @@
 							<li class="breadcrumb-item active">Додати показники</li>
 						</ol>
 					</nav>
-					<h2><i class="fas fa-plus me-2"></i>Додати показники лічильників</h2>
-					<p class="text-muted">Внесіть поточні показники ваших лічильників</p>
+					<h2><i class="fas fa-plus me-2"></i>{{ isEditing ? 'Редагувати' : 'Додати' }} показники лічильників</h2>
+					<p class="text-muted">{{ isEditing ? 'Редагуйте' : 'Внесіть поточні' }} показники ваших лічильників</p>
 				</div>
 			</div>
 
@@ -23,7 +23,7 @@
 				<div class="col-lg-8">
 					<div class="card">
 						<div class="card-header">
-							<h5 class="mb-0"><i class="fas fa-edit me-2"></i>Форма внесення показників</h5>
+							<h5 class="mb-0"><i class="fas fa-edit me-2"></i>{{ isEditing ? 'Редагування' : 'Форма внесення' }} показників</h5>
 						</div>
 						<div class="card-body">
 							<form @submit.prevent="saveReading">
@@ -136,7 +136,7 @@
 										<i class="fas fa-arrow-left me-2"></i>Назад
 									</router-link>
 									<button type="submit" class="btn btn-primary" :disabled="isSaving">
-										<i class="fas fa-save me-2"></i>{{ isSaving ? 'Збереження...' : 'Зберегти' }}
+										<i class="fas fa-save me-2"></i>{{ isSaving ? 'Збереження...' : (isEditing ? 'Оновити' : 'Зберегти') }}
 									</button>
 								</div>
 							</form>
@@ -219,7 +219,7 @@
 										</div>
 										<div class="text-end">
 											<div>{{ reading.current_reading }}</div>
-											<small class="text-muted">{{ formatCurrency(reading.cost) }}</small>
+											<small class="text-muted">{{ formatCurrency(reading.amount) }}</small>
 										</div>
 									</div>
 								</div>
@@ -266,9 +266,11 @@ import {
 	useGetServicesApiUtilitiesServicesGet,
 	useGetTariffsApiUtilitiesTariffsGet,
 	useGetReadingsApiUtilitiesReadingsGet,
-	useCreateReadingApiUtilitiesReadingsPost
+	useGetReadingApiUtilitiesReadingsReadingIdGet,
+	useCreateReadingApiUtilitiesReadingsPost,
+	useUpdateReadingApiUtilitiesReadingsReadingIdPatch
 } from '@/api/utilities/utilities';
-import type { UtilityReadingCreate } from '@/api/model';
+import type { UtilityReadingCreate, UtilityReadingUpdate } from '@/api/model';
 
 interface AddressData {
 	id: number;
@@ -299,7 +301,7 @@ interface ReadingData {
 	service_id: number;
 	period: string;
 	current_reading: number;
-	cost?: number;
+	amount?: number;
 }
 
 export default defineComponent({
@@ -311,16 +313,18 @@ export default defineComponent({
 		// Reactive state
 		const isSaving = ref(false);
 		const lastReadingHint = ref('');
+		const editReadingId = computed(() => route.query.editReadingId ? parseInt(route.query.editReadingId as string) : null);
+		const isEditing = computed(() => editReadingId.value !== null);
 
 		// Form data
 		const readingForm = reactive({
 			address_id: parseInt(route.query.addressId as string) || 0,
 			service_id: parseInt(route.query.serviceId as string) || 0,
-			period: new Date().toISOString().slice(0, 7), // Current month
+			period: route.query.period as string || new Date().toISOString().slice(0, 7),
 			current_reading: 0,
 			previous_reading: 0,
 			tariff_id: 0,
-			reading_date: new Date().toISOString().slice(0, 10), // Today
+			reading_date: new Date().toISOString().slice(0, 10),
 			is_paid: false,
 			notes: ''
 		});
@@ -337,7 +341,14 @@ export default defineComponent({
 		const { data: tariffsData } = useGetTariffsApiUtilitiesTariffsGet();
 		const { data: readingsData } = useGetReadingsApiUtilitiesReadingsGet();
 
+		// Edit reading data
+		const { data: editingReadingData } = useGetReadingApiUtilitiesReadingsReadingIdGet(
+			editReadingId,
+			{ query: { enabled: isEditing } }
+		);
+
 		const createReadingMutation = useCreateReadingApiUtilitiesReadingsPost();
+		const updateReadingMutation = useUpdateReadingApiUtilitiesReadingsReadingIdPatch();
 
 		// Computed properties
 		const addresses = computed(() => {
@@ -472,21 +483,39 @@ export default defineComponent({
 			isSaving.value = true;
 			
 			try {
-				const readingData: UtilityReadingCreate = {
-					address_id: readingForm.address_id,
-					service_id: readingForm.service_id,
-					period: readingForm.period,
-					current_reading: readingForm.current_reading,
-					previous_reading: readingForm.previous_reading || undefined,
-					tariff_id: readingForm.tariff_id,
-					reading_date: readingForm.reading_date || undefined,
-					is_paid: readingForm.is_paid || undefined,
-					notes: readingForm.notes || undefined
-				};
+				if (isEditing.value && editReadingId.value) {
+					// Update existing reading
+					const updateData: UtilityReadingUpdate = {
+						current_reading: readingForm.current_reading,
+						previous_reading: readingForm.previous_reading || undefined,
+						tariff_id: readingForm.tariff_id,
+						reading_date: readingForm.reading_date || undefined,
+						is_paid: readingForm.is_paid || undefined,
+						notes: readingForm.notes || undefined
+					};
 
-				await createReadingMutation.mutateAsync({
-					data: readingData
-				});
+					await updateReadingMutation.mutateAsync({
+						readingId: editReadingId.value,
+						data: updateData
+					});
+				} else {
+					// Create new reading
+					const readingData: UtilityReadingCreate = {
+						address_id: readingForm.address_id,
+						service_id: readingForm.service_id,
+						period: readingForm.period,
+						current_reading: readingForm.current_reading,
+						previous_reading: readingForm.previous_reading || undefined,
+						tariff_id: readingForm.tariff_id,
+						reading_date: readingForm.reading_date || undefined,
+						is_paid: readingForm.is_paid || undefined,
+						notes: readingForm.notes || undefined
+					};
+
+					await createReadingMutation.mutateAsync({
+						data: readingData
+					});
+				}
 
 				// Navigate back to utilities main page
 				router.push({ name: 'utilities' });
@@ -503,6 +532,25 @@ export default defineComponent({
 			calculateConsumption
 		);
 
+		// Watch for editing data
+		watch(editingReadingData, (data) => {
+			if (data?.data && isEditing.value) {
+				const reading = data.data as any;
+				readingForm.address_id = reading.address_id;
+				readingForm.service_id = reading.service_id;
+				readingForm.period = reading.period;
+				readingForm.current_reading = reading.current_reading;
+				readingForm.previous_reading = reading.previous_reading || 0;
+				readingForm.tariff_id = reading.tariff_id;
+				readingForm.reading_date = reading.reading_date ? reading.reading_date.slice(0, 10) : new Date().toISOString().slice(0, 10);
+				readingForm.is_paid = reading.is_paid || false;
+				readingForm.notes = reading.notes || '';
+				
+				// Recalculate consumption
+				calculateConsumption();
+			}
+		}, { immediate: true });
+
 		// Initialize form with query parameters
 		onMounted(() => {
 			if (readingForm.address_id && availableTariffs.value.length === 1) {
@@ -515,6 +563,7 @@ export default defineComponent({
 			readingForm,
 			calculationData,
 			isSaving,
+			isEditing,
 			lastReadingHint,
 			addresses,
 			filteredServices,
