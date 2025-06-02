@@ -2,10 +2,27 @@
 	<div class="tariff-list">
 		<div class="container-fluid">
 			<div class="row mb-4">
-				<div class="col-sm-8">
+				<div class="col-sm-6">
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item">
+								<router-link :to="{ name: 'utilities' }">Комунальні</router-link>
+							</li>
+							<li class="breadcrumb-item">
+								<router-link :to="{ name: 'utilities_addresses' }">Адреси</router-link>
+							</li>
+							<li class="breadcrumb-item">
+								<router-link :to="getServicesRoute()">Служби</router-link>
+							</li>
+							<li class="breadcrumb-item active">Тарифи</li>
+						</ol>
+					</nav>
 					<h2><i class="fas fa-money-bill me-2"></i>Тарифи</h2>
 				</div>
-				<div class="col-sm-4 text-end">
+				<div class="col-sm-6 text-end">
+					<router-link :to="getServicesRoute()" class="btn btn-secondary me-2">
+						<i class="fas fa-arrow-left me-2"></i>Назад до служб
+					</router-link>
 					<button class="btn btn-primary" @click="showAddModal = true">
 						<i class="fas fa-plus me-2"></i>Додати тариф
 					</button>
@@ -208,8 +225,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, reactive, computed } from 'vue';
+import { defineComponent, ref, reactive, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
+import { 
+	useGetTariffsApiUtilitiesTariffsGet,
+	useGetServiceApiUtilitiesServicesServiceIdGet 
+} from '@/api/utilities/utilities';
 
 interface TariffData {
 	id: number;
@@ -236,7 +257,6 @@ export default defineComponent({
 		const tariffToDelete = ref<TariffData | null>(null);
 		const isSaving = ref(false);
 		const isDeleting = ref(false);
-		const isLoading = ref(false);
 
 		// Form data
 		const tariffForm = reactive({
@@ -250,7 +270,14 @@ export default defineComponent({
 		});
 
 		// Mock data for now
-		const tariffs = computed(() => [] as TariffData[]);
+		const { data: tariffsData, isLoading } = useGetTariffsApiUtilitiesTariffsGet({
+			service_id: serviceId.value
+		});
+
+		const { data: serviceDataResponse } = useGetServiceApiUtilitiesServicesServiceIdGet(serviceId);
+
+		const tariffs = computed(() => (tariffsData.value?.data as TariffData[]) || []);
+		const serviceData = computed(() => serviceDataResponse.value?.data as any);
 
 		// Methods
 		const formatRate = (rate: number): string => {
@@ -339,9 +366,18 @@ export default defineComponent({
 			}
 		};
 
+		const getServicesRoute = () => {
+			const addressId = serviceData.value?.address_id;
+			if (addressId) {
+				return { name: 'utilities_services', params: { addressId } };
+			}
+			return { name: 'utilities_addresses' };
+		};
+
 		return {
 			// Data
 			tariffs,
+			serviceData,
 			isLoading,
 			showAddModal,
 			showDeleteModal,
@@ -358,7 +394,8 @@ export default defineComponent({
 			closeModal,
 			saveTariff,
 			confirmDelete,
-			deleteTariff
+			deleteTariff,
+			getServicesRoute
 		};
 	}
 });
@@ -367,6 +404,11 @@ export default defineComponent({
 <style scoped>
 .tariff-list {
 	padding: 20px 0;
+}
+
+.breadcrumb {
+	background: none;
+	padding: 0;
 }
 
 .modal {

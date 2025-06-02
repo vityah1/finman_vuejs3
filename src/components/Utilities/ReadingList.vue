@@ -134,7 +134,6 @@
 										<th>Служба</th>
 										<th>Показник</th>
 										<th>Споживання</th>
-										<th>Тариф</th>
 										<th>Вартість</th>
 										<th>Оплата</th>
 										<th>Дії</th>
@@ -159,10 +158,6 @@
 												{{ reading.consumption }}
 											</span>
 											<span v-else class="text-muted">-</span>
-										</td>
-										<td>
-											<span v-if="reading.tariff_id">{{ getTariffName(reading.tariff_id) }}</span>
-											<span v-else class="text-muted">Не вказано</span>
 										</td>
 										<td>
 											<strong v-if="reading.amount">{{ formatCurrency(reading.amount) }}</strong>

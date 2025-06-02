@@ -103,7 +103,8 @@
 												<input type="number" step="0.001" class="form-control" id="previousReading" 
 													   v-model="readingForm.previous_reading" 
 													   @input="calculateConsumption" 
-													   :placeholder="lastReadingHint">
+													   :placeholder="lastReadingHint"
+													   :readonly="isEditing">
 												<span v-if="selectedService" class="input-group-text">{{ selectedService.unit }}</span>
 											</div>
 											<small class="form-text text-muted">
@@ -132,9 +133,10 @@
 								</div>
 
 								<div class="d-flex justify-content-between">
-									<router-link :to="{ name: 'utilities' }" class="btn btn-secondary">
+									<button type="button" class="btn btn-secondary" @click="goBack">
 										<i class="fas fa-arrow-left me-2"></i>Назад
-									</router-link>
+									</button>
+
 									<button type="submit" class="btn btn-primary" :disabled="isSaving">
 										<i class="fas fa-save me-2"></i>{{ isSaving ? 'Збереження...' : (isEditing ? 'Оновити' : 'Зберегти') }}
 									</button>
@@ -445,17 +447,19 @@ export default defineComponent({
 				readingForm.tariff_id = availableTariffs.value[0].id;
 			}
 
-			// Get last reading for this service
-			const lastReading = readings.value
-				.filter(reading => reading.service_id === readingForm.service_id)
-				.sort((a, b) => new Date(b.period).getTime() - new Date(a.period).getTime())[0];
+			// Get last reading for this service only if not editing
+			if (!isEditing.value) {
+				const lastReading = readings.value
+					.filter(reading => reading.service_id === readingForm.service_id)
+					.sort((a, b) => new Date(b.period).getTime() - new Date(a.period).getTime())[0];
 
-			if (lastReading) {
-				readingForm.previous_reading = lastReading.current_reading;
-				lastReadingHint.value = lastReading.current_reading.toString();
-			} else {
-				readingForm.previous_reading = 0;
-				lastReadingHint.value = '';
+				if (lastReading) {
+					readingForm.previous_reading = lastReading.current_reading;
+					lastReadingHint.value = lastReading.current_reading.toString();
+				} else {
+					readingForm.previous_reading = 0;
+					lastReadingHint.value = '';
+				}
 			}
 
 			calculateConsumption();
@@ -517,13 +521,27 @@ export default defineComponent({
 					});
 				}
 
-				// Navigate back to utilities main page
-				router.push({ name: 'utilities' });
+				// Navigate back to reading list
+				router.push({ 
+					name: 'utilities_readings', 
+					params: { addressId: readingForm.address_id } 
+				});
 			} catch (error) {
 				console.error('Помилка збереження показника:', error);
 				// TODO: Show error message to user
 			} finally {
 				isSaving.value = false;
+			}
+		};
+
+		const goBack = () => {
+			if (readingForm.address_id) {
+				router.push({ 
+					name: 'utilities_readings', 
+					params: { addressId: readingForm.address_id } 
+				});
+			} else {
+				router.push({ name: 'utilities' });
 			}
 		};
 
@@ -545,6 +563,21 @@ export default defineComponent({
 				readingForm.reading_date = reading.reading_date ? reading.reading_date.slice(0, 10) : new Date().toISOString().slice(0, 10);
 				readingForm.is_paid = reading.is_paid || false;
 				readingForm.notes = reading.notes || '';
+				
+				// Set hint for previous reading in editing mode
+				if (reading.previous_reading) {
+					lastReadingHint.value = reading.previous_reading.toString();
+				} else if (readingForm.service_id) {
+					// Find previous reading from history if not set
+					const previousReading = readings.value
+						.filter(r => r.service_id === readingForm.service_id && r.period < reading.period)
+						.sort((a, b) => new Date(b.period).getTime() - new Date(a.period).getTime())[0];
+					
+					if (previousReading) {
+						readingForm.previous_reading = previousReading.current_reading;
+						lastReadingHint.value = previousReading.current_reading.toString();
+					}
+				}
 				
 				// Recalculate consumption
 				calculateConsumption();
@@ -580,7 +613,8 @@ export default defineComponent({
 			onAddressChange,
 			onServiceChange,
 			calculateConsumption,
-			saveReading
+			saveReading,
+			goBack
 		};
 	}
 });
