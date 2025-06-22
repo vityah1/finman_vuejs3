@@ -88,7 +88,10 @@
 <script lang="ts">
 import ConfigService from "../../services/ConfigService";
 import { defineComponent } from 'vue';
-import type { ConfigCreate, ConfigUpdate, CategoryCreate, CategoryUpdate } from '../../api/model';
+import type { ConfigCreate } from '@/api/model/configCreate';
+import type { ConfigUpdate } from '@/api/model/configUpdate';
+import type { CategoryCreate } from '@/api/model/categoryCreate';
+import type { CategoryUpdate } from '@/api/model/categoryUpdate';
 
 // Використовуємо інтерфейс для типів конфігурацій, які повертає API
 interface ConfigType {

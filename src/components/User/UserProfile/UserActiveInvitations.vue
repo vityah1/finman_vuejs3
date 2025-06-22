@@ -111,7 +111,7 @@ import {
 import {
   useDeleteInvitationApiInvitationsInvitationIdDelete
 } from '@/api/invitations/invitations';
-import type { GroupInvitationCreate } from '@/api/model';
+import type { GroupInvitationCreate } from '@/api/model/groupInvitationCreate';
 
 interface Group {
   id: number;

@@ -54,9 +54,11 @@
 						<thead>
 							<tr>
 								<th>Назва</th>
+								<th>Тип</th>
 								<th>Ставка</th>
 								<th>Абонплата</th>
 								<th>Валюта</th>
+								<th>Група</th>
 								<th>Період дії</th>
 								<th>Статус</th>
 								<th>Дії</th>
@@ -68,13 +70,25 @@
 									<strong>{{ tariff.name }}</strong>
 								</td>
 								<td>
+									<span v-if="tariff.tariff_type" class="badge bg-info">{{ getTariffTypeLabel(tariff.tariff_type) }}</span>
+									<span v-else class="text-muted">-</span>
+								</td>
+								<td>
 									<strong>{{ formatRate(tariff.rate) }}</strong>
+									<span v-if="tariff.calculation_method === 'percentage' && tariff.percentage_of" 
+										  class="text-muted d-block">
+										<small>({{ tariff.percentage_of }}% від основного)</small>
+									</span>
 								</td>
 								<td>
 									<span v-if="tariff.subscription_fee">{{ formatRate(tariff.subscription_fee) }}</span>
 									<span v-else class="text-muted">-</span>
 								</td>
 								<td>{{ tariff.currency || 'UAH' }}</td>
+								<td>
+									<span v-if="tariff.group_code" class="badge bg-secondary">{{ tariff.group_code }}</span>
+									<span v-else class="text-muted">-</span>
+								</td>
 								<td>
 									<small class="text-muted d-block">
 										з {{ formatDate(tariff.valid_from) }}
@@ -180,6 +194,56 @@
 									Активний тариф
 								</label>
 							</div>
+							
+							<!-- Розширені налаштування -->
+							<hr class="my-3">
+							<h6>Розширені налаштування</h6>
+							
+							<div class="row">
+								<div class="col-md-6">
+									<div class="mb-3">
+										<label for="tariffType" class="form-label">Тип тарифу</label>
+										<select class="form-control" id="tariffType" v-model="tariffForm.tariff_type">
+											<option value="">Стандартний</option>
+											<option value="consumption">Споживання (вода)</option>
+											<option value="drainage">Водовідведення</option>
+											<option value="day">Денний (електрика)</option>
+											<option value="night">Нічний (електрика)</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md-6">
+									<div class="mb-3">
+										<label for="groupCode" class="form-label">Код групи</label>
+										<input type="text" class="form-control" id="groupCode" 
+											   v-model="tariffForm.group_code"
+											   placeholder="Наприклад: water_2025">
+										<small class="form-text text-muted">Для групування пов'язаних тарифів</small>
+									</div>
+								</div>
+							</div>
+							
+							<div class="row">
+								<div class="col-md-6">
+									<div class="mb-3">
+										<label for="calculationMethod" class="form-label">Метод розрахунку</label>
+										<select class="form-control" id="calculationMethod" v-model="tariffForm.calculation_method">
+											<option value="standard">Стандартний</option>
+											<option value="percentage">Відсоток від основного</option>
+											<option value="fixed">Фіксована сума</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md-6" v-if="tariffForm.calculation_method === 'percentage'">
+									<div class="mb-3">
+										<label for="percentageOf" class="form-label">Відсоток</label>
+										<input type="number" step="0.01" class="form-control" id="percentageOf" 
+											   v-model="tariffForm.percentage_of"
+											   placeholder="80">
+										<small class="form-text text-muted">Відсоток від основного тарифу</small>
+									</div>
+								</div>
+							</div>
 						</form>
 					</div>
 					<div class="modal-footer">
@@ -229,7 +293,10 @@ import { defineComponent, ref, reactive, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { 
 	useGetTariffsApiUtilitiesTariffsGet,
-	useGetServiceApiUtilitiesServicesServiceIdGet 
+	useGetServiceApiUtilitiesServicesServiceIdGet,
+	useCreateTariffApiUtilitiesTariffsPost,
+	useUpdateTariffApiUtilitiesTariffsTariffIdPatch,
+	useDeleteTariffApiUtilitiesTariffsTariffIdDelete
 } from '@/api/utilities/utilities';
 
 interface TariffData {
@@ -242,6 +309,11 @@ interface TariffData {
 	valid_from: string;
 	valid_to?: string;
 	is_active: boolean;
+	// Нові поля
+	tariff_type?: string;
+	group_code?: string;
+	calculation_method?: string;
+	percentage_of?: number;
 }
 
 export default defineComponent({
@@ -266,7 +338,12 @@ export default defineComponent({
 			currency: 'UAH',
 			valid_from: '',
 			valid_to: '',
-			is_active: true
+			is_active: true,
+			// Нові поля
+			tariff_type: '',
+			group_code: '',
+			calculation_method: 'standard',
+			percentage_of: null as number | null
 		});
 
 		// Mock data for now
@@ -275,6 +352,11 @@ export default defineComponent({
 		});
 
 		const { data: serviceDataResponse } = useGetServiceApiUtilitiesServicesServiceIdGet(serviceId);
+
+		// Mutations
+		const createTariffMutation = useCreateTariffApiUtilitiesTariffsPost();
+		const updateTariffMutation = useUpdateTariffApiUtilitiesTariffsTariffIdPatch();
+		const deleteTariffMutation = useDeleteTariffApiUtilitiesTariffsTariffIdDelete();
 
 		const tariffs = computed(() => (tariffsData.value?.data as TariffData[]) || []);
 		const serviceData = computed(() => serviceDataResponse.value?.data as any);
@@ -290,6 +372,17 @@ export default defineComponent({
 		const formatDate = (dateString: string): string => {
 			return new Date(dateString).toLocaleDateString('uk-UA');
 		};
+		
+		const getTariffTypeLabel = (type: string): string => {
+			const types: Record<string, string> = {
+				consumption: 'Споживання',
+				drainage: 'Водовідведення',
+				day: 'Денний',
+				night: 'Нічний',
+				standard: 'Стандартний'
+			};
+			return types[type] || type;
+		};
 
 		const resetForm = () => {
 			tariffForm.name = '';
@@ -299,6 +392,11 @@ export default defineComponent({
 			tariffForm.valid_from = '';
 			tariffForm.valid_to = '';
 			tariffForm.is_active = true;
+			// Скидання нових полів
+			tariffForm.tariff_type = '';
+			tariffForm.group_code = '';
+			tariffForm.calculation_method = 'standard';
+			tariffForm.percentage_of = null;
 			editingTariff.value = null;
 		};
 
@@ -311,6 +409,11 @@ export default defineComponent({
 			tariffForm.valid_from = tariff.valid_from;
 			tariffForm.valid_to = tariff.valid_to || '';
 			tariffForm.is_active = tariff.is_active;
+			// Заповнення нових полів
+			tariffForm.tariff_type = tariff.tariff_type || '';
+			tariffForm.group_code = tariff.group_code || '';
+			tariffForm.calculation_method = tariff.calculation_method || 'standard';
+			tariffForm.percentage_of = tariff.percentage_of || null;
 			showAddModal.value = true;
 		};
 
@@ -327,15 +430,31 @@ export default defineComponent({
 					service_id: serviceId.value,
 					name: tariffForm.name,
 					rate: tariffForm.rate,
-					subscription_fee: tariffForm.subscription_fee || null,
+					subscription_fee: tariffForm.subscription_fee || 0,
 					currency: tariffForm.currency,
 					valid_from: tariffForm.valid_from,
 					valid_to: tariffForm.valid_to || undefined,
-					is_active: tariffForm.is_active
+					is_active: tariffForm.is_active,
+					// Нові поля
+					tariff_type: tariffForm.tariff_type || undefined,
+					group_code: tariffForm.group_code || undefined,
+					calculation_method: tariffForm.calculation_method,
+					percentage_of: tariffForm.percentage_of || undefined
 				};
 
-				// TODO: Implement save logic with real API
-				console.log('Save tariff:', tariffData);
+				if (editingTariff.value) {
+					// Update existing tariff
+					await updateTariffMutation.mutateAsync({
+						tariffId: editingTariff.value.id,
+						data: tariffData
+					});
+				} else {
+					// Create new tariff
+					await createTariffMutation.mutateAsync({
+						data: tariffData
+					});
+				}
+				
 				closeModal();
 			} catch (error) {
 				console.error('Помилка збереження тарифу:', error);
@@ -355,8 +474,10 @@ export default defineComponent({
 			isDeleting.value = true;
 			
 			try {
-				// TODO: Implement delete logic
-				console.log('Delete tariff:', tariffToDelete.value);
+				await deleteTariffMutation.mutateAsync({
+					tariffId: tariffToDelete.value.id
+				});
+				
 				showDeleteModal.value = false;
 				tariffToDelete.value = null;
 			} catch (error) {
@@ -390,6 +511,7 @@ export default defineComponent({
 			// Methods
 			formatRate,
 			formatDate,
+			getTariffTypeLabel,
 			editTariff,
 			closeModal,
 			saveTariff,

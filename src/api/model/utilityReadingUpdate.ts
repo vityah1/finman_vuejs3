@@ -4,6 +4,7 @@
  * FinMan API
  * OpenAPI spec version: 1.0.0
  */
+import type { UtilityReadingUpdatePeriod } from "./utilityReadingUpdatePeriod";
 import type { UtilityReadingUpdateCurrentReading } from "./utilityReadingUpdateCurrentReading";
 import type { UtilityReadingUpdatePreviousReading } from "./utilityReadingUpdatePreviousReading";
 import type { UtilityReadingUpdateTariffId } from "./utilityReadingUpdateTariffId";
@@ -15,6 +16,7 @@ import type { UtilityReadingUpdateNotes } from "./utilityReadingUpdateNotes";
  * Схема для оновлення показника
  */
 export interface UtilityReadingUpdate {
+  period?: UtilityReadingUpdatePeriod;
   current_reading?: UtilityReadingUpdateCurrentReading;
   previous_reading?: UtilityReadingUpdatePreviousReading;
   tariff_id?: UtilityReadingUpdateTariffId;

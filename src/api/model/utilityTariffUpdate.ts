@@ -11,6 +11,10 @@ import type { UtilityTariffUpdateCurrency } from "./utilityTariffUpdateCurrency"
 import type { UtilityTariffUpdateValidFrom } from "./utilityTariffUpdateValidFrom";
 import type { UtilityTariffUpdateValidTo } from "./utilityTariffUpdateValidTo";
 import type { UtilityTariffUpdateIsActive } from "./utilityTariffUpdateIsActive";
+import type { UtilityTariffUpdateTariffType } from "./utilityTariffUpdateTariffType";
+import type { UtilityTariffUpdateGroupCode } from "./utilityTariffUpdateGroupCode";
+import type { UtilityTariffUpdateCalculationMethod } from "./utilityTariffUpdateCalculationMethod";
+import type { UtilityTariffUpdatePercentageOf } from "./utilityTariffUpdatePercentageOf";
 
 /**
  * Схема для оновлення тарифу
@@ -23,4 +27,8 @@ export interface UtilityTariffUpdate {
   valid_from?: UtilityTariffUpdateValidFrom;
   valid_to?: UtilityTariffUpdateValidTo;
   is_active?: UtilityTariffUpdateIsActive;
+  tariff_type?: UtilityTariffUpdateTariffType;
+  group_code?: UtilityTariffUpdateGroupCode;
+  calculation_method?: UtilityTariffUpdateCalculationMethod;
+  percentage_of?: UtilityTariffUpdatePercentageOf;
 }

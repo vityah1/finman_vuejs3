@@ -8,6 +8,10 @@ import type { UtilityTariffCreateSubscriptionFee } from "./utilityTariffCreateSu
 import type { UtilityTariffCreateCurrency } from "./utilityTariffCreateCurrency";
 import type { UtilityTariffCreateValidTo } from "./utilityTariffCreateValidTo";
 import type { UtilityTariffCreateIsActive } from "./utilityTariffCreateIsActive";
+import type { UtilityTariffCreateTariffType } from "./utilityTariffCreateTariffType";
+import type { UtilityTariffCreateGroupCode } from "./utilityTariffCreateGroupCode";
+import type { UtilityTariffCreateCalculationMethod } from "./utilityTariffCreateCalculationMethod";
+import type { UtilityTariffCreatePercentageOf } from "./utilityTariffCreatePercentageOf";
 
 /**
  * Схема для створення тарифу
@@ -21,4 +25,8 @@ export interface UtilityTariffCreate {
   valid_from: string;
   valid_to?: UtilityTariffCreateValidTo;
   is_active?: UtilityTariffCreateIsActive;
+  tariff_type?: UtilityTariffCreateTariffType;
+  group_code?: UtilityTariffCreateGroupCode;
+  calculation_method?: UtilityTariffCreateCalculationMethod;
+  percentage_of?: UtilityTariffCreatePercentageOf;
 }

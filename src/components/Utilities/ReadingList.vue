@@ -1,6 +1,15 @@
 <template>
 	<div class="reading-list">
-		<div class="container-fluid">
+		<div v-if="!addressId || addressId === 0" class="container-fluid">
+			<div class="alert alert-warning">
+				<i class="fas fa-exclamation-triangle me-2"></i>
+				Невірна адреса. Будь ласка, оберіть адресу зі списку.
+				<router-link :to="{ name: 'utilities_addresses' }" class="btn btn-sm btn-primary ms-3">
+					Перейти до адрес
+				</router-link>
+			</div>
+		</div>
+		<div v-else class="container-fluid">
 			<div class="row mb-4">
 				<div class="col-sm-8">
 					<nav aria-label="breadcrumb">
@@ -31,7 +40,7 @@
 			<div class="row mb-4">
 				<div class="col-md-3">
 					<label for="periodFilter" class="form-label">Період</label>
-					<input type="month" class="form-control" id="periodFilter" v-model="selectedPeriod">
+					<MonthSelector v-model="selectedPeriod" />
 				</div>
 				<div class="col-md-3">
 					<label for="serviceFilter" class="form-label">Служба</label>
@@ -80,156 +89,27 @@
 			</div>
 
 			<div v-else>
-				<!-- Summary cards -->
-				<div class="row mb-4">
-					<div class="col-lg-3 col-md-6 mb-3">
-						<div class="card text-center">
-							<div class="card-body">
-								<i class="fas fa-calendar fa-2x text-primary mb-2"></i>
-								<h5 class="card-title">{{ totalReadings }}</h5>
-								<p class="card-text">Показників</p>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-3 col-md-6 mb-3">
-						<div class="card text-center">
-							<div class="card-body">
-								<i class="fas fa-money-bill fa-2x text-success mb-2"></i>
-								<h5 class="card-title">{{ formatCurrency(totalCost) }}</h5>
-								<p class="card-text">Загальна вартість</p>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-3 col-md-6 mb-3">
-						<div class="card text-center">
-							<div class="card-body">
-								<i class="fas fa-check fa-2x text-info mb-2"></i>
-								<h5 class="card-title">{{ paidReadings }}</h5>
-								<p class="card-text">Оплачено</p>
-							</div>
-						</div>
-					</div>
-					<div class="col-lg-3 col-md-6 mb-3">
-						<div class="card text-center">
-							<div class="card-body">
-								<i class="fas fa-exclamation fa-2x text-warning mb-2"></i>
-								<h5 class="card-title">{{ unpaidReadings }}</h5>
-								<p class="card-text">До оплати</p>
-							</div>
-						</div>
-					</div>
-				</div>
-
-				<!-- Readings table -->
-				<div class="card">
-					<div class="card-header">
-						<h5 class="mb-0"><i class="fas fa-table me-2"></i>Показники лічильників</h5>
-					</div>
-					<div class="card-body">
-						<div class="table-responsive">
-							<table class="table table-hover">
-								<thead>
-									<tr>
-										<th>Період</th>
-										<th>Служба</th>
-										<th>Показник</th>
-										<th>Споживання</th>
-										<th>Вартість</th>
-										<th>Оплата</th>
-										<th>Дії</th>
-									</tr>
-								</thead>
-								<tbody>
-									<tr v-for="reading in paginatedReadings" :key="`${reading.service_id}-${reading.period}`"
-										:class="{ 'table-success': reading.is_paid }">
-										<td>{{ formatPeriod(reading.period) }}</td>
-										<td>
-											<strong>{{ getServiceName(reading.service_id) }}</strong>
-											<small class="text-muted d-block">{{ getServiceUnit(reading.service_id) }}</small>
-										</td>
-										<td>
-											<strong>{{ reading.current_reading }}</strong>
-											<small v-if="getPreviousReading(reading)" class="text-muted d-block">
-												попередній: {{ getPreviousReading(reading) }}
-											</small>
-										</td>
-										<td>
-											<span v-if="reading.consumption" class="badge bg-primary">
-												{{ reading.consumption }}
-											</span>
-											<span v-else class="text-muted">-</span>
-										</td>
-										<td>
-											<strong v-if="reading.amount">{{ formatCurrency(reading.amount) }}</strong>
-											<span v-else class="text-muted">-</span>
-										</td>
-										<td>
-											<span v-if="reading.is_paid" class="badge bg-success">
-												<i class="fas fa-check me-1"></i>Оплачено
-											</span>
-											<button v-else class="btn btn-sm btn-outline-warning" 
-													@click="markAsPaid(reading)">
-												<i class="fas fa-money-bill me-1"></i>Оплатити
-											</button>
-										</td>
-										<td>
-											<div class="btn-group btn-group-sm">
-												<button class="btn btn-outline-primary" @click="editReading(reading)">
-													<i class="fas fa-edit"></i>
-												</button>
-												<button class="btn btn-outline-danger" @click="confirmDelete(reading)">
-													<i class="fas fa-trash"></i>
-												</button>
-											</div>
-										</td>
-									</tr>
-								</tbody>
-							</table>
-						</div>
-
-						<!-- Pagination -->
-						<nav v-if="totalPages > 1" aria-label="Навігація по сторінках">
-							<ul class="pagination justify-content-center">
-								<li class="page-item" :class="{ disabled: currentPage === 1 }">
-									<button class="page-link" @click="currentPage = 1" :disabled="currentPage === 1">
-										<i class="fas fa-angle-double-left"></i>
-									</button>
-								</li>
-								<li class="page-item" :class="{ disabled: currentPage === 1 }">
-									<button class="page-link" @click="currentPage -= 1" :disabled="currentPage === 1">
-										<i class="fas fa-angle-left"></i>
-									</button>
-								</li>
-								<li v-for="page in visiblePages" :key="page" 
-									class="page-item" :class="{ active: page === currentPage }">
-									<button class="page-link" @click="currentPage = page">{{ page }}</button>
-								</li>
-								<li class="page-item" :class="{ disabled: currentPage === totalPages }">
-									<button class="page-link" @click="currentPage += 1" :disabled="currentPage === totalPages">
-										<i class="fas fa-angle-right"></i>
-									</button>
-								</li>
-								<li class="page-item" :class="{ disabled: currentPage === totalPages }">
-									<button class="page-link" @click="currentPage = totalPages" :disabled="currentPage === totalPages">
-										<i class="fas fa-angle-double-right"></i>
-									</button>
-								</li>
-							</ul>
-						</nav>
-					</div>
-				</div>
+				<!-- Grouped view always -->
+				<GroupedReadings 
+					:addressId="addressId" 
+					:period="selectedPeriod || currentPeriod" 
+				/>
 			</div>
 		</div>
 	</div>
 </template><script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent, ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { 
 	useGetAddressApiUtilitiesAddressesAddressIdGet,
 	useGetServicesApiUtilitiesServicesGet,
 	useGetReadingsApiUtilitiesReadingsGet,
-	useUpdateReadingApiUtilitiesReadingsReadingIdPatch
+	useUpdateReadingApiUtilitiesReadingsReadingIdPatch,
+	useGetTariffsApiUtilitiesTariffsGet,
+	useGetLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet
 } from '@/api/utilities/utilities';
+import GroupedReadings from './GroupedReadings.vue';
+import MonthSelector from './MonthSelector.vue';
 
 interface AddressData {
 	id: number;
@@ -244,7 +124,7 @@ interface ServiceData {
 }
 
 interface ReadingData {
-	id: number;
+	id?: number;
 	service_id: number;
 	period: string;
 	current_reading: number;
@@ -253,14 +133,30 @@ interface ReadingData {
 	amount?: number;
 	is_paid: boolean;
 	tariff_id?: number;
+	reading_date?: string;
+	calculation_details?: string;
+}
+
+interface TariffData {
+	id: number;
+	name: string;
 }
 
 export default defineComponent({
 	name: 'ReadingList',
+	components: {
+		GroupedReadings,
+		MonthSelector
+	},
 	setup() {
 		const route = useRoute();
 		const router = useRouter();
-		const addressId = computed(() => parseInt(route.params.addressId as string));
+		const addressId = computed(() => {
+			const id = route.params.addressId;
+			const parsedId = id ? parseInt(id as string) : 0;
+			console.log('AddressId from route:', id, 'Parsed:', parsedId);
+			return parsedId;
+		});
 
 		// Filters
 		const selectedPeriod = ref('');
@@ -268,18 +164,72 @@ export default defineComponent({
 		const selectedPaymentStatus = ref('');
 		const currentPage = ref(1);
 		const itemsPerPage = 20;
+		
+		// UI state
+		const expandedReadings = ref(new Set<number>());
+		const viewMode = ref<'list' | 'grouped'>('grouped'); // За замовчуванням групований вигляд
+		const currentPeriod = computed(() => new Date().toISOString().slice(0, 7));
 
-		// API calls
-		const { data: addressData } = useGetAddressApiUtilitiesAddressesAddressIdGet(addressId);
-		const { data: servicesData } = useGetServicesApiUtilitiesServicesGet({ address_id: addressId.value });
-		const { data: readingsData, isLoading } = useGetReadingsApiUtilitiesReadingsGet({
-			address_id: addressId.value
-		});
+		// API calls - only call if addressId is valid
+		const { data: addressData } = useGetAddressApiUtilitiesAddressesAddressIdGet(
+			addressId,
+			{ query: { enabled: computed(() => addressId.value > 0) } }
+		);
+		const { data: servicesData } = useGetServicesApiUtilitiesServicesGet(
+			computed(() => addressId.value > 0 ? { address_id: addressId.value } : {}),
+			{ query: { enabled: computed(() => addressId.value > 0) } }
+		);
+		
+		// Отримуємо останній період з показниками
+		const { data: latestPeriodData } = useGetLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet(
+			addressId,
+			{ query: { enabled: computed(() => addressId.value > 0 && !selectedPeriod.value) } }
+		);
+		
+		// Автоматично встановлюємо останній період
+		watch(latestPeriodData, (data) => {
+			console.log('Latest period data:', data);
+			if (data?.data && typeof data.data === 'object' && 'period' in data.data) {
+				const periodValue = (data.data as { period: string }).period;
+				if (periodValue) {
+					selectedPeriod.value = periodValue;
+				}
+			}
+		}, { immediate: true });
+		
+		const { data: readingsData, isLoading } = useGetReadingsApiUtilitiesReadingsGet(
+			computed(() => addressId.value > 0 ? { 
+				address_id: addressId.value,
+				period: selectedPeriod.value || undefined 
+			} : {}),
+			{ 
+				query: { 
+					enabled: computed(() => addressId.value > 0),
+					refetchOnMount: true,
+					staleTime: 0
+				} 
+			}
+		);
+		const { data: tariffsData } = useGetTariffsApiUtilitiesTariffsGet();
 
 		// Computed properties
 		const currentAddress = computed(() => addressData.value?.data as AddressData);
 		const services = computed(() => (servicesData.value?.data as ServiceData[]) || []);
-		const readings = computed(() => (readingsData.value?.data as ReadingData[]) || []);
+		const readings = computed(() => {
+			const data = readingsData.value?.data;
+			console.log('Raw readings data from API:', readingsData.value);
+			console.log('Extracted readings data:', data);
+			
+			if (Array.isArray(data)) {
+				return data as ReadingData[];
+			} else if (data && typeof data === 'object') {
+				// Якщо дані обгорнуті в об'єкт
+				console.log('Data is object, trying to extract array');
+				return (data as any).items || (data as any).results || [];
+			}
+			return [];
+		});
+		const tariffs = computed(() => (tariffsData.value?.data as TariffData[]) || []);
 
 		const filteredReadings = computed(() => {
 			let filtered = readings.value;
@@ -300,15 +250,21 @@ export default defineComponent({
 		});
 
 		const paginatedReadings = computed(() => {
+			if (!filteredReadings.value || filteredReadings.value.length === 0) {
+				return [];
+			}
 			const start = (currentPage.value - 1) * itemsPerPage;
 			return filteredReadings.value.slice(start, start + itemsPerPage);
 		});
 
-		const totalPages = computed(() => Math.ceil(filteredReadings.value.length / itemsPerPage));
-		const totalReadings = computed(() => filteredReadings.value.length);
-		const paidReadings = computed(() => filteredReadings.value.filter(r => r.is_paid).length);
-		const unpaidReadings = computed(() => filteredReadings.value.filter(r => !r.is_paid).length);
-		const totalCost = computed(() => filteredReadings.value.reduce((sum, r) => sum + (r.amount || 0), 0));
+		const totalPages = computed(() => Math.ceil((filteredReadings.value?.length || 0) / itemsPerPage));
+		const totalReadings = computed(() => filteredReadings.value?.length || 0);
+		const paidReadings = computed(() => filteredReadings.value?.filter(r => r?.is_paid).length || 0);
+		const unpaidReadings = computed(() => filteredReadings.value?.filter(r => !r?.is_paid).length || 0);
+		const totalCost = computed(() => {
+			if (!filteredReadings.value || filteredReadings.value.length === 0) return 0;
+			return filteredReadings.value.reduce((sum, r) => sum + (r?.amount || 0), 0);
+		});
 
 		const hasFilters = computed(() => 
 			selectedPeriod.value || selectedService.value || selectedPaymentStatus.value
@@ -355,8 +311,9 @@ export default defineComponent({
 		};
 
 		const getTariffName = (tariffId?: number): string => {
-			// TODO: Get tariff name from API
-			return tariffId ? `Тариф #${tariffId}` : '-';
+			if (!tariffId) return '-';
+			const tariff = tariffs.value.find(t => t.id === tariffId);
+			return tariff?.name || `Тариф #${tariffId}`;
 		};
 
 		const resetFilters = () => {
@@ -372,6 +329,10 @@ export default defineComponent({
 		};
 
 		const editReading = (reading: ReadingData) => {
+			if (!reading?.id) {
+				console.error('Reading has no id:', reading);
+				return;
+			}
 			// Перенаправляємо на форму додавання показників з параметрами для редагування
 			router.push({
 				name: 'utilities_add_reading',
@@ -389,7 +350,9 @@ export default defineComponent({
 			console.log('Delete reading:', reading);
 		};
 
-		const getPreviousReading = (reading: ReadingData): number | null => {
+		const getPreviousReading = (reading: ReadingData | undefined): number | null => {
+			if (!reading) return null;
+			
 			// Спочатку перевіряємо, чи є попередній показник в самому об'єкті
 			if (reading.previous_reading !== undefined && reading.previous_reading !== null) {
 				return reading.previous_reading;
@@ -397,10 +360,42 @@ export default defineComponent({
 
 			// Шукаємо попередній показник в історії для тієї ж служби
 			const serviceReadings = readings.value
-				.filter(r => r.service_id === reading.service_id && r.period < reading.period)
+				.filter(r => r && r.service_id === reading.service_id && r.period < reading.period)
 				.sort((a, b) => new Date(b.period).getTime() - new Date(a.period).getTime());
 
 			return serviceReadings.length > 0 ? serviceReadings[0].current_reading : null;
+		};
+		
+		const formatRate = (rate: number): string => {
+			return new Intl.NumberFormat('uk-UA', {
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 4
+			}).format(rate);
+		};
+		
+		const formatDate = (dateString?: string): string => {
+			if (!dateString) return '-';
+			return new Date(dateString).toLocaleDateString('uk-UA');
+		};
+		
+		const toggleDetails = (readingId: number | undefined) => {
+			if (!readingId) return;
+			
+			if (expandedReadings.value.has(readingId)) {
+				expandedReadings.value.delete(readingId);
+			} else {
+				expandedReadings.value.add(readingId);
+			}
+		};
+		
+		const getCalculationDetails = (reading: ReadingData) => {
+			if (!reading || !reading.calculation_details) return null;
+			try {
+				return JSON.parse(reading.calculation_details);
+			} catch (e) {
+				console.error('Error parsing calculation details:', e);
+				return null;
+			}
 		};
 
 		return {
@@ -423,10 +418,15 @@ export default defineComponent({
 			totalCost,
 			hasFilters,
 			visiblePages,
+			expandedReadings,
+			viewMode,
+			currentPeriod,
 
 			// Methods
 			formatPeriod,
 			formatCurrency,
+			formatRate,
+			formatDate,
 			getServiceName,
 			getServiceUnit,
 			getTariffName,
@@ -434,7 +434,9 @@ export default defineComponent({
 			markAsPaid,
 			editReading,
 			confirmDelete,
-			getPreviousReading
+			getPreviousReading,
+			toggleDetails,
+			getCalculationDetails
 		};
 	}
 });

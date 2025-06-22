@@ -119,7 +119,9 @@ import { ref, computed, onMounted, defineComponent } from 'vue';
 import { useStore } from 'vuex';
 import { useRouter } from 'vue-router';
 import { useImportBankStatementApiImportPost } from '@/api/default/default';
-import type { BodyImportBankStatementApiImportPost, BodyImportBankStatementApiImportPostMode, HTTPValidationError } from '@/api/model';
+import type { BodyImportBankStatementApiImportPost } from '@/api/model/bodyImportBankStatementApiImportPost';
+import type { BodyImportBankStatementApiImportPostMode } from '@/api/model/bodyImportBankStatementApiImportPostMode';
+import type { HTTPValidationError } from '@/api/model/hTTPValidationError';
 import type { AxiosError } from 'axios';
 import { getErrorMessage, logError } from '@/utils/errorHandler';
 

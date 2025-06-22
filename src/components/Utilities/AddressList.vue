@@ -255,8 +255,11 @@ export default defineComponent({
 			if (addressReadings.length === 0) return 'Немає';
 
 			const lastReading = addressReadings[0];
-			const date = new Date(lastReading.reading_date || lastReading.period);
-			return date.toLocaleDateString('uk-UA', { day: '2-digit', month: '2-digit' });
+			// Використовуємо період (наприклад 2025-04), а не дату показника
+			const [year, month] = lastReading.period.split('-');
+			const date = new Date(parseInt(year), parseInt(month) - 1);
+			// Форматуємо як "квітень 2025"
+			return date.toLocaleDateString('uk-UA', { year: 'numeric', month: 'long' });
 		};
 
 		const resetForm = () => {

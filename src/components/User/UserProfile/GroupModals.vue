@@ -14,7 +14,7 @@ import { defineComponent } from 'vue';
 import {
   useAcceptInvitationApiInvitationsInvitationCodeAcceptPost
 } from '@/api/invitations/invitations';
-import type { AcceptInvitationApiInvitationsInvitationCodeAcceptPostBody } from '@/api/model';
+import type { AcceptInvitationApiInvitationsInvitationCodeAcceptPostBody } from '@/api/model/acceptInvitationApiInvitationsInvitationCodeAcceptPostBody';
 
 export default defineComponent({
   name: 'GroupModals',

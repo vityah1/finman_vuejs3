@@ -79,6 +79,9 @@
 								<small v-if="service.meter_number" class="text-muted d-block">
 									<i class="fas fa-barcode me-1"></i>Лічильник: {{ service.meter_number }}
 								</small>
+								<small v-if="service.has_shared_meter" class="text-muted d-block">
+									<i class="fas fa-link me-1"></i>Спільний показник для групи тарифів
+								</small>
 								<small v-if="service.description" class="text-muted d-block">
 									{{ service.description }}
 								</small>
@@ -162,6 +165,16 @@
 									Активна служба
 								</label>
 							</div>
+							<div class="form-check mt-2">
+								<input class="form-check-input" type="checkbox" id="sharedMeter" 
+									   v-model="serviceForm.has_shared_meter">
+								<label class="form-check-label" for="sharedMeter">
+									Спільний показник для групи тарифів
+								</label>
+								<small class="form-text text-muted d-block">
+									Якщо позначено, один показник буде використовуватися для розрахунку декількох тарифів (наприклад, розхід та злив води)
+								</small>
+							</div>
 						</form>
 					</div>
 					<div class="modal-footer">
@@ -233,6 +246,7 @@ interface ServiceData {
 	meter_number?: string;
 	address_id: number;
 	is_active: boolean;
+	has_shared_meter?: boolean;
 }
 
 interface TariffData {
@@ -270,7 +284,8 @@ export default defineComponent({
 			description: '',
 			unit: '',
 			meter_number: '',
-			is_active: true
+			is_active: true,
+			has_shared_meter: false
 		});
 
 		// API calls
@@ -325,6 +340,7 @@ export default defineComponent({
 			serviceForm.unit = '';
 			serviceForm.meter_number = '';
 			serviceForm.is_active = true;
+			serviceForm.has_shared_meter = false;
 			editingService.value = null;
 		};
 
@@ -335,6 +351,7 @@ export default defineComponent({
 			serviceForm.unit = service.unit;
 			serviceForm.meter_number = service.meter_number || '';
 			serviceForm.is_active = service.is_active;
+			serviceForm.has_shared_meter = service.has_shared_meter || false;
 			showAddModal.value = true;
 		};
 
@@ -353,7 +370,8 @@ export default defineComponent({
 					description: serviceForm.description || undefined,
 					unit: serviceForm.unit,
 					meter_number: serviceForm.meter_number || undefined,
-					is_active: serviceForm.is_active
+					is_active: serviceForm.is_active,
+					has_shared_meter: serviceForm.has_shared_meter
 				};
 
 				if (editingService.value) {

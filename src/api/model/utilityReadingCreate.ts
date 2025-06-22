@@ -5,9 +5,11 @@
  * OpenAPI spec version: 1.0.0
  */
 import type { UtilityReadingCreatePreviousReading } from "./utilityReadingCreatePreviousReading";
+import type { UtilityReadingCreateAmount } from "./utilityReadingCreateAmount";
 import type { UtilityReadingCreateReadingDate } from "./utilityReadingCreateReadingDate";
 import type { UtilityReadingCreateIsPaid } from "./utilityReadingCreateIsPaid";
 import type { UtilityReadingCreateNotes } from "./utilityReadingCreateNotes";
+import type { UtilityReadingCreateReadingType } from "./utilityReadingCreateReadingType";
 
 /**
  * Схема для створення показника
@@ -19,7 +21,9 @@ export interface UtilityReadingCreate {
   current_reading: number;
   previous_reading?: UtilityReadingCreatePreviousReading;
   tariff_id: number;
+  amount?: UtilityReadingCreateAmount;
   reading_date?: UtilityReadingCreateReadingDate;
   is_paid?: UtilityReadingCreateIsPaid;
   notes?: UtilityReadingCreateNotes;
+  reading_type?: UtilityReadingCreateReadingType;
 }

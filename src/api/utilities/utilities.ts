@@ -23,10 +23,16 @@ import { computed, unref } from "vue";
 import type { MaybeRef } from "vue";
 
 import type {
+  CreateBatchReadingsApiUtilitiesReadingsBatchPostBody,
+  GetDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGetParams,
+  GetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGetParams,
+  GetGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGetParams,
   GetReadingsApiUtilitiesReadingsGetParams,
   GetServicesApiUtilitiesServicesGetParams,
   GetTariffsApiUtilitiesTariffsGetParams,
+  GroupedReadingsResponse,
   HTTPValidationError,
+  LatestPeriodResponse,
   UtilityAddressCreate,
   UtilityAddressUpdate,
   UtilityReadingCreate,
@@ -34,6 +40,7 @@ import type {
   UtilityServiceCreate,
   UtilityServiceUpdate,
   UtilityTariffCreate,
+  UtilityTariffResponse,
   UtilityTariffUpdate,
 } from ".././model";
 
@@ -1107,7 +1114,7 @@ export function useGetTariffsApiUtilitiesTariffsGet<
 export const createTariffApiUtilitiesTariffsPost = (
   utilityTariffCreate: MaybeRef<UtilityTariffCreate>,
   options?: AxiosRequestConfig
-): Promise<AxiosResponse<unknown>> => {
+): Promise<AxiosResponse<UtilityTariffResponse>> => {
   utilityTariffCreate = unref(utilityTariffCreate);
 
   return axios.post(`/api/utilities/tariffs`, utilityTariffCreate, options);
@@ -1297,7 +1304,7 @@ export const updateTariffApiUtilitiesTariffsTariffIdPatch = (
   tariffId: MaybeRef<number>,
   utilityTariffUpdate: MaybeRef<UtilityTariffUpdate>,
   options?: AxiosRequestConfig
-): Promise<AxiosResponse<unknown>> => {
+): Promise<AxiosResponse<UtilityTariffResponse>> => {
   tariffId = unref(tariffId);
   utilityTariffUpdate = unref(utilityTariffUpdate);
 
@@ -1956,3 +1963,701 @@ export const useDeleteReadingApiUtilitiesReadingsReadingIdDelete = <
 
   return useMutation(mutationOptions);
 };
+/**
+ * Отримати згруповані тарифи для служби на заданий період
+ * @summary Get Grouped Tariffs
+ */
+export const getGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGet = (
+  serviceId: MaybeRef<number>,
+  params: MaybeRef<GetGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGetParams>,
+  options?: AxiosRequestConfig
+): Promise<AxiosResponse<unknown>> => {
+  serviceId = unref(serviceId);
+  params = unref(params);
+
+  return axios.get(`/api/utilities/tariffs/grouped/${serviceId}`, {
+    ...options,
+    params: { ...unref(params), ...options?.params },
+  });
+};
+
+export const getGetGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGetQueryKey =
+  (
+    serviceId: MaybeRef<number>,
+    params: MaybeRef<GetGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGetParams>
+  ) => {
+    return [
+      "api",
+      "utilities",
+      "tariffs",
+      "grouped",
+      serviceId,
+      ...(params ? [params] : []),
+    ] as const;
+  };
+
+export const getGetGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGetQueryOptions =
+  <
+    TData = Awaited<
+      ReturnType<typeof getGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGet>
+    >,
+    TError = AxiosError<HTTPValidationError>
+  >(
+    serviceId: MaybeRef<number>,
+    params: MaybeRef<GetGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGetParams>,
+    options?: {
+      query?: Partial<
+        UseQueryOptions<
+          Awaited<
+            ReturnType<
+              typeof getGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGet
+            >
+          >,
+          TError,
+          TData
+        >
+      >;
+      axios?: AxiosRequestConfig;
+    }
+  ) => {
+    const { query: queryOptions, axios: axiosOptions } = options ?? {};
+
+    const queryKey =
+      getGetGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGetQueryKey(
+        serviceId,
+        params
+      );
+
+    const queryFn: QueryFunction<
+      Awaited<
+        ReturnType<
+          typeof getGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGet
+        >
+      >
+    > = ({ signal }) =>
+      getGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGet(
+        serviceId,
+        params,
+        { signal, ...axiosOptions }
+      );
+
+    return {
+      queryKey,
+      queryFn,
+      enabled: computed(() => !!unref(serviceId)),
+      ...queryOptions,
+    } as UseQueryOptions<
+      Awaited<
+        ReturnType<
+          typeof getGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGet
+        >
+      >,
+      TError,
+      TData
+    >;
+  };
+
+export type GetGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGetQueryResult =
+  NonNullable<
+    Awaited<
+      ReturnType<typeof getGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGet>
+    >
+  >;
+export type GetGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGetQueryError =
+  AxiosError<HTTPValidationError>;
+
+/**
+ * @summary Get Grouped Tariffs
+ */
+
+export function useGetGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGet<
+  TData = Awaited<
+    ReturnType<typeof getGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGet>
+  >,
+  TError = AxiosError<HTTPValidationError>
+>(
+  serviceId: MaybeRef<number>,
+  params: MaybeRef<GetGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGetParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<
+            typeof getGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGet
+          >
+        >,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  }
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetGroupedTariffsApiUtilitiesTariffsGroupedServiceIdGetQueryOptions(
+      serviceId,
+      params,
+      options
+    );
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * Створити декілька показників одночасно (для електрики день/ніч)
+ * @summary Create Batch Readings
+ */
+export const createBatchReadingsApiUtilitiesReadingsBatchPost = (
+  createBatchReadingsApiUtilitiesReadingsBatchPostBody: MaybeRef<CreateBatchReadingsApiUtilitiesReadingsBatchPostBody>,
+  options?: AxiosRequestConfig
+): Promise<AxiosResponse<unknown>> => {
+  createBatchReadingsApiUtilitiesReadingsBatchPostBody = unref(
+    createBatchReadingsApiUtilitiesReadingsBatchPostBody
+  );
+
+  return axios.post(
+    `/api/utilities/readings/batch`,
+    createBatchReadingsApiUtilitiesReadingsBatchPostBody,
+    options
+  );
+};
+
+export const getCreateBatchReadingsApiUtilitiesReadingsBatchPostMutationOptions =
+  <TError = AxiosError<HTTPValidationError>, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<
+      Awaited<
+        ReturnType<typeof createBatchReadingsApiUtilitiesReadingsBatchPost>
+      >,
+      TError,
+      { data: CreateBatchReadingsApiUtilitiesReadingsBatchPostBody },
+      TContext
+    >;
+    axios?: AxiosRequestConfig;
+  }): UseMutationOptions<
+    Awaited<
+      ReturnType<typeof createBatchReadingsApiUtilitiesReadingsBatchPost>
+    >,
+    TError,
+    { data: CreateBatchReadingsApiUtilitiesReadingsBatchPostBody },
+    TContext
+  > => {
+    const mutationKey = ["createBatchReadingsApiUtilitiesReadingsBatchPost"];
+    const { mutation: mutationOptions, axios: axiosOptions } = options
+      ? options.mutation &&
+        "mutationKey" in options.mutation &&
+        options.mutation.mutationKey
+        ? options
+        : { ...options, mutation: { ...options.mutation, mutationKey } }
+      : { mutation: { mutationKey }, axios: undefined };
+
+    const mutationFn: MutationFunction<
+      Awaited<
+        ReturnType<typeof createBatchReadingsApiUtilitiesReadingsBatchPost>
+      >,
+      { data: CreateBatchReadingsApiUtilitiesReadingsBatchPostBody }
+    > = (props) => {
+      const { data } = props ?? {};
+
+      return createBatchReadingsApiUtilitiesReadingsBatchPost(
+        data,
+        axiosOptions
+      );
+    };
+
+    return { mutationFn, ...mutationOptions };
+  };
+
+export type CreateBatchReadingsApiUtilitiesReadingsBatchPostMutationResult =
+  NonNullable<
+    Awaited<ReturnType<typeof createBatchReadingsApiUtilitiesReadingsBatchPost>>
+  >;
+export type CreateBatchReadingsApiUtilitiesReadingsBatchPostMutationBody =
+  CreateBatchReadingsApiUtilitiesReadingsBatchPostBody;
+export type CreateBatchReadingsApiUtilitiesReadingsBatchPostMutationError =
+  AxiosError<HTTPValidationError>;
+
+/**
+ * @summary Create Batch Readings
+ */
+export const useCreateBatchReadingsApiUtilitiesReadingsBatchPost = <
+  TError = AxiosError<HTTPValidationError>,
+  TContext = unknown
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<
+      ReturnType<typeof createBatchReadingsApiUtilitiesReadingsBatchPost>
+    >,
+    TError,
+    { data: CreateBatchReadingsApiUtilitiesReadingsBatchPostBody },
+    TContext
+  >;
+  axios?: AxiosRequestConfig;
+}): UseMutationReturnType<
+  Awaited<ReturnType<typeof createBatchReadingsApiUtilitiesReadingsBatchPost>>,
+  TError,
+  { data: CreateBatchReadingsApiUtilitiesReadingsBatchPostBody },
+  TContext
+> => {
+  const mutationOptions =
+    getCreateBatchReadingsApiUtilitiesReadingsBatchPostMutationOptions(options);
+
+  return useMutation(mutationOptions);
+};
+/**
+ * Отримати показники з деталізованими розрахунками
+ * @summary Get Detailed Readings
+ */
+export const getDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGet = (
+  serviceId: MaybeRef<number>,
+  params: MaybeRef<GetDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGetParams>,
+  options?: AxiosRequestConfig
+): Promise<AxiosResponse<unknown>> => {
+  serviceId = unref(serviceId);
+  params = unref(params);
+
+  return axios.get(`/api/utilities/readings/detailed/${serviceId}`, {
+    ...options,
+    params: { ...unref(params), ...options?.params },
+  });
+};
+
+export const getGetDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGetQueryKey =
+  (
+    serviceId: MaybeRef<number>,
+    params: MaybeRef<GetDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGetParams>
+  ) => {
+    return [
+      "api",
+      "utilities",
+      "readings",
+      "detailed",
+      serviceId,
+      ...(params ? [params] : []),
+    ] as const;
+  };
+
+export const getGetDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGetQueryOptions =
+  <
+    TData = Awaited<
+      ReturnType<
+        typeof getDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGet
+      >
+    >,
+    TError = AxiosError<HTTPValidationError>
+  >(
+    serviceId: MaybeRef<number>,
+    params: MaybeRef<GetDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGetParams>,
+    options?: {
+      query?: Partial<
+        UseQueryOptions<
+          Awaited<
+            ReturnType<
+              typeof getDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGet
+            >
+          >,
+          TError,
+          TData
+        >
+      >;
+      axios?: AxiosRequestConfig;
+    }
+  ) => {
+    const { query: queryOptions, axios: axiosOptions } = options ?? {};
+
+    const queryKey =
+      getGetDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGetQueryKey(
+        serviceId,
+        params
+      );
+
+    const queryFn: QueryFunction<
+      Awaited<
+        ReturnType<
+          typeof getDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGet
+        >
+      >
+    > = ({ signal }) =>
+      getDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGet(
+        serviceId,
+        params,
+        { signal, ...axiosOptions }
+      );
+
+    return {
+      queryKey,
+      queryFn,
+      enabled: computed(() => !!unref(serviceId)),
+      ...queryOptions,
+    } as UseQueryOptions<
+      Awaited<
+        ReturnType<
+          typeof getDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGet
+        >
+      >,
+      TError,
+      TData
+    >;
+  };
+
+export type GetDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGetQueryResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        typeof getDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGet
+      >
+    >
+  >;
+export type GetDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGetQueryError =
+  AxiosError<HTTPValidationError>;
+
+/**
+ * @summary Get Detailed Readings
+ */
+
+export function useGetDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGet<
+  TData = Awaited<
+    ReturnType<
+      typeof getDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGet
+    >
+  >,
+  TError = AxiosError<HTTPValidationError>
+>(
+  serviceId: MaybeRef<number>,
+  params: MaybeRef<GetDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGetParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<
+            typeof getDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGet
+          >
+        >,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  }
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetDetailedReadingsApiUtilitiesReadingsDetailedServiceIdGetQueryOptions(
+      serviceId,
+      params,
+      options
+    );
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * Отримати останній період з показниками для адреси
+ * @summary Get Latest Period With Readings Endpoint
+ */
+export const getLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet =
+  (
+    addressId: MaybeRef<number>,
+    options?: AxiosRequestConfig
+  ): Promise<AxiosResponse<LatestPeriodResponse>> => {
+    addressId = unref(addressId);
+
+    return axios.get(
+      `/api/utilities/readings/latest-period/${addressId}`,
+      options
+    );
+  };
+
+export const getGetLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGetQueryKey =
+  (addressId: MaybeRef<number>) => {
+    return [
+      "api",
+      "utilities",
+      "readings",
+      "latest-period",
+      addressId,
+    ] as const;
+  };
+
+export const getGetLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGetQueryOptions =
+  <
+    TData = Awaited<
+      ReturnType<
+        typeof getLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet
+      >
+    >,
+    TError = AxiosError<HTTPValidationError>
+  >(
+    addressId: MaybeRef<number>,
+    options?: {
+      query?: Partial<
+        UseQueryOptions<
+          Awaited<
+            ReturnType<
+              typeof getLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet
+            >
+          >,
+          TError,
+          TData
+        >
+      >;
+      axios?: AxiosRequestConfig;
+    }
+  ) => {
+    const { query: queryOptions, axios: axiosOptions } = options ?? {};
+
+    const queryKey =
+      getGetLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGetQueryKey(
+        addressId
+      );
+
+    const queryFn: QueryFunction<
+      Awaited<
+        ReturnType<
+          typeof getLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet
+        >
+      >
+    > = ({ signal }) =>
+      getLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet(
+        addressId,
+        { signal, ...axiosOptions }
+      );
+
+    return {
+      queryKey,
+      queryFn,
+      enabled: computed(() => !!unref(addressId)),
+      ...queryOptions,
+    } as UseQueryOptions<
+      Awaited<
+        ReturnType<
+          typeof getLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet
+        >
+      >,
+      TError,
+      TData
+    >;
+  };
+
+export type GetLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGetQueryResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        typeof getLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet
+      >
+    >
+  >;
+export type GetLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGetQueryError =
+  AxiosError<HTTPValidationError>;
+
+/**
+ * @summary Get Latest Period With Readings Endpoint
+ */
+
+export function useGetLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet<
+  TData = Awaited<
+    ReturnType<
+      typeof getLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet
+    >
+  >,
+  TError = AxiosError<HTTPValidationError>
+>(
+  addressId: MaybeRef<number>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<
+            typeof getLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet
+          >
+        >,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  }
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGetQueryOptions(
+      addressId,
+      options
+    );
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
+
+/**
+ * Отримати згруповані показники для адреси за період
+ * @summary Get Grouped Readings Endpoint
+ */
+export const getGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet = (
+  params: MaybeRef<GetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGetParams>,
+  options?: AxiosRequestConfig
+): Promise<AxiosResponse<GroupedReadingsResponse>> => {
+  params = unref(params);
+
+  return axios.get(`/api/utilities/grouped-readings`, {
+    ...options,
+    params: { ...unref(params), ...options?.params },
+  });
+};
+
+export const getGetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGetQueryKey =
+  (
+    params: MaybeRef<GetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGetParams>
+  ) => {
+    return [
+      "api",
+      "utilities",
+      "grouped-readings",
+      ...(params ? [params] : []),
+    ] as const;
+  };
+
+export const getGetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGetQueryOptions =
+  <
+    TData = Awaited<
+      ReturnType<
+        typeof getGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet
+      >
+    >,
+    TError = AxiosError<HTTPValidationError>
+  >(
+    params: MaybeRef<GetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGetParams>,
+    options?: {
+      query?: Partial<
+        UseQueryOptions<
+          Awaited<
+            ReturnType<
+              typeof getGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet
+            >
+          >,
+          TError,
+          TData
+        >
+      >;
+      axios?: AxiosRequestConfig;
+    }
+  ) => {
+    const { query: queryOptions, axios: axiosOptions } = options ?? {};
+
+    const queryKey =
+      getGetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGetQueryKey(
+        params
+      );
+
+    const queryFn: QueryFunction<
+      Awaited<
+        ReturnType<
+          typeof getGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet
+        >
+      >
+    > = ({ signal }) =>
+      getGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet(params, {
+        signal,
+        ...axiosOptions,
+      });
+
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+      Awaited<
+        ReturnType<
+          typeof getGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet
+        >
+      >,
+      TError,
+      TData
+    >;
+  };
+
+export type GetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGetQueryResult =
+  NonNullable<
+    Awaited<
+      ReturnType<
+        typeof getGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet
+      >
+    >
+  >;
+export type GetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGetQueryError =
+  AxiosError<HTTPValidationError>;
+
+/**
+ * @summary Get Grouped Readings Endpoint
+ */
+
+export function useGetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet<
+  TData = Awaited<
+    ReturnType<typeof getGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet>
+  >,
+  TError = AxiosError<HTTPValidationError>
+>(
+  params: MaybeRef<GetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGetParams>,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<
+          ReturnType<
+            typeof getGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet
+          >
+        >,
+        TError,
+        TData
+      >
+    >;
+    axios?: AxiosRequestConfig;
+  }
+): UseQueryReturnType<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getGetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGetQueryOptions(
+      params,
+      options
+    );
+
+  const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
+
+  query.queryKey = unref(queryOptions).queryKey as DataTag<
+    QueryKey,
+    TData,
+    TError
+  >;
+
+  return query;
+}
