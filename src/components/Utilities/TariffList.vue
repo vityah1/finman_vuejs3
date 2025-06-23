@@ -207,6 +207,7 @@
 											<option value="">Стандартний</option>
 											<option value="consumption">Споживання (вода)</option>
 											<option value="drainage">Водовідведення</option>
+											<option value="subscription">Абонплата</option>
 											<option value="day">Денний (електрика)</option>
 											<option value="night">Нічний (електрика)</option>
 										</select>

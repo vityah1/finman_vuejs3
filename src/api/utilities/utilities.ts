@@ -36,6 +36,7 @@ import type {
   UtilityAddressCreate,
   UtilityAddressUpdate,
   UtilityReadingCreate,
+  UtilityReadingResponse,
   UtilityReadingUpdate,
   UtilityServiceCreate,
   UtilityServiceUpdate,
@@ -1781,7 +1782,7 @@ export const updateReadingApiUtilitiesReadingsReadingIdPatch = (
   readingId: MaybeRef<number>,
   utilityReadingUpdate: MaybeRef<UtilityReadingUpdate>,
   options?: AxiosRequestConfig
-): Promise<AxiosResponse<unknown>> => {
+): Promise<AxiosResponse<UtilityReadingResponse>> => {
   readingId = unref(readingId);
   utilityReadingUpdate = unref(utilityReadingUpdate);
 

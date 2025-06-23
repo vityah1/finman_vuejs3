@@ -8,6 +8,7 @@ import type { GroupedReadingItemId } from "./groupedReadingItemId";
 import type { GroupedReadingItemServiceId } from "./groupedReadingItemServiceId";
 import type { GroupedReadingItemTariffName } from "./groupedReadingItemTariffName";
 import type { GroupedReadingItemTariffType } from "./groupedReadingItemTariffType";
+import type { GroupedReadingItemCurrentReading } from "./groupedReadingItemCurrentReading";
 import type { GroupedReadingItemPreviousReading } from "./groupedReadingItemPreviousReading";
 import type { GroupedReadingItemConsumption } from "./groupedReadingItemConsumption";
 import type { GroupedReadingItemAmount } from "./groupedReadingItemAmount";
@@ -25,7 +26,7 @@ export interface GroupedReadingItem {
   service_name: string;
   tariff_name?: GroupedReadingItemTariffName;
   tariff_type?: GroupedReadingItemTariffType;
-  current_reading: number;
+  current_reading?: GroupedReadingItemCurrentReading;
   previous_reading?: GroupedReadingItemPreviousReading;
   consumption?: GroupedReadingItemConsumption;
   amount?: GroupedReadingItemAmount;

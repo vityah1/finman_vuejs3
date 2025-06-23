@@ -88,7 +88,10 @@
 										<span v-else>{{ reading.consumption || 0 }}</span>
 									</td>
 									<td class="text-end">
-										<span v-if="reading.tariff">
+										<span v-if="reading.tariff_type === 'subscription'">
+											Абонплата
+										</span>
+										<span v-else-if="reading.tariff">
 											{{ formatRate(reading.tariff.rate) }}
 											<span class="text-muted small d-block" v-if="reading.tariff_type === 'consumption'">
 												грн/{{ getServiceUnit(reading.service_id) }}
@@ -157,7 +160,10 @@
 										<span v-else>{{ reading.consumption || 0 }} {{ service.unit }}</span>
 									</td>
 									<td class="text-end">
-										<span v-if="isFixedPaymentService(reading.service_name)">
+										<span v-if="reading.tariff_type === 'subscription'">
+											Абонплата
+										</span>
+										<span v-else-if="isFixedPaymentService(reading.service_name)">
 											Фіксована сума
 										</span>
 										<span v-else-if="reading.tariff">

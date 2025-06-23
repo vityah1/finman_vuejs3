@@ -732,6 +732,9 @@ export default defineComponent({
 						multiReadingForm[group.type].tariff_id = group.mainTariff.id;
 					}
 				});
+				
+				// Calculate costs for electricity after setting tariffs
+				calculateTotalCost();
 			} else if (isFixedPaymentService.value && availableTariffs.value.length === 0) {
 				// For fixed payment services without tariffs, create default tariff
 				await createDefaultTariffForFixedPayment();
@@ -857,7 +860,7 @@ export default defineComponent({
 				reading.consumption = 0;
 			}
 			
-			// Recalculate total cost
+			// Recalculate total cost immediately
 			calculateTotalCost();
 		};
 		
@@ -906,37 +909,59 @@ export default defineComponent({
 					await createReadingMutation.mutateAsync({
 						data: readingData
 					});
-				} else if (isSharedMeterService.value && !isEditing.value) {
-					// For services with shared meter (water, gas) - create reading for each tariff
-					const baseData = {
-						address_id: readingForm.address_id,
-						service_id: readingForm.service_id,
-						period: readingForm.period,
-						current_reading: readingForm.current_reading,
-						previous_reading: readingForm.previous_reading || undefined,
-						reading_date: readingForm.reading_date || undefined,
-						is_paid: readingForm.is_paid || undefined,
-						notes: readingForm.notes || undefined
-					};
-					
-					// Create reading for each available tariff
-					for (const tariff of availableTariffs.value) {
+				} else if (isElectricityService.value && !isEditing.value) {
+					// For electricity service - create reading for each tariff type (day/night)
+					for (const [readingType, formData] of Object.entries(multiReadingForm)) {
+						if (formData.tariff_id === 0) continue; // Skip if no tariff selected
+						
 						const readingData: UtilityReadingCreate = {
-							...baseData,
-							tariff_id: tariff.id
+							address_id: readingForm.address_id,
+							service_id: readingForm.service_id,
+							period: readingForm.period,
+							current_reading: formData.current_reading,
+							previous_reading: formData.previous_reading || undefined,
+							tariff_id: formData.tariff_id,
+							reading_date: readingForm.reading_date || undefined,
+							is_paid: readingForm.is_paid || undefined,
+							notes: readingForm.notes || undefined,
+							reading_type: readingType
 						};
 						
 						await createReadingMutation.mutateAsync({
 							data: readingData
 						});
 					}
+				} else if (isSharedMeterService.value && !isEditing.value) {
+					// For services with shared meter (water, gas) - create ONE reading with main tariff
+					// The backend will handle all tariff calculations automatically
+					const mainTariff = availableTariffs.value.find(t => t.calculation_method === 'standard') || availableTariffs.value[0];
+					
+					if (!mainTariff) {
+						throw new Error('No tariff found for shared meter service');
+					}
+					
+					const readingData: UtilityReadingCreate = {
+						address_id: readingForm.address_id,
+						service_id: readingForm.service_id,
+						period: readingForm.period,
+						current_reading: readingForm.current_reading,
+						previous_reading: readingForm.previous_reading || undefined,
+						tariff_id: mainTariff.id, // Use main tariff, backend will calculate all
+						reading_date: readingForm.reading_date || undefined,
+						is_paid: readingForm.is_paid || undefined,
+						notes: readingForm.notes || undefined
+					};
+					
+					await createReadingMutation.mutateAsync({
+						data: readingData
+					});
 					
 				} else if (isEditing.value && editReadingId.value) {
 					// Update existing reading
 					const updateData: UtilityReadingUpdate = {
 						period: readingForm.period,
-						current_reading: readingForm.current_reading,
-						previous_reading: readingForm.previous_reading || undefined,
+						current_reading: isFixedPaymentService.value ? (readingForm.amount || 0) : readingForm.current_reading,
+						previous_reading: isFixedPaymentService.value ? 0 : (readingForm.previous_reading || undefined),
 						tariff_id: readingForm.tariff_id,
 						reading_date: readingForm.reading_date || undefined,
 						is_paid: readingForm.is_paid || undefined,
@@ -947,30 +972,6 @@ export default defineComponent({
 						readingId: editReadingId.value,
 						data: updateData
 					});
-				} else if (isSharedMeterService.value && !isEditing.value) {
-					// For services with shared meter (water) - create reading for each tariff
-					const baseData = {
-						address_id: readingForm.address_id,
-						service_id: readingForm.service_id,
-						period: readingForm.period,
-						current_reading: readingForm.current_reading,
-						previous_reading: readingForm.previous_reading || undefined,
-						reading_date: readingForm.reading_date || undefined,
-						is_paid: readingForm.is_paid || undefined,
-						notes: readingForm.notes || undefined
-					};
-					
-					// Create reading for each available tariff
-					for (const tariff of availableTariffs.value) {
-						const readingData: UtilityReadingCreate = {
-							...baseData,
-							tariff_id: tariff.id
-						};
-						
-						await createReadingMutation.mutateAsync({
-							data: readingData
-						});
-					}
 				} else {
 					// Create new reading (standard)
 					const readingData: UtilityReadingCreate = {
@@ -1076,6 +1077,20 @@ export default defineComponent({
 			calculateConsumption();
 		});
 
+		// Watch multiReadingForm for electricity calculations
+		watch(() => multiReadingForm, () => {
+			if (isElectricityService.value) {
+				calculateTotalCost();
+			}
+		}, { deep: true });
+
+		// Watch for tariff changes in multiReadingForm
+		watch(() => groupedTariffs.value, () => {
+			if (isElectricityService.value) {
+				calculateTotalCost();
+			}
+		}, { deep: true });
+
 		// Watch for editing data
 		watch(editingReadingData, (data) => {
 			if (data?.data && isEditing.value) {
@@ -1099,8 +1114,13 @@ export default defineComponent({
 				readingForm.is_paid = reading.is_paid || false;
 				readingForm.notes = reading.notes || '';
 				
-				// Перевірка, чи це електрика
-				if (reading.service && reading.service.has_shared_meter && reading.reading_type) {
+				// For fixed payment services, amount field should be filled
+				if (reading.service && isFixedPaymentService.value) {
+					readingForm.amount = reading.current_reading || 0;
+				}
+				
+				// Перевірка, чи це електрика або служба з multiple readings
+				if (reading.reading_type && (isElectricityService.value || reading.service?.service_group === 'electricity')) {
 					// Для електрики потрібна спеціальна обробка
 					const readingType = reading.reading_type;
 					// Initialize multiReadingForm for this type if not exists
@@ -1118,6 +1138,15 @@ export default defineComponent({
 						multiReadingForm[readingType].consumption = reading.consumption || 0;
 						multiReadingForm[readingType].tariff_id = reading.tariff_id || 0;
 					}
+					
+					// Recalculate after loading data
+					setTimeout(() => {
+						if (isElectricityService.value) {
+							calculateTotalCost();
+						} else if (isSharedMeterService.value) {
+							calculateConsumption();
+						}
+					}, 100);
 				}
 				
 				// Set hint for previous reading in editing mode
