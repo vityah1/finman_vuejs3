@@ -8,6 +8,7 @@ import type { UtilityAddressUpdateName } from "./utilityAddressUpdateName";
 import type { UtilityAddressUpdateAddress } from "./utilityAddressUpdateAddress";
 import type { UtilityAddressUpdateDescription } from "./utilityAddressUpdateDescription";
 import type { UtilityAddressUpdateIsActive } from "./utilityAddressUpdateIsActive";
+import type { UtilityAddressUpdateSource } from "./utilityAddressUpdateSource";
 
 /**
  * Схема для оновлення адреси комунальних служб
@@ -17,4 +18,5 @@ export interface UtilityAddressUpdate {
   address?: UtilityAddressUpdateAddress;
   description?: UtilityAddressUpdateDescription;
   is_active?: UtilityAddressUpdateIsActive;
+  source?: UtilityAddressUpdateSource;
 }

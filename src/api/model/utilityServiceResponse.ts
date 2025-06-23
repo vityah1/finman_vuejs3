@@ -14,6 +14,7 @@ import type { UtilityServiceResponseMeterNumber } from "./utilityServiceResponse
 import type { UtilityServiceResponseIsActive } from "./utilityServiceResponseIsActive";
 import type { UtilityServiceResponseHasSharedMeter } from "./utilityServiceResponseHasSharedMeter";
 import type { UtilityServiceResponseServiceGroup } from "./utilityServiceResponseServiceGroup";
+import type { UtilityServiceResponseSource } from "./utilityServiceResponseSource";
 import type { UtilityServiceResponseCreated } from "./utilityServiceResponseCreated";
 import type { UtilityServiceResponseUpdated } from "./utilityServiceResponseUpdated";
 import type { UtilityServiceResponseAddress } from "./utilityServiceResponseAddress";
@@ -32,6 +33,7 @@ export interface UtilityServiceResponse {
   is_active?: UtilityServiceResponseIsActive;
   has_shared_meter?: UtilityServiceResponseHasSharedMeter;
   service_group?: UtilityServiceResponseServiceGroup;
+  source?: UtilityServiceResponseSource;
   created?: UtilityServiceResponseCreated;
   updated?: UtilityServiceResponseUpdated;
   address?: UtilityServiceResponseAddress;

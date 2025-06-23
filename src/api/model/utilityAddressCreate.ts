@@ -6,6 +6,7 @@
  */
 import type { UtilityAddressCreateDescription } from "./utilityAddressCreateDescription";
 import type { UtilityAddressCreateIsActive } from "./utilityAddressCreateIsActive";
+import type { UtilityAddressCreateSource } from "./utilityAddressCreateSource";
 
 /**
  * Схема для створення адреси комунальних служб
@@ -15,4 +16,5 @@ export interface UtilityAddressCreate {
   address: string;
   description?: UtilityAddressCreateDescription;
   is_active?: UtilityAddressCreateIsActive;
+  source?: UtilityAddressCreateSource;
 }

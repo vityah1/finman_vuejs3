@@ -10,6 +10,7 @@ import type { UtilityAddressResponseName } from "./utilityAddressResponseName";
 import type { UtilityAddressResponseAddress } from "./utilityAddressResponseAddress";
 import type { UtilityAddressResponseDescription } from "./utilityAddressResponseDescription";
 import type { UtilityAddressResponseIsActive } from "./utilityAddressResponseIsActive";
+import type { UtilityAddressResponseSource } from "./utilityAddressResponseSource";
 import type { UtilityAddressResponseCreated } from "./utilityAddressResponseCreated";
 import type { UtilityAddressResponseUpdated } from "./utilityAddressResponseUpdated";
 
@@ -23,6 +24,7 @@ export interface UtilityAddressResponse {
   address?: UtilityAddressResponseAddress;
   description?: UtilityAddressResponseDescription;
   is_active?: UtilityAddressResponseIsActive;
+  source?: UtilityAddressResponseSource;
   created?: UtilityAddressResponseCreated;
   updated?: UtilityAddressResponseUpdated;
 }

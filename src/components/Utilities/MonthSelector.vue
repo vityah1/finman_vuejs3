@@ -29,7 +29,7 @@ export default defineComponent({
 		},
 		maxMonths: {
 			type: Number,
-			default: 24 // Показувати останні 24 місяці
+			default: 60 // Показувати останні 60 місяців (5 років)
 		}
 	},
 	emits: ['update:modelValue'],

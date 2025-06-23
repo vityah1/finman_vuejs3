@@ -12,6 +12,7 @@ import type { UtilityServiceUpdateMeterNumber } from "./utilityServiceUpdateMete
 import type { UtilityServiceUpdateIsActive } from "./utilityServiceUpdateIsActive";
 import type { UtilityServiceUpdateHasSharedMeter } from "./utilityServiceUpdateHasSharedMeter";
 import type { UtilityServiceUpdateServiceGroup } from "./utilityServiceUpdateServiceGroup";
+import type { UtilityServiceUpdateSource } from "./utilityServiceUpdateSource";
 
 /**
  * Схема для оновлення комунальної служби
@@ -25,4 +26,5 @@ export interface UtilityServiceUpdate {
   is_active?: UtilityServiceUpdateIsActive;
   has_shared_meter?: UtilityServiceUpdateHasSharedMeter;
   service_group?: UtilityServiceUpdateServiceGroup;
+  source?: UtilityServiceUpdateSource;
 }

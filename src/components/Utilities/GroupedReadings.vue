@@ -234,20 +234,30 @@ export default defineComponent({
 		period: {
 			type: String,
 			required: true
+		},
+		serviceFilter: {
+			type: String,
+			default: ''
 		}
 	},
 	setup(props) {
 		const router = useRouter();
-		const { addressId, period } = toRefs(props);
+		const { addressId, period, serviceFilter } = toRefs(props);
 		
 		// Use current period if not provided
 		const effectivePeriod = computed(() => period.value || new Date().toISOString().slice(0, 7));
 		// Fetch grouped readings
 		const { data: groupedDataResponse, isLoading: loading, error } = useGetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet(
-			computed(() => ({
-				address_id: addressId.value,
-				period: effectivePeriod.value
-			})),
+			computed(() => {
+				const params: any = {
+					address_id: addressId.value,
+					period: effectivePeriod.value
+				};
+				if (serviceFilter.value) {
+					params.service_id = parseInt(serviceFilter.value);
+				}
+				return params;
+			}),
 			{
 				query: {
 					enabled: computed(() => !!addressId.value),

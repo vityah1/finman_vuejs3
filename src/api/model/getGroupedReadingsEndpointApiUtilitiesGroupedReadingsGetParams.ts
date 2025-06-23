@@ -14,4 +14,8 @@ export type GetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGetParams = {
    * Період у форматі YYYY-MM
    */
   period?: string;
+  /**
+   * ID служби для фільтрації
+   */
+  service_id?: number;
 };

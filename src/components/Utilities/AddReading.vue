@@ -76,7 +76,6 @@
 												<option value="">Оберіть тариф</option>
 												<option v-for="tariff in availableTariffs" :key="tariff.id" :value="tariff.id">
 													{{ tariff.name }} - {{ formatRate(tariff.rate) }} {{ tariff.currency }}
-													<span v-if="tariff.subscription_fee"> + {{ formatRate(tariff.subscription_fee) }} абон.</span>
 												</option>
 											</select>
 											<div v-else class="alert alert-info p-2 mb-0">
@@ -310,11 +309,6 @@
 										{{ selectedTariff.name }}<br>
 										<strong>{{ formatRate(selectedTariff.rate) }} {{ selectedTariff.currency }}</strong>
 										<small class="text-muted d-block">за {{ selectedService?.unit }}</small>
-										<div v-if="selectedTariff.subscription_fee" class="mt-1">
-											<small class="text-info">
-												+ {{ formatRate(selectedTariff.subscription_fee) }} {{ selectedTariff.currency }} абонплата
-											</small>
-										</div>
 									</div>
 									<div v-else class="text-muted">Тариф не обрано</div>
 								</div>
@@ -330,12 +324,7 @@
 
 								<div class="small text-muted">
 									<strong>Формула:</strong><br>
-									<span v-if="selectedTariff?.subscription_fee">
-										{{ calculationData.consumption }} × {{ formatRate(selectedTariff?.rate || 0) }} + {{ formatRate(selectedTariff?.subscription_fee || 0) }} (абонплата) = {{ formatCurrency(calculationData.cost) }}
-									</span>
-									<span v-else>
-										{{ calculationData.consumption }} × {{ formatRate(selectedTariff?.rate || 0) }} = {{ formatCurrency(calculationData.cost) }}
-									</span>
+									{{ calculationData.consumption }} × {{ formatRate(selectedTariff?.rate || 0) }} = {{ formatCurrency(calculationData.cost) }}
 								</div>
 							</div>
 						</div>
@@ -435,7 +424,6 @@ interface TariffData {
 	service_id: number;
 	name: string;
 	rate: number;
-	subscription_fee?: number | null;
 	currency: string;
 	valid_from: string;
 	valid_to?: string;
@@ -673,7 +661,6 @@ export default defineComponent({
 					service_id: selectedService.value.id,
 					name: 'Стандартний тариф',
 					rate: 1, // For fixed payments, rate is always 1
-					subscription_fee: 0,
 					currency: 'UAH',
 					valid_from: new Date().toISOString(),
 					is_active: true,
@@ -821,8 +808,7 @@ export default defineComponent({
 				if (selectedTariff.value && calculationData.consumption > 0) {
 					// Розрахунок: споживання × ставка + абонплата
 					const consumptionCost = calculationData.consumption * selectedTariff.value.rate;
-					const subscriptionFee = selectedTariff.value.subscription_fee || 0;
-					calculationData.cost = consumptionCost + subscriptionFee;
+					calculationData.cost = consumptionCost;
 				} else {
 					calculationData.cost = 0;
 				}
@@ -831,8 +817,7 @@ export default defineComponent({
 				calculationData.consumption = readingForm.current_reading;
 				if (selectedTariff.value && calculationData.consumption > 0) {
 					const consumptionCost = calculationData.consumption * selectedTariff.value.rate;
-					const subscriptionFee = selectedTariff.value.subscription_fee || 0;
-					calculationData.cost = consumptionCost + subscriptionFee;
+					calculationData.cost = consumptionCost;
 				} else {
 					calculationData.cost = 0;
 				}
@@ -877,12 +862,6 @@ export default defineComponent({
 						totalCost += reading.consumption * tariff.rate;
 					}
 				});
-				
-				// Add subscription fee once
-				const firstTariff = groupedTariffs.value[0]?.mainTariff;
-				if (firstTariff?.subscription_fee) {
-					totalCost += firstTariff.subscription_fee;
-				}
 			}
 			
 			calculationData.cost = totalCost;

@@ -51,14 +51,7 @@
 						</option>
 					</select>
 				</div>
-				<div class="col-md-3">
-					<label for="statusFilter" class="form-label">Статус оплати</label>
-					<select class="form-control" id="statusFilter" v-model="selectedPaymentStatus">
-						<option value="">Всі</option>
-						<option value="paid">Оплачено</option>
-						<option value="unpaid">Не оплачено</option>
-					</select>
-				</div>
+				<div class="col-md-3"></div>
 				<div class="col-md-3 d-flex align-items-end">
 					<button class="btn btn-outline-secondary w-100" @click="resetFilters">
 						<i class="fas fa-times me-2"></i>Скинути фільтри
@@ -93,6 +86,7 @@
 				<GroupedReadings 
 					:addressId="addressId" 
 					:period="selectedPeriod || currentPeriod" 
+					:serviceFilter="selectedService"
 				/>
 			</div>
 		</div>
@@ -161,7 +155,6 @@ export default defineComponent({
 		// Filters
 		const selectedPeriod = ref('');
 		const selectedService = ref('');
-		const selectedPaymentStatus = ref('');
 		const currentPage = ref(1);
 		const itemsPerPage = 20;
 		
@@ -240,11 +233,6 @@ export default defineComponent({
 			if (selectedService.value) {
 				filtered = filtered.filter(r => r.service_id === parseInt(selectedService.value));
 			}
-			if (selectedPaymentStatus.value === 'paid') {
-				filtered = filtered.filter(r => r.is_paid);
-			} else if (selectedPaymentStatus.value === 'unpaid') {
-				filtered = filtered.filter(r => !r.is_paid);
-			}
 
 			return filtered.sort((a, b) => new Date(b.period).getTime() - new Date(a.period).getTime());
 		});
@@ -267,7 +255,7 @@ export default defineComponent({
 		});
 
 		const hasFilters = computed(() => 
-			selectedPeriod.value || selectedService.value || selectedPaymentStatus.value
+			selectedPeriod.value || selectedService.value
 		);
 
 		const visiblePages = computed(() => {
@@ -319,7 +307,6 @@ export default defineComponent({
 		const resetFilters = () => {
 			selectedPeriod.value = '';
 			selectedService.value = '';
-			selectedPaymentStatus.value = '';
 			currentPage.value = 1;
 		};
 
@@ -409,7 +396,6 @@ export default defineComponent({
 			isLoading,
 			selectedPeriod,
 			selectedService,
-			selectedPaymentStatus,
 			currentPage,
 			totalPages,
 			totalReadings,

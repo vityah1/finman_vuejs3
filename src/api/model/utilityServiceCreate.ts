@@ -9,6 +9,7 @@ import type { UtilityServiceCreateMeterNumber } from "./utilityServiceCreateMete
 import type { UtilityServiceCreateIsActive } from "./utilityServiceCreateIsActive";
 import type { UtilityServiceCreateHasSharedMeter } from "./utilityServiceCreateHasSharedMeter";
 import type { UtilityServiceCreateServiceGroup } from "./utilityServiceCreateServiceGroup";
+import type { UtilityServiceCreateSource } from "./utilityServiceCreateSource";
 
 /**
  * Схема для створення комунальної служби
@@ -22,4 +23,5 @@ export interface UtilityServiceCreate {
   is_active?: UtilityServiceCreateIsActive;
   has_shared_meter?: UtilityServiceCreateHasSharedMeter;
   service_group?: UtilityServiceCreateServiceGroup;
+  source?: UtilityServiceCreateSource;
 }

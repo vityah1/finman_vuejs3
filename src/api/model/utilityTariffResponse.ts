@@ -19,6 +19,7 @@ import type { UtilityTariffResponseTariffType } from "./utilityTariffResponseTar
 import type { UtilityTariffResponseGroupCode } from "./utilityTariffResponseGroupCode";
 import type { UtilityTariffResponseCalculationMethod } from "./utilityTariffResponseCalculationMethod";
 import type { UtilityTariffResponsePercentageOf } from "./utilityTariffResponsePercentageOf";
+import type { UtilityTariffResponseSource } from "./utilityTariffResponseSource";
 
 /**
  * Схема для відповіді з даними тарифу комунальної служби
@@ -39,4 +40,5 @@ export interface UtilityTariffResponse {
   group_code?: UtilityTariffResponseGroupCode;
   calculation_method?: UtilityTariffResponseCalculationMethod;
   percentage_of?: UtilityTariffResponsePercentageOf;
+  source?: UtilityTariffResponseSource;
 }

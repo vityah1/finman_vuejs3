@@ -11,6 +11,7 @@ import type { UtilityTariffCreateTariffType } from "./utilityTariffCreateTariffT
 import type { UtilityTariffCreateGroupCode } from "./utilityTariffCreateGroupCode";
 import type { UtilityTariffCreateCalculationMethod } from "./utilityTariffCreateCalculationMethod";
 import type { UtilityTariffCreatePercentageOf } from "./utilityTariffCreatePercentageOf";
+import type { UtilityTariffCreateSource } from "./utilityTariffCreateSource";
 
 /**
  * Схема для створення тарифу
@@ -27,4 +28,5 @@ export interface UtilityTariffCreate {
   group_code?: UtilityTariffCreateGroupCode;
   calculation_method?: UtilityTariffCreateCalculationMethod;
   percentage_of?: UtilityTariffCreatePercentageOf;
+  source?: UtilityTariffCreateSource;
 }

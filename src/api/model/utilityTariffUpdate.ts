@@ -14,6 +14,7 @@ import type { UtilityTariffUpdateTariffType } from "./utilityTariffUpdateTariffT
 import type { UtilityTariffUpdateGroupCode } from "./utilityTariffUpdateGroupCode";
 import type { UtilityTariffUpdateCalculationMethod } from "./utilityTariffUpdateCalculationMethod";
 import type { UtilityTariffUpdatePercentageOf } from "./utilityTariffUpdatePercentageOf";
+import type { UtilityTariffUpdateSource } from "./utilityTariffUpdateSource";
 
 /**
  * Схема для оновлення тарифу
@@ -29,4 +30,5 @@ export interface UtilityTariffUpdate {
   group_code?: UtilityTariffUpdateGroupCode;
   calculation_method?: UtilityTariffUpdateCalculationMethod;
   percentage_of?: UtilityTariffUpdatePercentageOf;
+  source?: UtilityTariffUpdateSource;
 }

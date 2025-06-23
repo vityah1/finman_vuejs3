@@ -58,6 +58,7 @@
 								<th>Ставка</th>
 								<th>Валюта</th>
 								<th>Група</th>
+								<th>Джерело</th>
 								<th>Період дії</th>
 								<th>Статус</th>
 								<th>Дії</th>
@@ -83,6 +84,10 @@
 								<td>
 									<span v-if="tariff.group_code" class="badge bg-secondary">{{ tariff.group_code }}</span>
 									<span v-else class="text-muted">-</span>
+								</td>
+								<td>
+									<span v-if="tariff.source === 'import'" class="badge bg-warning">Імпорт</span>
+									<span v-else class="badge bg-primary">Інтерфейс</span>
 								</td>
 								<td>
 									<small class="text-muted d-block">
@@ -302,6 +307,7 @@ interface TariffData {
 	group_code?: string;
 	calculation_method?: string;
 	percentage_of?: number;
+	source?: string;
 }
 
 export default defineComponent({
@@ -330,7 +336,8 @@ export default defineComponent({
 			tariff_type: '',
 			group_code: '',
 			calculation_method: 'standard',
-			percentage_of: null as number | null
+			percentage_of: null as number | null,
+			source: 'interface'
 		});
 
 		// Mock data for now
@@ -386,6 +393,7 @@ export default defineComponent({
 			tariffForm.group_code = '';
 			tariffForm.calculation_method = 'standard';
 			tariffForm.percentage_of = null;
+			tariffForm.source = 'interface';
 			editingTariff.value = null;
 		};
 
@@ -402,6 +410,7 @@ export default defineComponent({
 			tariffForm.group_code = tariff.group_code || '';
 			tariffForm.calculation_method = tariff.calculation_method || 'standard';
 			tariffForm.percentage_of = tariff.percentage_of || null;
+			tariffForm.source = tariff.source || 'interface';
 			showAddModal.value = true;
 		};
 
@@ -426,7 +435,8 @@ export default defineComponent({
 					tariff_type: tariffForm.tariff_type || undefined,
 					group_code: tariffForm.group_code || undefined,
 					calculation_method: tariffForm.calculation_method,
-					percentage_of: tariffForm.percentage_of || undefined
+					percentage_of: tariffForm.percentage_of || undefined,
+					source: tariffForm.source
 				};
 
 				if (editingTariff.value) {
