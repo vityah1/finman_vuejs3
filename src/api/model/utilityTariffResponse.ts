@@ -8,7 +8,6 @@ import type { UtilityTariffResponseId } from "./utilityTariffResponseId";
 import type { UtilityTariffResponseServiceId } from "./utilityTariffResponseServiceId";
 import type { UtilityTariffResponseName } from "./utilityTariffResponseName";
 import type { UtilityTariffResponseRate } from "./utilityTariffResponseRate";
-import type { UtilityTariffResponseSubscriptionFee } from "./utilityTariffResponseSubscriptionFee";
 import type { UtilityTariffResponseCurrency } from "./utilityTariffResponseCurrency";
 import type { UtilityTariffResponseValidFrom } from "./utilityTariffResponseValidFrom";
 import type { UtilityTariffResponseValidTo } from "./utilityTariffResponseValidTo";
@@ -29,7 +28,6 @@ export interface UtilityTariffResponse {
   service_id?: UtilityTariffResponseServiceId;
   name?: UtilityTariffResponseName;
   rate?: UtilityTariffResponseRate;
-  subscription_fee?: UtilityTariffResponseSubscriptionFee;
   currency?: UtilityTariffResponseCurrency;
   valid_from?: UtilityTariffResponseValidFrom;
   valid_to?: UtilityTariffResponseValidTo;

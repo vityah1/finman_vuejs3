@@ -56,7 +56,6 @@
 								<th>Назва</th>
 								<th>Тип</th>
 								<th>Ставка</th>
-								<th>Абонплата</th>
 								<th>Валюта</th>
 								<th>Група</th>
 								<th>Період дії</th>
@@ -79,10 +78,6 @@
 										  class="text-muted d-block">
 										<small>({{ tariff.percentage_of }}% від основного)</small>
 									</span>
-								</td>
-								<td>
-									<span v-if="tariff.subscription_fee">{{ formatRate(tariff.subscription_fee) }}</span>
-									<span v-else class="text-muted">-</span>
 								</td>
 								<td>{{ tariff.currency || 'UAH' }}</td>
 								<td>
@@ -140,21 +135,12 @@
 									   placeholder="Наприклад: Денний тариф, Нічний тариф">
 							</div>
 							<div class="row">
-								<div class="col-md-6">
+								<div class="col-md-12">
 									<div class="mb-3">
 										<label for="tariffRate" class="form-label">Ставка <span class="text-danger">*</span></label>
 										<input type="number" step="0.01" class="form-control" id="tariffRate" 
 											   v-model="tariffForm.rate" required 
 											   placeholder="0.00">
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="mb-3">
-										<label for="subscriptionFee" class="form-label">Абонплата</label>
-										<input type="number" step="0.01" class="form-control" id="subscriptionFee" 
-											   v-model="tariffForm.subscription_fee" 
-											   placeholder="0.00">
-										<small class="form-text text-muted">Фіксована щомісячна плата (опціонально)</small>
 									</div>
 								</div>
 							</div>
@@ -205,11 +191,13 @@
 										<label for="tariffType" class="form-label">Тип тарифу</label>
 										<select class="form-control" id="tariffType" v-model="tariffForm.tariff_type">
 											<option value="">Стандартний</option>
-											<option value="consumption">Споживання (вода)</option>
+											<option value="consumption">Споживання</option>
 											<option value="drainage">Водовідведення</option>
 											<option value="subscription">Абонплата</option>
-											<option value="day">Денний (електрика)</option>
-											<option value="night">Нічний (електрика)</option>
+											<option value="day">Денний</option>
+											<option value="night">Нічний</option>
+											<option value="apartment">Квартплата</option>
+											<option value="fixed">Фіксований</option>
 										</select>
 									</div>
 								</div>
@@ -305,7 +293,6 @@ interface TariffData {
 	service_id: number;
 	name: string;
 	rate: number;
-	subscription_fee?: number | null;
 	currency: string;
 	valid_from: string;
 	valid_to?: string;
@@ -335,7 +322,6 @@ export default defineComponent({
 		const tariffForm = reactive({
 			name: '',
 			rate: 0,
-			subscription_fee: 0,
 			currency: 'UAH',
 			valid_from: '',
 			valid_to: '',
@@ -378,8 +364,11 @@ export default defineComponent({
 			const types: Record<string, string> = {
 				consumption: 'Споживання',
 				drainage: 'Водовідведення',
+				subscription: 'Абонплата',
 				day: 'Денний',
 				night: 'Нічний',
+				apartment: 'Квартплата',
+				fixed: 'Фіксований',
 				standard: 'Стандартний'
 			};
 			return types[type] || type;
@@ -388,7 +377,6 @@ export default defineComponent({
 		const resetForm = () => {
 			tariffForm.name = '';
 			tariffForm.rate = 0;
-			tariffForm.subscription_fee = 0;
 			tariffForm.currency = 'UAH';
 			tariffForm.valid_from = '';
 			tariffForm.valid_to = '';
@@ -405,7 +393,6 @@ export default defineComponent({
 			editingTariff.value = tariff;
 			tariffForm.name = tariff.name;
 			tariffForm.rate = tariff.rate;
-			tariffForm.subscription_fee = tariff.subscription_fee || 0;
 			tariffForm.currency = tariff.currency;
 			tariffForm.valid_from = tariff.valid_from;
 			tariffForm.valid_to = tariff.valid_to || '';
@@ -431,7 +418,6 @@ export default defineComponent({
 					service_id: serviceId.value,
 					name: tariffForm.name,
 					rate: tariffForm.rate,
-					subscription_fee: tariffForm.subscription_fee || 0,
 					currency: tariffForm.currency,
 					valid_from: tariffForm.valid_from,
 					valid_to: tariffForm.valid_to || undefined,
