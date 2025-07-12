@@ -149,7 +149,7 @@
 									<td class="text-end">{{ formatCurrency(reading.amount) }}</td>
 									<td class="text-center">
 										<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
-										<button v-if="!group.has_shared_meter || service.readings.indexOf(reading) === 0" 
+										<button v-if="!group.has_shared_meter || (group.readings && group.readings.indexOf(reading) === 0)" 
 												class="btn btn-sm btn-outline-primary" 
 												@click="editReading(reading.id)"
 												title="Редагувати">
@@ -178,7 +178,7 @@
 										<small v-if="reading.tariff_name" class="text-muted">{{ reading.tariff_name }}</small>
 									</div>
 									<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
-									<button v-if="!group.has_shared_meter || service.readings.indexOf(reading) === 0" 
+									<button v-if="!group.has_shared_meter || (group.readings && group.readings.indexOf(reading) === 0)" 
 											class="btn btn-sm btn-outline-primary ms-2" 
 											@click="editReading(reading.id)"
 											title="Редагувати">
@@ -276,7 +276,7 @@
 									<td class="text-end">{{ formatCurrency(reading.amount) }}</td>
 									<td class="text-center">
 										<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
-										<button v-if="!group.has_shared_meter || service.readings.indexOf(reading) === 0" 
+										<button v-if="!group.has_shared_meter || (group.readings && group.readings.indexOf(reading) === 0)" 
 												class="btn btn-sm btn-outline-primary" 
 												@click="editReading(reading.id)"
 												title="Редагувати">
@@ -306,7 +306,7 @@
 										<small v-else-if="reading.tariff?.calculation_method === 'fixed'" class="text-muted badge bg-info">Фіксована сума</small>
 									</div>
 									<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
-									<button v-if="!group.has_shared_meter || service.readings.indexOf(reading) === 0" 
+									<button v-if="!group.has_shared_meter || (group.readings && group.readings.indexOf(reading) === 0)" 
 											class="btn btn-sm btn-outline-primary ms-2" 
 											@click="editReading(reading.id)"
 											title="Редагувати">
