@@ -308,7 +308,7 @@
 									</table>
 								</div>
 							</div>
-							<div v-else-if="!isSharedMeterService && calculationData.consumption">
+							<div v-else-if="!selectedService?.has_shared_meter && calculationData.consumption">
 								<div class="mb-3">
 									<h6>Споживання</h6>
 									<div class="h4 text-primary">
@@ -600,37 +600,19 @@ export default defineComponent({
 				.slice(0, 5);
 		});
 		
-		// Service type detection based on has_shared_meter flag
-		const isSharedMeterService = computed(() => {
-			return selectedService.value?.has_shared_meter === true;
+		// Service type detection based on service and tariff attributes
+		const hasFixedPaymentTariff = computed(() => {
+			if (!readingForm.service_id) return false;
+			return availableTariffs.value.some(tariff => 
+				tariff.calculation_method === 'fixed'
+			);
 		});
 		
-		const isElectricityService = computed(() => {
-			// Відключаємо електричну логіку для відладки
-			return false;
-			
-			// TODO: Логіка для множинних показників електрики буде виправлена пізніше
-			// if (!selectedService.value) return false;
-			
-			// const name = selectedService.value.name.toLowerCase();
-			// const isElectric = name.includes('електр') || name.includes('electric');
-			
-			// // Перевіряємо, чи є декілька тарифів для цієї служби (день/ніч)
-			// const electricTariffs = availableTariffs.value.filter(t => {
-			// 	const tariffName = t.name.toLowerCase();
-			// 	return tariffName.includes('день') || tariffName.includes('ніч') || 
-			// 	       tariffName.includes('day') || tariffName.includes('night');
-			// });
-			
-			// return isElectric && electricTariffs.length > 1 && !readingForm.tariff_id;
-		});
-		
-		// Визначення фіксованих платежів (квартплата, сміття)
-		const isFixedPaymentService = computed(() => {
-			if (!selectedService.value) return false;
-			const name = selectedService.value.name.toLowerCase();
-			const fixedServices = ['квартплата', 'сміття', 'rent', 'garbage'];
-			return fixedServices.some(service => name.includes(service));
+		const isMultiTariffService = computed(() => {
+			if (!readingForm.service_id) return false;
+			// Перевіряємо, чи є декілька активних тарифів з різними типами
+			const tariffTypes = new Set(availableTariffs.value.map(t => t.tariff_type));
+			return tariffTypes.size > 1 && !selectedService.value?.has_shared_meter;
 		});
 		
 		// Grouped tariffs for multi-tariff services
@@ -751,7 +733,7 @@ export default defineComponent({
 			};
 			
 			// Auto-select tariffs based on service type
-			if (isElectricityService.value) {
+			if (isMultiTariffService.value) {
 				// For electricity, assign tariffs to corresponding types
 				groupedTariffs.value.forEach(group => {
 					// Initialize multiReadingForm for this type if not exists
@@ -768,7 +750,7 @@ export default defineComponent({
 					}
 				});
 				
-				// Calculate costs for electricity after setting tariffs
+				// Calculate costs for multi-tariff service after setting tariffs
 				calculateTotalCost();
 			} else if (hasFixedPaymentTariff.value && availableTariffs.value.length === 0) {
 				// For fixed payment services without tariffs, create default tariff
@@ -800,7 +782,7 @@ export default defineComponent({
 				)
 				.sort((a, b) => b.period.localeCompare(a.period));
 
-			if (isElectricityService.value) {
+			if (isMultiTariffService.value) {
 				// Для електрики шукаємо по типах
 				groupedTariffs.value.forEach(group => {
 					const typeReadings = serviceReadings.filter(r => {
@@ -813,7 +795,7 @@ export default defineComponent({
 						multiReadingForm[group.type].previous_reading = typeReadings[0].current_reading;
 					}
 				});
-			} else if (isSharedMeterService.value) {
+			} else if (selectedService.value?.has_shared_meter) {
 				// Для служб зі спільним лічильником просто беремо останній показник
 				if (serviceReadings.length > 0) {
 					readingForm.previous_reading = serviceReadings[0].current_reading;
@@ -900,7 +882,7 @@ export default defineComponent({
 		const calculateTotalCost = () => {
 			let totalCost = 0;
 			
-			if (isElectricityService.value) {
+			if (isMultiTariffService.value) {
 				// Sum costs from all reading types
 				groupedTariffs.value.forEach(group => {
 					const reading = multiReadingForm[group.type];
@@ -920,7 +902,7 @@ export default defineComponent({
 			
 			try {
 				// Валідація: перевіряємо, чи поточний показник не менший за попередній
-				if (!isFixedPaymentService.value && readingForm.previous_reading && 
+				if (!hasFixedPaymentTariff.value && readingForm.previous_reading && 
 					readingForm.current_reading < readingForm.previous_reading) {
 					if (myAlert.value) {
 						myAlert.value.showAlert('danger', 'Помилка: поточний показник не може бути меншим за попередній');
@@ -928,7 +910,7 @@ export default defineComponent({
 					isSaving.value = false;
 					return;
 				}
-				if (isFixedPaymentService.value && !isEditing.value) {
+				if (hasFixedPaymentTariff.value && !isEditing.value) {
 					// Для фіксованих платежів (квартплата, сміття)
 					const readingData: UtilityReadingCreate = {
 						address_id: readingForm.address_id,
@@ -945,7 +927,7 @@ export default defineComponent({
 					await createReadingMutation.mutateAsync({
 						data: readingData
 					});
-				} else if (isElectricityService.value && !isEditing.value) {
+				} else if (isMultiTariffService.value && !isEditing.value) {
 					// For electricity service - create reading for each tariff type (day/night)
 					for (const [readingType, formData] of Object.entries(multiReadingForm)) {
 						if (formData.tariff_id === 0) continue; // Skip if no tariff selected
@@ -967,7 +949,7 @@ export default defineComponent({
 							data: readingData
 						});
 					}
-				} else if (isSharedMeterService.value && !isEditing.value) {
+				} else if (selectedService.value?.has_shared_meter && !isEditing.value) {
 					// For services with shared meter (water, gas) - create ONE reading with main tariff
 					// The backend will handle all tariff calculations automatically
 					const mainTariff = availableTariffs.value.find(t => t.calculation_method === 'standard') || availableTariffs.value[0];
@@ -996,8 +978,8 @@ export default defineComponent({
 					// Update existing reading
 					const updateData: UtilityReadingUpdate = {
 						period: readingForm.period,
-						current_reading: isFixedPaymentService.value ? (readingForm.amount || 0) : readingForm.current_reading,
-						previous_reading: isFixedPaymentService.value ? 0 : (readingForm.previous_reading || undefined),
+						current_reading: hasFixedPaymentTariff.value ? (readingForm.amount || 0) : readingForm.current_reading,
+						previous_reading: hasFixedPaymentTariff.value ? 0 : (readingForm.previous_reading || undefined),
 						tariff_id: readingForm.tariff_id,
 						reading_date: readingForm.reading_date || undefined,
 						is_paid: readingForm.is_paid || undefined,
@@ -1079,7 +1061,7 @@ export default defineComponent({
 		
 		// Calculate total amount for shared meter services
 		const calculateTotalAmount = (): number => {
-			if (!isSharedMeterService.value) return calculationData.cost;
+			if (!selectedService.value?.has_shared_meter) return calculationData.cost;
 			
 			let total = 0;
 			availableTariffs.value.forEach(tariff => {
@@ -1132,7 +1114,7 @@ export default defineComponent({
 
 		// Watch tariff changes
 		watch(() => readingForm.tariff_id, () => {
-			if (!isEditing.value && readingForm.service_id && !isSharedMeterService.value) {
+			if (!isEditing.value && readingForm.service_id && !selectedService.value?.has_shared_meter) {
 				findLastReading();
 			}
 			calculateConsumption();
@@ -1140,14 +1122,14 @@ export default defineComponent({
 
 		// Watch multiReadingForm for electricity calculations
 		watch(() => multiReadingForm, () => {
-			if (isElectricityService.value) {
+			if (isMultiTariffService.value) {
 				calculateTotalCost();
 			}
 		}, { deep: true });
 
 		// Watch for tariff changes in multiReadingForm
 		watch(() => groupedTariffs.value, () => {
-			if (isElectricityService.value) {
+			if (isMultiTariffService.value) {
 				calculateTotalCost();
 			}
 		}, { deep: true });
@@ -1176,12 +1158,12 @@ export default defineComponent({
 				readingForm.notes = reading.notes || '';
 				
 				// For fixed payment services, amount field should be filled
-				if (reading.service && isFixedPaymentService.value) {
+				if (reading.service && hasFixedPaymentTariff.value) {
 					readingForm.amount = reading.current_reading || 0;
 				}
 				
-				// Перевірка, чи це електрика або служба з multiple readings
-				if (reading.reading_type && (isElectricityService.value || reading.service?.service_group === 'electricity')) {
+				// Перевірка, чи це мульти-тарифна служба або служба з multiple readings
+				if (reading.reading_type && (isMultiTariffService.value || reading.service?.service_group === 'electricity')) {
 					// Для електрики потрібна спеціальна обробка
 					const readingType = reading.reading_type;
 					// Initialize multiReadingForm for this type if not exists
@@ -1202,9 +1184,9 @@ export default defineComponent({
 					
 					// Recalculate after loading data
 					setTimeout(() => {
-						if (isElectricityService.value) {
+						if (isMultiTariffService.value) {
 							calculateTotalCost();
-						} else if (isSharedMeterService.value) {
+						} else if (selectedService.value?.has_shared_meter) {
 							calculateConsumption();
 						}
 					}, 100);
@@ -1262,9 +1244,8 @@ export default defineComponent({
 			availableTariffs,
 			selectedTariff,
 			recentReadings,
-			isSharedMeterService,
-			isElectricityService,
-			isFixedPaymentService,
+			hasFixedPaymentTariff,
+			isMultiTariffService,
 			groupedTariffs,
 
 			// Methods
