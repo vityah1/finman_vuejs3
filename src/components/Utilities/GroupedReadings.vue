@@ -148,7 +148,9 @@
 									</td>
 									<td class="text-end">{{ formatCurrency(reading.amount) }}</td>
 									<td class="text-center">
-										<button class="btn btn-sm btn-outline-primary" 
+										<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
+										<button v-if="!group.has_shared_meter || service.readings.indexOf(reading) === 0" 
+												class="btn btn-sm btn-outline-primary" 
 												@click="editReading(reading.id)"
 												title="Редагувати">
 											<i class="fas fa-edit"></i>
@@ -175,7 +177,9 @@
 										<h6 class="card-title mb-1">{{ reading.service_name }}</h6>
 										<small v-if="reading.tariff_name" class="text-muted">{{ reading.tariff_name }}</small>
 									</div>
-									<button class="btn btn-sm btn-outline-primary ms-2" 
+									<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
+									<button v-if="!group.has_shared_meter || service.readings.indexOf(reading) === 0" 
+											class="btn btn-sm btn-outline-primary ms-2" 
 											@click="editReading(reading.id)"
 											title="Редагувати">
 										<i class="fas fa-edit"></i>
@@ -271,7 +275,9 @@
 									</td>
 									<td class="text-end">{{ formatCurrency(reading.amount) }}</td>
 									<td class="text-center">
-										<button class="btn btn-sm btn-outline-primary" 
+										<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
+										<button v-if="!group.has_shared_meter || service.readings.indexOf(reading) === 0" 
+												class="btn btn-sm btn-outline-primary" 
 												@click="editReading(reading.id)"
 												title="Редагувати">
 											<i class="fas fa-edit"></i>
@@ -299,7 +305,9 @@
 										<small v-if="reading.tariff_type === 'subscription'" class="text-muted badge bg-secondary">Абонплата</small>
 										<small v-else-if="reading.tariff?.calculation_method === 'fixed'" class="text-muted badge bg-info">Фіксована сума</small>
 									</div>
-									<button class="btn btn-sm btn-outline-primary ms-2" 
+									<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
+									<button v-if="!group.has_shared_meter || service.readings.indexOf(reading) === 0" 
+											class="btn btn-sm btn-outline-primary ms-2" 
 											@click="editReading(reading.id)"
 											title="Редагувати">
 										<i class="fas fa-edit"></i>
