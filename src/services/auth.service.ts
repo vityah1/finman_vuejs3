@@ -58,10 +58,17 @@ class AuthService {
         try {
             // Спробуємо отримати список користувачів, що вимагає авторизації
             const response = await getUsersApiUsersGet();
+            console.log('validateToken: токен валідний');
             return !!response.data;
-        } catch (error) {
-            console.error('Токен недійсний або протух:', error);
-            this.logout();
+        } catch (error: any) {
+            console.error('validateToken: токен недійсний або протух:', error?.response?.status || error.message);
+            
+            // Автоматично очищуємо localStorage тільки якщо це точно проблема з токеном
+            if (error?.response?.status === 401 || error?.response?.status === 403) {
+                console.log('validateToken: очищуємо localStorage через протухлий токен');
+                this.logout();
+            }
+            
             return false;
         }
     }

@@ -81,53 +81,73 @@ export default {
     }
   },
   methods: {
-    loadInitialData() {
-      // Завантажуємо довідники
-      this.$store.dispatch("sprs/get_sources");
-      this.$store.dispatch("sprs/get_currencies");
-      this.$store.dispatch("sprs/get_categories");
+    async loadInitialData() {
+      console.log("loadInitialData: завантаження початкових даних після авторизації...");
       
-      // Завантажуємо роки з платежами
-      // Це критично важливо після авторизації, щоб дані були доступні в інтерфейсі
-      PaymentService.getPaymentsYears({currency: this.$store.state.sprs.selectedCurrency || "UAH"})
-        .then(() => {
-          console.log("Роки платежів успішно отримано після авторизації");
-        })
-        .catch(error => {
-          console.error("Помилка завантаження років платежів після авторизації:", error);
-        });
+      try {
+        // Завантажуємо довідники паралельно
+        await Promise.all([
+          this.$store.dispatch("sprs/get_sources").catch(error => {
+            console.error("Помилка завантаження sources:", error);
+          }),
+          this.$store.dispatch("sprs/get_currencies").catch(error => {
+            console.error("Помилка завантаження currencies:", error);
+          }),
+          this.$store.dispatch("sprs/get_categories").catch(error => {
+            console.error("Помилка завантаження categories:", error);
+          })
+        ]);
         
-      // Оновлюємо всі кеші запитів
-      refreshAllData()
-        .then(() => {
-          console.log("Всі кеші запитів оновлено після авторизації");
-        })
-        .catch(error => {
-          console.error("Помилка оновлення кешів запитів:", error);
-        });
-    },
-    handleLogin(credentials) {
-      this.loading = true;
-
-      this.$store.dispatch("auth/login", credentials).then(
-        () => {
-          // Після успішної авторизації завантажуємо необхідні дані
-          this.loadInitialData();
-          
-          // Перенаправляємо на сторінку, з якої прийшли, або на профіль
-          const returnUrl = this.$route.query.returnUrl || '/profile';
-          this.$router.push(returnUrl);
-        },
-        (error) => {
-          this.loading = false;
-          this.message =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString();
+        console.log("loadInitialData: довідники завантажено");
+        
+        // Завантажуємо роки з платежами
+        // Це критично важливо після авторизації, щоб дані були доступні в інтерфейсі
+        try {
+          await PaymentService.getPaymentsYears({currency: this.$store.state.sprs.selectedCurrency || "UAH"});
+          console.log("loadInitialData: роки платежів успішно отримано після авторизації");
+        } catch (error) {
+          console.error("loadInitialData: помилка завантаження років платежів після авторизації:", error);
         }
-      );
+        
+        // Оновлюємо всі кеші запитів
+        try {
+          await refreshAllData();
+          console.log("loadInitialData: всі кеші запитів оновлено після авторизації");
+        } catch (error) {
+          console.error("loadInitialData: помилка оновлення кешів запитів:", error);
+        }
+        
+        console.log("loadInitialData: завантаження початкових даних завершено");
+      } catch (error) {
+        console.error("loadInitialData: загальна помилка завантаження даних:", error);
+      }
+    },
+    async handleLogin(credentials) {
+      this.loading = true;
+      this.message = "";
+
+      try {
+        console.log("handleLogin: виконуємо авторизацію...");
+        await this.$store.dispatch("auth/login", credentials);
+        
+        console.log("handleLogin: авторизація успішна, завантажуємо дані...");
+        // Після успішної авторизації завантажуємо необхідні дані
+        await this.loadInitialData();
+        
+        console.log("handleLogin: перенаправляємо користувача...");
+        // Перенаправляємо на сторінку, з якої прийшли, або на профіль
+        const returnUrl = this.$route.query.returnUrl || '/profile';
+        this.$router.push(returnUrl);
+      } catch (error) {
+        this.loading = false;
+        console.error("handleLogin: помилка авторизації:", error);
+        this.message =
+          (error.response &&
+            error.response.data &&
+            error.response.data.message) ||
+          error.message ||
+          error.toString();
+      }
     },
   },
 };

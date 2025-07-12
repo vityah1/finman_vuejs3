@@ -20,8 +20,15 @@
 			<!-- Загальна сума (показуємо вгорі) -->
 			<div class="card mb-4">
 				<div class="card-body">
-					<div class="d-flex justify-content-between align-items-center">
+					<!-- Десктопна версія -->
+					<div class="d-flex justify-content-between align-items-center d-none d-md-flex">
 						<h5 class="mb-0">Загальна сума за період {{ groupedData.period }}:</h5>
+						<h4 class="mb-0 text-primary">{{ formatCurrency(totalAmount) }}</h4>
+					</div>
+					
+					<!-- Мобільна версія - компактно -->
+					<div class="text-center d-md-none">
+						<div class="text-muted small">{{ groupedData.period }}</div>
 						<h4 class="mb-0 text-primary">{{ formatCurrency(totalAmount) }}</h4>
 					</div>
 				</div>
@@ -42,27 +49,45 @@
 				<div class="card-body">
 					<!-- Спільний показник для групи (показуємо один раз) -->
 					<div v-if="group.has_shared_meter && group.readings.length > 0" class="alert alert-info mb-3">
-						<div class="d-flex justify-content-between align-items-center">
-							<div>
-								<strong><i class="fas fa-tachometer-alt me-2"></i>Спільний показник лічильника:</strong> 
-								<span class="h5 ms-2">{{ getSharedMeterReading(group) }}</span>
+						<!-- Десктопна версія -->
+						<div class="d-none d-md-block">
+							<div class="d-flex justify-content-between align-items-center">
+								<div>
+									<strong><i class="fas fa-tachometer-alt me-2"></i>Спільний показник лічильника:</strong> 
+									<span class="h5 ms-2">{{ getSharedMeterReading(group) }}</span>
+									<span v-if="getSharedMeterPreviousReading(group)" class="text-muted ms-2">
+										(попередній: {{ getSharedMeterPreviousReading(group) }})
+									</span>
+								</div>
+								<div class="text-end">
+									<small class="text-muted">Споживання:</small><br>
+									<strong>{{ getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0) }}</strong>
+								</div>
+							</div>
+							<hr class="my-2">
+							<small class="text-muted">
+								<i class="fas fa-info-circle me-1"></i>
+								Один показник використовується для розрахунку всіх тарифів цієї групи
+							</small>
+						</div>
+						
+						<!-- Мобільна версія - компактна -->
+						<div class="d-md-none text-center">
+							<div class="mb-2">
+								<i class="fas fa-tachometer-alt me-2"></i>
+								<strong>Показник: {{ getSharedMeterReading(group) }}</strong>
 								<span v-if="getSharedMeterPreviousReading(group)" class="text-muted ms-2">
-									(попередній: {{ getSharedMeterPreviousReading(group) }})
+									(було: {{ getSharedMeterPreviousReading(group) }})
 								</span>
 							</div>
-							<div class="text-end">
-								<small class="text-muted">Споживання:</small><br>
-								<strong>{{ getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0) }}</strong>
-							</div>
+							<small class="text-muted">
+								Споживання: <strong>{{ getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0) }}</strong>
+							</small>
 						</div>
-						<hr class="my-2">
-						<small class="text-muted">
-							<i class="fas fa-info-circle me-1"></i>
-							Один показник використовується для розрахунку всіх тарифів цієї групи
-						</small>
 					</div>
 					<!-- Деталізація за службами/тарифами -->
-					<div class="table-responsive mb-3">
+					<!-- Десктопна версія -->
+					<div class="table-responsive mb-3 d-none d-md-block">
 						<table class="table table-sm">
 							<thead>
 								<tr>
@@ -131,6 +156,53 @@
 							</tfoot>
 						</table>
 					</div>
+					
+					<!-- Мобільна версія - карточки -->
+					<div class="d-md-none">
+						<div v-for="reading in group.readings as ExtendedGroupedReadingItem[]" :key="reading.id" 
+							 class="card mb-2">
+							<div class="card-body p-3">
+								<div class="d-flex justify-content-between align-items-start">
+									<div class="flex-grow-1">
+										<h6 class="card-title mb-1">{{ reading.service_name }}</h6>
+										<small v-if="reading.tariff_name" class="text-muted">{{ reading.tariff_name }}</small>
+									</div>
+									<button class="btn btn-sm btn-outline-primary ms-2" 
+											@click="editReading(reading.id)"
+											title="Редагувати">
+										<i class="fas fa-edit"></i>
+									</button>
+								</div>
+								
+								<div class="row mt-2">
+									<div class="col-6" v-if="!group.has_shared_meter && reading.current_reading">
+										<small class="text-muted">Останній показник:</small><br>
+										<strong>{{ reading.current_reading }}</strong>
+									</div>
+									<div class="col-6 text-end">
+										<small class="text-muted">Сума:</small><br>
+										<strong class="text-success">{{ formatCurrency(reading.amount) }}</strong>
+									</div>
+								</div>
+								
+								<!-- Додаткова інформація при розгортанні -->
+								<div v-if="reading.tariff_type !== 'subscription' && reading.consumption" class="mt-2 pt-2 border-top">
+									<small class="text-muted">
+										Споживання: <strong>{{ reading.consumption }}</strong> {{ getServiceUnit(reading.service_id) }}
+										<span v-if="reading.tariff">
+											• Тариф: <strong>{{ formatRate(reading.tariff.rate) }}</strong> грн/{{ getServiceUnit(reading.service_id) }}
+										</span>
+									</small>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Підсумок для групи на мобільному -->
+						<div class="alert alert-success d-flex justify-content-between align-items-center">
+							<strong>Загальна сума по групі:</strong>
+							<span class="h5 mb-0 text-success">{{ formatCurrency(group.total_amount) }}</span>
+						</div>
+					</div>
 				</div>
 			</div>
 			</div>
@@ -144,7 +216,8 @@
 					</h5>
 				</div>
 				<div class="card-body">
-					<div class="table-responsive">
+					<!-- Десктопна версія таблиці -->
+					<div class="table-responsive d-none d-md-block">
 						<table class="table table-sm">
 							<thead>
 								<tr>
@@ -205,6 +278,55 @@
 								</tr>
 							</tfoot>
 						</table>
+					</div>
+					
+					<!-- Мобільна версія - карточки -->
+					<div class="d-md-none">
+						<div v-for="reading in service.readings as ExtendedGroupedReadingItem[]" :key="reading.id" 
+							 class="card mb-2">
+							<div class="card-body p-3">
+								<div class="d-flex justify-content-between align-items-start">
+									<div class="flex-grow-1">
+										<h6 class="card-title mb-1">{{ reading.tariff_name || 'Без тарифу' }}</h6>
+										<small v-if="reading.tariff_type === 'subscription'" class="text-muted badge bg-secondary">Абонплата</small>
+										<small v-else-if="isFixedPaymentService(reading.service_name)" class="text-muted badge bg-info">Фіксована сума</small>
+									</div>
+									<button class="btn btn-sm btn-outline-primary ms-2" 
+											@click="editReading(reading.id)"
+											title="Редагувати">
+										<i class="fas fa-edit"></i>
+									</button>
+								</div>
+								
+								<div class="row mt-2">
+									<div class="col-6" v-if="!isFixedPaymentService(reading.service_name) && reading.current_reading">
+										<small class="text-muted">Останній показник:</small><br>
+										<strong>{{ reading.current_reading }}</strong>
+									</div>
+									<div class="col-6 text-end">
+										<small class="text-muted">Сума:</small><br>
+										<strong class="text-success">{{ formatCurrency(reading.amount) }}</strong>
+									</div>
+								</div>
+								
+								<!-- Додаткова інформація -->
+								<div v-if="reading.tariff_type !== 'subscription' && !isFixedPaymentService(reading.service_name) && reading.consumption" 
+									 class="mt-2 pt-2 border-top">
+									<small class="text-muted">
+										Споживання: <strong>{{ reading.consumption }}</strong> {{ service.unit }}
+										<span v-if="reading.tariff">
+											• Тариф: <strong>{{ formatRate(reading.tariff.rate) }}</strong> грн/{{ service.unit }}
+										</span>
+									</small>
+								</div>
+							</div>
+						</div>
+						
+						<!-- Підсумок для служби на мобільному -->
+						<div class="alert alert-success d-flex justify-content-between align-items-center">
+							<strong>Всього:</strong>
+							<span class="h5 mb-0 text-success">{{ formatCurrency(service.total_amount) }}</span>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -38,6 +38,7 @@ export const auth = {
     async checkAuth({ commit, state }: any) {
       const userStr = localStorage.getItem("user");
       if (!userStr) {
+        console.log("checkAuth: користувач відсутній в localStorage");
         commit("logout");
         return false;
       }
@@ -45,29 +46,41 @@ export const auth = {
       try {
         const user = JSON.parse(userStr);
         if (!user || !user.accessToken) {
+          console.log("checkAuth: відсутній токен доступу");
           commit("logout");
           return false;
         }
         
+        console.log("checkAuth: перевіряємо валідність токену через API...");
         // Виконуємо перевірку валідності токену через запит до API
         try {
           // Використовуємо API для перевірки валідності токена
           const isValid = await AuthService.validateToken();
           if (!isValid) {
+            console.log("checkAuth: токен недійсний");
             commit("logout");
             return false;
           }
           
+          console.log("checkAuth: токен валідний, користувач авторизований");
           // Якщо токен валідний, встановлюємо користувача в state
           commit("loginSuccess", user);
           return true;
-        } catch (apiError) {
-          console.error("Токен недійсний:", apiError);
+        } catch (apiError: any) {
+          console.error("checkAuth: помилка валідації токену:", apiError?.response?.status || apiError.message);
+          
+          // Якщо це помилка 401/403 - токен точно протух
+          if (apiError?.response?.status === 401 || apiError?.response?.status === 403) {
+            console.log("checkAuth: токен протух (401/403), виконуємо logout");
+          } else {
+            console.log("checkAuth: інша помилка API, можливо проблеми з мережею");
+          }
+          
           commit("logout");
           return false;
         }
       } catch (error) {
-        console.error("Помилка при перевірці авторизації:", error);
+        console.error("checkAuth: критична помилка при перевірці авторизації:", error);
         commit("logout");
         return false;
       }
