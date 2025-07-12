@@ -61,7 +61,11 @@
 								</div>
 								<div class="text-end">
 									<small class="text-muted">Споживання:</small><br>
-									<strong>{{ getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0) }}</strong>
+									<strong>{{ 
+										typeof getSharedMeterReading(group) === 'number' 
+											? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0)) 
+											: 'Немає даних' 
+									}}</strong>
 								</div>
 							</div>
 							<hr class="my-2">
@@ -81,7 +85,11 @@
 								</span>
 							</div>
 							<small class="text-muted">
-								Споживання: <strong>{{ getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0) }}</strong>
+								Споживання: <strong>{{ 
+									typeof getSharedMeterReading(group) === 'number' 
+										? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0)) 
+										: 'Немає даних' 
+								}}</strong>
 							</small>
 						</div>
 					</div>
@@ -516,26 +524,63 @@ export default defineComponent({
 		
 		// Get shared meter reading (not subscription)
 		const getSharedMeterReading = (group: any): number | string => {
-			if (!group.readings || group.readings.length === 0) return 'Немає даних';
+			if (!group.readings || group.readings.length === 0) {
+				console.log('getSharedMeterReading: немає показників', group);
+				return 'Немає даних';
+			}
 			
-			// Знаходимо показник що не є абонплатою
+			console.log('getSharedMeterReading: показники групи', group.readings);
+			
+			// Знаходимо показник що не є абонплатою та має валідний current_reading
 			const meterReading = group.readings.find((r: any) => 
-				r.current_reading > 0 && r.tariff_type !== 'subscription'
+				r.current_reading !== null && 
+				r.current_reading !== undefined && 
+				!isNaN(r.current_reading) && 
+				r.tariff_type !== 'subscription'
 			);
 			
-			return meterReading?.current_reading || group.readings[0]?.current_reading || 'Немає даних';
+			console.log('getSharedMeterReading: знайдений показник лічильника', meterReading);
+			
+			if (meterReading && meterReading.current_reading !== null) {
+				return Number(meterReading.current_reading);
+			}
+			
+			// Fallback: шукаємо будь-який показник з валідним current_reading
+			const anyReading = group.readings.find((r: any) => 
+				r.current_reading !== null && 
+				r.current_reading !== undefined && 
+				!isNaN(r.current_reading)
+			);
+			
+			console.log('getSharedMeterReading: fallback показник', anyReading);
+			
+			return anyReading ? Number(anyReading.current_reading) : 'Немає даних';
 		};
 		
 		// Get shared meter previous reading
 		const getSharedMeterPreviousReading = (group: any): number | null => {
 			if (!group.readings || group.readings.length === 0) return null;
 			
-			// Знаходимо показник що не є абонплатою
+			// Знаходимо показник що не є абонплатою та має валідний current_reading
 			const meterReading = group.readings.find((r: any) => 
-				r.current_reading > 0 && r.tariff_type !== 'subscription'
+				r.current_reading !== null && 
+				r.current_reading !== undefined && 
+				!isNaN(r.current_reading) && 
+				r.tariff_type !== 'subscription'
 			);
 			
-			return meterReading?.previous_reading || group.readings[0]?.previous_reading || null;
+			if (meterReading && meterReading.previous_reading !== null && meterReading.previous_reading !== undefined) {
+				return Number(meterReading.previous_reading);
+			}
+			
+			// Fallback: шукаємо будь-який показник з валідним previous_reading
+			const anyReading = group.readings.find((r: any) => 
+				r.previous_reading !== null && 
+				r.previous_reading !== undefined && 
+				!isNaN(r.previous_reading)
+			);
+			
+			return anyReading ? Number(anyReading.previous_reading) : null;
 		};
 		
 		return {
