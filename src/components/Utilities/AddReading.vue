@@ -59,6 +59,10 @@
 										<div class="mb-3">
 											<label for="period" class="form-label">Період <span class="text-danger">*</span></label>
 											<PeriodSelector v-model="readingForm.period" />
+											<small class="form-text text-muted">
+												<i class="fas fa-info-circle me-1"></i>
+												Автоматично: до 15 числа - попередній місяць, після 15 - поточний
+											</small>
 										</div>
 									</div>
 									<div class="col-md-4">
@@ -468,11 +472,25 @@ export default defineComponent({
 		const editReadingId = computed(() => route.query.editReadingId ? parseInt(route.query.editReadingId as string) : null);
 		const isEditing = computed(() => editReadingId.value !== null);
 
+		// Функція для автовизначення періоду на основі поточної дати
+		const getDefaultPeriod = (): string => {
+			const now = new Date();
+			const currentDay = now.getDate();
+			
+			// Якщо до 15 числа - попередній місяць, інакше поточний
+			if (currentDay <= 15) {
+				const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+				return prevMonth.toISOString().slice(0, 7);
+			} else {
+				return now.toISOString().slice(0, 7);
+			}
+		};
+
 		// Form data
 		const readingForm = reactive({
 			address_id: parseInt(route.query.addressId as string) || 0,
 			service_id: parseInt(route.query.serviceId as string) || 0,
-			period: route.query.period as string || new Date().toISOString().slice(0, 7),
+			period: route.query.period as string || getDefaultPeriod(),
 			current_reading: 0,
 			previous_reading: 0,
 			tariff_id: 0,
@@ -1194,6 +1212,7 @@ export default defineComponent({
 			groupedTariffs,
 
 			// Methods
+			getDefaultPeriod,
 			formatRate,
 			formatCurrency,
 			formatPeriod,
