@@ -606,8 +606,23 @@ export default defineComponent({
 		
 		const isElectricityService = computed(() => {
 			if (!selectedService.value) return false;
+			
+			// Якщо уже вибрано конкретний тариф, то це не множинна електрика
+			if (readingForm.tariff_id && readingForm.tariff_id > 0) {
+				return false;
+			}
+			
 			const name = selectedService.value.name.toLowerCase();
-			return name.includes('електр') || name.includes('electric');
+			const isElectric = name.includes('електр') || name.includes('electric');
+			
+			// Перевіряємо, чи є декілька тарифів для цієї служби (день/ніч)
+			const electricTariffs = availableTariffs.value.filter(t => {
+				const tariffName = t.name.toLowerCase();
+				return tariffName.includes('день') || tariffName.includes('ніч') || 
+				       tariffName.includes('day') || tariffName.includes('night');
+			});
+			
+			return isElectric && electricTariffs.length > 1;
 		});
 		
 		// Визначення фіксованих платежів (квартплата, сміття)
