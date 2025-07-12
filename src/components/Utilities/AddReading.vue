@@ -900,6 +900,12 @@ export default defineComponent({
 			isSaving.value = true;
 			
 			try {
+				// Валідація: перевіряємо, чи поточний показник не менший за попередній
+				if (!isFixedPaymentService.value && readingForm.previous_reading && 
+					readingForm.current_reading < readingForm.previous_reading) {
+					alert('Помилка: поточний показник не може бути меншим за попередній');
+					return;
+				}
 				if (isFixedPaymentService.value && !isEditing.value) {
 					// Для фіксованих платежів (квартплата, сміття)
 					const readingData: UtilityReadingCreate = {
@@ -1004,9 +1010,25 @@ export default defineComponent({
 					name: 'utilities_readings', 
 					params: { addressId: readingForm.address_id } 
 				});
-			} catch (error) {
+			} catch (error: any) {
 				console.error('Помилка збереження показника:', error);
-				// TODO: Show error message to user
+				
+				// Показуємо помилку користувачу
+				let errorMessage = 'Невідома помилка при збереженні показника';
+				
+				if (error?.response?.data?.detail) {
+					if (typeof error.response.data.detail === 'string') {
+						errorMessage = error.response.data.detail;
+					} else if (Array.isArray(error.response.data.detail)) {
+						errorMessage = error.response.data.detail.map((e: any) => e.msg || e.message || e).join(', ');
+					}
+				} else if (error?.response?.data?.message) {
+					errorMessage = error.response.data.message;
+				} else if (error?.message) {
+					errorMessage = error.message;
+				}
+				
+				alert(`Помилка збереження: ${errorMessage}`);
 			} finally {
 				isSaving.value = false;
 			}
