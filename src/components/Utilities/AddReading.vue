@@ -1150,8 +1150,8 @@ export default defineComponent({
 				readingForm.address_id = reading.address_id || 0;
 				readingForm.service_id = reading.service_id || 0;
 				readingForm.period = reading.period || '';
-				readingForm.current_reading = reading.current_reading || 0;
-				readingForm.previous_reading = reading.previous_reading || 0;
+				readingForm.current_reading = reading.current_reading !== null && reading.current_reading !== undefined ? reading.current_reading : 0;
+				readingForm.previous_reading = reading.previous_reading !== null && reading.previous_reading !== undefined ? reading.previous_reading : 0;
 				readingForm.tariff_id = reading.tariff_id || 0;
 				readingForm.reading_date = reading.reading_date ? reading.reading_date.slice(0, 10) : new Date().toISOString().slice(0, 10);
 				readingForm.is_paid = reading.is_paid || false;
@@ -1176,8 +1176,8 @@ export default defineComponent({
 						};
 					}
 					if (multiReadingForm[readingType]) {
-						multiReadingForm[readingType].current_reading = reading.current_reading || 0;
-						multiReadingForm[readingType].previous_reading = reading.previous_reading || 0;
+						multiReadingForm[readingType].current_reading = reading.current_reading !== null && reading.current_reading !== undefined ? reading.current_reading : 0;
+						multiReadingForm[readingType].previous_reading = reading.previous_reading !== null && reading.previous_reading !== undefined ? reading.previous_reading : 0;
 						multiReadingForm[readingType].consumption = reading.consumption || 0;
 						multiReadingForm[readingType].tariff_id = reading.tariff_id || 0;
 					}
