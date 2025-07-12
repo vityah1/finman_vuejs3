@@ -112,6 +112,15 @@
 
 								<div class="row" v-else-if="isSharedMeterService">
 									<!-- Для служб зі спільним показником -->
+									<div class="col-12">
+										<div class="alert alert-info mb-3">
+											<h6><i class="fas fa-info-circle me-2"></i>Спільний показник для всіх тарифів</h6>
+											<p class="mb-0">
+												Ця служба використовує один показник для розрахунку всіх тарифів. 
+												Введіть поточний показник, і система автоматично розрахує суми за всіма тарифами.
+											</p>
+										</div>
+									</div>
 									<div class="col-md-6">
 										<div class="mb-3">
 											<label for="currentReading" class="form-label">Поточний показник <span class="text-danger">*</span></label>

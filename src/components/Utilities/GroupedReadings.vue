@@ -42,11 +42,24 @@
 				<div class="card-body">
 					<!-- Спільний показник для групи (показуємо один раз) -->
 					<div v-if="group.has_shared_meter && group.readings.length > 0" class="alert alert-info mb-3">
-						<strong>Спільний показник:</strong> 
-						{{ getSharedMeterReading(group) }}
-						<span v-if="getSharedMeterPreviousReading(group)" class="text-muted">
-							(попередній: {{ getSharedMeterPreviousReading(group) }})
-						</span>
+						<div class="d-flex justify-content-between align-items-center">
+							<div>
+								<strong><i class="fas fa-tachometer-alt me-2"></i>Спільний показник лічильника:</strong> 
+								<span class="h5 ms-2">{{ getSharedMeterReading(group) }}</span>
+								<span v-if="getSharedMeterPreviousReading(group)" class="text-muted ms-2">
+									(попередній: {{ getSharedMeterPreviousReading(group) }})
+								</span>
+							</div>
+							<div class="text-end">
+								<small class="text-muted">Споживання:</small><br>
+								<strong>{{ getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0) }}</strong>
+							</div>
+						</div>
+						<hr class="my-2">
+						<small class="text-muted">
+							<i class="fas fa-info-circle me-1"></i>
+							Один показник використовується для розрахунку всіх тарифів цієї групи
+						</small>
 					</div>
 					<!-- Деталізація за службами/тарифами -->
 					<div class="table-responsive mb-3">
@@ -81,7 +94,9 @@
 												(попер. {{ reading.previous_reading }})
 											</span>
 										</span>
-										<span v-else class="text-muted">-</span>
+										<span v-else class="text-muted">
+											<small>Спільний показник</small>
+										</span>
 									</td>
 									<td class="text-end">
 										<span v-if="reading.tariff_type === 'subscription'">-</span>
