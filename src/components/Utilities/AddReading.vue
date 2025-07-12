@@ -1,5 +1,6 @@
 <template>
 	<div class="add-reading">
+		<alert-component ref="myAlert"></alert-component>
 		<div class="container-fluid">
 			<div class="row mb-4">
 				<div class="col-12">
@@ -405,6 +406,7 @@
 import { defineComponent, ref, reactive, computed, watch, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import PeriodSelector from './PeriodSelector.vue';
+import AlertComponent from '../AlertComponent.vue';
 import { 
 	useGetAddressesApiUtilitiesAddressesGet,
 	useGetServicesApiUtilitiesServicesGet,
@@ -459,7 +461,8 @@ interface ReadingData {
 export default defineComponent({
 	name: 'AddReading',
 	components: {
-		PeriodSelector
+		PeriodSelector,
+		AlertComponent
 	},
 	setup() {
 		const route = useRoute();
@@ -467,6 +470,7 @@ export default defineComponent({
 
 		// Reactive state
 		const isSaving = ref(false);
+		const myAlert = ref(null);
 		const isDeleting = ref(false);
 		const lastReadingHint = ref('');
 		const editReadingId = computed(() => route.query.editReadingId ? parseInt(route.query.editReadingId as string) : null);
@@ -903,7 +907,10 @@ export default defineComponent({
 				// Валідація: перевіряємо, чи поточний показник не менший за попередній
 				if (!isFixedPaymentService.value && readingForm.previous_reading && 
 					readingForm.current_reading < readingForm.previous_reading) {
-					alert('Помилка: поточний показник не може бути меншим за попередній');
+					if (myAlert.value) {
+						myAlert.value.showAlert('danger', 'Помилка: поточний показник не може бути меншим за попередній');
+					}
+					isSaving.value = false;
 					return;
 				}
 				if (isFixedPaymentService.value && !isEditing.value) {
@@ -1005,11 +1012,18 @@ export default defineComponent({
 					});
 				}
 
-				// Navigate back to reading list
-				router.push({ 
-					name: 'utilities_readings', 
-					params: { addressId: readingForm.address_id } 
-				});
+				// Показуємо успішне повідомлення
+				if (myAlert.value) {
+					myAlert.value.showAlert('success', isEditing.value ? 'Показник успішно оновлено!' : 'Показник успішно збережено!');
+				}
+
+				// Navigate back to reading list after short delay
+				setTimeout(() => {
+					router.push({ 
+						name: 'utilities_readings', 
+						params: { addressId: readingForm.address_id } 
+					});
+				}, 1500);
 			} catch (error: any) {
 				console.error('Помилка збереження показника:', error);
 				
@@ -1028,7 +1042,9 @@ export default defineComponent({
 					errorMessage = error.message;
 				}
 				
-				alert(`Помилка збереження: ${errorMessage}`);
+				if (myAlert.value) {
+					myAlert.value.showAlert('danger', `Помилка збереження: ${errorMessage}`);
+				}
 			} finally {
 				isSaving.value = false;
 			}
@@ -1221,6 +1237,7 @@ export default defineComponent({
 			calculationData,
 			isSaving,
 			isDeleting,
+			myAlert,
 			isEditing,
 			editReadingId,
 			lastReadingHint,
