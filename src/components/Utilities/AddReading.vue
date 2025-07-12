@@ -98,24 +98,7 @@
 									</div>
 								</div>
 
-								<div class="row" v-if="hasFixedPaymentTariff">
-									<!-- Для фіксованих платежів (квартплата, сміття) -->
-									<div class="col-md-6">
-										<div class="mb-3">
-											<label for="paymentAmount" class="form-label">Сума до сплати <span class="text-danger">*</span></label>
-											<div class="input-group">
-												<input type="number" step="0.01" class="form-control" id="paymentAmount" 
-													   v-model="readingForm.amount" required>
-												<span class="input-group-text">{{ selectedTariff?.currency || 'UAH' }}</span>
-											</div>
-											<small class="form-text text-muted">
-												Введіть суму згідно квитанції
-											</small>
-										</div>
-									</div>
-								</div>
-
-								<div class="row" v-else-if="selectedService?.has_shared_meter">
+								<div class="row" v-if="selectedService?.has_shared_meter">
 									<!-- Для служб зі спільним показником -->
 									<div class="col-12">
 										<div class="alert alert-info mb-3">
@@ -189,6 +172,23 @@
 													<small>Споживання: {{ multiReadingForm[tariffGroup.type].consumption || 0 }} {{ selectedService?.unit }}</small>
 												</div>
 											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="row" v-else-if="hasFixedPaymentTariff && !selectedService?.has_shared_meter">
+									<!-- Для фіксованих платежів (квартплата, сміття) -->
+									<div class="col-md-6">
+										<div class="mb-3">
+											<label for="paymentAmount" class="form-label">Сума до сплати <span class="text-danger">*</span></label>
+											<div class="input-group">
+												<input type="number" step="0.01" class="form-control" id="paymentAmount" 
+													   v-model="readingForm.amount" required>
+												<span class="input-group-text">{{ selectedTariff?.currency || 'UAH' }}</span>
+											</div>
+											<small class="form-text text-muted">
+												Введіть суму згідно квитанції
+											</small>
 										</div>
 									</div>
 								</div>
@@ -1117,6 +1117,12 @@ export default defineComponent({
 			if (!isEditing.value && readingForm.service_id && !selectedService.value?.has_shared_meter) {
 				findLastReading();
 			}
+			
+			// Для фіксованих тарифів автоматично заповнюємо суму
+			if (selectedTariff.value?.calculation_method === 'fixed' && !isEditing.value) {
+				readingForm.amount = selectedTariff.value.rate;
+			}
+			
 			calculateConsumption();
 		});
 
