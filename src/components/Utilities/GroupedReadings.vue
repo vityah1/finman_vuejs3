@@ -241,7 +241,7 @@
 								<tr v-for="reading in service.readings as ExtendedGroupedReadingItem[]" :key="reading.id">
 									<td>{{ reading.tariff_name || 'Без тарифу' }}</td>
 									<td class="text-end">
-										<span v-if="isFixedPaymentService(reading.service_name)">
+										<span v-if="reading.tariff?.calculation_method === 'fixed'">
 											-
 										</span>
 										<span v-else>
@@ -252,14 +252,14 @@
 										</span>
 									</td>
 									<td class="text-end">
-										<span v-if="reading.tariff_type === 'subscription' || isFixedPaymentService(reading.service_name)">-</span>
+										<span v-if="reading.tariff_type === 'subscription' || reading.tariff?.calculation_method === 'fixed'">-</span>
 										<span v-else>{{ reading.consumption || 0 }} {{ service.unit }}</span>
 									</td>
 									<td class="text-end">
 										<span v-if="reading.tariff_type === 'subscription'">
 											Абонплата
 										</span>
-										<span v-else-if="isFixedPaymentService(reading.service_name)">
+										<span v-else-if="reading.tariff?.calculation_method === 'fixed'">
 											Фіксована сума
 										</span>
 										<span v-else-if="reading.tariff">
@@ -297,7 +297,7 @@
 									<div class="flex-grow-1">
 										<h6 class="card-title mb-1">{{ reading.tariff_name || 'Без тарифу' }}</h6>
 										<small v-if="reading.tariff_type === 'subscription'" class="text-muted badge bg-secondary">Абонплата</small>
-										<small v-else-if="isFixedPaymentService(reading.service_name)" class="text-muted badge bg-info">Фіксована сума</small>
+										<small v-else-if="reading.tariff?.calculation_method === 'fixed'" class="text-muted badge bg-info">Фіксована сума</small>
 									</div>
 									<button class="btn btn-sm btn-outline-primary ms-2" 
 											@click="editReading(reading.id)"
@@ -307,7 +307,7 @@
 								</div>
 								
 								<div class="row mt-2">
-									<div class="col-6" v-if="!isFixedPaymentService(reading.service_name) && reading.current_reading">
+									<div class="col-6" v-if="reading.tariff?.calculation_method !== 'fixed' && reading.current_reading">
 										<small class="text-muted">Останній показник:</small><br>
 										<strong>{{ reading.current_reading }}</strong>
 									</div>
@@ -318,7 +318,7 @@
 								</div>
 								
 								<!-- Додаткова інформація -->
-								<div v-if="reading.tariff_type !== 'subscription' && !isFixedPaymentService(reading.service_name) && reading.consumption" 
+								<div v-if="reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed' && reading.consumption" 
 									 class="mt-2 pt-2 border-top">
 									<small class="text-muted">
 										Споживання: <strong>{{ reading.consumption }}</strong> {{ service.unit }}
@@ -455,12 +455,6 @@ export default defineComponent({
 			}).format(rate);
 		};
 		
-		// Check if service is fixed payment (rent, garbage, etc.)
-		const isFixedPaymentService = (serviceName: string): boolean => {
-			const name = serviceName.toLowerCase();
-			const fixedServices = ['квартплата', 'сміття', 'rent', 'garbage', 'інтернет', 'internet', 'домофон'];
-			return fixedServices.some(service => name.includes(service));
-		};
 		
 		// Get group title
 		const getGroupTitle = (groupName: string): string => {
@@ -590,7 +584,6 @@ export default defineComponent({
 			totalAmount,
 			formatCurrency,
 			formatRate,
-			isFixedPaymentService,
 			getGroupTitle,
 			editReading,
 			getServiceUnit,

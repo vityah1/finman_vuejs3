@@ -73,10 +73,10 @@
 												   v-model="readingForm.reading_date">
 										</div>
 									</div>
-									<div class="col-md-4" v-if="!isElectricityService">
+									<div class="col-md-4" v-if="!isMultiTariffService">
 										<div class="mb-3">
 											<label for="tariffSelect" class="form-label">Тариф <span class="text-danger">*</span></label>
-											<select v-if="!isSharedMeterService" class="form-control" id="tariffSelect" v-model="readingForm.tariff_id" 
+											<select v-if="!selectedService?.has_shared_meter" class="form-control" id="tariffSelect" v-model="readingForm.tariff_id" 
 													required :disabled="!readingForm.service_id">
 												<option value="">Оберіть тариф</option>
 												<option v-for="tariff in availableTariffs" :key="tariff.id" :value="tariff.id">
@@ -98,7 +98,7 @@
 									</div>
 								</div>
 
-								<div class="row" v-if="isFixedPaymentService">
+								<div class="row" v-if="hasFixedPaymentTariff">
 									<!-- Для фіксованих платежів (квартплата, сміття) -->
 									<div class="col-md-6">
 										<div class="mb-3">
@@ -115,7 +115,7 @@
 									</div>
 								</div>
 
-								<div class="row" v-else-if="isSharedMeterService">
+								<div class="row" v-else-if="selectedService?.has_shared_meter">
 									<!-- Для служб зі спільним показником -->
 									<div class="col-12">
 										<div class="alert alert-info mb-3">
@@ -155,7 +155,7 @@
 									</div>
 								</div>
 
-								<div class="row" v-else-if="isElectricityService">
+								<div class="row" v-else-if="isMultiTariffService">
 									<!-- Для електрики - декілька показників -->
 									<div class="col-12">
 										<h6 class="mb-3">Показники лічильника</h6>
@@ -267,11 +267,11 @@
 							<h5 class="mb-0"><i class="fas fa-calculator me-2"></i>Розрахунок</h5>
 						</div>
 						<div class="card-body">
-							<div v-if="!calculationData.consumption && !isSharedMeterService" class="text-center text-muted">
+							<div v-if="!calculationData.consumption && !selectedService?.has_shared_meter" class="text-center text-muted">
 								<i class="fas fa-info-circle fa-2x mb-3"></i>
 								<p>Заповніть показники для автоматичного розрахунку</p>
 							</div>
-							<div v-else-if="isSharedMeterService && readingForm.current_reading">
+							<div v-else-if="selectedService?.has_shared_meter && readingForm.current_reading">
 								<div class="mb-3">
 									<h6>Споживання</h6>
 									<div class="h4 text-primary">
@@ -432,6 +432,7 @@ interface ServiceData {
 	unit: string;
 	address_id: number;
 	has_shared_meter?: boolean;
+	service_group?: string;
 }
 
 interface TariffData {
@@ -769,7 +770,7 @@ export default defineComponent({
 				
 				// Calculate costs for electricity after setting tariffs
 				calculateTotalCost();
-			} else if (isFixedPaymentService.value && availableTariffs.value.length === 0) {
+			} else if (hasFixedPaymentTariff.value && availableTariffs.value.length === 0) {
 				// For fixed payment services without tariffs, create default tariff
 				await createDefaultTariffForFixedPayment();
 			} else if (availableTariffs.value.length === 1) {
