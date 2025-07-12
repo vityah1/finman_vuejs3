@@ -479,7 +479,9 @@ export default defineComponent({
 			
 			// Якщо до 15 числа - попередній місяць, інакше поточний
 			if (currentDay <= 15) {
-				const prevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+				// Створюємо дату попереднього місяця
+				const prevMonth = new Date(now);
+				prevMonth.setMonth(prevMonth.getMonth() - 1);
 				return prevMonth.toISOString().slice(0, 7);
 			} else {
 				return now.toISOString().slice(0, 7);
