@@ -84,7 +84,7 @@
 			</div>
 		</div>
 		<div v-if="total" class="row">
-			<div class="col-2 h4 text-success">Total:</div>
+			<div class="col-2 h4 text-success">Загалом:</div>
 			<div class="col-4 h4 text-danger">{{ total.toLocaleString() }} {{ selectedCurrency || "" }}</div>
 			<div class="col-4">{{ total_cnt }}</div>
 		</div>

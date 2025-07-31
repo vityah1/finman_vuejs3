@@ -61,7 +61,7 @@ export default defineComponent({
 <template>
   <div class="container">
     <header class="jumbotron">
-      <h3>About</h3>
+      <h3>Про програму</h3>
     </header>
     <div v-html="htmlContent"></div>
     {{ content }}

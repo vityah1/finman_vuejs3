@@ -12,10 +12,10 @@
 			</div>
 		</div>
 
-		<b-form v-model="showModal" :title="`Upload ${selectedBankType} file`">
+		<b-form v-model="showModal" :title="`Завантажити файл ${selectedBankType}`">
 			<template #modal-header>
 				<h5 class="modal-title text-danger">
-					Upload {{ selectedBankType }} xlsx file statements...
+					Завантажити файл виписки {{ selectedBankType }}...
 				</h5>
 			</template>
 			<template #default>
@@ -118,7 +118,7 @@
 							</div>
 						</div>
 						
-						<label>Select file from <strong>{{ selectedBankType.charAt(0).toUpperCase() + selectedBankType.slice(1) }}:</strong></label>
+						<label>Оберіть файл з <strong>{{ selectedBankType.charAt(0).toUpperCase() + selectedBankType.slice(1) }}:</strong></label>
 						<input
 							type="file"
 							class="form-control"
@@ -131,8 +131,8 @@
 							v-model="selectedOption"
 							:disabled="isLoading"
 						>
-							<option value="import">Import</option>
-							<option value="show">Show</option>
+							<option value="import">Імпортувати</option>
+							<option value="show">Показати</option>
 						</select>
 						<b-button
 							variant="primary"
@@ -141,7 +141,7 @@
 							:disabled="isLoading"
 						>
 							<span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-							{{ isLoading ? 'Обробка...' : 'Submit' }}
+							{{ isLoading ? 'Обробка...' : 'Виконати' }}
 						</b-button>
 					</div>
 				</b-form>

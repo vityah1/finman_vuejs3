@@ -13,7 +13,7 @@
 				</colgroup>
 				<b-thead head-variant="dark">
 					<b-tr>
-						<b-th>Total:</b-th>
+						<b-th>Загалом:</b-th>
 						<b-th>{{ total.toLocaleString() }}</b-th>
 						<b-th>{{ total_cnt }}</b-th>
 					</b-tr>

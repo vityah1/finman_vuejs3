@@ -26,25 +26,25 @@
 					<router-link
 						:to="{ name: 'payments_year_month', params: { year: currentYear, month: currentMonth }}"
 						class="nav-link">
-						Current
+						Поточний
 					</router-link>
 				</b-nav-item>
 				<b-nav-item v-if="currentUser">
 					<router-link
 						:to="{ name: 'payments', params: {action: 'last', year: currentYear, month: currentMonth, category_id: '_' }}"
 						class="nav-link">
-						Last
+						Останні
 					</router-link>
 				</b-nav-item>
 				<b-nav-item v-if="currentUser">
 					<router-link :to="{ name: 'payments_years' }" class="nav-link" @click="refreshYears">
-						Years
+						Роки
 					</router-link>
 				</b-nav-item>
 
-				<b-nav-item-dropdown v-if="currentUser" text="Banks">
+				<b-nav-item-dropdown v-if="currentUser" text="Банки">
 					<template #button-content>
-						<i class="fas fa-university"></i> Banks
+						<i class="fas fa-university"></i> Банки
 					</template>
 					<b-dropdown-item>
 						<router-link :to="{ name: 'mono_payments' }" class="nav-link">
@@ -54,12 +54,12 @@
 
 					<b-dropdown-item>
 						<router-link :to="{ name: 'import' }" class="nav-link">
-							<i class="fas fa-file-import"></i> Import
+							<i class="fas fa-file-import"></i> Імпорт
 						</router-link>
 					</b-dropdown-item>
 				</b-nav-item-dropdown>
 
-				<b-nav-item-dropdown v-if="currentUser" text="Utilities">
+				<b-nav-item-dropdown v-if="currentUser" text="Комунальні">
 					<template #button-content>
 						<i class="fas fa-home"></i> Комунальні
 					</template>
@@ -80,20 +80,20 @@
 					</b-dropdown-item>
 				</b-nav-item-dropdown>
 
-				<b-nav-item-dropdown text="User">
+				<b-nav-item-dropdown text="Користувач">
 					<template #button-content>
-						<i class="fas fa-user"></i> User
+						<i class="fas fa-user"></i> Користувач
 					</template>
 
 					<template v-if="!currentUser">
 						<b-dropdown-item>
 							<router-link :to="{ name: 'login' }" class="nav-link">
-								<i class="fas fa-sign-in-alt"></i> Login
+								<i class="fas fa-sign-in-alt"></i> Вхід
 							</router-link>
 						</b-dropdown-item>
 						<b-dropdown-item>
 							<router-link :to="{ name: 'register' }" class="nav-link">
-								<i class="fas fa-user-plus"></i> SignUp
+								<i class="fas fa-user-plus"></i> Реєстрація
 							</router-link>
 						</b-dropdown-item>
 					</template>
@@ -101,43 +101,43 @@
 					<template v-else>
 						<b-dropdown-item>
 							<router-link :to="{ name: 'profile' }" class="nav-link">
-								<i class="fas fa-user"></i> Profile
+								<i class="fas fa-user"></i> Профіль
 							</router-link>
 						</b-dropdown-item>
 
 						<b-dropdown-divider></b-dropdown-divider>
 						<b-dropdown-item v-if="currentUser">
 							<router-link :to="{ name: 'mono_user_token' }" class="nav-link">
-								<i class="fas fa-paw"></i> Mono: tokens
+								<i class="fas fa-paw"></i> Mono: токени
 							</router-link>
 						</b-dropdown-item>
 						<b-dropdown-item v-if="currentUser">
 							<router-link :to="{ name: 'mono_users' }" class="nav-link">
-								<i class="fas fa-paw"></i> Mono: users
+								<i class="fas fa-paw"></i> Mono: користувачі
 							</router-link>
 						</b-dropdown-item>
 						<b-dropdown-divider></b-dropdown-divider>
 						<b-dropdown-item v-if="currentUser">
 							<router-link :to="{ name: 'config' }" class="nav-link">
-								<i class="fas fa-cog"></i> Settings
+								<i class="fas fa-cog"></i> Налаштування
 							</router-link>
 						</b-dropdown-item>
 						<b-dropdown-item v-if="currentUser">
 							<router-link :to="{ name: 'category' }" class="nav-link">
-								<i class="fas fa-cog"></i> Categories
+								<i class="fas fa-cog"></i> Категорії
 							</router-link>
 						</b-dropdown-item>
 						<b-dropdown-divider></b-dropdown-divider>
 						<b-dropdown-item>
 							<a class="nav-link" @click.prevent="logOut">
-								<i class="fas fa-sign-out-alt"></i> Logout
+								<i class="fas fa-sign-out-alt"></i> Вихід
 							</a>
 						</b-dropdown-item>
 					</template>
 				</b-nav-item-dropdown>
 
 				<b-nav-item>
-					<router-link :to="{ name: 'about' }" class="nav-link">About</router-link>
+					<router-link :to="{ name: 'about' }" class="nav-link">Про програму</router-link>
 				</b-nav-item>
 			</b-navbar-nav>
 		</b-collapse>
