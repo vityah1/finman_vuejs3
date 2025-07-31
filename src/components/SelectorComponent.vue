@@ -1,46 +1,96 @@
 <template>
-	<div class="input-group mb-3">
-		<div class="col-auto">
-			<select
-				id="year"
-				v-model="localYear"
-				class="form-control w-auto"
-				name="year"
-				@change="emitChange"
-			>
-				<option v-for="(y, index) in years" :key="index" :value="y">
-					{{ y }}
-				</option>
-			</select>
+	<div class="filter-container mb-3">
+		<div class="input-group mb-2">
+			<div class="col-auto">
+				<select
+					id="year"
+					v-model="localYear"
+					class="form-control w-auto"
+					name="year"
+					@change="emitChange"
+				>
+					<option v-for="(y, index) in years" :key="index" :value="y">
+						{{ y }}
+					</option>
+				</select>
+			</div>
+			&nbsp;
+			<div class="col-auto">
+				<select
+					id="month"
+					v-model="localMonth"
+					class="form-control w-auto"
+					name="month"
+					@change="emitChange"
+				>
+					<option v-for="m in months" :key="m.number" :value="m.number">
+						[{{ m.number }}] {{ m.name }}
+					</option>
+				</select>
+			</div>
+			&nbsp;
+			<div class="col-auto" v-if="userGroup">
+				<select
+					id="group_user"
+					v-model="localGroupUserId"
+					class="form-control w-auto"
+					name="group_user"
+					@change="emitChange"
+				>
+					<option value="">Всі користувачі групи</option>
+					<option v-for="user in groupUsers" :key="user.id" :value="user.id">
+						{{ user.fullname || user.login }}
+					</option>
+				</select>
+			</div>
+			&nbsp;
+			<div class="col-auto">
+				<button 
+					type="button" 
+					class="btn btn-outline-primary btn-sm"
+					@click="openCustomPeriodModal"
+				>
+					<i class="fas fa-calendar-alt"></i> Кастомний період
+				</button>
+			</div>
 		</div>
-		&nbsp;
-		<div class="col-auto">
-			<select
-				id="month"
-				v-model="localMonth"
-				class="form-control w-auto"
-				name="month"
-				@change="emitChange"
-			>
-				<option v-for="m in months" :key="m.number" :value="m.number">
-					[{{ m.number }}] {{ m.name }}
-				</option>
-			</select>
-		</div>
-		&nbsp;
-		<div class="col-auto" v-if="userGroup">
-			<select
-				id="group_user"
-				v-model="localGroupUserId"
-				class="form-control w-auto"
-				name="group_user"
-				@change="emitChange"
-			>
-				<option value="">Всі користувачі групи</option>
-				<option v-for="user in groupUsers" :key="user.id" :value="user.id">
-					{{ user.fullname || user.login }}
-				</option>
-			</select>
+
+		<!-- Модалка для кастомного періоду -->
+		<div v-if="showModal" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<h5 class="modal-title">Вибрати кастомний період</h5>
+						<button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
+					</div>
+					<div class="modal-body">
+						<div class="row">
+							<div class="col-md-6">
+								<label for="modal_start_date" class="form-label">Дата початку:</label>
+								<input 
+									type="date" 
+									id="modal_start_date" 
+									v-model="modalStartDate"
+									class="form-control"
+								>
+							</div>
+							<div class="col-md-6">
+								<label for="modal_end_date" class="form-label">Дата кінця:</label>
+								<input 
+									type="date" 
+									id="modal_end_date" 
+									v-model="modalEndDate"
+									class="form-control"
+								>
+							</div>
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-secondary" @click="closeModal">Скасувати</button>
+						<button type="button" class="btn btn-primary" @click="applyCustomPeriod">Застосувати</button>
+					</div>
+				</div>
+			</div>
 		</div>
 	</div>
 </template>
@@ -57,6 +107,9 @@ export default {
 			localYear: undefined,
 			localMonth: undefined,
 			localGroupUserId: undefined,
+			modalStartDate: '',
+			modalEndDate: '',
+			showModal: false,
 			userGroup: null, // Група користувача
 			years: [],
 			months: [
@@ -84,23 +137,77 @@ export default {
 		}
 	},
 	methods: {
-		// В методі emitChange розкоментуємо перевірку ініціалізації
-emitChange() {
-  if (this.isInitializing) {
-    console.log("Ігнорується emitChange під час ініціалізації");
-    return;
-  }
+		openCustomPeriodModal() {
+			// Встановлюємо дати за замовчуванням відповідно до поточного вибраного місяця
+			this.setDefaultModalDates();
+			
+			// Відкриваємо модалку
+			this.showModal = true;
+		},
 
-  // Створюємо незмінювану копію даних
-  const eventData = Object.freeze({
-    year: this.localYear,
-    month: this.localMonth,
-    group_user_id: this.localGroupUserId,
-  });
+		closeModal() {
+			this.showModal = false;
+		},
 
-  console.log("Відправляємо дані з селектора:", eventData);
-  this.$emit("change", eventData);
-},
+		setDefaultModalDates() {
+			if (this.localYear && this.localMonth) {
+				const year = parseInt(this.localYear);
+				const month = parseInt(this.localMonth);
+				
+				// Початок місяця
+				this.modalStartDate = `${year}-${month.toString().padStart(2, '0')}-01`;
+				
+				// Кінець місяця
+				const nextMonth = month === 12 ? 1 : month + 1;
+				const nextYear = month === 12 ? year + 1 : year;
+				const lastDay = new Date(nextYear, nextMonth - 1, 0).getDate();
+				this.modalEndDate = `${year}-${month.toString().padStart(2, '0')}-${lastDay.toString().padStart(2, '0')}`;
+			}
+		},
+
+		applyCustomPeriod() {
+			if (!this.modalStartDate || !this.modalEndDate) {
+				alert('Заповніть обидві дати');
+				return;
+			}
+
+			if (this.modalStartDate > this.modalEndDate) {
+				alert('Дата початку не може бути пізніше дати кінця');
+				return;
+			}
+
+			// Закриваємо модалку
+			this.showModal = false;
+
+			// Відправляємо дані з кастомним періодом
+			const eventData = Object.freeze({
+				mode: 'custom',
+				start_date: this.modalStartDate,
+				end_date: this.modalEndDate,
+				group_user_id: this.localGroupUserId,
+			});
+
+			console.log("Відправляємо кастомний період:", eventData);
+			this.$emit("change", eventData);
+		},
+
+		emitChange() {
+			if (this.isInitializing) {
+				console.log("Ігнорується emitChange під час ініціалізації");
+				return;
+			}
+
+			// Звичайний режим місяць/рік
+			const eventData = Object.freeze({
+				mode: 'period',
+				year: this.localYear,
+				month: this.localMonth,
+				group_user_id: this.localGroupUserId,
+			});
+
+			console.log("Відправляємо дані з селектора:", eventData);
+			this.$emit("change", eventData);
+		},
 		async getPaymentsYears() {
 			PaymentService.getPaymentsYears({ currency: store.state.sprs.selectedCurrency || "UAH", grouped: true })
 				.then((response) => {

@@ -82,7 +82,15 @@ export default {
   },
   methods: {
     areParamsValid(params) {
-      return !!params && !!params.year && !!params.month;
+      if (!params) return false;
+      
+      // Перевіряємо кастомні дати
+      if (params.start_date && params.end_date) {
+        return true;
+      }
+      
+      // Перевіряємо рік/місяць
+      return !!params.year && !!params.month;
     },
 
     // У методі safeApiRequest зробіть валюту частиною унікального ідентифікатора запиту
@@ -145,16 +153,31 @@ export default {
 
     // Обробник події зміни фільтрів
     handleSelectChange(eventData) {
-      if (!eventData || !eventData.year || !eventData.month) {
+      if (!eventData) {
         console.warn("Пропуск обробки події з неповними даними", eventData);
         return;
+      }
+
+      // Перевіряємо режим фільтрації
+      if (eventData.mode === 'custom') {
+        if (!eventData.start_date || !eventData.end_date) {
+          console.warn("Пропуск обробки кастомного періоду без дат", eventData);
+          return;
+        }
+      } else {
+        if (!eventData.year || !eventData.month) {
+          console.warn("Пропуск обробки періоду без року/місяця", eventData);
+          return;
+        }
       }
 
       console.log("Обробка події зміни фільтрів:", eventData);
 
       // Оновлення локальних параметрів
-      this.year = eventData.year;
-      this.month = eventData.month;
+      if (eventData.mode === 'period') {
+        this.year = eventData.year;
+        this.month = eventData.month;
+      }
       this.group_user_id = eventData.group_user_id;
 
       // Зберігаємо у localStorage
@@ -164,12 +187,20 @@ export default {
         localStorage.removeItem('selectedGroupUserId');
       }
 
-      // Виконуємо запит
-      this.safeApiRequest({
-        year: this.year,
-        month: this.month,
-        group_user_id: this.group_user_id
-      }).then(() => {
+      // Виконуємо запит з правильними параметрами
+      const requestParams = eventData.mode === 'custom' 
+        ? {
+            start_date: eventData.start_date,
+            end_date: eventData.end_date,
+            group_user_id: this.group_user_id
+          }
+        : {
+            year: this.year,
+            month: this.month,
+            group_user_id: this.group_user_id
+          };
+
+      this.safeApiRequest(requestParams).then(() => {
         // Оновлюємо URL ТІЛЬКИ після успішного запиту
         const query = {};
         if (this.group_user_id) query.group_user_id = this.group_user_id;

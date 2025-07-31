@@ -27,7 +27,7 @@ import type {
 } from ".././model";
 
 /**
- * Повертає платежі згруповані за категоріями за певний період (рік, місяць)
+ * Повертає платежі згруповані за категоріями за певний період (рік, місяць або custom період)
  * @summary Payments For Period
  */
 export const paymentsForPeriodApiPaymentsPeriodGet = (

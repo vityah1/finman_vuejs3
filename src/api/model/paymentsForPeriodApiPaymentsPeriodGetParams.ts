@@ -15,6 +15,14 @@ export type PaymentsForPeriodApiPaymentsPeriodGetParams = {
    */
   month?: string;
   /**
+   * Дата початку періоду (YYYY-MM-DD)
+   */
+  start_date?: string | null;
+  /**
+   * Дата кінця періоду (YYYY-MM-DD)
+   */
+  end_date?: string | null;
+  /**
    * ID користувача Monobank
    */
   mono_user_id?: string | null;
