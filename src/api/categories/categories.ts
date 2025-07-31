@@ -24,6 +24,7 @@ import type { MaybeRef } from "vue";
 
 import type {
   CategoryCreate,
+  CategoryResponse,
   CategoryUpdate,
   HTTPValidationError,
 } from ".././model";
@@ -34,7 +35,7 @@ import type {
  */
 export const getCategoriesApiCategoriesGet = (
   options?: AxiosRequestConfig
-): Promise<AxiosResponse<unknown>> => {
+): Promise<AxiosResponse<CategoryResponse[]>> => {
   return axios.get(`/api/categories`, options);
 };
 
@@ -118,7 +119,7 @@ export function useGetCategoriesApiCategoriesGet<
 export const addCategoryApiCategoriesPost = (
   categoryCreate: MaybeRef<CategoryCreate>,
   options?: AxiosRequestConfig
-): Promise<AxiosResponse<unknown>> => {
+): Promise<AxiosResponse<CategoryResponse>> => {
   categoryCreate = unref(categoryCreate);
 
   return axios.post(`/api/categories`, categoryCreate, options);
@@ -379,7 +380,7 @@ export const useEditCategoryApiCategoriesCategoryIdPatch = <
 export const getCategoryApiCategoriesCategoryIdGet = (
   categoryId: MaybeRef<number>,
   options?: AxiosRequestConfig
-): Promise<AxiosResponse<unknown>> => {
+): Promise<AxiosResponse<CategoryResponse>> => {
   categoryId = unref(categoryId);
 
   return axios.get(`/api/categories/${categoryId}`, options);

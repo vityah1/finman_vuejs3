@@ -16,12 +16,12 @@
 					</div>
 
 					<div class="form-group">
-						<label><strong>Value:</strong></label>
+						<label><strong>{{ currentConfig.type_data === 'category_replace' ? 'Опис транзакції:' : 'Value:' }}</strong></label>
 						<input type="text" class="form-control" id="amount" v-model="currentConfig.value_data" />
 					</div>
 
 					<div v-if="currentConfig.is_need_add_value" class="form-group">
-						<label for="description"><strong>Add value:</strong></label>
+						<label for="description"><strong>{{ currentConfig.type_data === 'category_replace' ? 'Категорія для присвоєння:' : 'Add value:' }}</strong></label>
 						<template v-if="currentConfig.type_data === 'category_replace'">
 							<select v-model="currentConfig.add_value" class="form-select">
 								<option disabled value="">Оберіть категорію...</option>

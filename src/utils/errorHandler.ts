@@ -27,6 +27,12 @@ export function getErrorMessage(error: AxiosError<HTTPValidationError | any>, de
         const responseData = error.response.data;
         const status = error.response.status;
 
+        // Спочатку перевіряємо наявність detail, навіть для помилок 5xx
+        // Якщо є поле detail як рядок (загальні помилки API)
+        if (typeof responseData.detail === 'string') {
+            return responseData.detail;
+        }
+
         // Обробка помилок авторизації
         if (status === 401) {
             return "Сесія закінчилася. Будь ласка, увійдіть в систему знову.";
@@ -36,14 +42,9 @@ export function getErrorMessage(error: AxiosError<HTTPValidationError | any>, de
             return "У вас немає прав для виконання цієї дії.";
         }
 
-        // Обробка помилок сервера
+        // Обробка помилок сервера (тільки якщо немає detail)
         if (status >= 500) {
             return "Помилка сервера. Спробуйте пізніше або зверніться до адміністратора.";
-        }
-
-        // Якщо є поле detail як рядок (загальні помилки API)
-        if (typeof responseData.detail === 'string') {
-            return responseData.detail;
         }
 
         // Якщо є поле detail як масив ValidationError (помилки валідації)
