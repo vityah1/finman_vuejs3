@@ -52,7 +52,7 @@ const routes: Array<RouteRecordRaw> = [
 		meta: { requiresAuth: true },
 	},
 	{
-		path: "/api/import",
+		path: "/import",
 		name: "import",
 		component: () => import("./components/Banks/BankForm.vue"),
 		meta: { requiresAuth: true },
