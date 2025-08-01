@@ -24,7 +24,7 @@
 						<label>{{ currentUser.login }}</label>
 					</div>
 					<div class="form-group">
-						<label>Select bank type:</label>
+						<label>Оберіть тип банку:</label>
 						<div class="bank-selector mb-2">
 							<div
 								class="bank-option"

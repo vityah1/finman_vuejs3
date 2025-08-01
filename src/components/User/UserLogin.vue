@@ -8,12 +8,12 @@
       /> -->
       <Form @submit="handleLogin" :validation-schema="schema">
         <div class="form-group">
-          <label for="login">Username</label>
+          <label for="login">Ім'я користувача</label>
           <Field name="login" type="text" class="form-control" />
           <ErrorMessage name="login" class="error-feedback" />
         </div>
         <div class="form-group">
-          <label for="password">Password</label>
+          <label for="password">Пароль</label>
           <Field name="password" type="password" class="form-control" />
           <ErrorMessage name="password" class="error-feedback" />
         </div>
@@ -58,8 +58,8 @@ export default {
   },
   data() {
     const schema = yup.object().shape({
-      login: yup.string().required("Username is required!"),
-      password: yup.string().required("Password is required!"),
+      login: yup.string().required("Ім'я користувача обов'язкове!"),
+      password: yup.string().required("Пароль обов'язковий!"),
     });
 
     return {

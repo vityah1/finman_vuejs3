@@ -22,21 +22,21 @@
 				<div class="card-body">
 					<!-- Десктопна версія -->
 					<div class="d-flex justify-content-between align-items-center d-none d-md-flex">
-						<h5 class="mb-0">Загальна сума за період {{ groupedData.period }}:</h5>
+						<h5 class="mb-0">Загальна сума за період {{ filteredGroupedData.period }}:</h5>
 						<h4 class="mb-0 text-primary">{{ formatCurrency(totalAmount) }}</h4>
 					</div>
 					
 					<!-- Мобільна версія - компактно -->
 					<div class="text-center d-md-none">
-						<div class="text-muted small">{{ groupedData.period }}</div>
+						<div class="text-muted small">{{ filteredGroupedData.period }}</div>
 						<h4 class="mb-0 text-primary">{{ formatCurrency(totalAmount) }}</h4>
 					</div>
 				</div>
 			</div>
 			
 			<!-- Групи служб (електрика, вода) -->
-			<div v-if="groupedData.service_groups && groupedData.service_groups.length > 0">
-				<div v-for="group in groupedData.service_groups" :key="group.group_name" class="card mb-4">
+			<div v-if="filteredGroupedData.service_groups && filteredGroupedData.service_groups.length > 0">
+				<div v-for="group in filteredGroupedData.service_groups" :key="group.group_name" class="card mb-4">
 				<div class="card-header">
 					<h5 class="mb-0">
 						<i class="fas fa-layer-group me-2"></i>
@@ -220,7 +220,7 @@
 			</div>
 			
 			<!-- Окремі служби без груп -->
-			<div v-for="service in groupedData.services" :key="service.service_id" class="card mb-4">
+			<div v-for="service in filteredGroupedData.services" :key="service.service_id" class="card mb-4">
 				<div class="card-header">
 					<h5 class="mb-0">
 						<i class="fas fa-tachometer-alt me-2"></i>
@@ -422,25 +422,27 @@ export default defineComponent({
 		
 		const groupedData = computed(() => groupedDataResponse.value?.data as GroupedReadingsResponse | undefined);
 		
+		// Backend already filters data, use it directly
+		const filteredGroupedData = computed(() => groupedData.value);
+		
 		// Watch for errors
 		watchEffect(() => {
 			if (error.value) {
 				console.error('Error fetching grouped readings:', error.value);
-				console.error('Error response:', (error.value as any)?.response?.data);
 			}
 		});
 		
 		// Calculate total amount
 		const totalAmount = computed(() => {
-			if (!groupedData.value) return 0;
+			if (!filteredGroupedData.value) return 0;
 			
 			let total = 0;
 			// Сума по групах
-			groupedData.value.service_groups.forEach(group => {
+			filteredGroupedData.value.service_groups.forEach(group => {
 				total += group.total_amount;
 			});
 			// Сума по окремих службах
-			groupedData.value.services.forEach(service => {
+			filteredGroupedData.value.services.forEach(service => {
 				total += service.total_amount;
 			});
 			
@@ -489,13 +491,13 @@ export default defineComponent({
 		
 		// Get service unit
 		const getServiceUnit = (serviceId?: number): string => {
-			if (!serviceId || !groupedData.value) return '';
+			if (!serviceId || !filteredGroupedData.value) return '';
 			
 			// Знаходимо показник по service_id
 			let reading: ExtendedGroupedReadingItem | undefined;
 			
 			// Шукаємо в групах
-			for (const group of groupedData.value.service_groups) {
+			for (const group of filteredGroupedData.value.service_groups) {
 				reading = (group.readings as ExtendedGroupedReadingItem[])
 					.find(r => r.service_id === serviceId);
 				if (reading) break;
@@ -503,7 +505,7 @@ export default defineComponent({
 			
 			// Якщо не знайшли в групах, шукаємо в окремих службах
 			if (!reading) {
-				for (const service of groupedData.value.services) {
+				for (const service of filteredGroupedData.value.services) {
 					reading = (service.readings as ExtendedGroupedReadingItem[])
 						.find(r => r.service_id === serviceId);
 					if (reading) break;
@@ -527,11 +529,8 @@ export default defineComponent({
 		// Get shared meter reading (not subscription)
 		const getSharedMeterReading = (group: any): number | string => {
 			if (!group.readings || group.readings.length === 0) {
-				console.log('getSharedMeterReading: немає показників', group);
 				return 'Немає даних';
 			}
-			
-			console.log('getSharedMeterReading: показники групи', group.readings);
 			
 			// Знаходимо показник що не є абонплатою та має валідний current_reading
 			const meterReading = group.readings.find((r: any) => 
@@ -540,8 +539,6 @@ export default defineComponent({
 				!isNaN(r.current_reading) && 
 				r.tariff_type !== 'subscription'
 			);
-			
-			console.log('getSharedMeterReading: знайдений показник лічильника', meterReading);
 			
 			if (meterReading && meterReading.current_reading !== null) {
 				return Number(meterReading.current_reading);
@@ -553,8 +550,6 @@ export default defineComponent({
 				r.current_reading !== undefined && 
 				!isNaN(r.current_reading)
 			);
-			
-			console.log('getSharedMeterReading: fallback показник', anyReading);
 			
 			return anyReading ? Number(anyReading.current_reading) : 'Немає даних';
 		};
@@ -589,6 +584,7 @@ export default defineComponent({
 			loading,
 			error,
 			groupedData,
+			filteredGroupedData,
 			totalAmount,
 			formatCurrency,
 			formatRate,

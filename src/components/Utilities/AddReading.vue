@@ -73,7 +73,7 @@
 												   v-model="readingForm.reading_date">
 										</div>
 									</div>
-									<div class="col-md-4" v-if="!isMultiTariffService">
+									<div class="col-md-4" v-if="!isMultiTariffService && !(availableTariffs.length > 1 && availableTariffs.every(t => t.calculation_method === 'fixed'))">
 										<div class="mb-3">
 											<label for="tariffSelect" class="form-label">Тариф <span class="text-danger">*</span></label>
 											<select v-if="!selectedService?.has_shared_meter" class="form-control" id="tariffSelect" v-model="readingForm.tariff_id" 
@@ -98,7 +98,7 @@
 									</div>
 								</div>
 
-								<div class="row" v-if="hasFixedPaymentTariff && !selectedService?.has_shared_meter">
+								<div class="row" v-if="hasFixedPaymentTariff && !selectedService?.has_shared_meter && availableTariffs.length === 1">
 									<!-- Для фіксованих платежів (квартплата, сміття) -->
 									<div class="col-md-6">
 										<div class="mb-3">
@@ -115,14 +115,14 @@
 									</div>
 								</div>
 
-								<div class="row" v-else-if="selectedService?.has_shared_meter && !hasSharedMeterWithFixedAmounts && !isEditing">
+								<div class="row" v-else-if="selectedService?.has_shared_meter && !isEditing">
 									<!-- Для служб зі спільним показником (звичайних) -->
 									<div class="col-12">
 										<div class="alert alert-info mb-3">
 											<h6><i class="fas fa-info-circle me-2"></i>Спільний показник для всіх тарифів</h6>
 											<p class="mb-0">
-												Ця служба використовує один показник для розрахунку всіх тарифів. 
-												Введіть поточний показник, і система автоматично розрахує суми за всіма тарифами.
+												Ця служба використовує один показник для розрахунку тарифів споживання. 
+												Введіть поточний показник, і система автоматично розрахує суми за всіма тарифами (включаючи фіксовані платежі).
 											</p>
 										</div>
 									</div>
@@ -159,89 +159,34 @@
 									</div>
 								</div>
 
-								<div class="row" v-else-if="selectedService?.has_shared_meter && hasSharedMeterWithFixedAmounts && !isEditing">
-									<!-- Для служб зі спільним показником та фіксованими сумами (квартплата з освітленням) - Створення -->
-									<div class="col-12">
-										<div class="alert alert-info mb-3">
-											<h6><i class="fas fa-info-circle me-2"></i>Змішана система розрахунку</h6>
-											<p class="mb-0">
-												Ця служба має автоматичні та ручні компоненти. Деякі суми розраховуються автоматично, 
-												а інші потребують ручного введення.
-											</p>
-										</div>
-									</div>
-									<div class="col-md-6" v-for="tariff in availableTariffs" :key="tariff.id">
-										<div class="card mb-3" :class="{ 'border-success': tariff.calculation_method === 'fixed' && !requiresManualInput(tariff) }">
-											<div class="card-header">
-												<strong>{{ tariff.name }}</strong>
-												<span v-if="tariff.calculation_method === 'fixed' && !requiresManualInput(tariff)" 
-													  class="badge bg-success ms-2">Автоматично</span>
-												<span v-else-if="requiresManualInput(tariff)" 
-													  class="badge bg-warning ms-2">Введіть суму</span>
-											</div>
-											<div class="card-body">
-												<div class="mb-3" v-if="tariff.calculation_method === 'fixed' && !requiresManualInput(tariff)">
-													<label class="form-label">Фіксована сума</label>
-													<div class="input-group">
-														<input type="number" step="0.01" class="form-control" 
-															   :value="tariff.rate" readonly>
-														<span class="input-group-text">{{ tariff.currency }}</span>
-													</div>
-													<small class="text-muted">Розраховується автоматично</small>
-												</div>
-												<div class="mb-3" v-else-if="requiresManualInput(tariff)">
-													<label class="form-label">Сума до сплати <span class="text-danger">*</span></label>
-													<div class="input-group">
-														<input type="number" step="0.01" class="form-control" 
-															   v-model="readingForm[`tariff_${tariff.id}_amount`]" 
-															   :placeholder="`Введіть суму для ${tariff.name.toLowerCase()}`">
-														<span class="input-group-text">{{ tariff.currency }}</span>
-													</div>
-													<small class="text-muted">Введіть суму згідно квитанції</small>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
 
-								<div class="row" v-else-if="selectedService?.has_shared_meter && hasSharedMeterWithFixedAmounts && isEditing">
-									<!-- Для служб зі спільним показником та фіксованими сумами (квартплата з освітленням) - Редагування -->
+								<div class="row" v-else-if="availableTariffs.length > 1 && availableTariffs.every(t => t.calculation_method === 'fixed')">
+									<!-- Для служб з декількома фіксованими тарифами (квартплата) -->
 									<div class="col-12">
-										<div class="alert alert-info mb-3">
-											<h6><i class="fas fa-info-circle me-2"></i>Редагування квартплати</h6>
-											<p class="mb-0">
-												Змініть суми для тарифів згідно з актуальною квитанцією.
-											</p>
-										</div>
+										<h6 class="mb-3">Суми за тарифами</h6>
 									</div>
 									<div class="col-md-6" v-for="tariff in availableTariffs" :key="tariff.id">
-										<div class="card mb-3" :class="{ 'border-success': tariff.calculation_method === 'fixed' && !requiresManualInput(tariff) }">
+										<div class="card mb-3">
 											<div class="card-header">
 												<strong>{{ tariff.name }}</strong>
-												<span v-if="tariff.calculation_method === 'fixed' && !requiresManualInput(tariff)" 
-													  class="badge bg-success ms-2">Автоматично</span>
-												<span v-else-if="requiresManualInput(tariff)" 
-													  class="badge bg-warning ms-2">Редагувати суму</span>
+												<small class="text-muted ms-2">({{ tariff.tariff_type === 'subscription' ? 'абонплата' : 'змінна сума' }})</small>
 											</div>
 											<div class="card-body">
-												<div class="mb-3" v-if="tariff.calculation_method === 'fixed' && !requiresManualInput(tariff)">
-													<label class="form-label">Фіксована сума</label>
+												<div class="mb-3">
+													<label class="form-label">Сума <span class="text-danger">*</span></label>
 													<div class="input-group">
 														<input type="number" step="0.01" class="form-control" 
-															   :value="tariff.rate" readonly>
-														<span class="input-group-text">{{ tariff.currency }}</span>
+															   v-model="tariffAmounts[tariff.id]"
+															   :readonly="tariff.tariff_type === 'subscription'"
+															   required>
+														<span class="input-group-text">грн</span>
 													</div>
-													<small class="text-muted">Розраховується автоматично</small>
-												</div>
-												<div class="mb-3" v-else-if="requiresManualInput(tariff)">
-													<label class="form-label">Сума до сплати <span class="text-danger">*</span></label>
-													<div class="input-group">
-														<input type="number" step="0.01" class="form-control" 
-															   v-model="readingForm[`tariff_${tariff.id}_amount`]" 
-															   :placeholder="`Введіть суму для ${tariff.name.toLowerCase()}`">
-														<span class="input-group-text">{{ tariff.currency }}</span>
-													</div>
-													<small class="text-muted">Введіть суму згідно квитанції</small>
+													<small v-if="tariff.tariff_type === 'subscription'" class="text-muted">
+														Автоматично з тарифу: {{ formatCurrency(tariff.rate) }}
+													</small>
+													<small v-else class="text-muted">
+														Введіть суму вручну
+													</small>
 												</div>
 											</div>
 										</div>
@@ -365,7 +310,7 @@
 								<p>Заповніть показники для автоматичного розрахунку</p>
 							</div>
 							<div v-else-if="selectedService?.has_shared_meter && readingForm.current_reading">
-								<div class="mb-3" v-if="!hasSharedMeterWithFixedAmounts">
+								<div class="mb-3" v-if="availableTariffs.length <= 1">
 									<h6>Споживання</h6>
 									<div class="h4 text-primary">
 										{{ calculationData.consumption || (readingForm.current_reading - (readingForm.previous_reading || 0)) }} 
@@ -635,11 +580,24 @@ export default defineComponent({
 			cost: 0
 		});
 
+		// Tariff amounts for fixed amount services (like квартплата)
+		const tariffAmounts = ref<Record<number, number>>({});
+
 		// API calls
 		const { data: addressesData } = useGetAddressesApiUtilitiesAddressesGet();
 		const { data: servicesData } = useGetServicesApiUtilitiesServicesGet();
 		const { data: tariffsData } = useGetTariffsApiUtilitiesTariffsGet();
-		const { data: readingsData } = useGetReadingsApiUtilitiesReadingsGet();
+		const { data: readingsData } = useGetReadingsApiUtilitiesReadingsGet(
+			computed(() => ({
+				address_id: readingForm.address_id || undefined
+				// Не передаємо period щоб отримати всі показники для пошуку попереднього
+			})),
+			{
+				query: {
+					enabled: computed(() => !!readingForm.address_id)
+				}
+			}
+		);
 
 		// Edit reading data
 		const { data: editingReadingData } = useGetReadingApiUtilitiesReadingsReadingIdGet(
@@ -671,7 +629,25 @@ export default defineComponent({
 
 		const filteredServices = computed(() => {
 			if (!readingForm.address_id) return [];
-			return services.value.filter(service => service.address_id === readingForm.address_id);
+			
+			// Filter services by address
+			let availableServices = services.value.filter(service => service.address_id === readingForm.address_id);
+			
+			// If not editing, filter out services that already have readings for this period
+			if (!isEditing.value && readingForm.period) {
+				const existingReadings = readings.value || [];
+				const servicesWithReadings = new Set(
+					existingReadings
+						.filter(reading => reading.period === readingForm.period)
+						.map(reading => reading.service_id)
+				);
+				
+				availableServices = availableServices.filter(service => 
+					!servicesWithReadings.has(service.id)
+				);
+			}
+			
+			return availableServices;
 		});
 
 		const selectedService = computed(() => {
@@ -733,9 +709,18 @@ export default defineComponent({
 		
 		const isMultiTariffService = computed(() => {
 			if (!readingForm.service_id) return false;
-			// Перевіряємо, чи є декілька активних тарифів з різними типами
-			const tariffTypes = new Set(availableTariffs.value.map(t => t.tariff_type));
-			return tariffTypes.size > 1 && !selectedService.value?.has_shared_meter;
+			// Служба з різними типами тарифів що потребують окремих показників (день/ніч)
+			const tariffTypes = new Set(availableTariffs.value.map(t => t.tariff_type).filter(t => t));
+			const hasMultipleMeterTypes = tariffTypes.size > 1 && availableTariffs.value.some(t => t.calculation_method === 'standard');
+			return hasMultipleMeterTypes && !selectedService.value?.has_shared_meter;
+		});
+
+		// Service with multiple fixed tariffs (like квартплата with different components)
+		const isFixedAmountService = computed(() => {
+			if (!readingForm.service_id || selectedService.value?.has_shared_meter) return false;
+			// Служба має декілька тарифів з фіксованими сумами
+			return availableTariffs.value.length > 1 && 
+				   availableTariffs.value.every(t => t.calculation_method === 'fixed');
 		});
 		
 		// Grouped tariffs for multi-tariff services
@@ -1047,11 +1032,24 @@ export default defineComponent({
 			formSubmitted.value = true;
 			
 			// Валідація для спільного лічільника (але не для служб з фіксованими сумами)
-			if (selectedService.value?.has_shared_meter && !hasSharedMeterWithFixedAmounts.value && (!readingForm.current_reading || readingForm.current_reading <= 0)) {
+			if (selectedService.value?.has_shared_meter && (!readingForm.current_reading || readingForm.current_reading <= 0)) {
 				if (myAlert.value) {
 					myAlert.value.showAlert('danger', 'Введіть коректний поточний показник (більше 0)');
 				}
 				return;
+			}
+
+			// Валідація для служб з фіксованими сумами
+			if (isFixedAmountService.value) {
+				const hasValidAmounts = availableTariffs.value.some(tariff => 
+					(tariffAmounts.value[tariff.id] || 0) > 0
+				);
+				if (!hasValidAmounts) {
+					if (myAlert.value) {
+						myAlert.value.showAlert('danger', 'Введіть суми для тарифів');
+					}
+					return;
+				}
 			}
 			
 			isSaving.value = true;
@@ -1082,45 +1080,39 @@ export default defineComponent({
 				console.log('- hasFixedPaymentTariff:', hasFixedPaymentTariff.value);
 				console.log('- isMultiTariffService:', isMultiTariffService.value);
 				
-				if (hasSharedMeterWithFixedAmounts.value && !isEditing.value) {
-					// For services with shared meter AND fixed amounts (квартплата з освітленням)
-					// Create separate readings for each tariff
+				if (selectedService.value?.has_shared_meter && !isEditing.value) {
+					// For services with shared meter - backend creates readings for all tariffs
+					console.log('DEBUG: Saving shared meter service');
 					
-					console.log('DEBUG: Saving shared meter with fixed amounts');
+					const readingData: UtilityReadingCreate = {
+						address_id: readingForm.address_id,
+						service_id: readingForm.service_id,
+						period: readingForm.period,
+						current_reading: readingForm.current_reading,
+						previous_reading: readingForm.previous_reading || undefined,
+						tariff_id: availableTariffs.value[0]?.id, // Backend ignores this for shared meter
+						reading_date: readingForm.reading_date || undefined,
+						is_paid: readingForm.is_paid || undefined,
+						notes: readingForm.notes || undefined
+					};
 					
-					// Create readings for each tariff (both standard and fixed)
+					await createReadingMutation.mutateAsync({
+						data: readingData
+					});
+				} else if (isFixedAmountService.value && !isEditing.value) {
+					console.log('DEBUG: Saving fixed amount service (квартплата)');
+					
+					// Create separate readings for each tariff with respective amounts
 					for (const tariff of availableTariffs.value) {
-						let amount: number = 0;
-						let currentReading: number = 0;
-						let previousReading: number = 0;
-						
-						if (tariff.calculation_method === 'standard') {
-							// For standard tariffs, use meter readings
-							currentReading = readingForm.current_reading;
-							previousReading = readingForm.previous_reading || 0;
-							amount = currentReading; // For standard calculation, amount = reading
-						} else if (tariff.calculation_method === 'fixed') {
-							// For subscription tariffs, use tariff.rate automatically
-							if (tariff.tariff_type === 'subscription') {
-								currentReading = tariff.rate; // Store the fixed amount in current_reading
-								amount = tariff.rate;
-							} else {
-								// For non-subscription fixed tariffs, get the entered consumption/amount
-								const amountFieldName = `tariff_${tariff.id}_amount` as keyof typeof readingForm;
-								const enteredValue = readingForm[amountFieldName] as number || 0;
-								currentReading = enteredValue; // Store the consumption value
-								amount = enteredValue; // Amount will be calculated on backend based on tariff rate
-							}
-							previousReading = 0;
-						}
+						const amount = tariffAmounts.value[tariff.id] || 0;
 						
 						if (amount > 0) {
 							const readingData: UtilityReadingCreate = {
 								address_id: readingForm.address_id,
 								service_id: readingForm.service_id,
 								period: readingForm.period,
-								current_reading: currentReading,
-								previous_reading: previousReading || undefined,
+								current_reading: amount,  // Store amount as current_reading for fixed tariffs
+								previous_reading: 0,
 								tariff_id: tariff.id,
 								reading_date: readingForm.reading_date || undefined,
 								is_paid: readingForm.is_paid || undefined,
@@ -1132,55 +1124,6 @@ export default defineComponent({
 							});
 						}
 					}
-				} else if (selectedService.value?.has_shared_meter && !isEditing.value) {
-					// For services with shared meter (water, gas) - create ONE reading with main tariff
-					// The backend will handle all tariff calculations automatically
-					
-					console.log('DEBUG: Saving shared meter reading. current_reading =', readingForm.current_reading);
-					
-					// Валідація: перевіряємо, що введено поточний показник
-					if (!readingForm.current_reading || readingForm.current_reading <= 0) {
-						console.log('DEBUG: Validation failed - current_reading is', readingForm.current_reading);
-						if (myAlert.value) {
-							myAlert.value.showAlert('danger', 'Помилка: введіть поточний показник лічільника');
-						}
-						isSaving.value = false;
-						return;
-					}
-					
-					console.log('DEBUG: Available tariffs:', availableTariffs.value);
-					const mainTariff = availableTariffs.value.find(t => t.calculation_method === 'standard') || availableTariffs.value[0];
-					
-					console.log('DEBUG: Selected main tariff:', mainTariff);
-					
-					if (!mainTariff) {
-						console.log('DEBUG: No tariff found for shared meter service');
-						throw new Error('No tariff found for shared meter service');
-					}
-					
-					console.log('DEBUG: readingForm before creating readingData:', {
-						current_reading: readingForm.current_reading,
-						previous_reading: readingForm.previous_reading,
-						tariff_id: mainTariff.id
-					});
-					
-					const readingData: UtilityReadingCreate = {
-						address_id: readingForm.address_id,
-						service_id: readingForm.service_id,
-						period: readingForm.period,
-						current_reading: readingForm.current_reading,
-						previous_reading: readingForm.previous_reading || undefined,
-						tariff_id: mainTariff.id, // Use main tariff, backend will calculate all
-						reading_date: readingForm.reading_date || undefined,
-						is_paid: readingForm.is_paid || undefined,
-						notes: readingForm.notes || undefined
-					};
-					
-					console.log('DEBUG: Final readingData before API call:', readingData);
-					
-					await createReadingMutation.mutateAsync({
-						data: readingData
-					});
 				} else if (hasFixedPaymentTariff.value && !selectedService.value?.has_shared_meter && !isEditing.value) {
 					console.log('DEBUG: Going to FIXED PAYMENT block');
 					// Для фіксованих платежів (квартплата, сміття) БЕЗ спільного лічільника
@@ -1222,7 +1165,7 @@ export default defineComponent({
 							data: readingData
 						});
 					}
-				} else if (isEditing.value && hasSharedMeterWithFixedAmounts.value) {
+				} else if (isEditing.value && selectedService.value?.has_shared_meter) {
 					// Update existing readings for shared meter with fixed amounts (квартплата з освітленням)
 					console.log('DEBUG: Updating shared meter with fixed amounts reading');
 					
@@ -1352,8 +1295,8 @@ export default defineComponent({
 		
 		// Get consumption for specific tariff
 		const getTariffConsumption = (tariff: TariffData): number => {
-			// For shared meter services with multiple tariffs, get consumption from readingForm
-			if (selectedService.value?.has_shared_meter && hasSharedMeterWithFixedAmounts.value) {
+			// For fixed tariffs in shared meter services, the "consumption" is actually the amount entered
+			if (selectedService.value?.has_shared_meter && tariff.calculation_method === 'fixed') {
 				const amountFieldName = `tariff_${tariff.id}_amount` as keyof typeof readingForm;
 				const enteredValue = readingForm[amountFieldName] as number;
 				if (enteredValue !== undefined && enteredValue !== null) {
@@ -1361,24 +1304,20 @@ export default defineComponent({
 				}
 			}
 			
-			// Fallback to global calculation
+			// For standard tariffs, use actual consumption calculation
 			return calculationData.consumption || (readingForm.current_reading - (readingForm.previous_reading || 0));
 		};
 
 		// Calculate amount for single tariff
 		const calculateTariffAmount = (tariff: TariffData): number => {
-			// For shared meter services with multiple tariffs, get consumption from readingForm
-			if (selectedService.value?.has_shared_meter && hasSharedMeterWithFixedAmounts.value) {
-				// Get the specific tariff amount data from form
-				const amountFieldName = `tariff_${tariff.id}_amount` as keyof typeof readingForm;
-				const enteredValue = readingForm[amountFieldName] as number;
-				if (enteredValue !== undefined && enteredValue !== null) {
-					if (tariff.tariff_type === 'subscription') {
-						return enteredValue; // For subscription, the entered value is the amount
-					} else {
-						// For non-subscription, multiply by rate
-						return enteredValue * tariff.rate;
-					}
+			// For shared meter services, handle different calculation methods
+			if (selectedService.value?.has_shared_meter) {
+				if (tariff.calculation_method === 'fixed') {
+					// Fixed tariffs use their rate directly
+					return tariff.rate;
+				} else {
+					// Standard tariffs use consumption * rate
+					return getTariffConsumption(tariff) * tariff.rate;
 				}
 			}
 			
@@ -1539,6 +1478,23 @@ export default defineComponent({
 			calculateConsumption();
 		});
 
+
+		// Watch for service changes to initialize tariff amounts
+		watch(() => readingForm.service_id, (newServiceId) => {
+			if (newServiceId && isFixedAmountService.value) {
+				// Initialize tariff amounts for fixed amount services
+				availableTariffs.value.forEach(tariff => {
+					if (tariff.tariff_type === 'subscription') {
+						// Auto-fill subscription fees from tariff rate
+						tariffAmounts.value[tariff.id] = tariff.rate;
+					} else {
+						// Initialize empty for manual input
+						tariffAmounts.value[tariff.id] = 0;
+					}
+				});
+			}
+		});
+
 		// Watch multiReadingForm for electricity calculations
 		watch(() => multiReadingForm, () => {
 			if (isMultiTariffService.value) {
@@ -1658,6 +1614,7 @@ export default defineComponent({
 			readingForm,
 			multiReadingForm,
 			calculationData,
+			tariffAmounts,
 			isSaving,
 			isDeleting,
 			myAlert,
@@ -1673,6 +1630,7 @@ export default defineComponent({
 			recentReadings,
 			hasFixedPaymentTariff,
 			isMultiTariffService,
+			isFixedAmountService,
 			groupedTariffs,
 			hasSharedMeterWithFixedAmounts,
 
