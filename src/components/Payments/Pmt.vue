@@ -20,7 +20,7 @@
       <b-td class="text-center">
       <router-link
         class="year-link fw-bold"
-        :to="{ name: 'payments_months', params: { year: year.year } }"
+        :to="{ name: 'payments_year', params: { year: year.year } }"
         >
         {{ year.year }}
       </router-link>
@@ -63,6 +63,11 @@ export default {
           const response = await PaymentService.getPaymentsYears({currency: store.state.sprs.selectedCurrency || "UAH"});
           this.years = response.data;
           console.log('Роки платежів завантажено:', response.data);
+          // Debug output for checking data structure
+          if (response.data && response.data.length > 0) {
+            console.log('Перший елемент:', response.data[0]);
+            console.log('Поле year першого елемента:', response.data[0].year);
+          }
         } else {
           console.log('Користувач не авторизований, не завантажуємо роки платежів');
           this.years = [];
