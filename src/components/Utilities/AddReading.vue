@@ -175,9 +175,10 @@
 												<div class="mb-3">
 													<label class="form-label">Сума <span class="text-danger">*</span></label>
 													<div class="input-group">
-														<input type="number" step="0.01" class="form-control" 
+														<input type="text" inputmode="decimal" class="form-control"
 															   v-model="tariffAmounts[tariff.id]"
 															   :readonly="tariff.tariff_type === 'subscription'"
+															   @input="tariffAmounts[tariff.id] = $event.target.value.replace(',', '.')"
 															   required>
 														<span class="input-group-text">грн</span>
 													</div>
