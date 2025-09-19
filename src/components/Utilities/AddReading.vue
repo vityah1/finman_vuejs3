@@ -903,13 +903,24 @@ export default defineComponent({
 			if (!readingForm.service_id) return;
 
 			// Фільтруємо показники для поточної служби та періоду меншого за поточний
-			// Виключаємо показники з нульовим current_reading (наприклад, абонплата)
+			// Для служб зі спільним лічильником виключаємо показники з фіксованих тарифів
 			const serviceReadings = readings.value
-				.filter(reading => 
-					reading.service_id === readingForm.service_id &&
-					reading.period < readingForm.period &&
-					reading.current_reading > 0  // Тільки показники з реальними даними
-				)
+				.filter(reading => {
+					// Basic filters
+					if (reading.service_id !== readingForm.service_id) return false;
+					if (reading.period >= readingForm.period) return false;
+					if (reading.current_reading <= 0) return false;
+
+					// For shared meter services, exclude readings from fixed tariffs
+					if (selectedService.value?.has_shared_meter && reading.tariff_id) {
+						const readingTariff = tariffs.value.find(t => t.id === reading.tariff_id);
+						if (readingTariff?.calculation_method === 'fixed') {
+							return false;
+						}
+					}
+
+					return true;
+				})
 				.sort((a, b) => b.period.localeCompare(a.period));
 
 			if (isMultiTariffService.value) {
