@@ -104,8 +104,10 @@
 										<div class="mb-3">
 											<label for="paymentAmount" class="form-label">Сума до сплати <span class="text-danger">*</span></label>
 											<div class="input-group">
-												<input type="number" step="0.01" class="form-control" id="paymentAmount" 
-													   v-model="readingForm.amount" required>
+												<input type="text" inputmode="decimal" class="form-control" id="paymentAmount"
+													   v-model="readingForm.amount"
+													   @input="readingForm.amount = $event.target.value.replace(',', '.')"
+													   required>
 												<span class="input-group-text">{{ selectedTariff?.currency || 'UAH' }}</span>
 											</div>
 											<small class="form-text text-muted">
