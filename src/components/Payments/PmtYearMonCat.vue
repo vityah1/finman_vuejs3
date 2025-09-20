@@ -191,15 +191,15 @@
 		<!-- Payments table -->
 		<div class="row">
 			<div class="col-12">
-				<div class="payments-table-wrapper">
-					<b-table-simple hover responsive class="payments-detail-table">
+				<div class="payments-table-wrapper table-responsive">
+					<b-table-simple hover class="payments-detail-table">
 						<colgroup>
-							<col style="width: 50px;" />
-							<col style="width: 120px;" />
-							<col style="width: 150px;" />
-							<col style="width: auto;" />
-							<col style="width: 150px;" />
-							<col style="width: 100px;" />
+							<col style="width: 5%;" />
+							<col style="width: 15%;" />
+							<col style="width: 20%;" />
+							<col style="width: 30%;" />
+							<col style="width: 15%;" />
+							<col style="width: 15%;" />
 						</colgroup>
 						<b-thead head-variant="dark">
 							<b-tr>
@@ -775,17 +775,24 @@ export default {
 /* Payments table */
 .payments-table-wrapper {
 	margin-top: 30px;
+	overflow-x: auto;
+	-webkit-overflow-scrolling: touch;
+}
+
+.payments-table-wrapper.table-responsive {
+	min-height: 300px;
 }
 
 .payments-detail-table {
 	background: white;
 	box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 	border-radius: 12px;
-	overflow: hidden;
+	min-width: 800px;
+	width: 100%;
 }
 
 .payments-detail-table thead {
-	background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+	background: #2c3e50;
 }
 
 .payments-detail-table thead th {
@@ -794,6 +801,11 @@ export default {
 	padding: 14px 12px;
 	border: none;
 	font-size: 0.95em;
+	white-space: nowrap;
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	background: #2c3e50;
 }
 
 .sortable-header {
@@ -889,18 +901,47 @@ export default {
 	box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
+/* Mobile-specific styles */
+@media (max-width: 991px) {
+	.payments-table-wrapper {
+		margin-left: -15px;
+		margin-right: -15px;
+		padding-left: 0;
+		padding-right: 0;
+		border-radius: 0;
+	}
+
+	.payments-detail-table {
+		border-radius: 0;
+		box-shadow: none;
+		border: 1px solid #dee2e6;
+	}
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
+	.container-fluid {
+		padding-left: 10px;
+		padding-right: 10px;
+	}
+
 	.header-section {
 		padding: 15px;
+		margin-left: -10px;
+		margin-right: -10px;
+		border-radius: 0;
 	}
 
 	.category-title {
-		font-size: 1.4em;
+		font-size: 1.2em;
 	}
 
 	.total-amount {
-		font-size: 1.5em;
+		font-size: 1.3em;
+	}
+
+	.total-summary {
+		padding: 15px;
 	}
 
 	.payments-detail-table {
@@ -909,12 +950,36 @@ export default {
 
 	.payments-detail-table th,
 	.payments-detail-table td {
-		padding: 8px 6px;
+		padding: 10px 8px;
+		white-space: nowrap;
+	}
+
+	.payments-detail-table th {
+		font-size: 0.8rem;
 	}
 
 	.subcategory-badge,
 	.user-badge {
 		font-size: 0.75em;
+		padding: 2px 6px;
+	}
+
+	.amount-cell .amount-value {
+		font-size: 0.95em;
+	}
+
+	/* Scroll indicator */
+	.payments-table-wrapper::after {
+		content: '→ Прокрутіть таблицю →';
+		position: absolute;
+		bottom: 10px;
+		right: 10px;
+		background: rgba(0,0,0,0.7);
+		color: white;
+		padding: 5px 10px;
+		border-radius: 5px;
+		font-size: 0.75rem;
+		pointer-events: none;
 	}
 }
 </style>
