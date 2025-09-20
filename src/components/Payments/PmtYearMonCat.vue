@@ -1,5 +1,5 @@
 <template>
-	<div class="container">
+	<div class="container-fluid">
 		<alert-component ref="myAlert"></alert-component>
 		<!-- Modal -->
 		<b-modal v-model="showModal" :title="okTitle" @ok="doFormAction()">
@@ -69,24 +69,43 @@
 			</template>
 		</b-modal>
 
-		<div class="row">
-			<div class="col-1">
-				<router-link
-					:to="{ name: 'payments_year_month', params: { year: $route.params.year, month: $route.params.month } }">
-					<i class="fas fa-angle-double-left"></i>
-				</router-link>
+		<!-- Navigation and header -->
+		<div class="header-section mb-4">
+			<div class="row align-items-center">
+				<div class="col-auto">
+					<router-link
+						class="back-button"
+						:to="{ name: 'payments_year_month', params: { year: $route.params.year, month: $route.params.month } }">
+						<i class="fas fa-arrow-left"></i>
+						<span class="ms-2">Назад</span>
+					</router-link>
+				</div>
+				<div class="col">
+					<h3 class="mb-0 category-title">
+						<i class="bi bi-folder-fill me-2"></i>
+						{{ category_name }}
+					</h3>
+					<div class="period-info">
+						<span class="badge bg-info">{{ getMonthName($route.params.month) }} {{ $route.params.year }}</span>
+						<span v-if="$route.query.user" class="badge bg-secondary ms-2">{{ $route.query.user }}</span>
+					</div>
+				</div>
 			</div>
-			<div class="col">
-				<span v-if="category_name" class="text-small primary me-2">{{ category_name }}</span>
-				<span v-if="$route.params.year" class="text-primary">{{ $route.params.year }}-</span>
-				<span v-if="$route.params.month" class="text-primary">{{ $route.params.month }}</span>
-				<span v-if="$route.query.user">[{{ $route.query.user }}]</span>
+			<!-- Total summary -->
+			<div v-if="total" class="total-summary mt-3">
+				<div class="row align-items-center">
+					<div class="col-auto">
+						<span class="total-label">Загальна сума:</span>
+					</div>
+					<div class="col-auto">
+						<span class="total-amount">{{ total.toLocaleString() }}</span>
+						<span class="currency-badge ms-2">{{ selectedCurrency || "UAH" }}</span>
+					</div>
+					<div class="col-auto">
+						<span class="total-count">{{ total_cnt }} {{ getPaymentWord(total_cnt) }}</span>
+					</div>
+				</div>
 			</div>
-		</div>
-		<div v-if="total" class="row">
-			<div class="col-2 h4 text-success">Загалом:</div>
-			<div class="col-4 h4 text-danger">{{ total.toLocaleString() }} {{ selectedCurrency || "" }}</div>
-			<div class="col-4">{{ total_cnt }}</div>
 		</div>
 		<div v-if="hasSelectedPayments" class="row mb-3">
 			<div class="col-md-8">
@@ -169,42 +188,79 @@
 			</template>
 		</b-modal>
 
+		<!-- Payments table -->
 		<div class="row">
-			<div class="col-md-8">
-				<b-table-simple caption-top hover responsive small>
-					<colgroup>
-						<col />
-						<col />
-						<col />
-						<col />
-					</colgroup>
-					<b-thead head-variant="dark">
-						<b-tr>
-<b-th style="width: 40px;">
-	<input type="checkbox" v-model="selectAll" @change="toggleSelectAll" />
-</b-th>
-<b-th @click="sortBy('rdate')">Date&nbsp;↑↓</b-th>
-<b-th>Sub Category</b-th>
-<b-th @click="sortBy('mydesc')">Description&nbsp;↑↓</b-th>
-<b-th @click="sortBy('amount')">Amount&nbsp;↑↓</b-th>
-<b-th>User</b-th>
-						</b-tr>
-					</b-thead>
-					<b-tbody v-if="payments.length > 0">
-						<b-tr v-for="(payment, index) in sortedPayments" :key="index">
-							<b-td style="width: 40px;" @click.stop>
-								<input type="checkbox" :checked="isPaymentSelected(payment.id)" @change="togglePaymentSelection(payment.id)" />
-							</b-td>
-							<b-td @click="openFormEditPayment(payment.id)">{{ formatDate(payment.rdate) }}</b-td>
-							<b-td @click="openFormEditPayment(payment.id)"><span v-if="payment.category_name !== category_name">{{ payment.category_name
-								}}</span></b-td>
-							<b-td @click="openFormEditPayment(payment.id)">{{ payment.mydesc }}</b-td>
-							<b-td @click="openFormEditPayment(payment.id)">{{ payment.amount ? payment.amount.toLocaleString() : '0' }}</b-td>
-							<b-td @click="openFormEditPayment(payment.id)">{{ payment.user_login }}</b-td>
-						</b-tr>
-					</b-tbody>
-				</b-table-simple>
-				<div v-if="payments.length === 0">Data loading...</div>
+			<div class="col-12">
+				<div class="payments-table-wrapper">
+					<b-table-simple hover responsive class="payments-detail-table">
+						<colgroup>
+							<col style="width: 50px;" />
+							<col style="width: 120px;" />
+							<col style="width: 150px;" />
+							<col style="width: auto;" />
+							<col style="width: 150px;" />
+							<col style="width: 100px;" />
+						</colgroup>
+						<b-thead head-variant="dark">
+							<b-tr>
+								<b-th class="text-center checkbox-column">
+									<input type="checkbox" v-model="selectAll" @change="toggleSelectAll" class="form-check-input" />
+								</b-th>
+								<b-th class="sortable-header" @click="sortBy('rdate')">
+									Дата
+									<i class="fas fa-sort ms-1"></i>
+								</b-th>
+								<b-th>Підкатегорія</b-th>
+								<b-th class="sortable-header" @click="sortBy('mydesc')">
+									Опис
+									<i class="fas fa-sort ms-1"></i>
+								</b-th>
+								<b-th class="sortable-header text-end" @click="sortBy('amount')">
+									Сума
+									<i class="fas fa-sort ms-1"></i>
+								</b-th>
+								<b-th class="text-center">Користувач</b-th>
+							</b-tr>
+						</b-thead>
+						<b-tbody v-if="payments.length > 0">
+							<b-tr v-for="(payment, index) in sortedPayments" :key="index" class="payment-row">
+								<b-td class="text-center checkbox-column" @click.stop>
+									<input type="checkbox"
+										:checked="isPaymentSelected(payment.id)"
+										@change="togglePaymentSelection(payment.id)"
+										class="form-check-input" />
+								</b-td>
+								<b-td @click="openFormEditPayment(payment.id)" class="date-cell">
+									{{ formatDate(payment.rdate) }}
+								</b-td>
+								<b-td @click="openFormEditPayment(payment.id)" class="category-cell">
+									<span v-if="payment.category_name !== category_name" class="subcategory-badge">
+										{{ payment.category_name }}
+									</span>
+								</b-td>
+								<b-td @click="openFormEditPayment(payment.id)" class="description-cell">
+									{{ payment.mydesc }}
+								</b-td>
+								<b-td @click="openFormEditPayment(payment.id)" class="amount-cell text-end">
+									<span class="amount-value">{{ payment.amount ? payment.amount.toLocaleString() : '0' }}</span>
+								</b-td>
+								<b-td @click="openFormEditPayment(payment.id)" class="user-cell text-center">
+									<span class="user-badge">{{ payment.user_login }}</span>
+								</b-td>
+							</b-tr>
+						</b-tbody>
+						<b-tbody v-else>
+							<b-tr>
+								<b-td colspan="6" class="text-center py-5">
+									<div class="no-data">
+										<i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+										<span class="text-muted">Немає платежів за цей період</span>
+									</div>
+								</b-td>
+							</b-tr>
+						</b-tbody>
+					</b-table-simple>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -326,6 +382,27 @@ export default {
 		}
 		},
 	methods: {
+		getMonthName(monthNumber) {
+			const date = new Date();
+			date.setMonth(monthNumber - 1);
+			return date.toLocaleString('uk-UA', { month: 'long' });
+		},
+		getPaymentWord(count) {
+			const lastDigit = count % 10;
+			const lastTwoDigits = count % 100;
+
+			if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+				return 'платежів';
+			}
+
+			if (lastDigit === 1) {
+				return 'платіж';
+			} else if (lastDigit >= 2 && lastDigit <= 4) {
+				return 'платежі';
+			} else {
+				return 'платежів';
+			}
+		},
 		formatDate(date) {
 			return moment(date).format('DD.MM.YYYY');
 		},
@@ -610,3 +687,234 @@ export default {
 	},
 };
 </script>
+
+<style scoped>
+.container-fluid {
+	padding-top: 20px;
+}
+
+/* Header section */
+.header-section {
+	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+	color: white;
+	padding: 25px;
+	border-radius: 12px;
+	box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.back-button {
+	color: white;
+	text-decoration: none;
+	font-weight: 500;
+	transition: all 0.3s ease;
+	padding: 8px 16px;
+	background: rgba(255,255,255,0.1);
+	border-radius: 8px;
+	display: inline-flex;
+	align-items: center;
+}
+
+.back-button:hover {
+	background: rgba(255,255,255,0.2);
+	color: white;
+	transform: translateX(-3px);
+}
+
+.category-title {
+	color: white;
+	font-weight: 600;
+	margin-bottom: 8px !important;
+}
+
+.category-title i {
+	opacity: 0.9;
+}
+
+.period-info .badge {
+	font-size: 0.9em;
+	padding: 6px 12px;
+}
+
+/* Total summary */
+.total-summary {
+	background: white;
+	padding: 20px;
+	border-radius: 10px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+
+.total-label {
+	font-size: 1.1em;
+	font-weight: 600;
+	color: #495057;
+}
+
+.total-amount {
+	font-size: 1.8em;
+	font-weight: bold;
+	color: #dc3545;
+	font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+}
+
+.currency-badge {
+	display: inline-block;
+	padding: 6px 12px;
+	background: #e7f5ff;
+	color: #0c8599;
+	border-radius: 6px;
+	font-size: 0.85em;
+	font-weight: 600;
+}
+
+.total-count {
+	font-size: 1.1em;
+	color: #6c757d;
+	font-weight: 500;
+}
+
+/* Payments table */
+.payments-table-wrapper {
+	margin-top: 30px;
+}
+
+.payments-detail-table {
+	background: white;
+	box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+	border-radius: 12px;
+	overflow: hidden;
+}
+
+.payments-detail-table thead {
+	background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+}
+
+.payments-detail-table thead th {
+	color: white !important;
+	font-weight: 600;
+	padding: 14px 12px;
+	border: none;
+	font-size: 0.95em;
+}
+
+.sortable-header {
+	cursor: pointer;
+	transition: background 0.2s;
+	user-select: none;
+}
+
+.sortable-header:hover {
+	background: rgba(255,255,255,0.1);
+}
+
+.sortable-header i {
+	opacity: 0.7;
+	font-size: 0.85em;
+}
+
+.checkbox-column {
+	width: 50px !important;
+}
+
+.form-check-input {
+	cursor: pointer;
+	width: 18px;
+	height: 18px;
+}
+
+/* Payment rows */
+.payment-row {
+	transition: all 0.2s ease;
+	border-bottom: 1px solid #f0f0f0;
+}
+
+.payment-row:hover {
+	background-color: #f8f9fa;
+	transform: scale(1.005);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+	cursor: pointer;
+}
+
+.payment-row td {
+	padding: 12px 10px;
+	vertical-align: middle;
+}
+
+.date-cell {
+	font-weight: 500;
+	color: #495057;
+}
+
+.category-cell .subcategory-badge {
+	display: inline-block;
+	padding: 4px 10px;
+	background: #f0f3ff;
+	color: #5969dd;
+	border-radius: 6px;
+	font-size: 0.85em;
+	font-weight: 500;
+}
+
+.description-cell {
+	color: #212529;
+	font-weight: 400;
+}
+
+.amount-cell .amount-value {
+	font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+	font-weight: 600;
+	color: #28a745;
+	font-size: 1.05em;
+}
+
+.user-cell .user-badge {
+	display: inline-block;
+	padding: 3px 8px;
+	background: #e9ecef;
+	color: #495057;
+	border-radius: 4px;
+	font-size: 0.85em;
+}
+
+/* No data state */
+.no-data {
+	padding: 40px;
+}
+
+.no-data i {
+	color: #dee2e6;
+}
+
+/* Bulk actions dropdown */
+.dropdown-toggle {
+	box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+	.header-section {
+		padding: 15px;
+	}
+
+	.category-title {
+		font-size: 1.4em;
+	}
+
+	.total-amount {
+		font-size: 1.5em;
+	}
+
+	.payments-detail-table {
+		font-size: 0.85rem;
+	}
+
+	.payments-detail-table th,
+	.payments-detail-table td {
+		padding: 8px 6px;
+	}
+
+	.subcategory-badge,
+	.user-badge {
+		font-size: 0.75em;
+	}
+}
+</style>
