@@ -5,12 +5,12 @@
 				<alert-component ref="myAlert"></alert-component>
 
 				<!-- Period and filter selector -->
-				<div class="selector-wrapper mb-4">
+				<div class="selector-wrapper">
 					<selector-component @change="handleSelectChange" />
 				</div>
 
 				<!-- Month and Year display -->
-				<div class="period-header mb-3">
+				<div class="period-header">
 					<h3 class="text-center fw-bold text-primary">
 						{{ getMonthName(month) }} {{ year }}
 					</h3>
@@ -23,8 +23,8 @@
 						<col style="width: 35%;" />
 						<col style="width: 15%;" />
 					</colgroup>
-					<b-thead head-variant="dark">
-						<b-tr class="totals-row">
+					<b-thead>
+						<b-tr class="totals-row table-header-row">
 							<b-th>Категорія</b-th>
 							<b-th class="text-end">Сума</b-th>
 							<b-th class="text-center">К-ть</b-th>
@@ -293,24 +293,27 @@ export default {
 
 <style scoped>
 .container-fluid {
-  padding-top: 20px;
+  padding-top: 10px;
 }
 
 .selector-wrapper {
-  background: #f8f9fa;
-  padding: 15px;
-  border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  background: linear-gradient(to right, #f8f9fa, #ffffff);
+  padding: 12px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  margin-bottom: 15px !important;
 }
 
 .period-header {
-  padding: 20px 0;
+  padding: 12px 0;
+  margin-bottom: 15px !important;
   border-bottom: 2px solid #e9ecef;
 }
 
 .period-header h3 {
   margin: 0;
   text-transform: capitalize;
+  font-size: 1.5rem;
 }
 
 .categories-table {
@@ -322,14 +325,25 @@ export default {
 }
 
 .categories-table thead {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #4a5568;
 }
 
 .categories-table thead th {
   color: white !important;
-  font-weight: 600;
-  padding: 15px 12px;
-  border: none;
+  font-weight: 700;
+  padding: 16px 14px !important;
+  border: none !important;
+  font-size: 1em;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+
+.table-header-row {
+  background: #4a5568 !important;
+}
+
+.table-header-row th {
+  background: #4a5568 !important;
+  color: white !important;
 }
 
 .category-link {

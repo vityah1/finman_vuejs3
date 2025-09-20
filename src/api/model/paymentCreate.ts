@@ -12,6 +12,9 @@ import type { PaymentCreateCategoryId } from "./paymentCreateCategoryId";
 import type { PaymentCreateRdate } from "./paymentCreateRdate";
 import type { PaymentCreateSource } from "./paymentCreateSource";
 import type { PaymentCreateRefuelData } from "./paymentCreateRefuelData";
+import type { PaymentCreateAmountOriginal } from "./paymentCreateAmountOriginal";
+import type { PaymentCreateCurrencyOriginal } from "./paymentCreateCurrencyOriginal";
+import type { PaymentCreateExchangeRate } from "./paymentCreateExchangeRate";
 import type { PaymentCreateBankPaymentId } from "./paymentCreateBankPaymentId";
 import type { PaymentCreateUserId } from "./paymentCreateUserId";
 
@@ -34,6 +37,12 @@ export interface PaymentCreate {
   source?: PaymentCreateSource;
   /** Дані про заправку (якщо це заправка) */
   refuel_data?: PaymentCreateRefuelData;
+  /** Original amount in transaction currency */
+  amount_original?: PaymentCreateAmountOriginal;
+  /** Original transaction currency */
+  currency_original?: PaymentCreateCurrencyOriginal;
+  /** Exchange rate at transaction time */
+  exchange_rate?: PaymentCreateExchangeRate;
   /** Унікальний ID платежу (генерується автоматично) */
   bank_payment_id?: PaymentCreateBankPaymentId;
   /** ID користувача (встановлюється автоматично) */

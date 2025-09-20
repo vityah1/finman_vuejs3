@@ -12,6 +12,9 @@ import type { PaymentUpdateCategoryId } from "./paymentUpdateCategoryId";
 import type { PaymentUpdateRdate } from "./paymentUpdateRdate";
 import type { PaymentUpdateSource } from "./paymentUpdateSource";
 import type { PaymentUpdateRefuelData } from "./paymentUpdateRefuelData";
+import type { PaymentUpdateAmountOriginal } from "./paymentUpdateAmountOriginal";
+import type { PaymentUpdateCurrencyOriginal } from "./paymentUpdateCurrencyOriginal";
+import type { PaymentUpdateExchangeRate } from "./paymentUpdateExchangeRate";
 
 export interface PaymentUpdate {
   /** Сума платежу */
@@ -32,4 +35,10 @@ export interface PaymentUpdate {
   source?: PaymentUpdateSource;
   /** Дані про заправку (якщо це заправка) */
   refuel_data?: PaymentUpdateRefuelData;
+  /** Original amount in transaction currency */
+  amount_original?: PaymentUpdateAmountOriginal;
+  /** Original transaction currency */
+  currency_original?: PaymentUpdateCurrencyOriginal;
+  /** Exchange rate at transaction time */
+  exchange_rate?: PaymentUpdateExchangeRate;
 }

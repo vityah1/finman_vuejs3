@@ -127,7 +127,7 @@ export function usePaymentsForPeriodApiPaymentsPeriodGet<
 }
 
 /**
- * Повертає платежі згруповані за роками
+ * Повертає платежі згруповані за роками з підтримкою валют
  * @summary Payments By Years
  */
 export const paymentsByYearsApiPaymentsYearsGet = (
@@ -227,7 +227,7 @@ export function usePaymentsByYearsApiPaymentsYearsGet<
 }
 
 /**
- * Повертає платежі згруповані за місяцями в році
+ * Повертає платежі згруповані за місяцями в році з підтримкою валют
  * @summary Payment By Months
  */
 export const paymentByMonthsApiPaymentsYearMonthsGet = (
