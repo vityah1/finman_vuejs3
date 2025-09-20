@@ -188,43 +188,36 @@
 			</template>
 		</b-modal>
 
-		<!-- Payments table -->
+		<!-- Payments table/cards -->
 		<div class="row">
 			<div class="col-12">
-				<div class="payments-table-wrapper table-responsive">
+				<!-- Desktop table view -->
+				<div class="payments-table-wrapper d-none d-lg-block">
 					<b-table-simple hover class="payments-detail-table">
-						<colgroup>
-							<col style="width: 5%;" />
-							<col style="width: 15%;" />
-							<col style="width: 20%;" />
-							<col style="width: 30%;" />
-							<col style="width: 15%;" />
-							<col style="width: 15%;" />
-						</colgroup>
 						<b-thead head-variant="dark">
 							<b-tr>
-								<b-th class="text-center checkbox-column">
+								<b-th class="text-center" style="width: 5%">
 									<input type="checkbox" v-model="selectAll" @change="toggleSelectAll" class="form-check-input" />
 								</b-th>
-								<b-th class="sortable-header" @click="sortBy('rdate')">
+								<b-th class="sortable-header" @click="sortBy('rdate')" style="width: 12%">
 									Дата
 									<i class="fas fa-sort ms-1"></i>
 								</b-th>
-								<b-th>Підкатегорія</b-th>
-								<b-th class="sortable-header" @click="sortBy('mydesc')">
+								<b-th style="width: 18%">Підкатегорія</b-th>
+								<b-th class="sortable-header" @click="sortBy('mydesc')" style="width: 35%">
 									Опис
 									<i class="fas fa-sort ms-1"></i>
 								</b-th>
-								<b-th class="sortable-header text-end" @click="sortBy('amount')">
+								<b-th class="sortable-header text-end" @click="sortBy('amount')" style="width: 15%">
 									Сума
 									<i class="fas fa-sort ms-1"></i>
 								</b-th>
-								<b-th class="text-center">Користувач</b-th>
+								<b-th class="text-center" style="width: 15%">Користувач</b-th>
 							</b-tr>
 						</b-thead>
 						<b-tbody v-if="payments.length > 0">
 							<b-tr v-for="(payment, index) in sortedPayments" :key="index" class="payment-row">
-								<b-td class="text-center checkbox-column" @click.stop>
+								<b-td class="text-center" @click.stop>
 									<input type="checkbox"
 										:checked="isPaymentSelected(payment.id)"
 										@change="togglePaymentSelection(payment.id)"
@@ -249,17 +242,73 @@
 								</b-td>
 							</b-tr>
 						</b-tbody>
-						<b-tbody v-else>
-							<b-tr>
-								<b-td colspan="6" class="text-center py-5">
-									<div class="no-data">
-										<i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
-										<span class="text-muted">Немає платежів за цей період</span>
-									</div>
-								</b-td>
-							</b-tr>
-						</b-tbody>
 					</b-table-simple>
+				</div>
+
+				<!-- Mobile card view -->
+				<div class="mobile-cards-view d-lg-none">
+					<!-- Sort controls for mobile -->
+					<div class="mobile-sort-controls mb-3">
+						<div class="d-flex justify-content-between align-items-center">
+							<div class="form-check">
+								<input type="checkbox" v-model="selectAll" @change="toggleSelectAll" class="form-check-input" id="selectAllMobile">
+								<label class="form-check-label" for="selectAllMobile">
+									Вибрати все
+								</label>
+							</div>
+							<div class="dropdown">
+								<button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+									<i class="fas fa-sort"></i> Сортувати
+								</button>
+								<ul class="dropdown-menu">
+									<li><a class="dropdown-item" @click="sortBy('rdate')">За датою</a></li>
+									<li><a class="dropdown-item" @click="sortBy('amount')">За сумою</a></li>
+									<li><a class="dropdown-item" @click="sortBy('mydesc')">За описом</a></li>
+								</ul>
+							</div>
+						</div>
+					</div>
+
+					<!-- Payment cards -->
+					<div v-if="payments.length > 0" class="payment-cards">
+						<div v-for="(payment, index) in sortedPayments" :key="index" class="payment-card" @click="openFormEditPayment(payment.id)">
+							<div class="card-checkbox" @click.stop>
+								<input type="checkbox"
+									:checked="isPaymentSelected(payment.id)"
+									@change="togglePaymentSelection(payment.id)"
+									class="form-check-input" />
+							</div>
+							<div class="card-header">
+								<div class="card-date">
+									<i class="far fa-calendar"></i>
+									{{ formatDate(payment.rdate) }}
+								</div>
+								<div class="card-amount">
+									{{ payment.amount ? payment.amount.toLocaleString() : '0' }}
+									<span class="currency-small">{{ selectedCurrency || 'UAH' }}</span>
+								</div>
+							</div>
+							<div class="card-body">
+								<div v-if="payment.category_name !== category_name" class="card-subcategory">
+									<i class="fas fa-tag"></i>
+									{{ payment.category_name }}
+								</div>
+								<div class="card-description">
+									{{ payment.mydesc || 'Без опису' }}
+								</div>
+								<div v-if="payment.user_login" class="card-user">
+									<i class="fas fa-user"></i>
+									{{ payment.user_login }}
+								</div>
+							</div>
+						</div>
+					</div>
+
+					<!-- No data state -->
+					<div v-else class="no-data text-center py-5">
+						<i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
+						<span class="text-muted">Немає платежів за цей період</span>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -775,20 +824,119 @@ export default {
 /* Payments table */
 .payments-table-wrapper {
 	margin-top: 30px;
-	overflow-x: auto;
-	-webkit-overflow-scrolling: touch;
-}
-
-.payments-table-wrapper.table-responsive {
-	min-height: 300px;
 }
 
 .payments-detail-table {
 	background: white;
 	box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 	border-radius: 12px;
-	min-width: 800px;
 	width: 100%;
+}
+
+/* Mobile cards view */
+.mobile-cards-view {
+	margin-top: 20px;
+}
+
+.mobile-sort-controls {
+	background: white;
+	padding: 15px;
+	border-radius: 8px;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.payment-cards {
+	margin-top: 15px;
+}
+
+.payment-card {
+	background: white;
+	border-radius: 12px;
+	box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+	margin-bottom: 15px;
+	position: relative;
+	transition: all 0.3s ease;
+	cursor: pointer;
+}
+
+.payment-card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+
+.card-checkbox {
+	position: absolute;
+	top: 15px;
+	left: 15px;
+	z-index: 2;
+}
+
+.card-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 15px;
+	padding-left: 45px;
+	border-bottom: 1px solid #e9ecef;
+}
+
+.card-date {
+	color: #6c757d;
+	font-size: 0.9em;
+}
+
+.card-date i {
+	margin-right: 5px;
+}
+
+.card-amount {
+	font-size: 1.4em;
+	font-weight: bold;
+	color: #28a745;
+	font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+}
+
+.currency-small {
+	font-size: 0.7em;
+	font-weight: normal;
+	color: #6c757d;
+	margin-left: 3px;
+}
+
+.card-body {
+	padding: 15px;
+	padding-left: 45px;
+}
+
+.card-subcategory {
+	display: inline-block;
+	padding: 4px 10px;
+	background: #f0f3ff;
+	color: #5969dd;
+	border-radius: 6px;
+	font-size: 0.85em;
+	margin-bottom: 10px;
+}
+
+.card-subcategory i {
+	margin-right: 5px;
+}
+
+.card-description {
+	font-size: 1.05em;
+	color: #212529;
+	margin-bottom: 8px;
+	word-break: break-word;
+}
+
+.card-user {
+	font-size: 0.85em;
+	color: #6c757d;
+	margin-top: 10px;
+}
+
+.card-user i {
+	margin-right: 5px;
 }
 
 .payments-detail-table thead {
@@ -901,23 +1049,6 @@ export default {
 	box-shadow: 0 2px 6px rgba(0,0,0,0.1);
 }
 
-/* Mobile-specific styles */
-@media (max-width: 991px) {
-	.payments-table-wrapper {
-		margin-left: -15px;
-		margin-right: -15px;
-		padding-left: 0;
-		padding-right: 0;
-		border-radius: 0;
-	}
-
-	.payments-detail-table {
-		border-radius: 0;
-		box-shadow: none;
-		border: 1px solid #dee2e6;
-	}
-}
-
 /* Responsive adjustments */
 @media (max-width: 768px) {
 	.container-fluid {
@@ -942,44 +1073,42 @@ export default {
 
 	.total-summary {
 		padding: 15px;
+		margin-bottom: 20px;
 	}
 
-	.payments-detail-table {
-		font-size: 0.85rem;
+	.payment-card {
+		margin-bottom: 12px;
 	}
 
-	.payments-detail-table th,
-	.payments-detail-table td {
-		padding: 10px 8px;
-		white-space: nowrap;
+	.card-amount {
+		font-size: 1.2em;
 	}
 
-	.payments-detail-table th {
-		font-size: 0.8rem;
-	}
-
-	.subcategory-badge,
-	.user-badge {
-		font-size: 0.75em;
-		padding: 2px 6px;
-	}
-
-	.amount-cell .amount-value {
+	.card-description {
 		font-size: 0.95em;
 	}
+}
 
-	/* Scroll indicator */
-	.payments-table-wrapper::after {
-		content: '→ Прокрутіть таблицю →';
-		position: absolute;
-		bottom: 10px;
-		right: 10px;
-		background: rgba(0,0,0,0.7);
-		color: white;
-		padding: 5px 10px;
-		border-radius: 5px;
-		font-size: 0.75rem;
-		pointer-events: none;
+/* Small mobile devices */
+@media (max-width: 576px) {
+	.container-fluid {
+		padding-left: 5px;
+		padding-right: 5px;
+	}
+
+	.payment-card {
+		border-radius: 8px;
+	}
+
+	.card-header,
+	.card-body {
+		padding: 12px;
+		padding-left: 40px;
+	}
+
+	.card-checkbox {
+		top: 12px;
+		left: 12px;
 	}
 }
 </style>
