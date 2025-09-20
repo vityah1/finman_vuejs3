@@ -35,37 +35,37 @@
 		<!--</div>-->
 		<div class="row">
 			<div class="col-md-8">
-				<b-table-simple hover small caption-top responsive class="table-sm">
+				<b-table-simple hover small caption-top responsive class="months-table">
 					<!--      <caption>Table Head</caption>-->
 					<colgroup>
-						<col />
-						<col />
-						<col />
+						<col style="width: 40%;" />
+						<col style="width: 40%;" />
+						<col style="width: 20%;" />
 					</colgroup>
 					<b-thead head-variant="dark">
 						<b-tr>
-							<b-th class="px-2">Month</b-th>
-							<b-th class="px-2">Amount</b-th>
-							<b-th class="px-2">Count</b-th>
+							<b-th class="text-center">Month</b-th>
+							<b-th class="text-end">Amount</b-th>
+							<b-th class="text-center">Count</b-th>
 						</b-tr>
 					</b-thead>
 					<b-tbody v-if="(payments_in_year.length > 0)">
 						<b-tr v-for="(month, index) in payments_in_year" :key="index">
-							<b-td class="px-2">
+							<b-td class="text-center">
 								<router-link
-									class="col-4"
+									class="month-link fw-bold"
 									:to="{ name: 'payments_year_month', params: { year: year, month: month.month} }"
 								>
-									[{{ month.month }}] {{ getMonthName(month.month) }}
+									{{ getMonthName(month.month) }}
 								</router-link>
 							</b-td>
-							<b-td class="px-2">{{ month.amount.toLocaleString() }}</b-td>
-							<b-td class="px-2">{{ month.cnt }}</b-td>
+							<b-td class="text-end amount-cell">{{ month.amount.toLocaleString() }} {{ selectedCurrency || "UAH" }}</b-td>
+							<b-td class="text-center">{{ month.cnt }}</b-td>
 						</b-tr>
 					</b-tbody>
 					<b-tfoot>
 						<b-tr>
-							<b-td collspan="3"></b-td>
+							<b-td colspan="3"></b-td>
 						</b-tr>
 					</b-tfoot>
 				</b-table-simple>
@@ -127,18 +127,76 @@ export default {
 		this.retrieveMonths(this.$route.params.year);
 	},
 	watch: {
-    // Якщо блок watch відсутній, створіть його
-    '$store.state.sprs.selectedCurrency'() {
+    '$store.state.sprs.selectedCurrency'(newCurrency) {
+        this.selectedCurrency = newCurrency;
         this.retrieveMonths(this.year);
     }
 }
 };
 </script>
 
-<style>
+<style scoped>
 .list {
 	text-align: left;
 	max-width: 750px;
 	margin: auto;
+}
+
+.months-table {
+	margin-top: 20px;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.month-link {
+	text-decoration: none;
+	color: #007bff;
+	font-size: 1.05em;
+	transition: color 0.2s ease;
+	text-transform: capitalize;
+}
+
+.month-link:hover {
+	color: #0056b3;
+	text-decoration: underline;
+}
+
+.amount-cell {
+	font-family: 'Courier New', monospace;
+	font-weight: 600;
+	color: #28a745;
+	font-size: 1.05em;
+}
+
+.months-table tbody tr:hover {
+	background-color: #f8f9fa;
+}
+
+.months-table th {
+	font-weight: 600;
+	border-bottom: 2px solid #495057;
+	padding: 10px 8px;
+}
+
+.months-table td {
+	padding: 12px 8px;
+	vertical-align: middle;
+}
+
+/* Style for year selector */
+#year {
+	font-weight: 600;
+	min-width: 100px;
+}
+
+/* Style for totals */
+.text-danger {
+	font-weight: bold;
+	font-size: 1.1em;
+}
+
+.text-muted {
+	font-size: 0.95em;
 }
 </style>
