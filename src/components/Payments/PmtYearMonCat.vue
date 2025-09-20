@@ -70,7 +70,7 @@
 		</b-modal>
 
 		<!-- Navigation and header -->
-		<div class="header-section mb-4">
+		<div class="header-section">
 			<div class="row align-items-center">
 				<div class="col-auto">
 					<router-link
@@ -194,8 +194,8 @@
 				<!-- Desktop table view -->
 				<div class="payments-table-wrapper d-none d-lg-block">
 					<b-table-simple hover class="payments-detail-table">
-						<b-thead head-variant="dark">
-							<b-tr>
+						<b-thead>
+							<b-tr class="table-header-row">
 								<b-th class="text-center" style="width: 5%">
 									<input type="checkbox" v-model="selectAll" @change="toggleSelectAll" class="form-check-input" />
 								</b-th>
@@ -272,33 +272,28 @@
 					<!-- Payment cards -->
 					<div v-if="payments.length > 0" class="payment-cards">
 						<div v-for="(payment, index) in sortedPayments" :key="index" class="payment-card" @click="openFormEditPayment(payment.id)">
-							<div class="card-checkbox" @click.stop>
-								<input type="checkbox"
-									:checked="isPaymentSelected(payment.id)"
-									@change="togglePaymentSelection(payment.id)"
-									class="form-check-input" />
-							</div>
-							<div class="card-header">
-								<div class="card-date">
-									<i class="far fa-calendar"></i>
-									{{ formatDate(payment.rdate) }}
+							<div class="card-compact">
+								<div class="card-check-col" @click.stop>
+									<input type="checkbox"
+										:checked="isPaymentSelected(payment.id)"
+										@change="togglePaymentSelection(payment.id)"
+										class="form-check-input" />
 								</div>
-								<div class="card-amount">
-									{{ payment.amount ? payment.amount.toLocaleString() : '0' }}
-									<span class="currency-small">{{ selectedCurrency || 'UAH' }}</span>
+								<div class="card-content">
+									<div class="card-line-1">
+										<span class="card-date">{{ formatDate(payment.rdate) }}</span>
+										<span v-if="payment.user_login" class="card-user">{{ payment.user_login }}</span>
+									</div>
+									<div class="card-line-2">
+										<div class="card-desc-wrapper">
+											<div class="card-description">{{ payment.mydesc || 'Платіж' }}</div>
+											<span v-if="payment.category_name !== category_name" class="card-subcategory">{{ payment.category_name }}</span>
+										</div>
+									</div>
 								</div>
-							</div>
-							<div class="card-body">
-								<div v-if="payment.category_name !== category_name" class="card-subcategory">
-									<i class="fas fa-tag"></i>
-									{{ payment.category_name }}
-								</div>
-								<div class="card-description">
-									{{ payment.mydesc || 'Без опису' }}
-								</div>
-								<div v-if="payment.user_login" class="card-user">
-									<i class="fas fa-user"></i>
-									{{ payment.user_login }}
+								<div class="card-amount-col">
+									<div class="amount-val">{{ payment.amount ? payment.amount.toLocaleString() : '0' }}</div>
+									<div class="amount-cur">{{ selectedCurrency || 'UAH' }}</div>
 								</div>
 							</div>
 						</div>
@@ -739,16 +734,17 @@ export default {
 
 <style scoped>
 .container-fluid {
-	padding-top: 20px;
+	padding-top: 10px;
 }
 
 /* Header section */
 .header-section {
 	background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 	color: white;
-	padding: 25px;
-	border-radius: 12px;
-	box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+	padding: 15px 20px;
+	border-radius: 10px;
+	box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+	margin-bottom: 20px !important;
 }
 
 .back-button {
@@ -786,10 +782,11 @@ export default {
 
 /* Total summary */
 .total-summary {
-	background: white;
-	padding: 20px;
-	border-radius: 10px;
-	box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+	background: rgba(255,255,255,0.95);
+	padding: 12px 15px;
+	border-radius: 8px;
+	margin-top: 10px;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.08);
 }
 
 .total-label {
@@ -823,14 +820,16 @@ export default {
 
 /* Payments table */
 .payments-table-wrapper {
-	margin-top: 30px;
+	margin-top: 15px;
 }
 
 .payments-detail-table {
 	background: white;
 	box-shadow: 0 2px 12px rgba(0,0,0,0.08);
-	border-radius: 12px;
+	border-radius: 10px;
 	width: 100%;
+	overflow: hidden;
+	border: 1px solid #e9ecef;
 }
 
 /* Mobile cards view */
@@ -851,109 +850,124 @@ export default {
 
 .payment-card {
 	background: white;
-	border-radius: 12px;
-	box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-	margin-bottom: 15px;
-	position: relative;
-	transition: all 0.3s ease;
+	border-radius: 8px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+	margin-bottom: 8px;
+	transition: all 0.2s ease;
 	cursor: pointer;
+	border: 1px solid #e9ecef;
 }
 
 .payment-card:hover {
-	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+	box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+	border-color: #667eea;
 }
 
-.card-checkbox {
-	position: absolute;
-	top: 15px;
-	left: 15px;
-	z-index: 2;
+.card-compact {
+	display: flex;
+	align-items: center;
+	padding: 10px;
 }
 
-.card-header {
+.card-check-col {
+	flex-shrink: 0;
+	margin-right: 10px;
+}
+
+.card-content {
+	flex: 1;
+	min-width: 0;
+}
+
+.card-line-1 {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	padding: 15px;
-	padding-left: 45px;
-	border-bottom: 1px solid #e9ecef;
+	margin-bottom: 3px;
+	font-size: 0.85em;
 }
 
 .card-date {
 	color: #6c757d;
+	font-weight: 500;
+}
+
+.card-user {
+	background: #f8f9fa;
+	padding: 1px 6px;
+	border-radius: 3px;
+	color: #495057;
 	font-size: 0.9em;
 }
 
-.card-date i {
-	margin-right: 5px;
+.card-line-2 {
+	display: flex;
+	align-items: center;
 }
 
-.card-amount {
-	font-size: 1.4em;
-	font-weight: bold;
-	color: #28a745;
-	font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+.card-desc-wrapper {
+	flex: 1;
+	min-width: 0;
 }
 
-.currency-small {
-	font-size: 0.7em;
-	font-weight: normal;
-	color: #6c757d;
-	margin-left: 3px;
-}
-
-.card-body {
-	padding: 15px;
-	padding-left: 45px;
+.card-description {
+	font-size: 0.95em;
+	color: #212529;
+	font-weight: 500;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	display: inline;
 }
 
 .card-subcategory {
 	display: inline-block;
-	padding: 4px 10px;
+	padding: 1px 6px;
 	background: #f0f3ff;
 	color: #5969dd;
-	border-radius: 6px;
-	font-size: 0.85em;
-	margin-bottom: 10px;
+	border-radius: 3px;
+	font-size: 0.75em;
+	font-weight: 500;
+	margin-left: 8px;
 }
 
-.card-subcategory i {
-	margin-right: 5px;
+.card-amount-col {
+	flex-shrink: 0;
+	text-align: right;
+	padding-left: 12px;
 }
 
-.card-description {
-	font-size: 1.05em;
-	color: #212529;
-	margin-bottom: 8px;
-	word-break: break-word;
+.amount-val {
+	font-size: 1.1em;
+	font-weight: bold;
+	color: #28a745;
+	font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+	line-height: 1.2;
 }
 
-.card-user {
-	font-size: 0.85em;
+.amount-cur {
+	font-size: 0.7em;
 	color: #6c757d;
-	margin-top: 10px;
-}
-
-.card-user i {
-	margin-right: 5px;
+	font-weight: normal;
 }
 
 .payments-detail-table thead {
-	background: #2c3e50;
+	background: #4a5568;
 }
 
 .payments-detail-table thead th {
 	color: white !important;
-	font-weight: 600;
-	padding: 14px 12px;
-	border: none;
-	font-size: 0.95em;
+	font-weight: 700;
+	padding: 18px 14px !important;
+	border: none !important;
+	font-size: 1em;
 	white-space: nowrap;
 	position: sticky;
 	top: 0;
 	z-index: 10;
-	background: #2c3e50;
+	background: #4a5568 !important;
+	letter-spacing: 0.5px;
+	text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
 }
 
 .sortable-header {
@@ -963,7 +977,17 @@ export default {
 }
 
 .sortable-header:hover {
-	background: rgba(255,255,255,0.1);
+	background: rgba(255,255,255,0.15) !important;
+}
+
+.table-header-row {
+	background: #4a5568 !important;
+}
+
+.table-header-row th {
+	background: #4a5568 !important;
+	color: white !important;
+	font-weight: 700 !important;
 }
 
 .sortable-header i {
@@ -1077,15 +1101,29 @@ export default {
 	}
 
 	.payment-card {
-		margin-bottom: 12px;
+		margin-bottom: 6px;
 	}
 
-	.card-amount {
-		font-size: 1.2em;
+	.card-compact {
+		padding: 8px;
+	}
+
+	.card-check-col {
+		margin-right: 8px;
+	}
+
+	.amount-val {
+		font-size: 1em;
 	}
 
 	.card-description {
-		font-size: 0.95em;
+		font-size: 0.9em;
+	}
+
+	.card-subcategory {
+		display: block;
+		margin-left: 0;
+		margin-top: 3px;
 	}
 }
 
@@ -1097,18 +1135,28 @@ export default {
 	}
 
 	.payment-card {
-		border-radius: 8px;
+		border-radius: 6px;
+		margin-bottom: 5px;
 	}
 
-	.card-header,
-	.card-body {
-		padding: 12px;
-		padding-left: 40px;
+	.card-compact {
+		padding: 6px;
 	}
 
-	.card-checkbox {
-		top: 12px;
-		left: 12px;
+	.card-check-col {
+		margin-right: 6px;
+	}
+
+	.amount-val {
+		font-size: 0.95em;
+	}
+
+	.card-line-1 {
+		font-size: 0.8em;
+	}
+
+	.card-description {
+		font-size: 0.85em;
 	}
 }
 </style>
