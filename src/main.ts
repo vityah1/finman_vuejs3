@@ -13,11 +13,10 @@ import BootstrapVueNext from "bootstrap-vue-next"
 import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css"
 
-// PrimeVue imports
+// PrimeVue imports - NO CUSTOM THEME, JUST DEFAULTS
 import PrimeVue from 'primevue/config'
-import * as Aura from '@primevue/themes/aura'
-import 'primeicons/primeicons.css'
-import 'primeflex/primeflex.css'
+import Lara from '@primevue/themes/lara'
+import 'primeicons/primeicons.css'                            // Icons
 
 // PrimeVue components
 import DataTable from 'primevue/datatable'
@@ -59,15 +58,14 @@ window.addEventListener('unhandledrejection', (event) => {
 app.config.globalProperties.$moment = moment
 app.use(BootstrapVueNext)
 app.use(PrimeVue, {
+  ripple: true,
   theme: {
-    preset: Aura,
+    preset: Lara,
     options: {
       prefix: 'p',
-      darkModeSelector: '.dark-mode',
-      cssLayer: false
+      darkModeSelector: false
     }
-  },
-  ripple: true
+  }
 })
 app.use(VueQueryPlugin, {
   queryClient

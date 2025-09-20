@@ -1,107 +1,97 @@
 <template>
-	<div class="filter-container mb-3">
-		<div class="input-group mb-2">
-			<div class="col-auto">
-				<select
-					id="year"
-					v-model="localYear"
-					class="form-control w-auto"
-					name="year"
-					@change="emitChange"
-				>
-					<option v-for="(y, index) in years" :key="index" :value="y">
-						{{ y }}
-					</option>
-				</select>
-			</div>
-			&nbsp;
-			<div class="col-auto">
-				<select
-					id="month"
-					v-model="localMonth"
-					class="form-control w-auto"
-					name="month"
-					@change="emitChange"
-				>
-					<option v-for="m in months" :key="m.number" :value="m.number">
-						[{{ m.number }}] {{ m.name }}
-					</option>
-				</select>
-			</div>
-			&nbsp;
-			<div class="col-auto" v-if="userGroup">
-				<select
-					id="group_user"
-					v-model="localGroupUserId"
-					class="form-control w-auto"
-					name="group_user"
-					@change="emitChange"
-				>
-					<option value="">Всі користувачі групи</option>
-					<option v-for="user in groupUsers" :key="user.id" :value="user.id">
-						{{ user.fullname || user.login }}
-					</option>
-				</select>
-			</div>
-			&nbsp;
-			<div class="col-auto">
-				<button 
-					type="button" 
-					class="btn btn-outline-primary btn-sm"
-					@click="openCustomPeriodModal"
-				>
-					<i class="fas fa-calendar-alt"></i> Кастомний період
-				</button>
-			</div>
+	<div>
+		<div>
+			<Dropdown
+				v-model="localYear"
+				:options="years"
+				placeholder="Рік"
+				@change="emitChange"
+			/>
+			<Dropdown
+				v-model="localMonth"
+				:options="monthOptions"
+				optionLabel="label"
+				optionValue="value"
+				placeholder="Місяць"
+				@change="emitChange"
+			/>
+			<Dropdown
+				v-if="userGroup"
+				v-model="localGroupUserId"
+				:options="groupUserOptions"
+				optionLabel="label"
+				optionValue="value"
+				placeholder="Користувач"
+				@change="emitChange"
+			/>
+			<PButton
+				icon="pi pi-calendar"
+				label="Період"
+				@click="openCustomPeriodModal"
+			/>
 		</div>
 
-		<!-- Модалка для кастомного періоду -->
-		<div v-if="showModal" class="modal fade show d-block" tabindex="-1" style="background-color: rgba(0,0,0,0.5);">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Вибрати кастомний період</h5>
-						<button type="button" class="btn-close" @click="closeModal" aria-label="Close"></button>
-					</div>
-					<div class="modal-body">
-						<div class="row">
-							<div class="col-md-6">
-								<label for="modal_start_date" class="form-label">Дата початку:</label>
-								<input 
-									type="date" 
-									id="modal_start_date" 
-									v-model="modalStartDate"
-									class="form-control"
-								>
-							</div>
-							<div class="col-md-6">
-								<label for="modal_end_date" class="form-label">Дата кінця:</label>
-								<input 
-									type="date" 
-									id="modal_end_date" 
-									v-model="modalEndDate"
-									class="form-control"
-								>
-							</div>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" @click="closeModal">Скасувати</button>
-						<button type="button" class="btn btn-primary" @click="applyCustomPeriod">Застосувати</button>
-					</div>
+		<!-- Custom Period Dialog -->
+		<Dialog
+			v-model:visible="showModal"
+			header="Вибрати кастомний період"
+			:modal="true"
+			:closable="true"
+			:style="{ width: '450px' }"
+		>
+			<div>
+				<div>
+					<label for="start_date">Дата початку:</label>
+					<Calendar
+						v-model="modalStartDate"
+						id="start_date"
+						dateFormat="yy-mm-dd"
+						showIcon
+					/>
+				</div>
+				<div>
+					<label for="end_date">Дата кінця:</label>
+					<Calendar
+						v-model="modalEndDate"
+						id="end_date"
+						dateFormat="yy-mm-dd"
+						showIcon
+					/>
 				</div>
 			</div>
-		</div>
+			<template #footer>
+				<PButton label="Скасувати" icon="pi pi-times" @click="closeModal" />
+				<PButton label="Застосувати" icon="pi pi-check" @click="applyCustomPeriod" />
+			</template>
+		</Dialog>
 	</div>
 </template>
 
 <script>
 import GroupService from "@/services/GroupService";
 import PaymentService from "@/services/PaymentService";
+import Dialog from 'primevue/dialog';
+import Calendar from 'primevue/calendar';
+import Dropdown from 'primevue/dropdown';
 import store from "@/store";
 
 export default {
 	name: "SelectorComponent",
+	props: {
+		currentYear: {
+			type: [Number, String],
+			default: null
+		},
+		currentMonth: {
+			type: [Number, String],
+			default: null
+		}
+	},
+	components: {
+		Dialog,
+		Calendar,
+		Dropdown
+	},
 	data() {
 		return {
 			localYear: undefined,
@@ -134,6 +124,21 @@ export default {
 	computed: {
 		currentUser() {
 			return this.$store.state.auth.user;
+		},
+		monthOptions() {
+			return this.months.map(m => ({
+				label: `[${m.number}] ${m.name}`,
+				value: m.number
+			}));
+		},
+		groupUserOptions() {
+			return [
+				{ label: 'Всі користувачі групи', value: '' },
+				...this.groupUsers.map(user => ({
+					label: user.fullname || user.login,
+					value: user.id
+				}))
+			];
 		}
 	},
 	methods: {
@@ -259,8 +264,9 @@ async getUserGroup() {
   this.getPaymentsYears();
   this.getUserGroup();
 
-  this.localYear = this.$route.params.year || new Date().getFullYear();
-  this.localMonth = this.$route.params.month || new Date().getMonth() + 1;
+  // Використовуємо пропси якщо вони передані, інакше беремо з роуту або поточну дату
+  this.localYear = this.currentYear || this.$route.params.year || new Date().getFullYear();
+  this.localMonth = this.currentMonth || this.$route.params.month || new Date().getMonth() + 1;
   this.localGroupUserId = this.$route.query.group_user_id || localStorage.getItem('selectedGroupUserId') || "";
 
   // Ключова зміна: чекаємо достатньо часу перед розблокуванням подій
@@ -276,7 +282,21 @@ async getUserGroup() {
 			} else {
 				localStorage.removeItem('selectedGroupUserId');
 			}
+		},
+		currentYear(newVal) {
+			if (newVal && newVal !== this.localYear) {
+				this.localYear = newVal;
+			}
+		},
+		currentMonth(newVal) {
+			if (newVal && newVal !== this.localMonth) {
+				this.localMonth = newVal;
+			}
 		}
 	}
 };
 </script>
+
+<style scoped>
+/* NO CUSTOM STYLES - USING PURE PRIMEVUE DEFAULTS */
+</style>
