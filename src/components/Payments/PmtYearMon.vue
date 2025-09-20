@@ -37,7 +37,7 @@
 									class="category-link"
 									:to="{
 										name: 'payments',
-										params: { action: 'show', year: year, month: month, category_id: category.category_id },
+										params: { year: year, month: month, category_id: category.category_id },
 										query: { group_user_id: group_user_id }
 									}"
 								>

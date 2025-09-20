@@ -13,6 +13,23 @@ import BootstrapVueNext from "bootstrap-vue-next"
 import "bootstrap/dist/css/bootstrap.css"
 import "bootstrap-vue-next/dist/bootstrap-vue-next.css"
 
+// PrimeVue imports
+import PrimeVue from 'primevue/config'
+import * as Aura from '@primevue/themes/aura'
+import 'primeicons/primeicons.css'
+import 'primeflex/primeflex.css'
+
+// PrimeVue components
+import DataTable from 'primevue/datatable'
+import Column from 'primevue/column'
+import Card from 'primevue/card'
+import Button from 'primevue/button'
+import InputText from 'primevue/inputtext'
+import Dropdown from 'primevue/dropdown'
+import Calendar from 'primevue/calendar'
+import Panel from 'primevue/panel'
+import Paginator from 'primevue/paginator'
+
 import AlertComponent from './components/AlertComponent.vue'
 
 const app = createApp(App)
@@ -41,9 +58,31 @@ window.addEventListener('unhandledrejection', (event) => {
 // Додаємо момент до глобальних властивостей з типізацією
 app.config.globalProperties.$moment = moment
 app.use(BootstrapVueNext)
+app.use(PrimeVue, {
+  theme: {
+    preset: Aura,
+    options: {
+      prefix: 'p',
+      darkModeSelector: '.dark-mode',
+      cssLayer: false
+    }
+  },
+  ripple: true
+})
 app.use(VueQueryPlugin, {
   queryClient
 })
+
+// Register PrimeVue components globally
+app.component('DataTable', DataTable)
+app.component('Column', Column)
+app.component('PCard', Card)
+app.component('PButton', Button)
+app.component('InputText', InputText)
+app.component('Dropdown', Dropdown)
+app.component('Calendar', Calendar)
+app.component('Panel', Panel)
+app.component('Paginator', Paginator)
 
 app.use(router).use(store)
     .component('alert-component', AlertComponent)

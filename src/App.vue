@@ -18,3 +18,8 @@ export default {
 	},
 };
 </script>
+
+<style>
+/* Import global design system */
+@import './styles/main.css';
+</style>

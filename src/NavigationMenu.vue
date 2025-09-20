@@ -22,25 +22,40 @@
 						<i class="fas fa-home"></i>
 					</router-link>
 				</b-nav-item>
+				<!-- Швидкий доступ до поточного місяця -->
 				<b-nav-item v-if="currentUser">
 					<router-link
 						:to="{ name: 'payments_year_month', params: { year: currentYear, month: currentMonth }}"
 						class="nav-link">
+						<i class="fas fa-calendar-day me-1"></i>
 						Поточний
 					</router-link>
 				</b-nav-item>
-				<b-nav-item v-if="currentUser">
-					<router-link
-						:to="{ name: 'payments', params: {action: 'last', year: currentYear, month: currentMonth, category_id: '_' }}"
-						class="nav-link">
-						Останні
-					</router-link>
-				</b-nav-item>
-				<b-nav-item v-if="currentUser">
-					<router-link :to="{ name: 'payments_years' }" class="nav-link" @click="refreshYears">
-						Роки
-					</router-link>
-				</b-nav-item>
+
+				<!-- Випадаюче меню Витрати -->
+				<b-nav-item-dropdown v-if="currentUser" text="Витрати">
+					<template #button-content>
+						<i class="fas fa-money-bill-wave me-1"></i> Витрати
+					</template>
+					<b-dropdown-item>
+						<router-link
+							:to="{ name: 'payments', params: {action: 'last', year: currentYear, month: currentMonth, category_id: '_' }}"
+							class="nav-link">
+							<i class="fas fa-history me-1"></i> Останні
+						</router-link>
+					</b-dropdown-item>
+					<b-dropdown-item>
+						<router-link :to="{ name: 'payments_years' }" class="nav-link" @click="refreshYears">
+							<i class="fas fa-calendar-alt me-1"></i> Роки
+						</router-link>
+					</b-dropdown-item>
+					<b-dropdown-divider></b-dropdown-divider>
+					<b-dropdown-item>
+						<router-link :to="{ name: 'category' }" class="nav-link">
+							<i class="fas fa-tags me-1"></i> Категорії
+						</router-link>
+					</b-dropdown-item>
+				</b-nav-item-dropdown>
 
 				<b-nav-item-dropdown v-if="currentUser" text="Банки">
 					<template #button-content>
@@ -120,11 +135,6 @@
 						<b-dropdown-item v-if="currentUser">
 							<router-link :to="{ name: 'config' }" class="nav-link">
 								<i class="fas fa-cog"></i> Налаштування
-							</router-link>
-						</b-dropdown-item>
-						<b-dropdown-item v-if="currentUser">
-							<router-link :to="{ name: 'category' }" class="nav-link">
-								<i class="fas fa-cog"></i> Категорії
 							</router-link>
 						</b-dropdown-item>
 						<b-dropdown-divider></b-dropdown-divider>

@@ -1,0 +1,252 @@
+/* Main stylesheet that imports all design system files */
+@import './variables.css';
+@import './utilities.css';
+
+/* Global resets for compact design */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  margin: 0;
+  padding: 0;
+}
+
+/* Override Bootstrap excessive spacing */
+.container,
+.container-fluid {
+  padding-left: var(--spacing-md);
+  padding-right: var(--spacing-md);
+}
+
+.row {
+  margin-left: calc(var(--spacing-sm) * -1);
+  margin-right: calc(var(--spacing-sm) * -1);
+}
+
+.col,
+[class*="col-"] {
+  padding-left: var(--spacing-sm);
+  padding-right: var(--spacing-sm);
+}
+
+/* Compact Bootstrap components */
+.card {
+  margin-bottom: var(--spacing-md);
+}
+
+.card-body {
+  padding: var(--spacing-md);
+}
+
+.card-header {
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.btn {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.btn-sm {
+  padding: 2px var(--spacing-sm);
+  font-size: var(--font-size-xs);
+}
+
+/* Table improvements */
+.table {
+  margin-bottom: 0;
+}
+
+.table thead th {
+  background: var(--table-header-bg);
+  color: var(--table-header-color);
+  padding: var(--table-padding-y) var(--table-padding-x);
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  border: none;
+}
+
+.table tbody td {
+  padding: var(--table-padding-y) var(--table-padding-x);
+  vertical-align: middle;
+  font-size: var(--font-size-sm);
+}
+
+/* Navigation improvements */
+.navbar {
+  padding: var(--spacing-sm) var(--spacing-md);
+  box-shadow: var(--shadow-md);
+}
+
+.navbar-nav .nav-link {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+.dropdown-menu {
+  font-size: var(--font-size-sm);
+}
+
+.dropdown-item {
+  padding: var(--spacing-xs) var(--spacing-md);
+}
+
+/* Form improvements */
+.form-group {
+  margin-bottom: var(--spacing-md);
+}
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
+}
+
+.form-control,
+.form-select {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-sm);
+}
+
+/* Alert improvements */
+.alert {
+  padding: var(--spacing-sm) var(--spacing-md);
+  margin-bottom: var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+/* Modal improvements */
+.modal-header {
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.modal-body {
+  padding: var(--spacing-md);
+}
+
+.modal-footer {
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+/* PrimeVue overrides for compact design */
+.p-component {
+  font-size: var(--font-size-sm);
+}
+
+.p-button {
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: var(--font-size-sm);
+}
+
+.p-button-sm {
+  padding: 2px var(--spacing-sm);
+  font-size: var(--font-size-xs);
+}
+
+.p-datatable .p-datatable-thead > tr > th {
+  padding: var(--table-padding-y) var(--table-padding-x);
+  background: var(--table-header-bg);
+  color: var(--table-header-color);
+}
+
+.p-datatable .p-datatable-tbody > tr > td {
+  padding: var(--table-padding-y) var(--table-padding-x);
+}
+
+.p-card .p-card-body {
+  padding: var(--spacing-md);
+}
+
+.p-card .p-card-content {
+  padding: 0;
+}
+
+/* Currency badge styling */
+.currency-badge {
+  display: inline-block;
+  padding: 2px 6px;
+  background: #e7f5ff;
+  color: #0c8599;
+  border-radius: var(--border-radius-sm);
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  margin-left: 4px;
+}
+
+/* Amount styling */
+.amount-cell {
+  font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-success);
+}
+
+/* Link styling */
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-primary-dark);
+  text-decoration: underline;
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-muted);
+  border-radius: var(--border-radius-sm);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary);
+}
+
+/* Mobile specific styles */
+@media (max-width: 768px) {
+  body {
+    font-size: var(--font-size-sm);
+  }
+
+  .container,
+  .container-fluid {
+    padding-left: var(--spacing-sm);
+    padding-right: var(--spacing-sm);
+  }
+
+  .modal-dialog {
+    margin: var(--spacing-sm);
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    font-size: 10pt;
+  }
+
+  .table {
+    font-size: 9pt;
+  }
+}
