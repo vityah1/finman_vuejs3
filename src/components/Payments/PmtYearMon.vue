@@ -62,30 +62,22 @@
 								</template>
 							</Column>
 
-							<!-- Enhanced footer with better styling -->
-							<template #footer>
-								<PCard>
-									<template #content>
-										<div style="display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0;">
-											<div style="display: flex; align-items: center; gap: 0.5rem;">
-												<i class="pi pi-calculator" style="color: var(--primary-color); font-size: 1.2rem;"></i>
-												<span style="font-weight: 600; font-size: 1.2rem;">Загальна сума:</span>
-											</div>
-											<div style="display: flex; align-items: center; gap: 1rem;">
-												<div style="display: flex; align-items: center; gap: 0.25rem;">
-													<span style="font-weight: 700; font-size: 1.4rem; color: var(--primary-color);">{{ total.toLocaleString() }}</span>
-													<span style="color: var(--text-color-secondary); font-size: 1rem;">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
-												</div>
-												<div style="display: flex; align-items: center; gap: 0.25rem;">
-<!--													<span style="color: var(&#45;&#45;text-color-secondary);">Операцій:</span>-->
-													<PTag :value="total_cnt" severity="success" style="font-weight: 600;" />
-												</div>
-											</div>
-										</div>
-									</template>
-								</PCard>
-							</template>
 						</DataTable>
+
+						<!-- Summary panel aligned with table -->
+						<div style="margin-top: 1rem; padding: 1rem; background: var(--surface-ground); border-radius: 0.375rem; border: 1px solid var(--surface-border);">
+							<div style="display: flex; justify-content: flex-end; align-items: center; gap: 2rem;">
+								<div style="display: flex; align-items: center; gap: 0.5rem;">
+									<span style="color: var(--text-color-secondary); font-weight: 500;">Операцій:</span>
+									<PTag :value="total_cnt" severity="success" style="font-weight: 600;" />
+								</div>
+								<div style="display: flex; align-items: center; gap: 0.25rem;">
+									<span style="color: var(--text-color-secondary); font-weight: 500;">Загальна сума:</span>
+									<span style="font-weight: 700; font-size: 1.4rem; color: var(--primary-color);">{{ total.toLocaleString() }}</span>
+									<span style="color: var(--text-color-secondary); font-size: 1rem;">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+								</div>
+							</div>
+						</div>
 					</template>
 				</PCard>
 			</template>
@@ -327,7 +319,7 @@ export default {
       console.warn("Запит при зміні валюти не вдався");
     });
   }
-}
+	}
 };
 </script>
 

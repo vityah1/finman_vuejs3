@@ -1,77 +1,105 @@
 <template>
-  <div class="container">
-    <alert-component ref="myAlert"></alert-component>
+  <div>
+    <AlertComponent ref="myAlert"></AlertComponent>
+
     <!-- Modal -->
-    <b-modal
-    v-if="currentMonoUser"
-    v-model="showModal"
-    @ok="doFormAction()"
-    :title="okTitle"
-    :okTitle="okTitle"
+    <Dialog
+      v-if="currentMonoUser"
+      v-model:visible="showModal"
+      :header="okTitle + ' MonoUser [' + currentMonoUser.id + ']'"
+      modal
+      style="width: 50rem"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
     >
-      <template #modal-header>
-        <h5 class="modal-title text-danger">
-          {{okTitle}} MonoUser [{{ this.currentMonoUser.id }}]
-        </h5>
+      <div style="margin-bottom: 1rem;">
+        <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Name:</label>
+        <InputText v-model="currentMonoUser.name" style="width: 100%;" />
+      </div>
+
+      <div style="margin-bottom: 1rem;">
+        <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Token:</label>
+        <InputText v-model="currentMonoUser.token" style="width: 100%;" />
+      </div>
+
+      <template #footer>
+        <PButton label="Скасувати" icon="pi pi-times" text @click="showModal = false" />
+        <PButton v-if="currentMonoUser.action == 'edit'" label="Видалити" icon="pi pi-trash" severity="danger" @click="delMonoUser" />
+        <PButton :label="okTitle" icon="pi pi-check" @click="doFormAction" />
       </template>
-      <template #default>
-        <b-form >
-          <div class="form-group">
-            <label>{{ currentMonoUser.name }}</label>
-          </div>
+    </Dialog>
 
-
-          <div class="form-group">
-            <label><strong>Name:</strong></label>
-            <input type="text" class="form-control" id="amount" v-model="currentMonoUser.name" />
-          </div>
-
-          <div class="form-group">
-            <label><strong>Token:</strong></label>
-            <input type="text" class="form-control" id="amount" v-model="currentMonoUser.token" />
-          </div>
-
-        </b-form>
-        <div>
-          <p></p>
-          <b-button v-if="currentMonoUser.action == 'edit'" variant="danger" @click="delMonoUser">
-            Delete
-          </b-button>
+    <!-- Main content -->
+    <PCard>
+      <template #header>
+        <div style="padding: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="pi pi-users" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+          <span style="font-weight: 600;">Моно користувачі</span>
+          <PButton
+            icon="pi pi-arrow-left"
+            label="Назад"
+            text
+            @click="goBackToSettings"
+            style="margin-left: auto;"
+          />
         </div>
       </template>
-    </b-modal>
 
-    <div class="row">
-      <div class="col-4">
-        <b-button variant="primary" @click="openFormAddMonoUser()"> Add Mono user</b-button>
-      </div>
-    </div>
+      <template #content>
+        <div style="margin-bottom: 1rem;">
+          <PButton label="Додати Моно користувача" icon="pi pi-plus" @click="openFormAddMonoUser()" />
+        </div>
 
-    <div v-if="mono_users" class="row">
-      <div class="col-12">
-        <b-table-simple hover small caption-top responsive>
-          <caption>Mono users</caption>
-          <b-thead>
-            <b-th>Name</b-th>
-            <b-th>Token</b-th>
-          </b-thead>
+        <DataTable
+          v-if="mono_users"
+          :value="mono_users"
+          @row-click="(event) => openFormEditMonoUser(event.data.id)"
+          dataKey="id"
+          stripedRows
+          style="cursor: pointer;"
+        >
+          <template #empty>
+            <div style="text-align: center; padding: 2rem; color: var(--text-color-secondary);">
+              <i class="pi pi-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+              Немає Моно користувачів
+            </div>
+          </template>
 
-          <b-tbody>
-            <b-tr v-for="(mono_user, index) in mono_users" :key="index" @click="openFormEditMonoUser(mono_user.id)">
-              <b-td>{{ mono_user.name }}</b-td>
-              <b-td>{{ mono_user.token }}</b-td>
+          <Column field="id" header="ID" style="width: 80px;">
+            <template #body="{ data }">
+              <PTag :value="'#' + data.id" severity="secondary" />
+            </template>
+          </Column>
 
-            </b-tr>
-          </b-tbody>
-        </b-table-simple>
-      </div>
-    </div>
+          <Column field="name" header="Ім'я" />
+
+          <Column field="token" header="Токен">
+            <template #body="{ data }">
+              <span style="font-family: monospace; font-size: 0.9rem;">
+                {{ data.token ? data.token.substring(0, 20) + '...' : 'Не вказано' }}
+              </span>
+            </template>
+          </Column>
+        </DataTable>
+      </template>
+    </PCard>
   </div>
 </template>
 
 <script lang="ts">
 import MonoUsersService from "../../../services/MonoUsersService";
 import { defineComponent } from 'vue';
+
+// PrimeVue imports
+import Card from 'primevue/card';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import InputText from 'primevue/inputtext';
+import Tag from 'primevue/tag';
+
+// Additional components
+import AlertComponent from '../../AlertComponent.vue';
 
 interface MonoUser {
   id: number;
@@ -95,6 +123,16 @@ interface AlertComponent {
 
 export default defineComponent({
   name: "MonoUsers",
+  components: {
+    PCard: Card,
+    DataTable,
+    Column,
+    PButton: Button,
+    Dialog,
+    InputText,
+    PTag: Tag,
+    AlertComponent
+  },
   data() {
     return {
       okTitle: "",
@@ -201,6 +239,9 @@ export default defineComponent({
         .catch((e) => {
           console.log(e);
         });
+    },
+    goBackToSettings() {
+      this.$router.push({ name: 'config', query: { section: 'mono' } });
     },
   },
   mounted(): void {

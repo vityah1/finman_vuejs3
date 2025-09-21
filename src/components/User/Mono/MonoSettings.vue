@@ -1,53 +1,123 @@
 <template>
-  <div class="container">
-    <header class="jumbotron">
-      <h3>Mono</h3>
-    </header>
-    <div v-for="mono_user in mono_users" :key="mono_user.mono_user_id">
-      <div>
-        This api server webhook: <br><span class="">{{ mono_user.this_api_webhook }}</span>
-        <hr>
-        Current user webhook: <br>
-        <input type="text" v-model="mono_user.webHookUrl" class="form-control mw-100">
-        <input type="button" @click="save_webhook(mono_user.mono_user_id, mono_user.webHookUrl)" value="Set webhook" class="btn btn-primary">
-        <hr>
-        User info:
-        {{ mono_user.name }}
-        <table class="table ">
-          <thead>
-            <tr>
-              <th>Type</th>
-              <th>Card</th>
-              <th>Balance</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr v-for="item in mono_user.filteredData" :key="item.id">
-              <td>{{ item.type }}</td>
-              <td>
-                <template v-for="(pan, index) in item.maskedPan" :key="index">
-      {{ pan }}
-      <br>
-    </template>
-              {{item.id}}
-            </td>
-              <td>{{ item.balance / 100 }} {{ getCurrenciesByCode(item.currencyCode) }}</td>
-            </tr>
-          </tbody>
-        </table>
+  <div>
+    <AlertComponent ref="myAlert"></AlertComponent>
 
-        <br>
-        <!-- {{ JSON.stringify(jsonResponse, null, 2) }} -->
-      </div>
-    </div>
+    <!-- Main content -->
+    <PCard>
+      <template #header>
+        <div style="padding: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+          <i class="pi pi-key" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+          <span style="font-weight: 600;">Моно токени</span>
+          <PButton
+            icon="pi pi-arrow-left"
+            label="Назад"
+            text
+            @click="goBackToSettings"
+            style="margin-left: auto;"
+          />
+        </div>
+      </template>
+
+      <template #content>
+        <div v-if="mono_users.length === 0" style="text-align: center; padding: 2rem; color: var(--text-color-secondary);">
+          <i class="pi pi-info-circle" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+          Немає Моно користувачів для налаштування токенів
+        </div>
+
+        <div v-for="mono_user in mono_users" :key="mono_user.mono_user_id" style="margin-bottom: 2rem;">
+          <PCard>
+            <template #header>
+              <div style="padding: 1rem;">
+                <h4 style="margin: 0; color: var(--text-color);">{{ mono_user.name }}</h4>
+              </div>
+            </template>
+
+            <template #content>
+              <!-- API Webhook Info -->
+              <div style="margin-bottom: 1.5rem;">
+                <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Webhook цього API сервера:</label>
+                <InputText
+                  :value="mono_user.this_api_webhook"
+                  readonly
+                  style="width: 100%; font-family: monospace; background-color: var(--surface-100);"
+                />
+              </div>
+
+              <!-- User Webhook Setting -->
+              <div style="margin-bottom: 1.5rem;">
+                <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Поточний webhook користувача:</label>
+                <div style="display: flex; gap: 0.5rem;">
+                  <InputText
+                    v-model="mono_user.webHookUrl"
+                    placeholder="Введіть URL webhook"
+                    style="flex: 1;"
+                  />
+                  <PButton
+                    label="Встановити webhook"
+                    icon="pi pi-save"
+                    @click="save_webhook(mono_user.mono_user_id, mono_user.webHookUrl)"
+                  />
+                </div>
+              </div>
+
+              <!-- Accounts Table -->
+              <div v-if="mono_user.filteredData && mono_user.filteredData.length > 0">
+                <label style="font-weight: 600; margin-bottom: 1rem; display: block;">Рахунки користувача:</label>
+                <DataTable :value="mono_user.filteredData" stripedRows>
+                  <Column field="type" header="Тип" />
+                  <Column field="maskedPan" header="Картка">
+                    <template #body="{ data }">
+                      <div>
+                        <div v-for="(pan, index) in data.maskedPan" :key="index" style="font-family: monospace;">
+                          {{ pan }}
+                        </div>
+                        <PTag :value="'ID: ' + data.id" severity="secondary" style="margin-top: 0.25rem;" />
+                      </div>
+                    </template>
+                  </Column>
+                  <Column field="balance" header="Баланс">
+                    <template #body="{ data }">
+                      <span style="font-weight: 600; color: var(--green-500);">
+                        {{ (data.balance / 100).toLocaleString() }} {{ getCurrenciesByCode(data.currencyCode) }}
+                      </span>
+                    </template>
+                  </Column>
+                </DataTable>
+              </div>
+            </template>
+          </PCard>
+        </div>
+      </template>
+    </PCard>
   </div>
 </template>
 
-<script>
+<script lang="ts">
 import MonoService from "../../../services/MonoService";
+import { defineComponent } from 'vue';
 
-export default {
+// PrimeVue imports
+import Card from 'primevue/card';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Tag from 'primevue/tag';
+
+// Additional components
+import AlertComponent from '../../AlertComponent.vue';
+
+export default defineComponent({
   name: "MonoSettings",
+  components: {
+    PCard: Card,
+    DataTable,
+    Column,
+    PButton: Button,
+    InputText,
+    PTag: Tag,
+    AlertComponent
+  },
   data() {
     return {
       mono_users: [],
@@ -101,5 +171,15 @@ export default {
       }
     );
   },
-};
+  methods: {
+    save_webhook(monoUserId: number, webhookUrl: string) {
+      // Implementation for saving webhook
+      console.log('Saving webhook for user:', monoUserId, 'URL:', webhookUrl);
+      // You would call MonoService.setWebhook or similar here
+    },
+    goBackToSettings() {
+      this.$router.push({ name: 'config', query: { section: 'mono' } });
+    },
+  },
+});
 </script>

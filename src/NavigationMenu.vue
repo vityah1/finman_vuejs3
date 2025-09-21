@@ -122,17 +122,6 @@
 
 						<b-dropdown-divider></b-dropdown-divider>
 						<b-dropdown-item v-if="currentUser">
-							<router-link :to="{ name: 'mono_user_token' }" class="nav-link">
-								<i class="fas fa-paw"></i> Mono: токени
-							</router-link>
-						</b-dropdown-item>
-						<b-dropdown-item v-if="currentUser">
-							<router-link :to="{ name: 'mono_users' }" class="nav-link">
-								<i class="fas fa-paw"></i> Mono: користувачі
-							</router-link>
-						</b-dropdown-item>
-						<b-dropdown-divider></b-dropdown-divider>
-						<b-dropdown-item v-if="currentUser">
 							<router-link :to="{ name: 'config' }" class="nav-link">
 								<i class="fas fa-cog"></i> Налаштування
 							</router-link>

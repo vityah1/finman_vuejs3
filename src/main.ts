@@ -29,6 +29,9 @@ import Calendar from 'primevue/calendar'
 import Panel from 'primevue/panel'
 import Paginator from 'primevue/paginator'
 
+// PrimeVue directives
+import Tooltip from 'primevue/tooltip'
+
 import AlertComponent from './components/AlertComponent.vue'
 
 const app = createApp(App)
@@ -81,6 +84,9 @@ app.component('Dropdown', Dropdown)
 app.component('Calendar', Calendar)
 app.component('Panel', Panel)
 app.component('Paginator', Paginator)
+
+// Register PrimeVue directives
+app.directive('tooltip', Tooltip)
 
 app.use(router).use(store)
     .component('alert-component', AlertComponent)
