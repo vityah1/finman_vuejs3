@@ -27,7 +27,7 @@ import type {
 
 Параметри:
     file: Файл з банківськими транзакціями
-    mode: Тип банку (wise, p24, revolut, pumb, erste)
+    mode: Тип банку (wise, p24, revolut, pumb, erste, raiffeisen)
     action: Дія - 'show' для попереднього перегляду або 'import' для імпорту даних
  * @summary Import Bank Statement
  */

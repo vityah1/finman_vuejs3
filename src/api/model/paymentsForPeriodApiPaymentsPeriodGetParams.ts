@@ -34,4 +34,8 @@ export type PaymentsForPeriodApiPaymentsPeriodGetParams = {
    * ID користувача групи
    */
   group_user_id?: string | null;
+  /**
+   * Джерело платежу для фільтрації (mono|pryvat|pwa|revolut|wise)
+   */
+  source?: string | null;
 };

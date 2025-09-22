@@ -18,8 +18,4 @@ export type PaymentsByYearsApiPaymentsYearsGetParams = {
    * Валюта
    */
   currency?: string;
-  /**
-   * Показувати в оригінальній валюті
-   */
-  show_original?: boolean | null;
 };

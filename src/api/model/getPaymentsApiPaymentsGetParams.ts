@@ -30,4 +30,8 @@ export type GetPaymentsApiPaymentsGetParams = {
    * ID користувача групи
    */
   group_user_id?: string | null;
+  /**
+   * Джерело платежу для фільтрації (mono|pryvat|webapp|revolut|wise)
+   */
+  source?: string | null;
 };

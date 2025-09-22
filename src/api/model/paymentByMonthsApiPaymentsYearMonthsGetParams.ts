@@ -14,8 +14,4 @@ export type PaymentByMonthsApiPaymentsYearMonthsGetParams = {
    * Валюта
    */
   currency?: string;
-  /**
-   * Показувати в оригінальній валюті
-   */
-  show_original?: boolean | null;
 };
