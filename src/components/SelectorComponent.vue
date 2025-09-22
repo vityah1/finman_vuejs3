@@ -24,6 +24,14 @@
 				placeholder="Користувач"
 				@change="emitChange"
 			/>
+			<Dropdown
+				v-model="localSource"
+				:options="sourceOptions"
+				optionLabel="label"
+				optionValue="value"
+				placeholder="Джерело"
+				@change="emitChange"
+			/>
 			<PButton
 				icon="pi pi-calendar"
 				label="Період"
@@ -97,6 +105,7 @@ export default {
 			localYear: undefined,
 			localMonth: undefined,
 			localGroupUserId: undefined,
+			localSource: undefined,
 			modalStartDate: '',
 			modalEndDate: '',
 			showModal: false,
@@ -116,6 +125,17 @@ export default {
 				{ number: 11, name: "Листопад" },
 				{ number: 12, name: "Грудень" },
 				{ number: 99, name: "Всі" },
+			],
+			sourceOptions: [
+				{ label: 'Всі джерела', value: '' },
+				{ label: 'MonoBank', value: 'mono' },
+				{ label: 'Веб-додаток (PWA)', value: 'pwa' },
+				{ label: 'PrivatBank', value: 'p24' },
+				{ label: 'Wise', value: 'wise' },
+				{ label: 'Revolut', value: 'revolut' },
+				{ label: 'PUMB', value: 'pumb' },
+				{ label: 'Raiffeisen', value: 'raiffeisen' },
+				{ label: 'Erste Bank', value: 'erste' }
 			],
 			groupUsers: [],
 			isInitializing: true,
@@ -190,6 +210,7 @@ export default {
 				start_date: this.modalStartDate,
 				end_date: this.modalEndDate,
 				group_user_id: this.localGroupUserId,
+				source: this.localSource,
 			});
 
 			console.log("Відправляємо кастомний період:", eventData);
@@ -208,6 +229,7 @@ export default {
 				year: this.localYear,
 				month: this.localMonth,
 				group_user_id: this.localGroupUserId,
+				source: this.localSource,
 			});
 
 			console.log("Відправляємо дані з селектора:", eventData);
@@ -269,6 +291,7 @@ async getUserGroup() {
   this.localYear = parseInt(this.currentYear || this.$route.params.year || new Date().getFullYear());
   this.localMonth = parseInt(this.currentMonth || this.$route.params.month || new Date().getMonth() + 1);
   this.localGroupUserId = this.$route.query.group_user_id || localStorage.getItem('selectedGroupUserId') || "";
+  this.localSource = this.$route.query.source || localStorage.getItem('selectedSource') || "";
 
   // Ключова зміна: чекаємо достатньо часу перед розблокуванням подій
   setTimeout(() => {
@@ -282,6 +305,13 @@ async getUserGroup() {
 				localStorage.setItem('selectedGroupUserId', newVal);
 			} else {
 				localStorage.removeItem('selectedGroupUserId');
+			}
+		},
+		localSource(newVal) {
+			if (newVal) {
+				localStorage.setItem('selectedSource', newVal);
+			} else {
+				localStorage.removeItem('selectedSource');
 			}
 		},
 		currentYear(newVal) {

@@ -85,7 +85,7 @@
 								<template #body="{ data }">
 									<div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem;">
 										<span style="font-weight: 600; font-size: 1.1rem; color: var(--green-500);">{{ formatAmount(data.amount) }}</span>
-										<span style="color: var(--text-color-secondary); font-size: 0.9rem;">UAH</span>
+										<span style="color: var(--text-color-secondary); font-size: 0.9rem;">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
 									</div>
 								</template>
 							</Column>
@@ -116,7 +116,7 @@
 								<div style="display: flex; align-items: center; gap: 0.25rem;">
 									<span style="color: var(--text-color-secondary); font-weight: 500;">Загальна сума:</span>
 									<span style="font-weight: 700; font-size: 1.3rem; color: var(--green-500);">{{ formatAmount(total) }}</span>
-									<span style="color: var(--text-color-secondary); font-size: 0.9rem;">UAH</span>
+									<span style="color: var(--text-color-secondary); font-size: 0.9rem;">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
 								</div>
 							</div>
 						</div>
@@ -525,7 +525,8 @@ export default defineComponent({
 				category_id: this.$route.params.category_id || "",
 				q: this.$route.query.q || "",
 				currency: store.state.sprs.selectedCurrency || "UAH",
-				group_user_id: this.$route.query.group_user_id || ""
+				group_user_id: this.$route.query.group_user_id || "",
+				source: this.$route.query.source || ""
 			};
 			try {
 				const response = await PaymentService.getPayments(data);

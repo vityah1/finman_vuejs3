@@ -64,6 +64,13 @@
 							>
 								<i class="fas fa-euro-sign"></i> ERSTE Bank
 							</div>
+							<div
+								class="bank-option"
+								:class="{ active: selectedBankType === 'raiffeisen', disabled: isLoading }"
+								@click="!isLoading && (selectedBankType = 'raiffeisen')"
+							>
+								<i class="fas fa-university"></i> Raiffeisen Bank
+							</div>
 						</div>
 						
 						<!-- Підказки для кожного банку -->
@@ -118,6 +125,16 @@
 									<li>Експортуйте в форматі PDF</li>
 								</ol>
 								<small style="color: var(--text-color-secondary);">Автоматична конвертація EUR → UAH за курсом НБУ</small>
+							</div>
+							<div v-else-if="selectedBankType === 'raiffeisen'">
+								<ol style="margin-bottom: 0; padding-left: 1.25rem;">
+									<li>Увійдіть в Raiffeisen Online</li>
+									<li>Перейдіть до розділу "Рахунки"</li>
+									<li>Виберіть потрібний рахунок</li>
+									<li>Натисніть "Довідка про рух коштів"</li>
+									<li>Вкажіть період та завантажте у форматі CSV</li>
+								</ol>
+								<small style="color: var(--text-color-secondary);">Підтримуються CSV виписки з Raiffeisen Online Banking</small>
 							</div>
 						</Message>
 					</div>

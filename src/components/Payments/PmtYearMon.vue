@@ -130,6 +130,7 @@ export default {
       total: 0,
       total_cnt: 0,
       group_user_id: this.$route.query.group_user_id || localStorage.getItem('selectedGroupUserId') || undefined,
+      source: this.$route.query.source || localStorage.getItem('selectedSource') || undefined,
       lastRequest: null,
       isRequestInProgress: false
     };
@@ -148,10 +149,14 @@ export default {
     },
 
     navigateToCategory(categoryId) {
+      const query = {};
+      if (this.group_user_id) query.group_user_id = this.group_user_id;
+      if (this.source) query.source = this.source;
+
       this.$router.push({
         name: 'payments',
         params: { year: this.year, month: this.month, category_id: categoryId },
-        query: { group_user_id: this.group_user_id }
+        query
       });
     },
 
@@ -253,6 +258,7 @@ export default {
         this.month = eventData.month;
       }
       this.group_user_id = eventData.group_user_id;
+      this.source = eventData.source;
 
       // Зберігаємо у localStorage
       if (eventData.group_user_id) {
@@ -261,23 +267,32 @@ export default {
         localStorage.removeItem('selectedGroupUserId');
       }
 
+      if (eventData.source) {
+        localStorage.setItem('selectedSource', eventData.source);
+      } else {
+        localStorage.removeItem('selectedSource');
+      }
+
       // Виконуємо запит з правильними параметрами
-      const requestParams = eventData.mode === 'custom' 
+      const requestParams = eventData.mode === 'custom'
         ? {
             start_date: eventData.start_date,
             end_date: eventData.end_date,
-            group_user_id: this.group_user_id
+            group_user_id: this.group_user_id,
+            source: this.source
           }
         : {
             year: this.year,
             month: this.month,
-            group_user_id: this.group_user_id
+            group_user_id: this.group_user_id,
+            source: this.source
           };
 
       this.safeApiRequest(requestParams).then(() => {
         // Оновлюємо URL ТІЛЬКИ після успішного запиту
         const query = {};
         if (this.group_user_id) query.group_user_id = this.group_user_id;
+        if (this.source) query.source = this.source;
 
         // Використовуємо replace, щоб не створювати нову запись в історії
         this.$router.replace({
@@ -299,7 +314,8 @@ export default {
     this.safeApiRequest({
       year: this.year,
       month: this.month,
-      group_user_id: this.group_user_id
+      group_user_id: this.group_user_id,
+      source: this.source
     }).catch((error) => {
       // Помилка вже оброблена в safeApiRequest
       console.warn("Початковий запит не вдався");
@@ -312,6 +328,7 @@ export default {
       year: this.year,
       month: this.month,
       group_user_id: this.group_user_id,
+      source: this.source,
       currency: newCurrency,
       forceUpdate: true
     }).catch((error) => {
