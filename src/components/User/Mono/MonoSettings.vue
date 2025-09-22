@@ -130,9 +130,9 @@ export default defineComponent({
   },
   methods: {
     getCurrenciesByCode(currencyCode) {
-    const currency = this.currencies.find(c => c.currencyCode === currencyCode);
-    return currency ? currency.currency : '';
-  },
+      const currency = this.currencies.find(c => c.currencyCode === currencyCode);
+      return currency ? currency.currency : '';
+    },
     async save_webhook(mono_user_id, webHookUrl) {
       var data = {
         mono_user_id: mono_user_id,
@@ -147,7 +147,10 @@ export default defineComponent({
         .catch((e) => {
           console.log(e);
         });
-    }
+    },
+    goBackToSettings() {
+      this.$router.push({ name: 'config', query: { section: 'mono' } });
+    },
   },
   mounted() {
     this.currencies = this.$store.state.sprs.currencies;
@@ -170,16 +173,6 @@ export default defineComponent({
           error.toString();
       }
     );
-  },
-  methods: {
-    save_webhook(monoUserId: number, webhookUrl: string) {
-      // Implementation for saving webhook
-      console.log('Saving webhook for user:', monoUserId, 'URL:', webhookUrl);
-      // You would call MonoService.setWebhook or similar here
-    },
-    goBackToSettings() {
-      this.$router.push({ name: 'config', query: { section: 'mono' } });
-    },
   },
 });
 </script>
