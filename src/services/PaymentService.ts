@@ -101,11 +101,15 @@ class PaymentService {
 
     addPayment(data: any) {
         return addPaymentApiPaymentsPost(data, {
-            
+
         }).catch(error => {
             console.error('Помилка додавання платежу:', error.response?.data || error.message);
             throw error;
         });
+    }
+
+    createPayment(data: any) {
+        return this.addPayment(data);
     }
 
     updatePayment(id: number, data: any) {

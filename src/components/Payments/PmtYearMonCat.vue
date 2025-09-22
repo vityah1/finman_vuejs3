@@ -181,10 +181,24 @@
 				</div>
 
 				<div style="margin-bottom: 1rem;">
+					<label for="currency" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Валюта:</label>
+					<Dropdown
+						v-model="currentPayment.currency"
+						:options="currencyOptions"
+						optionLabel="label"
+						optionValue="value"
+						placeholder="Виберіть валюту"
+						id="currency"
+						style="width: 100%;" />
+				</div>
+
+				<div style="margin-bottom: 1rem;">
 					<label for="source" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Джерело:</label>
 					<Dropdown
 						v-model="currentPayment.source"
 						:options="sources"
+						optionLabel="label"
+						optionValue="value"
 						placeholder="Виберіть джерело"
 						id="source"
 						style="width: 100%;" />
@@ -258,6 +272,7 @@ export default defineComponent({
 				mydesc: "",
 				amount: 0,
 				currency_amount: 0,
+				currency: "UAH",
 				source: "mono",
 				refuel_data: {
 					km: null,
@@ -268,7 +283,16 @@ export default defineComponent({
 			},
 			selectedCategoryId: null,
 			categories: [],
-			sources: ["mono", "pwa", "pryvat", "revolut", "wise", "p24", "pumb", "erste"],
+			sources: [
+				{ label: "PWA (Ручне додавання)", value: "pwa" },
+				{ label: "MonoBank", value: "mono" },
+				{ label: "PrivatBank", value: "pryvat" },
+				{ label: "Revolut", value: "revolut" },
+				{ label: "Wise", value: "wise" },
+				{ label: "Portmone", value: "p24" },
+				{ label: "PUMB", value: "pumb" },
+				{ label: "Erste Bank", value: "erste" }
+			],
 			category_name: "",
 			year: this.$route.params.year,
 			month: this.$route.params.month,
@@ -307,6 +331,22 @@ export default defineComponent({
 			}
 			const selectedCategory = this.categories.find(cat => cat.id === this.selectedCategoryId);
 			return selectedCategory ? selectedCategory.is_fuel : false;
+		},
+		currencyOptions() {
+			// Get currencies from store or use default list
+			const storeCurrencies = this.$store.state.sprs.currencies || [];
+			if (storeCurrencies.length > 0) {
+				return storeCurrencies.map(currency => ({
+					label: currency.currencyCode || currency.currency,
+					value: currency.currencyCode || currency.currency
+				}));
+			}
+			// Default currencies if store is empty
+			return [
+				{ label: 'UAH', value: 'UAH' },
+				{ label: 'USD', value: 'USD' },
+				{ label: 'EUR', value: 'EUR' }
+			];
 		},
 	},
 	methods: {
@@ -356,7 +396,8 @@ export default defineComponent({
 				mydesc: "",
 				amount: 0,
 				currency_amount: 0,
-				source: "webapp",
+				currency: this.$store.state.sprs.selectedCurrency || "UAH",
+				source: "pwa",
 				refuel_data: {
 					km: null,
 					litres: null,
@@ -385,6 +426,10 @@ export default defineComponent({
 						price_val: null,
 						station_name: null
 					};
+				}
+				// Ensure currency field exists
+				if (!this.currentPayment.currency) {
+					this.currentPayment.currency = this.$store.state.sprs.selectedCurrency || "UAH";
 				}
 				this.showModal = true;
 			}
