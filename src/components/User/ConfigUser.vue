@@ -342,6 +342,7 @@
 									paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
 									currentPageReportTemplate="Показано {first} - {last} з {totalRecords} записів"
 									filterDisplay="row"
+									v-model:filters="tableFilters[config_type.type_data]"
 								>
 									<template #empty>
 										<div style="text-align: center; padding: 2rem; color: var(--text-color-secondary);">
@@ -349,23 +350,34 @@
 											Немає налаштувань цього типу
 										</div>
 									</template>
+
 									<Column field="id" header="ID" style="width: 80px;" sortable>
 										<template #body="{ data }">
 											<PTag :value="'#' + data.id" severity="secondary" />
 										</template>
 									</Column>
+
 									<Column
 										field="value_data"
 										:header="getValueHeader(config_type.type_data)"
 										sortable
-										:showFilterMenu="true"
-									/>
+										:showFilterMatchModes="false"
+									>
+										<template #filter="{ filterModel, filterCallback }">
+											<InputText
+												v-model="filterModel.value"
+												@input="filterCallback()"
+												:placeholder="'Пошук у полі ' + getValueHeader(config_type.type_data).toLowerCase()"
+											/>
+										</template>
+									</Column>
+
 									<Column
 										v-if="config_type.is_need_add_value"
 										field="add_value"
 										:header="getAddValueHeader(config_type.type_data)"
 										sortable
-										:showFilterMenu="true"
+										:showFilterMatchModes="false"
 									>
 										<template #body="{ data }">
 											<span v-if="config_type.type_data === 'category_replace' && data.add_value">
@@ -374,6 +386,27 @@
 											<span v-else-if="data.add_value">
 												→ {{ data.add_value }}
 											</span>
+										</template>
+										<template #filter="{ filterModel, filterCallback }">
+											<!-- Category dropdown filter for category_replace -->
+											<Dropdown
+												v-if="config_type.type_data === 'category_replace'"
+												v-model="filterModel.value"
+												@change="filterCallback()"
+												:options="formattedCategories"
+												optionLabel="name"
+												optionValue="id"
+												placeholder="Оберіть категорію..."
+												:showClear="true"
+												style="width: 100%;"
+											/>
+											<!-- Text input for other types -->
+											<InputText
+												v-else
+												v-model="filterModel.value"
+												@input="filterCallback()"
+												:placeholder="'Пошук у полі ' + getAddValueHeader(config_type.type_data).toLowerCase()"
+											/>
 										</template>
 									</Column>
 								</DataTable>
@@ -497,6 +530,7 @@ export default defineComponent({
 			selectedConfigType: null as { type_data: string | null } | null,
 			telegramToken: '',
 			telegramChatId: '',
+			tableFilters: {} as Record<string, any>,
 		};
 	},
 	computed: {
@@ -545,6 +579,8 @@ export default defineComponent({
 			try {
 				const response = await ConfigService.getConfigTypes();
 				this.config_types = response.data;
+				// Initialize filters after config types are loaded
+				this.initializeFilters();
 			} catch (e) {
 				console.log(e);
 				(this.$refs.myAlert as AlertComponent).showAlert("danger", "Помилка завантаження типів налаштувань");
@@ -866,6 +902,22 @@ export default defineComponent({
 				default:
 					return config_type.name || 'Налаштування';
 			}
+		},
+		initializeFilters() {
+			// Initialize filters for each config type
+			this.config_types.forEach(config_type => {
+				if (!this.tableFilters[config_type.type_data]) {
+					this.tableFilters[config_type.type_data] = {
+						value_data: { value: null, matchMode: 'contains' }
+					};
+
+					if (config_type.is_need_add_value) {
+						// Use 'equals' for category_replace (dropdown), 'contains' for others (text input)
+						const matchMode = config_type.type_data === 'category_replace' ? 'equals' : 'contains';
+						this.tableFilters[config_type.type_data].add_value = { value: null, matchMode: matchMode };
+					}
+				}
+			});
 		}
 	},
 	mounted() {

@@ -49,12 +49,6 @@
 							<i class="fas fa-calendar-alt me-1"></i> Роки
 						</router-link>
 					</b-dropdown-item>
-					<b-dropdown-divider></b-dropdown-divider>
-					<b-dropdown-item>
-						<router-link :to="{ name: 'category' }" class="nav-link">
-							<i class="fas fa-tags me-1"></i> Категорії
-						</router-link>
-					</b-dropdown-item>
 				</b-nav-item-dropdown>
 
 				<b-nav-item-dropdown v-if="currentUser" text="Банки">
@@ -121,6 +115,11 @@
 						</b-dropdown-item>
 
 						<b-dropdown-divider></b-dropdown-divider>
+						<b-dropdown-item v-if="currentUser">
+							<router-link :to="{ name: 'category' }" class="nav-link">
+								<i class="fas fa-tags"></i> Категорії
+							</router-link>
+						</b-dropdown-item>
 						<b-dropdown-item v-if="currentUser">
 							<router-link :to="{ name: 'config' }" class="nav-link">
 								<i class="fas fa-cog"></i> Налаштування

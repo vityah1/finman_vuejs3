@@ -265,8 +265,9 @@ async getUserGroup() {
   this.getUserGroup();
 
   // Використовуємо пропси якщо вони передані, інакше беремо з роуту або поточну дату
-  this.localYear = this.currentYear || this.$route.params.year || new Date().getFullYear();
-  this.localMonth = this.currentMonth || this.$route.params.month || new Date().getMonth() + 1;
+  // Переконуємося що значення конвертуються до чисел
+  this.localYear = parseInt(this.currentYear || this.$route.params.year || new Date().getFullYear());
+  this.localMonth = parseInt(this.currentMonth || this.$route.params.month || new Date().getMonth() + 1);
   this.localGroupUserId = this.$route.query.group_user_id || localStorage.getItem('selectedGroupUserId') || "";
 
   // Ключова зміна: чекаємо достатньо часу перед розблокуванням подій

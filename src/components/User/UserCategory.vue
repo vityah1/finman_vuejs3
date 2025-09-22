@@ -1,71 +1,142 @@
 <template>
-  <div class="container">
+  <div>
     <alert-component ref="myAlert"></alert-component>
+
     <!-- Modal -->
-    <b-modal v-if="currentCategory" v-model="showModal" @ok="do_form_action()" :title="okTitle" :okTitle="okTitle">
-      <div>
-        <h5 class="modal-title text-danger">
-          {{ okTitle }} {{ currentCategory.name }} [{{ currentCategory.id }}]
-        </h5>
+    <Dialog
+      v-if="currentCategory"
+      v-model:visible="showModal"
+      :header="okTitle + ' категорію'"
+      modal
+      style="width: 50rem"
+      :breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+    >
+      <div v-if="currentCategory" style="margin-bottom: 1rem;">
+        <div style="margin-bottom: 1rem;">
+          <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">
+            <i class="pi pi-tag" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+            Назва категорії:
+          </label>
+          <InputText v-model="currentCategory.name" style="width: 100%;" />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">
+            <i class="pi pi-sitemap" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+            Батьківська категорія:
+          </label>
+          <Dropdown
+            v-model="currentCategory.parent_id"
+            :options="parentCategoryOptions"
+            optionLabel="name"
+            optionValue="id"
+            placeholder="Без батьківської категорії"
+            style="width: 100%;"
+            :showClear="true"
+          />
+        </div>
+
+        <div style="margin-bottom: 1rem;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <Checkbox
+              v-model="currentCategory.is_fuel"
+              :binary="true"
+              inputId="is_fuel"
+            />
+            <label for="is_fuel" style="font-weight: 600;">
+              <i class="pi pi-bolt" style="color: var(--orange-500); margin-right: 0.5rem;"></i>
+              Пальне
+            </label>
+          </div>
+          <small style="color: var(--text-color-secondary);">Позначте, якщо це категорія для пального</small>
+        </div>
       </div>
-      <div>
-        <form v-if="currentCategory">
-          <div class="form-group">
-            <!-- <label>{{ currentCategory.name }}</label> -->
-          </div>
 
-          <div class="form-group">
-            <label><strong>Name:</strong></label>
-            <input type="text" class="form-control" id="category_name" v-model="currentCategory.name" />
-          </div>
-          <div class="form-group">
-            <label><strong>Parent Category:</strong></label>
-            <select v-model="currentCategory.parent_id" class="form-select">
-              <option value="0">(No Parent)</option>
-              <option v-for="category in formattedCategories" :value="category.id" :key="category.id">
-                {{ category.name }}
-              </option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label class="me-2"><strong>Is Fuel:</strong></label>
-            <input type="checkbox" class="form-check-input" id="is_fuel" v-model="currentCategory.is_fuel" />
-          </div>
-        </form>
-        <b-button variant="danger" class="mt-2" @click="deleteCategory">
-          Delete
-        </b-button>
-      </div>
-    </b-modal>
+      <template #footer>
+        <PButton label="Скасувати" icon="pi pi-times" text @click="showModal = false" />
+        <PButton v-if="currentCategory.action === 'edit'" label="Видалити" icon="pi pi-trash" severity="danger" @click="deleteCategory" />
+        <PButton :label="okTitle" icon="pi pi-check" @click="do_form_action" />
+      </template>
+    </Dialog>
 
-    <b-table-simple hover small caption-top responsive>
-      <caption>User categories
-        <b-button @click="open_form_add_category()" variant="outline-primary" class="btn-sm">➕</b-button>
-      </caption>
-      <b-thead>
-        <b-tr>
-          <b-th>ID</b-th>
-          <b-th>Name</b-th>
-          <b-th>Parent ID</b-th>
-        </b-tr>
-      </b-thead>
-      <b-tbody v-if="formattedCategories && formattedCategories.length > 0">
-        <b-tr v-for="category in formattedCategories" :key="category.id" @click="open_form_edit_category(category.id)">
-          <b-td>{{ category.id }}</b-td>
-          <b-td>{{ category.name }}</b-td>
-          <b-td>{{ category.parent_id }}</b-td>
-        </b-tr>
-      </b-tbody>
-      <b-tfoot></b-tfoot>
-    </b-table-simple>
+    <PCard>
+      <template #header>
+        <div style="padding: 1rem; display: flex; align-items: center; justify-content: space-between;">
+          <div style="display: flex; align-items: center; gap: 0.5rem;">
+            <i class="pi pi-tags" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+            <span style="font-weight: 600;">Категорії користувача</span>
+          </div>
+          <PButton
+            @click="open_form_add_category()"
+            icon="pi pi-plus"
+            label="Додати категорію"
+            size="small"
+          />
+        </div>
+      </template>
 
-    <div v-if="!formattedCategories || formattedCategories.length === 0">Loading...</div>
+      <template #content>
+        <DataTable
+          :value="formattedCategories"
+          @row-click="(event) => open_form_edit_category(event.data.id)"
+          dataKey="id"
+          stripedRows
+          style="cursor: pointer;"
+          :paginator="formattedCategories.length > 10"
+          :rows="10"
+          :rowsPerPageOptions="[10, 25, 50]"
+          paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+          currentPageReportTemplate="Показано {first} - {last} з {totalRecords} категорій"
+        >
+          <template #empty>
+            <div style="text-align: center; padding: 2rem; color: var(--text-color-secondary);">
+              <i class="pi pi-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+              Категорії завантажуються...
+            </div>
+          </template>
+
+          <Column field="id" header="ID" style="width: 80px;" sortable>
+            <template #body="{ data }">
+              <PTag :value="'#' + data.id" severity="secondary" />
+            </template>
+          </Column>
+
+          <Column field="name" header="Назва категорії" sortable>
+            <template #body="{ data }">
+              <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <i class="pi pi-tag" style="color: var(--primary-color);"></i>
+                <span>{{ data.name }}</span>
+                <PTag v-if="data.is_fuel" value="Пальне" severity="warning" size="small" />
+              </div>
+            </template>
+          </Column>
+
+          <Column field="parent_id" header="Батьківська категорія" sortable>
+            <template #body="{ data }">
+              <span v-if="data.parent_id">{{ findParentCategoryName(data.parent_id) }}</span>
+              <span v-else style="color: var(--text-color-secondary); font-style: italic;">Головна категорія</span>
+            </template>
+          </Column>
+        </DataTable>
+      </template>
+    </PCard>
   </div>
 </template>
 
 <script lang="ts">
 import CategoryService from "../../services/CategoryService";
 import { defineComponent } from 'vue';
+
+// PrimeVue imports
+import Dialog from 'primevue/dialog';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Dropdown from 'primevue/dropdown';
+import Checkbox from 'primevue/checkbox';
+import Tag from 'primevue/tag';
+import Card from 'primevue/card';
 
 interface Category {
   id?: number;
@@ -83,6 +154,17 @@ interface AlertComponent {
 
 export default defineComponent({
   name: "UserCategory",
+  components: {
+    Dialog,
+    DataTable,
+    Column,
+    PButton: Button,
+    InputText,
+    Dropdown,
+    Checkbox,
+    PTag: Tag,
+    PCard: Card
+  },
   data() {
     return {
       okTitle: "",
@@ -101,6 +183,18 @@ export default defineComponent({
       }
       return this.formatCategories(this.categories);
     },
+    parentCategoryOptions() {
+      if (!Array.isArray(this.categories)) {
+        return [];
+      }
+      return [
+        { name: 'Без батьківської категорії', id: null },
+        ...this.categories.map(category => ({
+          name: category.name,
+          id: category.id
+        }))
+      ];
+    }
   },
   methods: {
     formatCategories(categories: Category[], parentId: number | null = null, prefix = ''): Category[] {
@@ -122,6 +216,13 @@ export default defineComponent({
         return acc;
       }, []);
     },
+    findParentCategoryName(parentId: number | null): string {
+      if (!parentId || !Array.isArray(this.categories)) {
+        return '';
+      }
+      const parent = this.categories.find(cat => cat.id === parentId);
+      return parent ? parent.name : '';
+    },
     do_form_action(): void {
       if (this.currentCategory.action === 'add') {
         this.addCategory();
@@ -130,8 +231,8 @@ export default defineComponent({
       }
     },
     open_form_add_category(): void {
-      this.currentCategory = { parent_id: 0, name: '', is_fuel: false, action: 'add' };
-      this.okTitle = 'Add';
+      this.currentCategory = { parent_id: null, name: '', is_fuel: false, action: 'add' };
+      this.okTitle = 'Додати';
       this.showModal = true;
     },
     async open_form_edit_category(id: number): Promise<void> {
@@ -140,7 +241,7 @@ export default defineComponent({
           // Перевіряємо, що response.data є об'єктом перед використанням spread оператора
           const categoryData = response.data && typeof response.data === 'object' ? response.data : {};
           this.currentCategory = { ...categoryData, action: 'edit' };
-          this.okTitle = 'Update';
+          this.okTitle = 'Оновити';
           this.showModal = true;
         })
         .catch((e) => {
@@ -151,11 +252,11 @@ export default defineComponent({
       CategoryService.updateCategory(this.currentCategory.id, this.currentCategory)
         .then(() => {
           this.refreshCategories();
-          (this.$refs.myAlert as AlertComponent).showAlert('success', 'Category updated');
+          (this.$refs.myAlert as AlertComponent).showAlert('success', 'Категорію оновлено');
         })
         .catch((e) => {
           console.error('Error updating category:', e);
-          (this.$refs.myAlert as AlertComponent).showAlert('danger', 'Update failed');
+          (this.$refs.myAlert as AlertComponent).showAlert('danger', 'Помилка оновлення');
         });
       this.showModal = false;
     },
@@ -163,11 +264,11 @@ export default defineComponent({
       CategoryService.addCategory(this.currentCategory)
         .then(() => {
           this.refreshCategories();
-          (this.$refs.myAlert as AlertComponent).showAlert('success', 'Category added');
+          (this.$refs.myAlert as AlertComponent).showAlert('success', 'Категорію додано');
         })
         .catch((e) => {
           console.error('Error updating category:', e);
-          (this.$refs.myAlert as AlertComponent).showAlert('danger', 'Add failed');
+          (this.$refs.myAlert as AlertComponent).showAlert('danger', 'Помилка додавання');
         });
       this.showModal = false;
     },
@@ -175,11 +276,11 @@ export default defineComponent({
       CategoryService.deleteCategory(this.currentCategory.id)
         .then(() => {
           this.refreshCategories();
-          (this.$refs.myAlert as AlertComponent).showAlert('success', 'Category deleted');
+          (this.$refs.myAlert as AlertComponent).showAlert('success', 'Категорію видалено');
         })
         .catch((e) => {
           console.error('Error updating category:', e);
-          (this.$refs.myAlert as AlertComponent).showAlert('danger', 'Delete failed');
+          (this.$refs.myAlert as AlertComponent).showAlert('danger', 'Помилка видалення');
         });
       this.showModal = false;
     },

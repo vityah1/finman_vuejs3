@@ -1,31 +1,31 @@
 <template>
-	<div class="container">
+	<div>
 		<alert-component ref="myAlert"></alert-component>
 
 		<!-- Індикатор завантаження -->
 		<div v-if="isLoading" class="loading-overlay">
 			<div class="loading-content">
-				<div class="spinner-border text-primary" role="status">
-					<span class="visually-hidden">Завантаження...</span>
-				</div>
-				<p class="mt-2 mb-0">Обробка файлу...</p>
+				<ProgressSpinner style="width: 50px; height: 50px" strokeWidth="8" />
+				<p style="margin-top: 1rem; margin-bottom: 0;">Обробка файлу...</p>
 			</div>
 		</div>
 
-		<b-form v-model="showModal" :title="`Завантажити файл ${selectedBankType}`">
-			<template #modal-header>
-				<h5 class="modal-title text-danger">
-					Завантажити файл виписки {{ selectedBankType }}...
-				</h5>
+		<PCard>
+			<template #header>
+				<div style="padding: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+					<i class="pi pi-upload" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+					<span style="font-weight: 600;">Імпорт банківських виписок</span>
+				</div>
 			</template>
-			<template #default>
-				<b-form v-if="currentUser">
-					<div class="form-group">
-						<label>{{ currentUser.login }}</label>
-					</div>
-					<div class="form-group">
-						<label>Оберіть тип банку:</label>
-						<div class="bank-selector mb-2">
+
+			<template #content>
+				<div v-if="currentUser">
+					<div style="margin-bottom: 1.5rem;">
+						<label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">
+							<i class="pi pi-building" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+							Оберіть тип банку:
+						</label>
+						<div class="bank-selector" style="margin-bottom: 1rem;">
 							<div
 								class="bank-option"
 								:class="{ active: selectedBankType === 'revolut', disabled: isLoading }"
@@ -67,10 +67,13 @@
 						</div>
 						
 						<!-- Підказки для кожного банку -->
-						<div v-if="selectedBankType" class="alert alert-info mt-3 mb-3">
-							<h6 class="alert-heading"><i class="fas fa-info-circle me-2"></i>Як отримати виписку:</h6>
+						<Message v-if="selectedBankType" severity="info" :closable="false" style="margin-top: 1rem; margin-bottom: 1rem;">
+							<h6 style="margin: 0 0 0.5rem 0; font-weight: 600;">
+								<i class="pi pi-info-circle" style="margin-right: 0.5rem;"></i>
+								Як отримати виписку:
+							</h6>
 							<div v-if="selectedBankType === 'revolut'">
-								<ol class="mb-0">
+								<ol style="margin-bottom: 0; padding-left: 1.25rem;">
 									<li>Відкрийте додаток Revolut</li>
 									<li>Перейдіть в Accounts → виберіть рахунок</li>
 									<li>Натисніть More → Statement</li>
@@ -79,7 +82,7 @@
 								</ol>
 							</div>
 							<div v-else-if="selectedBankType === 'wise'">
-								<ol class="mb-0">
+								<ol style="margin-bottom: 0; padding-left: 1.25rem;">
 									<li>Зайдіть в Wise</li>
 									<li>Перейдіть в рахунок</li>
 									<li>Натисніть три крапки зверху справа</li>
@@ -89,7 +92,7 @@
 								</ol>
 							</div>
 							<div v-else-if="selectedBankType === 'p24'">
-								<ol class="mb-0">
+								<ol style="margin-bottom: 0; padding-left: 1.25rem;">
 									<li>Увійдіть в Приват24</li>
 									<li>Перейдіть в "Усі виписки"</li>
 									<li>Виберіть картку та період</li>
@@ -97,7 +100,7 @@
 								</ol>
 							</div>
 							<div v-else-if="selectedBankType === 'pumb'">
-								<ol class="mb-0">
+								<ol style="margin-bottom: 0; padding-left: 1.25rem;">
 									<li>Відкрийте додаток ПУМБ</li>
 									<li>Перейдіть до потрібної картки</li>
 									<li>Натисніть три крапки справа зверху</li>
@@ -105,101 +108,195 @@
 									<li>Вкажіть період та натисніть "Поділитись"</li>
 									<li>Збережіть отриманий PDF файл</li>
 								</ol>
-								<small class="text-muted">Підтримуються PDF виписки з додатку ПУМБ</small>
+								<small style="color: var(--text-color-secondary);">Підтримуються PDF виписки з додатку ПУМБ</small>
 							</div>
 							<div v-else-if="selectedBankType === 'erste'">
-								<ol class="mb-0">
+								<ol style="margin-bottom: 0; padding-left: 1.25rem;">
 									<li>Увійдіть в George (Erste Bank)</li>
 									<li>Перейдіть в Accounts → Transaction history</li>
 									<li>Виберіть рахунок та період</li>
 									<li>Експортуйте в форматі PDF</li>
 								</ol>
-								<small class="text-muted">Автоматична конвертація EUR → UAH за курсом НБУ</small>
+								<small style="color: var(--text-color-secondary);">Автоматична конвертація EUR → UAH за курсом НБУ</small>
 							</div>
-						</div>
-						
-						<label>Оберіть файл з <strong>{{ selectedBankType.charAt(0).toUpperCase() + selectedBankType.slice(1) }}:</strong></label>
-						<input
-							type="file"
-							class="form-control"
-							id="amount"
-							@change="handleFileChange"
-							:disabled="isLoading"
-						/>
-						<select
-							class="form-control mt-2"
-							v-model="selectedOption"
-							:disabled="isLoading"
-						>
-							<option value="import">Імпортувати</option>
-							<option value="show">Показати</option>
-						</select>
-						<b-button
-							variant="primary"
-							class="mt-2"
-							@click="handleButtonClick"
-							:disabled="isLoading"
-						>
-							<span v-if="isLoading" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-							{{ isLoading ? 'Обробка...' : 'Виконати' }}
-						</b-button>
+						</Message>
 					</div>
-				</b-form>
-				<div></div>
-			</template>
-		</b-form>
-		<b-table-simple>
-			<b-tbody v-if="(payments.length > 0)">
-				<b-tr v-for="(payment, index) in paymentsWithCategories" :key="index">
-					<b-td>
-						<span> {{ $moment(payment.rdate).format("DD.MMM") }} </span>
-					</b-td>
-					<b-td>{{ payment.category_id }}</b-td>
-					<b-td>{{ payment.category_name }}</b-td>
-					<b-td>{{ payment.mydesc }}</b-td>
-					<b-td>{{ payment.currency_amount.toLocaleString() }}</b-td>
-					<b-td><span v-if="payment.sql" style="color: green;">✔</span><span v-else style="color: red;">✘</span>
-					</b-td>
-					<b-td v-if="selectedOption === 'show'">
-						<b-button 
-							size="sm" 
-							variant="outline-primary" 
-							@click="openCategoryRuleModal(payment)"
+
+					<div style="margin-bottom: 1.5rem;">
+						<label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">
+							<i class="pi pi-file" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+							Завантажити файл виписки {{ selectedBankType.charAt(0).toUpperCase() + selectedBankType.slice(1) }}:
+						</label>
+						<FileUpload
+							mode="basic"
+							:multiple="false"
 							:disabled="isLoading"
-						>
-							<i class="fas fa-tag"></i>
-						</b-button>
-					</b-td>
-				</b-tr>
-			</b-tbody>
-		</b-table-simple>
-		<div v-if="(payments.length == 0)">...</div>
-		
+							@select="handleFileSelect"
+							accept=".csv,.xlsx,.xls,.pdf"
+							:auto="false"
+							chooseLabel="Оберіть файл"
+							class="p-button-outlined"
+						/>
+					</div>
+
+					<div style="margin-bottom: 1.5rem;">
+						<label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">
+							<i class="pi pi-cog" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+							Дія:
+						</label>
+						<Dropdown
+							v-model="selectedOption"
+							:options="actionOptions"
+							optionLabel="label"
+							optionValue="value"
+							placeholder="Оберіть дію"
+							:disabled="isLoading"
+							style="width: 100%;"
+						/>
+					</div>
+
+					<PButton
+						label="Виконати"
+						icon="pi pi-play"
+						@click="handleButtonClick"
+						:loading="isLoading"
+						:disabled="!file"
+						style="width: 100%;"
+					/>
+				</div>
+			</template>
+		</PCard>
+
+		<!-- Результати обробки -->
+		<PCard v-if="paymentsWithCategories.length > 0" style="margin-top: 1.5rem;">
+			<template #header>
+				<div style="padding: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+					<i class="pi pi-list" style="font-size: 1.5rem; color: var(--primary-color);"></i>
+					<span style="font-weight: 600;">Результати обробки файлу</span>
+					<PTag :value="paymentsWithCategories.length" severity="info" />
+				</div>
+			</template>
+
+			<template #content>
+				<DataTable
+					:value="paymentsWithCategories"
+					dataKey="id"
+					stripedRows
+					:paginator="paymentsWithCategories.length > 10"
+					:rows="10"
+					:rowsPerPageOptions="[10, 25, 50]"
+					paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+					currentPageReportTemplate="Показано {first} - {last} з {totalRecords} платежів"
+				>
+					<template #empty>
+						<div style="text-align: center; padding: 2rem; color: var(--text-color-secondary);">
+							<i class="pi pi-inbox" style="font-size: 2rem; margin-bottom: 1rem; display: block;"></i>
+							<span>Немає даних для відображення</span>
+						</div>
+					</template>
+
+					<Column field="rdate" header="Дата" style="width: 120px;" sortable>
+						<template #body="{ data }">
+							<span>{{ formatDate(data.rdate) }}</span>
+						</template>
+					</Column>
+
+					<Column field="category_id" header="ID" style="width: 80px;" sortable>
+						<template #body="{ data }">
+							<PTag :value="data.category_id" severity="secondary" />
+						</template>
+					</Column>
+
+					<Column field="category_name" header="Категорія" sortable>
+						<template #body="{ data }">
+							<div style="display: flex; align-items: center; gap: 0.5rem;">
+								<i class="pi pi-tag" style="color: var(--primary-color);"></i>
+								<span>{{ data.category_name }}</span>
+							</div>
+						</template>
+					</Column>
+
+					<Column field="mydesc" header="Опис" sortable>
+						<template #body="{ data }">
+							<span>{{ data.mydesc }}</span>
+						</template>
+					</Column>
+
+					<Column field="currency_amount" header="Сума" style="width: 120px; text-align: right;" sortable>
+						<template #body="{ data }">
+							<span style="font-weight: 600;">{{ data.currency_amount?.toLocaleString() || 0 }}</span>
+						</template>
+					</Column>
+
+					<Column field="sql" header="Статус" style="width: 80px; text-align: center;">
+						<template #body="{ data }">
+							<i
+								:class="data.sql ? 'pi pi-check' : 'pi pi-times'"
+								:style="{ color: data.sql ? 'var(--green-500)' : 'var(--red-500)' }"
+							></i>
+						</template>
+					</Column>
+
+					<Column v-if="selectedOption === 'show'" header="Дії" style="width: 100px;">
+						<template #body="{ data }">
+							<PButton
+								icon="pi pi-tag"
+								size="small"
+								severity="secondary"
+								outlined
+								@click="openCategoryRuleModal(data)"
+								:disabled="isLoading"
+								v-tooltip.top="'Створити правило категоризації'"
+							/>
+						</template>
+					</Column>
+				</DataTable>
+			</template>
+		</PCard>
+
 		<!-- Модальне вікно для створення правила категоризації -->
-		<b-modal v-model="showCategoryRuleModal" title="Створити правило категоризації" @ok="saveCategoryRule">
-			<div v-if="selectedPaymentForRule" class="category-rule-form">
-				<div class="form-group">
-					<label><strong>Опис транзакції:</strong></label>
-					<input 
-						type="text" 
-						class="form-control" 
+		<Dialog
+			v-model:visible="showCategoryRuleModal"
+			header="Створити правило категоризації"
+			modal
+			style="width: 50rem"
+			:breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+		>
+			<div v-if="selectedPaymentForRule" style="margin-bottom: 1rem;">
+				<div style="margin-bottom: 1rem;">
+					<label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">
+						<i class="pi pi-file-edit" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+						Опис транзакції:
+					</label>
+					<InputText
 						v-model="categoryRuleForm.description"
 						placeholder="Введіть опис або його частину для правила"
+						style="width: 100%;"
 					/>
-					<small class="text-muted">Можете редагувати опис для точнішого правила (наприклад, залишити тільки частину)</small>
+					<small style="color: var(--text-color-secondary);">Можете редагувати опис для точнішого правила (наприклад, залишити тільки частину)</small>
 				</div>
-				
-				<div class="form-group mt-3">
-					<label><strong>Категорія для присвоєння:</strong></label>
-					<select v-model="categoryRuleForm.categoryId" class="form-select" required>
-						<option disabled value="">Оберіть категорію...</option>
-						<option v-for="category in formattedCategories" :value="category.id" :key="category.id">
-							{{ category.name }}
-						</option>
-					</select>
+
+				<div style="margin-bottom: 1rem;">
+					<label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">
+						<i class="pi pi-tag" style="color: var(--primary-color); margin-right: 0.5rem;"></i>
+						Категорія для присвоєння:
+					</label>
+					<Dropdown
+						v-model="categoryRuleForm.categoryId"
+						:options="formattedCategories"
+						optionLabel="name"
+						optionValue="id"
+						placeholder="Оберіть категорію..."
+						style="width: 100%;"
+					/>
 				</div>
 			</div>
-		</b-modal>
+
+			<template #footer>
+				<PButton label="Скасувати" icon="pi pi-times" text @click="showCategoryRuleModal = false" />
+				<PButton label="Зберегти" icon="pi pi-check" @click="saveCategoryRule" />
+			</template>
+		</Dialog>
 	</div>
 </template>
 
@@ -215,6 +312,19 @@ import type { AxiosError } from 'axios';
 import { getErrorMessage, logError } from '@/utils/errorHandler';
 import ConfigService from '@/services/ConfigService';
 import { useGetCategoriesApiCategoriesGet } from '@/api/categories/categories';
+
+// PrimeVue imports
+import Card from 'primevue/card';
+import DataTable from 'primevue/datatable';
+import Column from 'primevue/column';
+import Button from 'primevue/button';
+import Dialog from 'primevue/dialog';
+import InputText from 'primevue/inputtext';
+import Dropdown from 'primevue/dropdown';
+import FileUpload from 'primevue/fileupload';
+import Message from 'primevue/message';
+import Tag from 'primevue/tag';
+import ProgressSpinner from 'primevue/progressspinner';
 
 interface Payment {
 	id: number;
@@ -238,6 +348,19 @@ interface AlertComponent {
 
 export default defineComponent({
 	name: "BankForm",
+	components: {
+		PCard: Card,
+		DataTable,
+		Column,
+		PButton: Button,
+		Dialog,
+		InputText,
+		Dropdown,
+		FileUpload,
+		Message,
+		PTag: Tag,
+		ProgressSpinner
+	},
 	setup() {
 		const store = useStore();
 		const router = useRouter();
@@ -258,9 +381,15 @@ export default defineComponent({
 		});
 
 		const currentUser = computed(() => store.state.auth.user);
-		
+
 		// Використовуємо Orval хук для завантаження категорій
 		const { data: categoriesData } = useGetCategoriesApiCategoriesGet();
+
+		// Опції для дій
+		const actionOptions = ref([
+			{ label: 'Імпортувати', value: 'import' },
+			{ label: 'Показати', value: 'show' }
+		]);
 
 
 
@@ -300,6 +429,21 @@ export default defineComponent({
 				file.value = target.files[0];
 				console.log("File selected:", file.value);
 			}
+		};
+
+		// Обробка вибору файлу через PrimeVue FileUpload
+		const handleFileSelect = (event: any) => {
+			if (event.files && event.files.length > 0) {
+				file.value = event.files[0];
+				console.log("File selected:", file.value);
+			}
+		};
+
+		// Форматування дати
+		const formatDate = (dateString: string) => {
+			if (!dateString) return '';
+			const date = new Date(dateString);
+			return date.toLocaleDateString('uk-UA', { day: '2-digit', month: 'short' });
 		};
 
 		const handleButtonClick = (): void => {
@@ -428,10 +572,13 @@ export default defineComponent({
 			selectedPaymentForRule,
 			categoryRuleForm,
 			formattedCategories,
+			actionOptions,
 			handleFileChange,
+			handleFileSelect,
 			handleButtonClick,
 			openCategoryRuleModal,
 			saveCategoryRule,
+			formatDate,
 			isLoading: computed<boolean>(() => uploadMutation.isPending.value)
 		};
 	},
