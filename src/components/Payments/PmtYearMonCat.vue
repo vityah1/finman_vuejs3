@@ -416,7 +416,11 @@ export default defineComponent({
 				this.currentPayment = { ...payment };
 				// Convert datetime to date format for backend compatibility
 				if (this.currentPayment.rdate) {
-					this.currentPayment.rdate = this.currentPayment.rdate.split('T')[0];
+					if (typeof this.currentPayment.rdate === 'string') {
+						this.currentPayment.rdate = this.currentPayment.rdate.split('T')[0];
+					} else if (this.currentPayment.rdate instanceof Date) {
+						this.currentPayment.rdate = this.currentPayment.rdate.toISOString().split('T')[0];
+					}
 				}
 				this.selectedCategoryId = payment.category_id;
 				if (!this.currentPayment.refuel_data) {
@@ -473,7 +477,16 @@ export default defineComponent({
 		},
 
 		async addPayment() {
-			const [year, month, day] = this.currentPayment.rdate.split('-');
+			// Ensure rdate is in correct format
+			let rdateString;
+			if (typeof this.currentPayment.rdate === 'string') {
+				rdateString = this.currentPayment.rdate;
+			} else if (this.currentPayment.rdate instanceof Date) {
+				rdateString = this.currentPayment.rdate.toISOString().split('T')[0];
+				this.currentPayment.rdate = rdateString;
+			}
+
+			const [year, month, day] = rdateString.split('-');
 			const formattedMonth = month.replace(/^0+/, "");
 			if (this.$route.params.year !== year || this.$route.params.month !== formattedMonth || this.$route.params.category_id !== this.currentPayment.category_id) {
 				this.$router.push({
@@ -491,6 +504,11 @@ export default defineComponent({
 
 		async updatePayment() {
 			try {
+				// Ensure rdate is in correct format
+				if (this.currentPayment.rdate instanceof Date) {
+					this.currentPayment.rdate = this.currentPayment.rdate.toISOString().split('T')[0];
+				}
+
 				const oldCategoryId = this.$route.params.category_id;
 				await PaymentService.updatePayment(this.currentPayment.id, this.currentPayment);
 
