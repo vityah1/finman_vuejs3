@@ -197,7 +197,7 @@ export default defineComponent({
     }
   },
   methods: {
-    formatCategories(categories: Category[], parentId: number | null = null, prefix = ''): Category[] {
+    formatCategories(categories: Category[], parentId: number | null = null, level = 0): Category[] {
       // Додаткова перевірка, що categories є масивом
       if (!Array.isArray(categories)) {
         console.warn('formatCategories: categories is not an array:', categories);
@@ -206,11 +206,12 @@ export default defineComponent({
 
       return categories.reduce((acc, category) => {
         if ((category.parent_id === parentId) || (parentId === null && !category.parent_id)) {
+          const indent = level > 0 ? "└─ ".repeat(level) : "";
           acc.push({
             ...category,
-            name: prefix + category.name
+            name: indent + category.name
           });
-          const children = this.formatCategories(categories, category.id, prefix + '--');
+          const children = this.formatCategories(categories, category.id, level + 1);
           acc = acc.concat(children);
         }
         return acc;

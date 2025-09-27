@@ -309,9 +309,10 @@ export default defineComponent({
 			}
 			const formatCategory = (category, level = 0) => {
 				const subcategories = this.categories.filter(cat => cat.parent_id === category.id);
+				const indent = level > 0 ? "└─ ".repeat(level) : "";
 				const result = [{
 					...category,
-					name: "  ".repeat(level) + category.name,
+					name: indent + category.name,
 				}];
 				subcategories.forEach(subcat => {
 					result.push(...formatCategory(subcat, level + 1));

@@ -481,18 +481,19 @@ export default defineComponent({
 		};
 
 		// Функція для форматування категорій з ієрархією
-		const formatCategories = (categories: any[], parentId: number | null = null, prefix = ''): any[] => {
+		const formatCategories = (categories: any[], parentId: number | null = null, level = 0): any[] => {
 			if (!Array.isArray(categories)) {
 				return [];
 			}
-			
+
 			return categories.reduce((acc, category) => {
 				if ((category.parent_id === parentId) || (parentId === null && !category.parent_id)) {
+					const indent = level > 0 ? "└─ ".repeat(level) : "";
 					acc.push({
 						id: category.id,
-						name: prefix + category.name
+						name: indent + category.name
 					});
-					const children = formatCategories(categories, category.id, prefix + '--');
+					const children = formatCategories(categories, category.id, level + 1);
 					acc = acc.concat(children);
 				}
 				return acc;
