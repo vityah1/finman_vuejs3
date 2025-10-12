@@ -204,18 +204,29 @@ export default defineComponent({
       console.log('🔍 groupUsers computed:', {
         hasQuery: !!this.groupUsersQuery,
         hasData: !!response,
+        responseType: typeof response,
+        responseKeys: response ? Object.keys(response) : [],
         dataValue: response,
         isLoading: this.groupUsersQuery?.isLoading,
         error: this.groupUsersQuery?.error
       });
 
-      if (!response?.data) {
-        console.log('⚠️ No response data');
+      if (!response) {
+        console.log('⚠️ No response');
+        return [];
+      }
+
+      // TanStack Query returns AxiosResponse, so data is in response.data
+      const data = (response as any)?.data;
+      console.log('📦 Extracted data:', data, 'isArray:', Array.isArray(data));
+
+      if (!data || !Array.isArray(data)) {
+        console.log('⚠️ No array data');
         return [];
       }
 
       // Response.data is GroupUserResponse[] from Orval
-      const users = response.data.map((user) => ({
+      const users = data.map((user: any) => ({
         ...user,
         // role is already set by backend, but we can override if needed
         role: user.id === this.userGroup?.owner_id ? "owner" : (user.role || "member"),
@@ -233,18 +244,29 @@ export default defineComponent({
       console.log('🔍 activeInvitations computed:', {
         hasQuery: !!this.groupInvitationsQuery,
         hasData: !!response,
+        responseType: typeof response,
+        responseKeys: response ? Object.keys(response) : [],
         dataValue: response,
         isLoading: this.groupInvitationsQuery?.isLoading,
         error: this.groupInvitationsQuery?.error
       });
 
-      if (!response?.data) {
-        console.log('⚠️ No response data');
+      if (!response) {
+        console.log('⚠️ No response');
+        return [];
+      }
+
+      // TanStack Query returns AxiosResponse, so data is in response.data
+      const data = (response as any)?.data;
+      console.log('📦 Extracted invitations data:', data, 'isArray:', Array.isArray(data));
+
+      if (!data || !Array.isArray(data)) {
+        console.log('⚠️ No array data');
         return [];
       }
 
       // Response.data is GroupInvitationResponse[] from Orval
-      const invitations = response.data.filter((inv) => inv.is_active) as Invitation[];
+      const invitations = data.filter((inv: any) => inv.is_active) as Invitation[];
       console.log('✅ Filtered invitations:', invitations);
       return invitations;
     },
