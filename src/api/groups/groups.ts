@@ -26,6 +26,7 @@ import type {
   GroupCreate,
   GroupInvitationCreate,
   GroupInvitationResponse,
+  GroupResponse,
   GroupUpdate,
   GroupUserAdd,
   GroupUserResponse,
@@ -381,7 +382,7 @@ export const useCreateGroupInvitationApiGroupsGroupIdInvitationsPost = <
  */
 export const getGroupsApiGroupsGet = (
   options?: AxiosRequestConfig
-): Promise<AxiosResponse<unknown>> => {
+): Promise<AxiosResponse<GroupResponse[]>> => {
   return axios.get(`/api/groups`, options);
 };
 
