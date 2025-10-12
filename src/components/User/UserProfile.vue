@@ -183,10 +183,6 @@ export default defineComponent({
 
       // Дані для груп
       userGroup: null as Group | null,
-      groupUsers: [] as GroupUser[],
-
-      // Запрошення
-      activeInvitations: [] as Invitation[],
 
       // Модальні вікна
       showJoinGroupModal: false,
@@ -204,9 +200,26 @@ export default defineComponent({
       if (!this.userGroup) return false;
       return this.userGroup.owner_id === this.currentUser.id;
     },
+    groupUsers() {
+      const data = this.groupUsersQuery?.data;
+      if (data && (data as any).data) {
+        return (data as any).data.map((user: GroupUser) => ({
+          ...user,
+          role: user.id === this.userGroup?.owner_id ? "owner" : "member",
+        }));
+      }
+      return [];
+    },
     filteredGroupUsers() {
       if (!this.userGroup || !this.groupUsers || !this.groupUsers.length) return [];
       return this.groupUsers.filter(user => user.id !== this.currentUser.id);
+    },
+    activeInvitations() {
+      const data = this.groupInvitationsQuery?.data;
+      if (data && (data as any).data) {
+        return (data as any).data.filter((inv: Invitation) => inv.is_active);
+      }
+      return [];
     },
     loadingGroupUsers() {
       return this.groupUsersQuery?.isLoading || false;
@@ -225,31 +238,6 @@ export default defineComponent({
         } else {
           this.userGroup = null;
           this.groupId = null;
-          this.groupUsers = [];
-          this.activeInvitations = [];
-        }
-      },
-      immediate: true
-    },
-    'groupUsersQuery.data': {
-      handler(newData) {
-        if (newData && (newData as any).data) {
-          this.groupUsers = (newData as any).data.map((user: GroupUser) => ({
-            ...user,
-            role: user.id === this.userGroup!.owner_id ? "owner" : "member",
-          }));
-        } else {
-          this.groupUsers = [];
-        }
-      },
-      immediate: true
-    },
-    'groupInvitationsQuery.data': {
-      handler(newData) {
-        if (newData && (newData as any).data) {
-          this.activeInvitations = (newData as any).data.filter((inv: Invitation) => inv.is_active);
-        } else {
-          this.activeInvitations = [];
         }
       },
       immediate: true
@@ -278,7 +266,6 @@ export default defineComponent({
 
     handleGroupLeft() {
       this.userGroup = null;
-      this.groupUsers = [];
       this.refetchGroups();
     },
 
