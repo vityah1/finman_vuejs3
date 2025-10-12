@@ -80,7 +80,7 @@ import {
 
 // Імпортуємо хуки Orval для роботи з запрошеннями
 import {
-  useCheckUserInvitationsApiUsersInvitationsGet,
+  useCheckUserInvitationsApiInvitationsGet,
   useAcceptInvitationApiInvitationsInvitationCodeAcceptPost
 } from "@/api/invitations/invitations";
 
@@ -139,7 +139,7 @@ export default defineComponent({
     const { data: groupsData, refetch: refetchGroups } = useGetGroupsApiGroupsGet();
     
     // Хуки для запрошень користувача
-    const { data: userInvitationsData, refetch: refetchUserInvitations } = useCheckUserInvitationsApiUsersInvitationsGet();
+    const { data: userInvitationsData, refetch: refetchUserInvitations } = useCheckUserInvitationsApiInvitationsGet();
     const acceptInvitationMutation = useAcceptInvitationApiInvitationsInvitationCodeAcceptPost();
     
     return {
