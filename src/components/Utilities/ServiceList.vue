@@ -25,9 +25,7 @@
 			</div>
 
 			<div v-if="isLoading" class="text-center">
-				<div class="spinner-border" role="status">
-					<span class="visually-hidden">Завантаження...</span>
-				</div>
+				<ProgressSpinner />
 			</div>
 
 			<div v-else-if="!currentAddress" class="text-center">
@@ -254,6 +252,7 @@ import InputText from 'primevue/inputtext';
 import Textarea from 'primevue/textarea';
 import Checkbox from 'primevue/checkbox';
 import Message from 'primevue/message';
+import ProgressSpinner from 'primevue/progressspinner';
 
 interface AddressData {
 	id: number;
@@ -293,7 +292,8 @@ export default defineComponent({
 		InputText,
 		Textarea,
 		Checkbox,
-		Message
+		Message,
+		ProgressSpinner
 	},
 	setup() {
 		const route = useRoute();

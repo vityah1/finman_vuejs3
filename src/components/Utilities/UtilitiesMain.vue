@@ -71,9 +71,7 @@
 						</div>
 						<div class="card-body">
 							<div v-if="isLoadingReadings" class="text-center">
-								<div class="spinner-border" role="status">
-									<span class="visually-hidden">Завантаження...</span>
-								</div>
+								<ProgressSpinner />
 							</div>
 							<div v-else-if="latestReadings.length === 0" class="text-center text-muted">
 								<i class="fas fa-info-circle me-2"></i>Показники ще не додані
@@ -159,6 +157,7 @@ import {
 	useGetReadingsApiUtilitiesReadingsGet
 } from '@/api/utilities/utilities';
 import Button from 'primevue/button';
+import ProgressSpinner from 'primevue/progressspinner';
 
 interface ReadingData {
 	address_id: number;
@@ -184,7 +183,8 @@ interface ServiceData {
 export default defineComponent({
 	name: 'UtilitiesMain',
 	components: {
-		Button
+		Button,
+		ProgressSpinner
 	},
 	setup() {
 		const currentPeriod = new Date().toISOString().slice(0, 7); // YYYY-MM format

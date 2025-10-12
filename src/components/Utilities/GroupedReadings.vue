@@ -1,9 +1,7 @@
 <template>
 	<div class="grouped-readings">
 		<div v-if="loading" class="text-center p-4">
-			<div class="spinner-border text-primary" role="status">
-				<span class="visually-hidden">Завантаження...</span>
-			</div>
+			<ProgressSpinner />
 		</div>
 		<div v-else-if="error" class="alert alert-danger">
 			<i class="fas fa-exclamation-triangle me-2"></i>
@@ -370,6 +368,7 @@ import { useRouter } from 'vue-router';
 import { useGetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet } from '@/api/utilities/utilities';
 import type { GroupedReadingsResponse } from '@/api/model/groupedReadingsResponse';
 import Button from 'primevue/button';
+import ProgressSpinner from 'primevue/progressspinner';
 
 // Розширюємо тип для включення service_id
 interface ExtendedGroupedReadingItem {
@@ -391,7 +390,8 @@ interface ExtendedGroupedReadingItem {
 export default defineComponent({
 	name: 'GroupedReadings',
 	components: {
-		Button
+		Button,
+		ProgressSpinner
 	},
 	props: {
 		addressId: {

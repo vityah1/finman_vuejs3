@@ -32,9 +32,7 @@
 			</div>
 
 			<div v-if="isLoading" class="text-center">
-				<div class="spinner-border" role="status">
-					<span class="visually-hidden">Завантаження...</span>
-				</div>
+				<ProgressSpinner />
 			</div>
 
 			<div v-else-if="tariffs.length === 0" class="text-center">
@@ -320,6 +318,7 @@ import Dropdown from 'primevue/dropdown';
 import Calendar from 'primevue/calendar';
 import Checkbox from 'primevue/checkbox';
 import Message from 'primevue/message';
+import ProgressSpinner from 'primevue/progressspinner';
 
 interface TariffData {
 	id: number;
@@ -348,7 +347,8 @@ export default defineComponent({
 		Dropdown,
 		Calendar,
 		Checkbox,
-		Message
+		Message,
+		ProgressSpinner
 	},
 	setup() {
 		const route = useRoute();

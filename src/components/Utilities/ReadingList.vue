@@ -69,9 +69,7 @@
 			</div>
 
 			<div v-if="isLoading" class="text-center">
-				<div class="spinner-border" role="status">
-					<span class="visually-hidden">Завантаження...</span>
-				</div>
+				<ProgressSpinner />
 			</div>
 
 			<div v-else-if="filteredReadings.length === 0" class="text-center">
@@ -114,6 +112,7 @@ import {
 } from '@/api/utilities/utilities';
 import GroupedReadings from './GroupedReadings.vue';
 import Button from 'primevue/button';
+import ProgressSpinner from 'primevue/progressspinner';
 import MonthSelector from './MonthSelector.vue';
 
 interface AddressData {
@@ -152,7 +151,8 @@ export default defineComponent({
 	components: {
 		GroupedReadings,
 		MonthSelector,
-		Button
+		Button,
+		ProgressSpinner
 	},
 	setup() {
 		const route = useRoute();
