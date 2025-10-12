@@ -200,13 +200,33 @@ export default defineComponent({
       return this.userGroup.owner_id === this.currentUser.id;
     },
     groupUsers() {
-      const data = this.groupUsersQuery?.data;
-      if (data && (data as any).data) {
-        return (data as any).data.map((user: GroupUser) => ({
+      const response = this.groupUsersQuery?.data;
+      console.log('🔍 groupUsers computed:', {
+        hasQuery: !!this.groupUsersQuery,
+        hasData: !!response,
+        dataValue: response,
+        isLoading: this.groupUsersQuery?.isLoading,
+        error: this.groupUsersQuery?.error
+      });
+
+      if (!response) {
+        console.log('⚠️ No response data');
+        return [];
+      }
+
+      // Handle both {data: [...]} and [...] response formats
+      const data = (response as any).data || response;
+
+      if (Array.isArray(data) && data.length > 0) {
+        const users = data.map((user: GroupUser) => ({
           ...user,
           role: user.id === this.userGroup?.owner_id ? "owner" : "member",
         }));
+        console.log('✅ Mapped users:', users);
+        return users;
       }
+
+      console.log('⚠️ No users in data array');
       return [];
     },
     filteredGroupUsers() {
@@ -214,10 +234,30 @@ export default defineComponent({
       return this.groupUsers.filter(user => user.id !== this.currentUser.id);
     },
     activeInvitations() {
-      const data = this.groupInvitationsQuery?.data;
-      if (data && (data as any).data) {
-        return (data as any).data.filter((inv: Invitation) => inv.is_active);
+      const response = this.groupInvitationsQuery?.data;
+      console.log('🔍 activeInvitations computed:', {
+        hasQuery: !!this.groupInvitationsQuery,
+        hasData: !!response,
+        dataValue: response,
+        isLoading: this.groupInvitationsQuery?.isLoading,
+        error: this.groupInvitationsQuery?.error
+      });
+
+      if (!response) {
+        console.log('⚠️ No response data');
+        return [];
       }
+
+      // Handle both {data: [...]} and [...] response formats
+      const data = (response as any).data || response;
+
+      if (Array.isArray(data)) {
+        const invitations = data.filter((inv: Invitation) => inv.is_active);
+        console.log('✅ Filtered invitations:', invitations);
+        return invitations;
+      }
+
+      console.log('⚠️ No invitations in data array');
       return [];
     },
     loadingGroupUsers() {
@@ -230,13 +270,16 @@ export default defineComponent({
   watch: {
     groupsData: {
       handler(newData) {
+        console.log('📊 groupsData changed:', newData);
         if (newData?.data && Array.isArray(newData.data) && newData.data.length > 0) {
           this.userGroup = newData.data[0];
           // Set groupId to trigger queries
           this.groupId = this.userGroup.id;
+          console.log('✅ Set groupId:', this.groupId);
         } else {
           this.userGroup = null;
           this.groupId = null;
+          console.log('⚠️ No group data, groupId set to null');
         }
       },
       immediate: true
