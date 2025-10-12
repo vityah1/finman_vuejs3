@@ -31,7 +31,7 @@
                 {{ getFormattedRole(user) }}
               </span>
               <span v-if="user.relation_type" class="badge bg-info ms-2">
-                {{ user.relation_type }}
+                {{ getFormattedRelation(user) }}
               </span>
             </div>
             <div class="user-details small text-muted mt-1">
@@ -153,6 +153,18 @@ export default defineComponent({
         'member': 'Учасник',
       };
       return roleMap[user.role || ''] || user.role;
+    },
+
+    getFormattedRelation(user: GroupUser) {
+      if (!user.relation_type) return '';
+      const relationMap: Record<string, string> = {
+        'spouse': 'Чоловік/Дружина',
+        'child': 'Дитина',
+        'parent': 'Батько/Мати',
+        'relative': 'Родич',
+        'friend': 'Друг',
+      };
+      return relationMap[user.relation_type] || user.relation_type;
     },
 
     openSetRelationModal(user: GroupUser) {
