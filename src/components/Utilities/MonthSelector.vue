@@ -1,27 +1,41 @@
 <template>
 	<div class="month-selector">
-		<div class="input-group">
-			<select v-model="selectedMonth" class="form-select" @change="updateValue">
+		<div class="flex gap-2">
+			<select v-model="selectedMonth" class="form-select flex-1" @change="updateValue">
 				<option value="">Всі періоди</option>
 				<option v-for="month in availableMonths" :key="month.value" :value="month.value">
 					{{ month.label }}
 				</option>
 			</select>
-			<button class="btn btn-outline-secondary" type="button" @click="goToPrevious" :disabled="!canGoPrevious">
-				<i class="fas fa-chevron-left"></i>
-			</button>
-			<button class="btn btn-outline-secondary" type="button" @click="goToNext" :disabled="!canGoNext">
-				<i class="fas fa-chevron-right"></i>
-			</button>
+			<Button
+				icon="pi pi-chevron-left"
+				type="button"
+				@click="goToPrevious"
+				:disabled="!canGoPrevious"
+				outlined
+				severity="secondary"
+			/>
+			<Button
+				icon="pi pi-chevron-right"
+				type="button"
+				@click="goToNext"
+				:disabled="!canGoNext"
+				outlined
+				severity="secondary"
+			/>
 		</div>
 	</div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, computed, watch } from 'vue';
+import Button from 'primevue/button';
 
 export default defineComponent({
 	name: 'MonthSelector',
+	components: {
+		Button
+	},
 	props: {
 		modelValue: {
 			type: String,
@@ -134,7 +148,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.month-selector .input-group {
+.month-selector .flex {
 	width: 100%;
 }
 
