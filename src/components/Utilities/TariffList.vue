@@ -3,20 +3,14 @@
 		<div class="container-fluid">
 			<div class="row mb-4">
 				<div class="col-sm-6">
-					<nav aria-label="breadcrumb">
-						<ol class="breadcrumb">
-							<li class="breadcrumb-item">
-								<router-link :to="{ name: 'utilities' }">Комунальні</router-link>
-							</li>
-							<li class="breadcrumb-item">
-								<router-link :to="{ name: 'utilities_addresses' }">Адреси</router-link>
-							</li>
-							<li class="breadcrumb-item">
-								<router-link :to="getServicesRoute()">Служби</router-link>
-							</li>
-							<li class="breadcrumb-item active">Тарифи</li>
-						</ol>
-					</nav>
+					<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
+						<template #item="{ item }">
+							<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
+								<span class="p-menuitem-text">{{ item.label }}</span>
+							</router-link>
+							<span v-else class="p-menuitem-text">{{ item.label }}</span>
+						</template>
+					</Breadcrumb>
 					<h2><i class="fas fa-money-bill me-2"></i>Тарифи</h2>
 				</div>
 				<div class="col-sm-6 text-end">
@@ -68,24 +62,24 @@
 									<strong>{{ tariff.name }}</strong>
 								</td>
 								<td>
-									<span v-if="tariff.tariff_type" class="badge bg-info">{{ getTariffTypeLabel(tariff.tariff_type) }}</span>
+									<Tag v-if="tariff.tariff_type" severity="info" :value="getTariffTypeLabel(tariff.tariff_type)" />
 									<span v-else class="text-muted">-</span>
 								</td>
 								<td>
 									<strong>{{ formatRate(tariff.rate) }}</strong>
-									<span v-if="tariff.calculation_method === 'percentage' && tariff.percentage_of" 
+									<span v-if="tariff.calculation_method === 'percentage' && tariff.percentage_of"
 										  class="text-muted d-block">
 										<small>({{ tariff.percentage_of }}% від основного)</small>
 									</span>
 								</td>
 								<td>{{ tariff.currency || 'UAH' }}</td>
 								<td>
-									<span v-if="tariff.group_code" class="badge bg-secondary">{{ tariff.group_code }}</span>
+									<Tag v-if="tariff.group_code" severity="secondary" :value="tariff.group_code" />
 									<span v-else class="text-muted">-</span>
 								</td>
 								<td>
-									<span v-if="tariff.source === 'import'" class="badge bg-warning">Імпорт</span>
-									<span v-else class="badge bg-primary">Інтерфейс</span>
+									<Tag v-if="tariff.source === 'import'" severity="warning" value="Імпорт" />
+									<Tag v-else severity="primary" value="Інтерфейс" />
 								</td>
 								<td>
 									<small class="text-muted d-block">
@@ -97,8 +91,8 @@
 									<small v-else class="text-muted d-block">безстроково</small>
 								</td>
 								<td>
-									<span v-if="tariff.is_active" class="badge bg-success">Активний</span>
-									<span v-else class="badge bg-secondary">Неактивний</span>
+									<Tag v-if="tariff.is_active" severity="success" value="Активний" />
+									<Tag v-else severity="secondary" value="Неактивний" />
 								</td>
 								<td>
 									<div class="flex gap-2">
@@ -118,144 +112,148 @@
 			v-model:visible="showAddModal"
 			:header="editingTariff ? 'Редагувати тариф' : 'Додати новий тариф'"
 			:modal="true"
-			:style="{ width: '650px' }"
+			:style="{ width: '800px' }"
 			@hide="closeModal"
 		>
 			<form @submit.prevent="saveTariff">
-				<div class="mb-3">
-					<label for="tariffName" class="form-label">Назва тарифу <span class="text-danger">*</span></label>
-					<InputText
-						id="tariffName"
-						v-model="tariffForm.name"
-						required
-						placeholder="Наприклад: Денний тариф, Нічний тариф"
-						class="w-full"
-					/>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<div class="mb-3">
-							<label for="tariffRate" class="form-label">Ставка <span class="text-danger">*</span></label>
-							<InputNumber
-								id="tariffRate"
-								v-model="tariffForm.rate"
-								required
-								:minFractionDigits="2"
-								:maxFractionDigits="2"
-								placeholder="0.00"
-								class="w-full"
-							/>
-						</div>
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="tariffName">Назва тарифу <span style="color: var(--red-500)">*</span></label>
 					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-12">
-						<div class="mb-3">
-							<label for="tariffCurrency" class="form-label">Валюта</label>
-							<Dropdown
-								id="tariffCurrency"
-								v-model="tariffForm.currency"
-								:options="['UAH', 'USD', 'EUR']"
-								class="w-full"
-							/>
-						</div>
+					<div class="field col-12 md:col-8">
+						<InputText
+							id="tariffName"
+							v-model="tariffForm.name"
+							required
+							placeholder="Наприклад: Денний тариф, Нічний тариф"
+						/>
 					</div>
-				</div>
-				<div class="row">
-					<div class="col-md-6">
-						<div class="mb-3">
-							<label for="validFrom" class="form-label">Дійсний з <span class="text-danger">*</span></label>
-							<Calendar
-								id="validFrom"
-								v-model="tariffForm.valid_from"
-								dateFormat="yy-mm-dd"
-								required
-								class="w-full"
-							/>
-						</div>
-					</div>
-					<div class="col-md-6">
-						<div class="mb-3">
-							<label for="validTo" class="form-label">Дійсний до</label>
-							<Calendar
-								id="validTo"
-								v-model="tariffForm.valid_to"
-								dateFormat="yy-mm-dd"
-								class="w-full"
-							/>
-							<small class="text-muted">Залиште порожнім для безстрокового тарифу</small>
-						</div>
-					</div>
-				</div>
-				<div class="flex align-items-center mb-3">
-					<Checkbox
-						id="tariffActive"
-						v-model="tariffForm.is_active"
-						:binary="true"
-					/>
-					<label for="tariffActive" class="ml-2">Активний тариф</label>
 				</div>
 
-				<!-- Розширені налаштування -->
-				<hr class="my-3">
-				<h6>Розширені налаштування</h6>
-
-				<div class="row">
-					<div class="col-md-6">
-						<div class="mb-3">
-							<label for="tariffType" class="form-label">Тип тарифу</label>
-							<Dropdown
-								id="tariffType"
-								v-model="tariffForm.tariff_type"
-								:options="tariffTypeOptions"
-								optionLabel="label"
-								optionValue="value"
-								placeholder="Стандартний"
-								class="w-full"
-							/>
-						</div>
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="tariffRate">Ставка <span style="color: var(--red-500)">*</span></label>
 					</div>
-					<div class="col-md-6">
-						<div class="mb-3">
-							<label for="groupCode" class="form-label">Код групи</label>
-							<InputText
-								id="groupCode"
-								v-model="tariffForm.group_code"
-								placeholder="Наприклад: water_2025"
-								class="w-full"
+					<div class="field col-12 md:col-4">
+						<InputNumber
+							id="tariffRate"
+							v-model="tariffForm.rate"
+							required
+							:minFractionDigits="2"
+							:maxFractionDigits="2"
+							placeholder="0.00"
+						/>
+					</div>
+					<div class="field col-12 md:col-4">
+						<Dropdown
+							id="tariffCurrency"
+							v-model="tariffForm.currency"
+							:options="['UAH', 'USD', 'EUR']"
+							placeholder="Валюта"
+						/>
+					</div>
+				</div>
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="validFrom">Дійсний з <span style="color: var(--red-500)">*</span></label>
+					</div>
+					<div class="field col-12 md:col-4">
+						<Calendar
+							id="validFrom"
+							v-model="tariffForm.valid_from"
+							dateFormat="yy-mm-dd"
+							required
+						/>
+					</div>
+					<div class="field col-12 md:col-4">
+						<Calendar
+							id="validTo"
+							v-model="tariffForm.valid_to"
+							dateFormat="yy-mm-dd"
+							placeholder="Дійсний до"
+						/>
+						<small class="block text-color-secondary">Порожнє = безстроковий</small>
+					</div>
+				</div>
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4"></div>
+					<div class="field col-12 md:col-8">
+						<div class="field-checkbox">
+							<Checkbox
+								id="tariffActive"
+								v-model="tariffForm.is_active"
+								:binary="true"
 							/>
-							<small class="text-muted">Для групування пов'язаних тарифів</small>
+							<label for="tariffActive">Активний тариф</label>
 						</div>
 					</div>
 				</div>
 
-				<div class="row">
-					<div class="col-md-6">
-						<div class="mb-3">
-							<label for="calculationMethod" class="form-label">Метод розрахунку</label>
-							<Dropdown
-								id="calculationMethod"
-								v-model="tariffForm.calculation_method"
-								:options="calculationMethodOptions"
-								optionLabel="label"
-								optionValue="value"
-								class="w-full"
-							/>
-						</div>
+				<!-- Розширені налаштування -->
+				<div class="divider my-4">
+					<span class="text-color-secondary font-semibold">Розширені налаштування</span>
+				</div>
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="tariffType">Тип тарифу</label>
 					</div>
-					<div class="col-md-6" v-if="tariffForm.calculation_method === 'percentage'">
-						<div class="mb-3">
-							<label for="percentageOf" class="form-label">Відсоток</label>
-							<InputNumber
-								id="percentageOf"
-								v-model="tariffForm.percentage_of"
-								:minFractionDigits="2"
-								:maxFractionDigits="2"
-								placeholder="80"
-								class="w-full"
-							/>
-							<small class="text-muted">Відсоток від основного тарифу</small>
-						</div>
+					<div class="field col-12 md:col-8">
+						<Dropdown
+							id="tariffType"
+							v-model="tariffForm.tariff_type"
+							:options="tariffTypeOptions"
+							optionLabel="label"
+							optionValue="value"
+							placeholder="Стандартний"
+						/>
+					</div>
+				</div>
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="groupCode">Код групи</label>
+					</div>
+					<div class="field col-12 md:col-8">
+						<InputText
+							id="groupCode"
+							v-model="tariffForm.group_code"
+							placeholder="Наприклад: water_2025"
+						/>
+						<small class="block text-color-secondary">Для групування пов'язаних тарифів</small>
+					</div>
+				</div>
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="calculationMethod">Метод розрахунку</label>
+					</div>
+					<div class="field col-12 md:col-8">
+						<Dropdown
+							id="calculationMethod"
+							v-model="tariffForm.calculation_method"
+							:options="calculationMethodOptions"
+							optionLabel="label"
+							optionValue="value"
+						/>
+					</div>
+				</div>
+
+				<div class="formgrid grid" v-if="tariffForm.calculation_method === 'percentage'">
+					<div class="field col-12 md:col-4">
+						<label for="percentageOf">Відсоток</label>
+					</div>
+					<div class="field col-12 md:col-8">
+						<InputNumber
+							id="percentageOf"
+							v-model="tariffForm.percentage_of"
+							:minFractionDigits="2"
+							:maxFractionDigits="2"
+							placeholder="80"
+						/>
+						<small class="block text-color-secondary">Відсоток від основного тарифу</small>
 					</div>
 				</div>
 			</form>
@@ -277,13 +275,14 @@
 			v-model:visible="showDeleteModal"
 			header="Підтвердити видалення"
 			:modal="true"
-			:style="{ width: '450px' }"
+			:style="{ width: '500px' }"
 		>
-			<p>Ви дійсно хочете видалити тариф "<strong>{{ tariffToDelete?.name }}</strong>"?</p>
-			<Message severity="warn" :closable="false">
-				<i class="fas fa-exclamation-triangle me-2"></i>
-				Ця дія може вплинути на розрахунки показників!
-			</Message>
+			<div class="confirmation-content">
+				<p class="mb-3">Ви дійсно хочете видалити тариф "<strong>{{ tariffToDelete?.name }}</strong>"?</p>
+				<Message severity="warn" :closable="false">
+					Ця дія може вплинути на розрахунки показників!
+				</Message>
+			</div>
 
 			<template #footer>
 				<Button label="Скасувати" icon="pi pi-times" @click="showDeleteModal = false" text />
@@ -302,7 +301,7 @@
 
 <script lang="ts">
 import { defineComponent, ref, reactive, computed, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import {
 	useGetTariffsApiUtilitiesTariffsGet,
 	useGetServiceApiUtilitiesServicesServiceIdGet,
@@ -314,6 +313,8 @@ import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
 import InputText from 'primevue/inputtext';
 import InputNumber from 'primevue/inputnumber';
+import Tag from 'primevue/tag';
+import Breadcrumb from 'primevue/breadcrumb';
 import Dropdown from 'primevue/dropdown';
 import Calendar from 'primevue/calendar';
 import Checkbox from 'primevue/checkbox';
@@ -348,11 +349,23 @@ export default defineComponent({
 		Calendar,
 		Checkbox,
 		Message,
-		ProgressSpinner
+		ProgressSpinner,
+		Tag,
+		Breadcrumb
 	},
 	setup() {
 		const route = useRoute();
+		const router = useRouter();
 		const serviceId = computed(() => parseInt(route.params.serviceId as string));
+		const addressId = computed(() => route.params.addressId ? parseInt(route.params.addressId as string) : null);
+
+		// Breadcrumb
+		const breadcrumbHome = { icon: 'pi pi-home', route: { name: 'utilities' } };
+		const breadcrumbItems = computed(() => [
+			{ label: 'Адреси', route: { name: 'utilities_addresses' } },
+			{ label: 'Служби', route: addressId.value ? { name: 'utilities_services', params: { addressId: addressId.value } } : null },
+			{ label: 'Тарифи' }
+		]);
 
 		// Reactive state
 		const showAddModal = ref(false);
@@ -562,6 +575,9 @@ export default defineComponent({
 			isDeleting,
 			tariffTypeOptions,
 			calculationMethodOptions,
+			addressId,
+			breadcrumbHome,
+			breadcrumbItems,
 
 			// Methods
 			formatRate,

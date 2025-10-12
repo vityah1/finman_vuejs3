@@ -3,6 +3,14 @@
 		<div class="container-fluid">
 			<div class="row mb-4">
 				<div class="col-sm-6">
+					<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
+						<template #item="{ item }">
+							<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
+								<span class="p-menuitem-text">{{ item.label }}</span>
+							</router-link>
+							<span v-else class="p-menuitem-text">{{ item.label }}</span>
+						</template>
+					</Breadcrumb>
 					<h2><i class="fas fa-map-marker-alt me-2"></i>Адреси</h2>
 				</div>
 				<div class="col-sm-6 text-end">
@@ -90,48 +98,69 @@
 			v-model:visible="showAddModal"
 			:header="editingAddress ? 'Редагувати адресу' : 'Додати нову адресу'"
 			:modal="true"
-			:style="{ width: '500px' }"
+			:style="{ width: '700px' }"
 			@hide="closeModal"
 		>
 			<form @submit.prevent="saveAddress">
-				<div class="mb-3">
-					<label for="addressName" class="form-label">Назва <span class="text-danger">*</span></label>
-					<InputText
-						id="addressName"
-						v-model="addressForm.name"
-						required
-						placeholder="Наприклад: Квартира, Дача, Офіс"
-						class="w-full"
-					/>
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="addressName">Назва <span style="color: var(--red-500)">*</span></label>
+					</div>
+					<div class="field col-12 md:col-8">
+						<InputText
+							id="addressName"
+							v-model="addressForm.name"
+							required
+							placeholder="Наприклад: Квартира, Дача, Офіс"
+						/>
+					</div>
 				</div>
-				<div class="mb-3">
-					<label for="addressFull" class="form-label">Повна адреса <span class="text-danger">*</span></label>
-					<Textarea
-						id="addressFull"
-						v-model="addressForm.address"
-						required
-						placeholder="Повна адреса з індексом"
-						rows="2"
-						class="w-full"
-					/>
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="addressFull">Повна адреса <span style="color: var(--red-500)">*</span></label>
+					</div>
+					<div class="field col-12 md:col-8">
+						<Textarea
+							id="addressFull"
+							v-model="addressForm.address"
+							required
+							placeholder="Повна адреса з індексом"
+							rows="3"
+							cols="50"
+							auto-resize
+						/>
+					</div>
 				</div>
-				<div class="mb-3">
-					<label for="addressDescription" class="form-label">Опис</label>
-					<Textarea
-						id="addressDescription"
-						v-model="addressForm.description"
-						placeholder="Додаткова інформація про адресу"
-						rows="2"
-						class="w-full"
-					/>
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="addressDescription">Опис</label>
+					</div>
+					<div class="field col-12 md:col-8">
+						<Textarea
+							id="addressDescription"
+							v-model="addressForm.description"
+							placeholder="Додаткова інформація про адресу"
+							rows="3"
+							cols="50"
+							auto-resize
+						/>
+					</div>
 				</div>
-				<div class="flex align-items-center">
-					<Checkbox
-						id="addressActive"
-						v-model="addressForm.is_active"
-						:binary="true"
-					/>
-					<label for="addressActive" class="ml-2">Активна адреса</label>
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4"></div>
+					<div class="field col-12 md:col-8">
+						<div class="field-checkbox">
+							<Checkbox
+								id="addressActive"
+								v-model="addressForm.is_active"
+								:binary="true"
+							/>
+							<label for="addressActive">Активна адреса</label>
+						</div>
+					</div>
 				</div>
 			</form>
 
@@ -152,13 +181,14 @@
 			v-model:visible="showDeleteModal"
 			header="Підтвердити видалення"
 			:modal="true"
-			:style="{ width: '450px' }"
+			:style="{ width: '500px' }"
 		>
-			<p>Ви дійсно хочете видалити адресу "<strong>{{ addressToDelete?.name }}</strong>"?</p>
-			<Message severity="warn" :closable="false">
-				<i class="fas fa-exclamation-triangle me-2"></i>
-				Ця дія також видалить всі пов'язані служби, тарифи та показники!
-			</Message>
+			<div class="confirmation-content">
+				<p class="mb-3">Ви дійсно хочете видалити адресу "<strong>{{ addressToDelete?.name }}</strong>"?</p>
+				<Message severity="warn" :closable="false">
+					Ця дія також видалить всі пов'язані служби, тарифи та показники!
+				</Message>
+			</div>
 
 			<template #footer>
 				<Button label="Скасувати" icon="pi pi-times" @click="showDeleteModal = false" text />
@@ -192,6 +222,7 @@ import Textarea from 'primevue/textarea';
 import Checkbox from 'primevue/checkbox';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
+import Breadcrumb from 'primevue/breadcrumb';
 
 interface AddressData {
 	id: number;
@@ -223,9 +254,16 @@ export default defineComponent({
 		Textarea,
 		Checkbox,
 		Message,
-		ProgressSpinner
+		ProgressSpinner,
+		Breadcrumb
 	},
 	setup() {
+		// Breadcrumb
+		const breadcrumbHome = { icon: 'pi pi-home', route: { name: 'utilities' } };
+		const breadcrumbItems = ref([
+			{ label: 'Адреси' }
+		]);
+
 		// Reactive state
 		const showAddModal = ref(false);
 		const showDeleteModal = ref(false);
@@ -385,7 +423,9 @@ export default defineComponent({
 			closeModal,
 			saveAddress,
 			confirmDelete,
-			deleteAddress
+			deleteAddress,
+			breadcrumbHome,
+			breadcrumbItems
 		};
 	}
 });

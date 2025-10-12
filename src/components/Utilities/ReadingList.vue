@@ -1,8 +1,7 @@
 <template>
 	<div class="reading-list">
 		<div v-if="!addressId || addressId === 0" class="container-fluid">
-			<div class="alert alert-warning">
-				<i class="fas fa-exclamation-triangle me-2"></i>
+			<Message severity="warn" :closable="false">
 				Невірна адреса. Будь ласка, оберіть адресу зі списку.
 				<Button
 					label="Перейти до адрес"
@@ -10,22 +9,19 @@
 					class="ms-3"
 					@click="$router.push({ name: 'utilities_addresses' })"
 				/>
-			</div>
+			</Message>
 		</div>
 		<div v-else class="container-fluid">
 			<div class="row mb-4">
 				<div class="col-sm-8">
-					<nav aria-label="breadcrumb">
-						<ol class="breadcrumb">
-							<li class="breadcrumb-item">
-								<router-link :to="{ name: 'utilities' }">Комунальні</router-link>
-							</li>
-							<li class="breadcrumb-item">
-								<router-link :to="{ name: 'utilities_addresses' }">Адреси</router-link>
-							</li>
-							<li class="breadcrumb-item active">{{ currentAddress?.name || 'Показники' }}</li>
-						</ol>
-					</nav>
+					<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
+						<template #item="{ item }">
+							<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
+								<span class="p-menuitem-text">{{ item.label }}</span>
+							</router-link>
+							<span v-else class="p-menuitem-text">{{ item.label }}</span>
+						</template>
+					</Breadcrumb>
 					<h2><i class="fas fa-chart-line me-2"></i>Показники лічильників</h2>
 					<p v-if="currentAddress" class="text-muted">
 						<i class="fas fa-map-marker-alt me-2"></i>{{ currentAddress.address }}
@@ -41,30 +37,42 @@
 			</div>
 
 			<!-- Filters -->
-			<div class="row mb-4">
-				<div class="col-md-3">
-					<label for="periodFilter" class="form-label">Період</label>
-					<MonthSelector v-model="selectedPeriod" />
-				</div>
-				<div class="col-md-3">
-					<label for="serviceFilter" class="form-label">Служба</label>
-					<select class="form-control" id="serviceFilter" v-model="selectedService">
-						<option value="">Всі служби</option>
-						<option v-for="service in services" :key="service.id" :value="service.id">
-							{{ service.name }}
-						</option>
-					</select>
-				</div>
-				<div class="col-md-3"></div>
-				<div class="col-md-3 d-flex align-items-end">
-					<Button
-						label="Скинути фільтри"
-						icon="pi pi-times"
-						outlined
-						severity="secondary"
-						class="w-100"
-						@click="resetFilters"
-					/>
+			<div class="card mb-4">
+				<div class="card-body">
+					<div class="formgrid grid">
+						<div class="field col-12 md:col-2">
+							<label for="periodFilter">Період</label>
+						</div>
+						<div class="field col-12 md:col-4">
+							<MonthSelector v-model="selectedPeriod" />
+						</div>
+						<div class="field col-12 md:col-2">
+							<label for="serviceFilter">Служба</label>
+						</div>
+						<div class="field col-12 md:col-4">
+							<Dropdown
+								id="serviceFilter"
+								v-model="selectedService"
+								:options="services"
+								optionLabel="name"
+								optionValue="id"
+								placeholder="Всі служби"
+								showClear
+							/>
+						</div>
+					</div>
+					<div class="formgrid grid">
+						<div class="field col-12 md:col-2"></div>
+						<div class="field col-12 md:col-10">
+							<Button
+								label="Скинути фільтри"
+								icon="pi pi-times"
+								outlined
+								severity="secondary"
+								@click="resetFilters"
+							/>
+						</div>
+					</div>
 				</div>
 			</div>
 
@@ -113,6 +121,9 @@ import {
 import GroupedReadings from './GroupedReadings.vue';
 import Button from 'primevue/button';
 import ProgressSpinner from 'primevue/progressspinner';
+import Dropdown from 'primevue/dropdown';
+import Message from 'primevue/message';
+import Breadcrumb from 'primevue/breadcrumb';
 import MonthSelector from './MonthSelector.vue';
 
 interface AddressData {
@@ -152,7 +163,10 @@ export default defineComponent({
 		GroupedReadings,
 		MonthSelector,
 		Button,
-		ProgressSpinner
+		ProgressSpinner,
+		Dropdown,
+		Message,
+		Breadcrumb
 	},
 	setup() {
 		const route = useRoute();
@@ -169,11 +183,18 @@ export default defineComponent({
 		const selectedService = ref('');
 		const currentPage = ref(1);
 		const itemsPerPage = 20;
-		
+
 		// UI state
 		const expandedReadings = ref(new Set<number>());
 		const viewMode = ref<'list' | 'grouped'>('grouped'); // За замовчуванням групований вигляд
 		const currentPeriod = computed(() => new Date().toISOString().slice(0, 7));
+
+		// Breadcrumb
+		const breadcrumbHome = { icon: 'pi pi-home', route: { name: 'utilities' } };
+		const breadcrumbItems = computed(() => [
+			{ label: 'Адреси', route: { name: 'utilities_addresses' } },
+			{ label: currentAddress.value?.name || 'Показники' }
+		]);
 
 		// API calls - only call if addressId is valid
 		const { data: addressData } = useGetAddressApiUtilitiesAddressesAddressIdGet(
@@ -434,7 +455,9 @@ export default defineComponent({
 			confirmDelete,
 			getPreviousReading,
 			toggleDetails,
-			getCalculationDetails
+			getCalculationDetails,
+			breadcrumbHome,
+			breadcrumbItems
 		};
 	}
 });

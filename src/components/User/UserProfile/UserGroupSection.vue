@@ -67,7 +67,11 @@
       </div>
       <div class="p-field">
         <label for="group-description">Опис</label>
-        <Textarea id="group-description" v-model="newGroup.description" rows="3" />
+        <Textarea id="group-description" v-model="newGroup.description"
+			rows="3"
+			cols="50"
+			auto-resize
+		/>
       </div>
     </div>
     <template #footer>
@@ -84,7 +88,11 @@
       </div>
       <div class="p-field">
         <label for="edit-group-description">Опис</label>
-        <Textarea id="edit-group-description" v-model="editingGroup.description" rows="3" />
+        <Textarea id="edit-group-description" v-model="editingGroup.description"
+			rows="3"
+			cols="50"
+			auto-resize
+		/>
       </div>
     </div>
     <template #footer>

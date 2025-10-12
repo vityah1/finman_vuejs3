@@ -1,24 +1,36 @@
 <template>
   <div class="col-md-12">
     <div class="card card-container">
-      <!-- <img
-        id="profile-img"
-        src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-        class="profile-img-card"
-      /> -->
-      <Form @submit="handleLogin" :validation-schema="schema">
-        <div class="form-group">
+      <Form @submit="handleLogin" :validation-schema="schema" class="p-fluid">
+        <div class="field">
           <label for="login">Ім'я користувача</label>
-          <Field name="login" type="text" class="form-control" />
-          <ErrorMessage name="login" class="error-feedback" />
-        </div>
-        <div class="form-group">
-          <label for="password">Пароль</label>
-          <Field name="password" type="password" class="form-control" />
-          <ErrorMessage name="password" class="error-feedback" />
+          <Field name="login" type="text" v-slot="{ field, errorMessage }">
+            <InputText
+              v-bind="field"
+              id="login"
+              :class="{ 'p-invalid': errorMessage }"
+              placeholder="Введіть ім'я користувача"
+            />
+            <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
+          </Field>
         </div>
 
-        <div class="form-group">
+        <div class="field">
+          <label for="password">Пароль</label>
+          <Field name="password" type="password" v-slot="{ field, errorMessage }">
+            <Password
+              v-bind="field"
+              id="password"
+              :class="{ 'p-invalid': errorMessage }"
+              placeholder="Введіть пароль"
+              :feedback="false"
+              toggleMask
+            />
+            <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
+          </Field>
+        </div>
+
+        <div class="field">
           <Button
             label="Увійти"
             type="submit"
@@ -30,30 +42,33 @@
           />
         </div>
 
-        <div class="form-group">
-          <div v-if="message" class="alert alert-danger" role="alert">
-            {{ message }}
-          </div>
-        </div>
+        <Message v-if="message" severity="error" :closable="false">
+          {{ message }}
+        </Message>
       </Form>
     </div>
   </div>
 </template>
 
 <script>
-import { Form, Field, ErrorMessage } from "vee-validate";
+import { Form, Field } from "vee-validate";
 import * as yup from "yup";
 import PaymentService from "../../services/PaymentService";
 import { refreshAllData } from "../../query-client";
 import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Password from 'primevue/password';
+import Message from 'primevue/message';
 
 export default {
   name: "UserLogin",
   components: {
     Form,
     Field,
-    ErrorMessage,
     Button,
+    InputText,
+    Password,
+    Message,
   },
   data() {
     const schema = yup.object().shape({

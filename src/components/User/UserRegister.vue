@@ -1,44 +1,75 @@
 <template>
   <div class="col-md-12">
     <div class="card card-container">
-      <!-- <img
-        id="profile-img"
-        src="//ssl.gstatic.com/accounts/ui/avatar_2x.png"
-        class="profile-img-card"
-      /> -->
-      <Form @submit="handleRegister" :validation-schema="schema">
+      <Form @submit="handleRegister" :validation-schema="schema" class="p-fluid">
         <div v-if="!successful">
-          <div class="form-group">
+          <div class="field">
             <label for="login">Ім'я користувача</label>
-            <Field name="login" type="text" class="form-control" />
-            <ErrorMessage name="login" class="error-feedback" />
+            <Field name="login" type="text" v-slot="{ field, errorMessage }">
+              <InputText
+                v-bind="field"
+                id="login"
+                :class="{ 'p-invalid': errorMessage }"
+                placeholder="Введіть ім'я користувача"
+              />
+              <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
+            </Field>
           </div>
 
-          <div class="form-group">
+          <div class="field">
             <label for="password">Пароль</label>
-            <Field name="password" type="password" class="form-control" />
-            <ErrorMessage name="password" class="error-feedback" />
+            <Field name="password" type="password" v-slot="{ field, errorMessage }">
+              <Password
+                v-bind="field"
+                id="password"
+                :class="{ 'p-invalid': errorMessage }"
+                placeholder="Введіть пароль"
+                toggleMask
+              />
+              <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
+            </Field>
           </div>
 
-          <div class="form-group">
-          <label for="fullname">Повне ім'я</label>
-          <Field name="fullname" type="text" class="form-control" />
-          <ErrorMessage name="fullname" class="error-feedback" />
-        </div>
+          <div class="field">
+            <label for="fullname">Повне ім'я</label>
+            <Field name="fullname" type="text" v-slot="{ field, errorMessage }">
+              <InputText
+                v-bind="field"
+                id="fullname"
+                :class="{ 'p-invalid': errorMessage }"
+                placeholder="Введіть повне ім'я"
+              />
+              <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
+            </Field>
+          </div>
 
-        <div class="form-group">
-          <label for="phone">Телефон</label>
-          <Field name="phone" type="text" class="form-control" />
-          <ErrorMessage name="phone" class="error-feedback" />
-        </div>  
+          <div class="field">
+            <label for="phone">Телефон</label>
+            <Field name="phone" type="text" v-slot="{ field, errorMessage }">
+              <InputText
+                v-bind="field"
+                id="phone"
+                :class="{ 'p-invalid': errorMessage }"
+                placeholder="Введіть номер телефону"
+              />
+              <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
+            </Field>
+          </div>
 
-        <div class="form-group">
-          <label for="email">Електронна пошта</label>
-          <Field name="email" type="text" class="form-control" />
-          <ErrorMessage name="email" class="error-feedback" />
-        </div>  
+          <div class="field">
+            <label for="email">Електронна пошта</label>
+            <Field name="email" type="text" v-slot="{ field, errorMessage }">
+              <InputText
+                v-bind="field"
+                id="email"
+                :class="{ 'p-invalid': errorMessage }"
+                placeholder="Введіть email"
+              />
+              <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
+            </Field>
+          </div>
 
-          <div class="form-group">
+          <div class="field">
             <Button
               label="Реєстрація"
               type="submit"
@@ -50,29 +81,30 @@
         </div>
       </Form>
 
-      <div
-        v-if="message"
-        class="alert"
-        :class="successful ? 'alert-success' : 'alert-danger'"
-      >
+      <Message v-if="message" :severity="successful ? 'success' : 'error'" :closable="false">
         {{ message }}
-      </div>
+      </Message>
     </div>
   </div>
 </template>
 
 <script>
-import { Form, Field, ErrorMessage } from "vee-validate";
+import { Form, Field } from "vee-validate";
 import * as yup from "yup";
 import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Password from 'primevue/password';
+import Message from 'primevue/message';
 
 export default {
   name: "UserRegister",
   components: {
     Form,
     Field,
-    ErrorMessage,
     Button,
+    InputText,
+    Password,
+    Message,
   },
   data() {
     const schema = yup.object().shape({

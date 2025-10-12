@@ -151,6 +151,117 @@ body {
   font-size: var(--font-size-xs);
 }
 
+/* PrimeVue Form Styling */
+.p-fluid .field {
+  margin-bottom: 1rem;
+}
+
+.field {
+  margin-bottom: 0.75rem;
+}
+
+.field label {
+  display: block;
+  margin-bottom: 0.35rem;
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: #495057;
+}
+
+/* Horizontal form layout - label and input on same line for desktop */
+@media (min-width: 768px) {
+  .formgrid.grid .field label {
+    margin-bottom: 0;
+    padding-top: 0.35rem;
+    line-height: 1.4;
+  }
+}
+
+.field-checkbox {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.field-checkbox label {
+  margin-bottom: 0;
+  margin-left: 0.5rem;
+  font-weight: 400;
+}
+
+.formgrid {
+  display: grid;
+  gap: 0;
+}
+
+.formgrid.grid {
+  margin-left: -0.5rem;
+  margin-right: -0.5rem;
+}
+
+.formgrid .field {
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+}
+
+/* PrimeVue Input Components */
+.p-inputtext,
+.p-dropdown,
+.p-calendar,
+.p-inputnumber-input {
+  width: 100%;
+}
+
+/* Textarea styling - wider and shorter */
+.p-inputtextarea {
+  width: 100%;
+  min-height: 60px !important;
+  resize: vertical;
+}
+
+.p-error {
+  color: #e24c4c;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}
+
+.p-invalid {
+  border-color: #e24c4c !important;
+}
+
+/* Dialog content spacing */
+.p-dialog .p-dialog-content {
+  padding: 1.5rem;
+}
+
+.confirmation-content {
+  padding: 0.5rem 0;
+}
+
+.confirmation-content .mb-3 {
+  margin-bottom: 1rem;
+}
+
+/* Divider in forms */
+.divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 1.5rem 0;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.divider span {
+  padding: 0 1rem;
+}
+
 .p-datatable .p-datatable-thead > tr > th {
   padding: var(--table-padding-y) var(--table-padding-x);
   background: var(--table-header-bg);

@@ -28,259 +28,309 @@
 						</div>
 						<div class="card-body">
 							<form @submit.prevent="saveReading">
-								<div class="row">
-									<div class="col-md-6">
-										<div class="mb-3">
-											<label for="addressSelect" class="form-label">Адреса <span class="text-danger">*</span></label>
-											<select class="form-control" id="addressSelect" v-model="readingForm.address_id" 
-													required @change="onAddressChange">
-												<option value="">Оберіть адресу</option>
-												<option v-for="address in addresses" :key="address.id" :value="address.id">
-													{{ address.name }} - {{ address.address }}
-												</option>
-											</select>
-										</div>
+								<div class="formgrid grid">
+									<div class="field col-12 md:col-2">
+										<label for="addressSelect">Адреса <span style="color: var(--red-500)">*</span></label>
 									</div>
-									<div class="col-md-6">
-										<div class="mb-3">
-											<label for="serviceSelect" class="form-label">Служба <span class="text-danger">*</span></label>
-											<select class="form-control" id="serviceSelect" v-model="readingForm.service_id" 
-													required @change="onServiceChange" :disabled="!readingForm.address_id">
-												<option value="">Оберіть службу</option>
-												<option v-for="service in filteredServices" :key="service.id" :value="service.id">
-													{{ service.name }} ({{ service.unit }})
-												</option>
-											</select>
-										</div>
+									<div class="field col-12 md:col-4">
+										<Dropdown
+											id="addressSelect"
+											v-model="readingForm.address_id"
+											:options="addresses"
+											optionLabel="name"
+											optionValue="id"
+											placeholder="Оберіть адресу"
+											required
+											@change="onAddressChange"
+										>
+											<template #option="slotProps">
+												<div>{{ slotProps.option.name }} - {{ slotProps.option.address }}</div>
+											</template>
+										</Dropdown>
 									</div>
-								</div>
-
-								<div class="row">
-									<div class="col-md-4">
-										<div class="mb-3">
-											<label for="period" class="form-label">Період <span class="text-danger">*</span></label>
-											<PeriodSelector v-model="readingForm.period" />
-											<small class="form-text text-muted">
-												<i class="fas fa-info-circle me-1"></i>
-												Автоматично: до 15 числа - попередній місяць, після 15 - поточний
-											</small>
-										</div>
+									<div class="field col-12 md:col-2">
+										<label for="serviceSelect">Служба <span style="color: var(--red-500)">*</span></label>
 									</div>
-									<div class="col-md-4">
-										<div class="mb-3">
-											<label for="readingDate" class="form-label">Дата зняття</label>
-											<input type="date" class="form-control" id="readingDate" 
-												   v-model="readingForm.reading_date">
-										</div>
-									</div>
-									<div class="col-md-4" v-if="!isMultiTariffService && !(availableTariffs.length > 1 && availableTariffs.every(t => t.calculation_method === 'fixed'))">
-										<div class="mb-3">
-											<label for="tariffSelect" class="form-label">Тариф <span class="text-danger">*</span></label>
-											<select v-if="!selectedService?.has_shared_meter" class="form-control" id="tariffSelect" v-model="readingForm.tariff_id" 
-													required :disabled="!readingForm.service_id">
-												<option value="">Оберіть тариф</option>
-												<option v-for="tariff in availableTariffs" :key="tariff.id" :value="tariff.id">
-													{{ tariff.name }} - {{ formatRate(tariff.rate) }} {{ tariff.currency }}
-												</option>
-											</select>
-											<div v-else class="alert alert-info p-2 mb-0">
-												<small>
-													<i class="fas fa-info-circle me-1"></i>
-													Для цієї служби будуть автоматично розраховані суми за всіма тарифами:
-													<ul class="mb-0 mt-1">
-														<li v-for="tariff in availableTariffs" :key="tariff.id">
-															{{ tariff.name }} - {{ formatRate(tariff.rate) }} {{ tariff.currency }}/{{ selectedService?.unit }}
-														</li>
-													</ul>
-												</small>
-											</div>
-										</div>
+									<div class="field col-12 md:col-4">
+										<Dropdown
+											id="serviceSelect"
+											v-model="readingForm.service_id"
+											:options="filteredServices"
+											optionLabel="name"
+											optionValue="id"
+											placeholder="Оберіть службу"
+											required
+											:disabled="!readingForm.address_id"
+											@change="onServiceChange"
+										>
+											<template #option="slotProps">
+												<div>{{ slotProps.option.name }} ({{ slotProps.option.unit }})</div>
+											</template>
+										</Dropdown>
 									</div>
 								</div>
 
-								<div class="row" v-if="hasFixedPaymentTariff && !selectedService?.has_shared_meter && availableTariffs.length === 1">
-									<!-- Для фіксованих платежів (квартплата, сміття) -->
-									<div class="col-md-6">
-										<div class="mb-3">
-											<label for="paymentAmount" class="form-label">Сума до сплати <span class="text-danger">*</span></label>
-											<div class="input-group">
-												<input type="text" inputmode="decimal" class="form-control" id="paymentAmount"
-													   v-model="readingForm.amount"
-													   @input="readingForm.amount = $event.target.value.replace(',', '.')"
-													   required>
-												<span class="input-group-text">{{ selectedTariff?.currency || 'UAH' }}</span>
-											</div>
-											<small class="form-text text-muted">
-												Введіть суму згідно квитанції
-											</small>
-										</div>
+								<div class="formgrid grid">
+									<div class="field col-12 md:col-2">
+										<label for="period">Період <span style="color: var(--red-500)">*</span></label>
+									</div>
+									<div class="field col-12 md:col-4">
+										<PeriodSelector v-model="readingForm.period" />
+										<small class="block text-color-secondary">До 15 - попередній</small>
+									</div>
+									<div class="field col-12 md:col-2">
+										<label for="readingDate">Дата зняття</label>
+									</div>
+									<div class="field col-12 md:col-4">
+										<Calendar
+											id="readingDate"
+											v-model="readingForm.reading_date"
+											dateFormat="yy-mm-dd"
+										/>
 									</div>
 								</div>
 
-								<div class="row" v-else-if="selectedService?.has_shared_meter && !isEditing">
+								<div class="formgrid grid" v-if="!isMultiTariffService && !(availableTariffs.length > 1 && availableTariffs.every(t => t.calculation_method === 'fixed'))">
+									<div class="field col-12 md:col-2">
+										<label for="tariffSelect">Тариф <span style="color: var(--red-500)">*</span></label>
+									</div>
+									<div class="field col-12 md:col-10">
+										<Dropdown
+											v-if="!selectedService?.has_shared_meter"
+											id="tariffSelect"
+											v-model="readingForm.tariff_id"
+											:options="availableTariffs"
+											optionLabel="name"
+											optionValue="id"
+											placeholder="Оберіть тариф"
+											required
+											:disabled="!readingForm.service_id"
+										>
+											<template #option="slotProps">
+												<div>{{ slotProps.option.name }} - {{ formatRate(slotProps.option.rate) }} {{ slotProps.option.currency }}</div>
+											</template>
+										</Dropdown>
+										<Message v-else severity="info" :closable="false">
+											Для цієї служби будуть автоматично розраховані суми за всіма тарифами:
+											<ul class="mb-0 mt-2">
+												<li v-for="tariff in availableTariffs" :key="tariff.id">
+													{{ tariff.name }} - {{ formatRate(tariff.rate) }} {{ tariff.currency }}/{{ selectedService?.unit }}
+												</li>
+											</ul>
+										</Message>
+									</div>
+								</div>
+
+								<div class="formgrid grid" v-if="hasFixedPaymentTariff && !selectedService?.has_shared_meter && availableTariffs.length === 1">
+									<div class="field col-12 md:col-2">
+										<label for="paymentAmount">Сума до сплати <span style="color: var(--red-500)">*</span></label>
+									</div>
+									<div class="field col-12 md:col-10">
+										<InputNumber
+											id="paymentAmount"
+											v-model="readingForm.amount"
+											mode="decimal"
+											:minFractionDigits="2"
+											:maxFractionDigits="2"
+											:suffix="' ' + (selectedTariff?.currency || 'UAH')"
+											required
+										/>
+										<small class="block text-color-secondary">Введіть суму згідно квитанції</small>
+									</div>
+								</div>
+
+								<div v-else-if="selectedService?.has_shared_meter && !isEditing">
 									<!-- Для служб зі спільним показником (звичайних) -->
-									<div class="col-12">
-										<div class="alert alert-info mb-3">
-											<h6><i class="fas fa-info-circle me-2"></i>Спільний показник для всіх тарифів</h6>
-											<p class="mb-0">
-												Ця служба використовує один показник для розрахунку тарифів споживання. 
-												Введіть поточний показник, і система автоматично розрахує суми за всіма тарифами (включаючи фіксовані платежі).
-											</p>
+									<Message severity="info" :closable="false" class="mb-3">
+										<strong>Спільний показник для всіх тарифів</strong>
+										<p class="mb-0 mt-2">
+											Ця служба використовує один показник для розрахунку тарифів споживання.
+											Введіть поточний показник, і система автоматично розрахує суми за всіма тарифами (включаючи фіксовані платежі).
+										</p>
+									</Message>
+
+									<div class="formgrid grid">
+										<div class="field col-12 md:col-2">
+											<label for="currentReading">Поточний показник <span style="color: var(--red-500)">*</span></label>
 										</div>
-									</div>
-									<div class="col-md-6">
-										<div class="mb-3">
-											<label for="currentReading" class="form-label">Поточний показник <span class="text-danger">*</span></label>
-											<div class="input-group">
-												<input type="number" step="1" class="form-control" id="currentReading" 
-													   v-model="readingForm.current_reading" required min="0"
-													   :class="{ 'is-invalid': (!readingForm.current_reading || readingForm.current_reading <= 0) && formSubmitted }"
-													   @input="calculateConsumption">
-												<span v-if="selectedService" class="input-group-text">{{ selectedService.unit }}</span>
-											</div>
-											<div v-if="(!readingForm.current_reading || readingForm.current_reading <= 0) && formSubmitted" class="invalid-feedback">
+										<div class="field col-12 md:col-4">
+											<InputNumber
+												id="currentReading"
+												v-model="readingForm.current_reading"
+												:suffix="' ' + (selectedService?.unit || '')"
+												:min="0"
+												:minFractionDigits="0"
+												:maxFractionDigits="3"
+												required
+												:class="{ 'p-invalid': (!readingForm.current_reading || readingForm.current_reading <= 0) && formSubmitted }"
+												@input="calculateConsumption"
+											/>
+											<small v-if="(!readingForm.current_reading || readingForm.current_reading <= 0) && formSubmitted" class="p-error">
 												Введіть коректний поточний показник (більше 0)
-											</div>
+											</small>
 										</div>
-									</div>
-									<div class="col-md-6">
-										<div class="mb-3">
-											<label for="previousReading" class="form-label">Попередній показник</label>
-											<div class="input-group">
-												<input type="number" step="0.001" class="form-control" id="previousReading" 
-													   v-model="readingForm.previous_reading" 
-													   @input="calculateConsumption" 
-													   :placeholder="lastReadingHint"
-													   readonly>
-												<span v-if="selectedService" class="input-group-text">{{ selectedService.unit }}</span>
-											</div>
-											<small class="form-text text-muted">
-												{{ lastReadingHint ? `Останній показник: ${lastReadingHint}` : 'Автоматично підставиться останній показник' }}
+										<div class="field col-12 md:col-2">
+											<label for="previousReading">Попередній показник</label>
+										</div>
+										<div class="field col-12 md:col-4">
+											<InputNumber
+												id="previousReading"
+												v-model="readingForm.previous_reading"
+												:suffix="' ' + (selectedService?.unit || '')"
+												:minFractionDigits="0"
+												:maxFractionDigits="3"
+												:placeholder="lastReadingHint"
+												readonly
+												@input="calculateConsumption"
+											/>
+											<small class="block text-color-secondary">
+												{{ lastReadingHint ? `Останній: ${lastReadingHint}` : 'Автоматично' }}
 											</small>
 										</div>
 									</div>
 								</div>
 
 
-								<div class="row" v-else-if="availableTariffs.length > 1 && availableTariffs.every(t => t.calculation_method === 'fixed')">
+								<div v-else-if="availableTariffs.length > 1 && availableTariffs.every(t => t.calculation_method === 'fixed')">
 									<!-- Для служб з декількома фіксованими тарифами (квартплата) -->
-									<div class="col-12">
-										<h6 class="mb-3">Суми за тарифами</h6>
-									</div>
-									<div class="col-md-6" v-for="tariff in availableTariffs" :key="tariff.id">
-										<div class="card mb-3">
-											<div class="card-header">
-												<strong>{{ tariff.name }}</strong>
-												<small class="text-muted ms-2">({{ tariff.tariff_type === 'subscription' ? 'абонплата' : 'змінна сума' }})</small>
-											</div>
-											<div class="card-body">
-												<div class="mb-3">
-													<label class="form-label">Сума <span class="text-danger">*</span></label>
-													<div class="input-group">
-														<input type="text" inputmode="decimal" class="form-control"
-															   v-model="tariffAmounts[tariff.id]"
-															   :readonly="tariff.tariff_type === 'subscription'"
-															   @input="tariffAmounts[tariff.id] = $event.target.value.replace(',', '.')"
-															   required>
-														<span class="input-group-text">грн</span>
-													</div>
-													<small v-if="tariff.tariff_type === 'subscription'" class="text-muted">
+									<h6 class="mb-3">Суми за тарифами</h6>
+
+									<div class="formgrid grid">
+										<div class="field col-12 md:col-6" v-for="tariff in availableTariffs" :key="tariff.id">
+											<Panel :header="tariff.name" class="mb-3">
+												<template #header>
+													<strong>{{ tariff.name }}</strong>
+													<small class="ml-2 text-color-secondary">({{ tariff.tariff_type === 'subscription' ? 'абонплата' : 'змінна сума' }})</small>
+												</template>
+
+												<div class="field">
+													<label>Сума <span style="color: var(--red-500)">*</span></label>
+													<InputNumber
+														v-model="tariffAmounts[tariff.id]"
+														mode="decimal"
+														:minFractionDigits="2"
+														:maxFractionDigits="2"
+														suffix=" грн"
+														:readonly="tariff.tariff_type === 'subscription'"
+														required
+													/>
+													<small v-if="tariff.tariff_type === 'subscription'" class="block text-color-secondary mt-1">
 														Автоматично з тарифу: {{ formatCurrency(tariff.rate) }}
 													</small>
-													<small v-else class="text-muted">
+													<small v-else class="block text-color-secondary mt-1">
 														Введіть суму вручну
 													</small>
 												</div>
-											</div>
+											</Panel>
 										</div>
 									</div>
 								</div>
 
-								<div class="row" v-else-if="isMultiTariffService">
+								<div v-else-if="isMultiTariffService">
 									<!-- Для електрики - декілька показників -->
-									<div class="col-12">
-										<h6 class="mb-3">Показники лічильника</h6>
-									</div>
-									<div class="col-md-6" v-for="tariffGroup in groupedTariffs" :key="tariffGroup.type">
-										<div class="card mb-3">
-											<div class="card-header">
-												<strong>{{ getTariffTypeLabel(tariffGroup.type) }}</strong>
-											</div>
-											<div class="card-body">
-												<div class="mb-3">
-													<label class="form-label">Поточний показник</label>
-													<div class="input-group">
-														<input type="number" step="0.001" class="form-control" 
-															   :value="getMultiReadingValue(tariffGroup.type, 'current_reading')"
-															   @input="setMultiReadingValue(tariffGroup.type, 'current_reading', $event.target.value); calculateMultiConsumption(tariffGroup.type)">
-														<span class="input-group-text">{{ selectedService?.unit }}</span>
-													</div>
+									<h6 class="mb-3">Показники лічильника</h6>
+
+									<div class="formgrid grid">
+										<div class="field col-12 md:col-6" v-for="tariffGroup in groupedTariffs" :key="tariffGroup.type">
+											<Panel :header="getTariffTypeLabel(tariffGroup.type)" class="mb-3">
+												<div class="field">
+													<label>Поточний показник</label>
+													<InputNumber
+														:modelValue="getMultiReadingValue(tariffGroup.type, 'current_reading')"
+														@update:modelValue="setMultiReadingValue(tariffGroup.type, 'current_reading', $event); calculateMultiConsumption(tariffGroup.type)"
+														:suffix="' ' + (selectedService?.unit || '')"
+														:minFractionDigits="0"
+														:maxFractionDigits="3"
+													/>
 												</div>
-												<div class="mb-3">
-													<label class="form-label">Попередній показник</label>
-													<div class="input-group">
-														<input type="number" step="0.001" class="form-control" 
-															   :value="getMultiReadingValue(tariffGroup.type, 'previous_reading')"
-															   @input="setMultiReadingValue(tariffGroup.type, 'previous_reading', $event.target.value); calculateMultiConsumption(tariffGroup.type)"
-															   readonly>
-														<span class="input-group-text">{{ selectedService?.unit }}</span>
-													</div>
+
+												<div class="field">
+													<label>Попередній показник</label>
+													<InputNumber
+														:modelValue="getMultiReadingValue(tariffGroup.type, 'previous_reading')"
+														@update:modelValue="setMultiReadingValue(tariffGroup.type, 'previous_reading', $event); calculateMultiConsumption(tariffGroup.type)"
+														:suffix="' ' + (selectedService?.unit || '')"
+														:minFractionDigits="0"
+														:maxFractionDigits="3"
+														readonly
+													/>
 												</div>
-												<div class="text-muted">
-													<small>Споживання: {{ getMultiReadingValue(tariffGroup.type, 'consumption') }} {{ selectedService?.unit }}</small>
-												</div>
-											</div>
+
+												<small class="text-color-secondary">
+													Споживання: {{ getMultiReadingValue(tariffGroup.type, 'consumption') }} {{ selectedService?.unit }}
+												</small>
+											</Panel>
 										</div>
 									</div>
 								</div>
 
-								<div class="row" v-else>
+								<div v-else>
 									<!-- Стандартний варіант -->
-									<div class="col-md-6">
-										<div class="mb-3">
-											<label for="currentReading" class="form-label">Поточний показник <span class="text-danger">*</span></label>
-											<div class="input-group">
-												<input type="number" step="0.001" class="form-control" id="currentReading" 
-													   v-model="readingForm.current_reading" required 
-													   @input="calculateConsumption">
-												<span v-if="selectedService" class="input-group-text">{{ selectedService.unit }}</span>
-											</div>
+									<div class="formgrid grid">
+										<div class="field col-12 md:col-2">
+											<label for="currentReading">Поточний показник <span style="color: var(--red-500)">*</span></label>
 										</div>
-									</div>
-									<div class="col-md-6">
-										<div class="mb-3">
-											<label for="previousReading" class="form-label">Попередній показник</label>
-											<div class="input-group">
-												<input type="number" step="0.001" class="form-control" id="previousReading" 
-													   v-model="readingForm.previous_reading" 
-													   @input="calculateConsumption" 
-													   :placeholder="lastReadingHint"
-													   readonly>
-												<span v-if="selectedService" class="input-group-text">{{ selectedService.unit }}</span>
-											</div>
-											<small class="form-text text-muted">
-												{{ lastReadingHint ? `Останній показник: ${lastReadingHint}` : 'Автоматично підставиться останній показник' }}
+										<div class="field col-12 md:col-4">
+											<InputNumber
+												id="currentReading"
+												v-model="readingForm.current_reading"
+												:suffix="' ' + (selectedService?.unit || '')"
+												:minFractionDigits="0"
+												:maxFractionDigits="3"
+												required
+												@input="calculateConsumption"
+											/>
+										</div>
+										<div class="field col-12 md:col-2">
+											<label for="previousReading">Попередній показник</label>
+										</div>
+										<div class="field col-12 md:col-4">
+											<InputNumber
+												id="previousReading"
+												v-model="readingForm.previous_reading"
+												:suffix="' ' + (selectedService?.unit || '')"
+												:minFractionDigits="0"
+												:maxFractionDigits="3"
+												:placeholder="lastReadingHint"
+												readonly
+												@input="calculateConsumption"
+											/>
+											<small class="block text-color-secondary">
+												{{ lastReadingHint ? `Останній: ${lastReadingHint}` : 'Автоматично' }}
 											</small>
 										</div>
 									</div>
 								</div>
 
-								<div class="row">
-									<div class="col-md-12">
-										<div class="mb-3">
-											<label for="notes" class="form-label">Примітки</label>
-											<textarea class="form-control" id="notes" rows="2" 
-													  v-model="readingForm.notes"
-													  placeholder="Додаткова інформація про показники"></textarea>
-										</div>
+								<div class="formgrid grid">
+									<div class="field col-12 md:col-2">
+										<label for="notes">Примітки</label>
 									</div>
+									<div class="field col-12 md:col-10">
+										<Textarea
+											id="notes"
+											v-model="readingForm.notes"
+											rows="3"
+											cols="50"
+											placeholder="Додаткова інформація про показники"
+											auto-resize
+										/>
+									</div>
+									<div class="field col-12 md:col-4"></div>
 								</div>
 
-								<div class="form-check mb-3">
-									<input class="form-check-input" type="checkbox" id="isPaid" v-model="readingForm.is_paid">
-									<label class="form-check-label" for="isPaid">
-										Показники оплачені
-									</label>
+								<div class="formgrid grid">
+									<div class="field col-12 md:col-2"></div>
+									<div class="field col-12 md:col-10">
+										<div class="field-checkbox">
+											<Checkbox
+												id="isPaid"
+												v-model="readingForm.is_paid"
+												:binary="true"
+											/>
+											<label for="isPaid">Показники оплачені</label>
+										</div>
+									</div>
 								</div>
 
 								<div class="d-flex justify-content-between">
@@ -545,6 +595,13 @@ interface ReadingData {
 
 import Dialog from 'primevue/dialog';
 import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown';
+import Calendar from 'primevue/calendar';
+import InputNumber from 'primevue/inputnumber';
+import Message from 'primevue/message';
+import Panel from 'primevue/panel';
+import Textarea from 'primevue/textarea';
+import Checkbox from 'primevue/checkbox';
 
 export default defineComponent({
 	name: 'AddReading',
@@ -552,7 +609,14 @@ export default defineComponent({
 		PeriodSelector,
 		AlertComponent,
 		Dialog,
-		Button
+		Button,
+		Dropdown,
+		Calendar,
+		InputNumber,
+		Message,
+		Panel,
+		Textarea,
+		Checkbox
 	},
 	setup() {
 		const route = useRoute();

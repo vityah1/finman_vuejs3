@@ -3,17 +3,14 @@
 		<div class="container-fluid">
 			<div class="row mb-4">
 				<div class="col-sm-8">
-					<nav aria-label="breadcrumb">
-						<ol class="breadcrumb">
-							<li class="breadcrumb-item">
-								<router-link :to="{ name: 'utilities' }">Комунальні</router-link>
-							</li>
-							<li class="breadcrumb-item">
-								<router-link :to="{ name: 'utilities_addresses' }">Адреси</router-link>
-							</li>
-							<li class="breadcrumb-item active">{{ currentAddress?.name || 'Служби' }}</li>
-						</ol>
-					</nav>
+					<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
+						<template #item="{ item }">
+							<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
+								<span class="p-menuitem-text">{{ item.label }}</span>
+							</router-link>
+							<span v-else class="p-menuitem-text">{{ item.label }}</span>
+						</template>
+					</Breadcrumb>
 					<h2><i class="fas fa-cogs me-2"></i>Комунальні служби</h2>
 					<p v-if="currentAddress" class="text-muted">
 						<i class="fas fa-map-marker-alt me-2"></i>{{ currentAddress.address }}
@@ -128,67 +125,94 @@
 			v-model:visible="showAddModal"
 			:header="editingService ? 'Редагувати службу' : 'Додати нову службу'"
 			:modal="true"
-			:style="{ width: '550px' }"
+			:style="{ width: '750px' }"
 			@hide="closeModal"
 		>
 			<form @submit.prevent="saveService">
-				<div class="mb-3">
-					<label for="serviceName" class="form-label">Назва служби <span class="text-danger">*</span></label>
-					<InputText
-						id="serviceName"
-						v-model="serviceForm.name"
-						required
-						placeholder="Наприклад: Електроенергія, Газ, Вода"
-						class="w-full"
-					/>
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="serviceName">Назва служби <span style="color: var(--red-500)">*</span></label>
+					</div>
+					<div class="field col-12 md:col-8">
+						<InputText
+							id="serviceName"
+							v-model="serviceForm.name"
+							required
+							placeholder="Наприклад: Електроенергія, Газ, Вода"
+						/>
+					</div>
 				</div>
-				<div class="mb-3">
-					<label for="serviceUnit" class="form-label">Одиниця виміру <span class="text-danger">*</span></label>
-					<InputText
-						id="serviceUnit"
-						v-model="serviceForm.unit"
-						required
-						placeholder="Наприклад: кВт·год, м³, Гкал"
-						class="w-full"
-					/>
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="serviceUnit">Одиниця виміру <span style="color: var(--red-500)">*</span></label>
+					</div>
+					<div class="field col-12 md:col-8">
+						<InputText
+							id="serviceUnit"
+							v-model="serviceForm.unit"
+							required
+							placeholder="Наприклад: кВт·год, м³, Гкал"
+						/>
+					</div>
 				</div>
-				<div class="mb-3">
-					<label for="meterNumber" class="form-label">Номер лічильника</label>
-					<InputText
-						id="meterNumber"
-						v-model="serviceForm.meter_number"
-						placeholder="Серійний номер лічильника"
-						class="w-full"
-					/>
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="meterNumber">Номер лічильника</label>
+					</div>
+					<div class="field col-12 md:col-8">
+						<InputText
+							id="meterNumber"
+							v-model="serviceForm.meter_number"
+							placeholder="Серійний номер лічильника"
+						/>
+					</div>
 				</div>
-				<div class="mb-3">
-					<label for="serviceDescription" class="form-label">Опис</label>
-					<Textarea
-						id="serviceDescription"
-						v-model="serviceForm.description"
-						placeholder="Додаткова інформація про службу"
-						rows="2"
-						class="w-full"
-					/>
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4">
+						<label for="serviceDescription">Опис</label>
+					</div>
+					<div class="field col-12 md:col-8">
+						<Textarea
+							id="serviceDescription"
+							v-model="serviceForm.description"
+							placeholder="Додаткова інформація про службу"
+							rows="3"
+							cols="50"
+							auto-resize
+						/>
+					</div>
 				</div>
-				<div class="flex align-items-center mb-3">
-					<Checkbox
-						id="serviceActive"
-						v-model="serviceForm.is_active"
-						:binary="true"
-					/>
-					<label for="serviceActive" class="ml-2">Активна служба</label>
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4"></div>
+					<div class="field col-12 md:col-8">
+						<div class="field-checkbox">
+							<Checkbox
+								id="serviceActive"
+								v-model="serviceForm.is_active"
+								:binary="true"
+							/>
+							<label for="serviceActive">Активна служба</label>
+						</div>
+					</div>
 				</div>
-				<div class="flex align-items-start">
-					<Checkbox
-						id="sharedMeter"
-						v-model="serviceForm.has_shared_meter"
-						:binary="true"
-					/>
-					<div class="ml-2">
-						<label for="sharedMeter">Спільний показник для групи тарифів</label>
-						<small class="text-muted d-block">
-							Якщо позначено, один показник буде використовуватися для розрахунку декількох тарифів (наприклад, розхід та злив води)
+
+				<div class="formgrid grid">
+					<div class="field col-12 md:col-4"></div>
+					<div class="field col-12 md:col-8">
+						<div class="field-checkbox">
+							<Checkbox
+								id="sharedMeter"
+								v-model="serviceForm.has_shared_meter"
+								:binary="true"
+							/>
+							<label for="sharedMeter">Спільний показник для групи тарифів</label>
+						</div>
+						<small class="block text-color-secondary mt-1">
+							Якщо позначено, один показник буде використовуватися для розрахунку декількох тарифів
 						</small>
 					</div>
 				</div>
@@ -211,13 +235,14 @@
 			v-model:visible="showDeleteModal"
 			header="Підтвердити видалення"
 			:modal="true"
-			:style="{ width: '450px' }"
+			:style="{ width: '500px' }"
 		>
-			<p>Ви дійсно хочете видалити службу "<strong>{{ serviceToDelete?.name }}</strong>"?</p>
-			<Message severity="warn" :closable="false">
-				<i class="fas fa-exclamation-triangle me-2"></i>
-				Ця дія також видалить всі пов'язані тарифи та показники!
-			</Message>
+			<div class="confirmation-content">
+				<p class="mb-3">Ви дійсно хочете видалити службу "<strong>{{ serviceToDelete?.name }}</strong>"?</p>
+				<Message severity="warn" :closable="false">
+					Ця дія також видалить всі пов'язані тарифи та показники!
+				</Message>
+			</div>
 
 			<template #footer>
 				<Button label="Скасувати" icon="pi pi-times" @click="showDeleteModal = false" text />
@@ -253,6 +278,7 @@ import Textarea from 'primevue/textarea';
 import Checkbox from 'primevue/checkbox';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
+import Breadcrumb from 'primevue/breadcrumb';
 
 interface AddressData {
 	id: number;
@@ -293,12 +319,13 @@ export default defineComponent({
 		Textarea,
 		Checkbox,
 		Message,
-		ProgressSpinner
+		ProgressSpinner,
+		Breadcrumb
 	},
 	setup() {
 		const route = useRoute();
 		const router = useRouter();
-		
+
 		const addressId = computed(() => parseInt(route.params.addressId as string));
 
 		// Reactive state
@@ -337,6 +364,13 @@ export default defineComponent({
 		const currentAddress = computed(() => {
 			return addressData.value?.data as AddressData;
 		});
+
+		// Breadcrumb
+		const breadcrumbHome = { icon: 'pi pi-home', route: { name: 'utilities' } };
+		const breadcrumbItems = computed(() => [
+			{ label: 'Адреси', route: { name: 'utilities_addresses' } },
+			{ label: currentAddress.value?.name || 'Служби' }
+		]);
 
 		const services = computed(() => {
 			return (servicesData.value?.data as ServiceData[]) || [];
@@ -474,6 +508,8 @@ export default defineComponent({
 			serviceForm,
 			isSaving,
 			isDeleting,
+			breadcrumbHome,
+			breadcrumbItems,
 
 			// Methods
 			getTariffsCount,

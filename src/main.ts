@@ -17,6 +17,7 @@ import "bootstrap-vue-next/dist/bootstrap-vue-next.css"
 import PrimeVue from 'primevue/config'
 import Lara from '@primevue/themes/lara'
 import 'primeicons/primeicons.css'                            // Icons
+import 'primeflex/primeflex.css'                              // PrimeFlex utility classes
 
 // PrimeVue components
 import DataTable from 'primevue/datatable'

@@ -5,45 +5,104 @@
       <h4 class="mb-0">Особиста інформація</h4>
     </div>
     <div class="card-body">
-      <Form :validation-schema="schema" @submit="editUser">
-        <div class="form-group">
-          <label for="login">Логін</label>
-          <Field v-model="currentUser.login" class="form-control" name="login" type="text" />
-          <ErrorMessage class="error-feedback" name="login" />
+      <Form :validation-schema="schema" @submit="editUser" style="max-width: 800px;">
+        <div class="formgrid grid">
+          <div class="field col-12 md:col-4">
+            <label for="login">Логін</label>
+          </div>
+          <div class="field col-12 md:col-8">
+            <Field v-model="currentUser.login" name="login" type="text" v-slot="{ field, errorMessage }">
+              <InputText
+                v-bind="field"
+                id="login"
+                :class="{ 'p-invalid': errorMessage }"
+                placeholder="Введіть логін"
+              />
+              <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
+            </Field>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="password">Пароль</label>
-          <Field class="form-control" name="password" type="password" />
-          <ErrorMessage class="error-feedback" name="password" />
+        <div class="formgrid grid">
+          <div class="field col-12 md:col-4">
+            <label for="password">Пароль</label>
+          </div>
+          <div class="field col-12 md:col-8">
+            <Field name="password" type="password" v-slot="{ field, errorMessage }">
+              <Password
+                v-bind="field"
+                id="password"
+                :class="{ 'p-invalid': errorMessage }"
+                placeholder="Залиште порожнім, щоб не змінювати"
+                :feedback="false"
+                toggleMask
+              />
+              <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
+            </Field>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="fullname">Повне ім'я</label>
-          <Field v-model="currentUser.fullname" class="form-control" name="fullname" type="text" />
-          <ErrorMessage class="error-feedback" name="fullname" />
+        <div class="formgrid grid">
+          <div class="field col-12 md:col-4">
+            <label for="fullname">Повне ім'я</label>
+          </div>
+          <div class="field col-12 md:col-8">
+            <Field v-model="currentUser.fullname" name="fullname" type="text" v-slot="{ field, errorMessage }">
+              <InputText
+                v-bind="field"
+                id="fullname"
+                :class="{ 'p-invalid': errorMessage }"
+                placeholder="Введіть повне ім'я"
+              />
+              <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
+            </Field>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="phone">Телефон</label>
-          <Field v-model="currentUser.phone" class="form-control" name="phone" type="text" />
-          <ErrorMessage class="error-feedback" name="phone" />
+        <div class="formgrid grid">
+          <div class="field col-12 md:col-4">
+            <label for="phone">Телефон</label>
+          </div>
+          <div class="field col-12 md:col-8">
+            <Field v-model="currentUser.phone" name="phone" type="text" v-slot="{ field, errorMessage }">
+              <InputText
+                v-bind="field"
+                id="phone"
+                :class="{ 'p-invalid': errorMessage }"
+                placeholder="Введіть номер телефону"
+              />
+              <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
+            </Field>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label for="email">Email</label>
-          <Field v-model="currentUser.email" class="form-control" name="email" type="text" />
-          <ErrorMessage class="error-feedback" name="email" />
+        <div class="formgrid grid">
+          <div class="field col-12 md:col-4">
+            <label for="email">Email</label>
+          </div>
+          <div class="field col-12 md:col-8">
+            <Field v-model="currentUser.email" name="email" type="text" v-slot="{ field, errorMessage }">
+              <InputText
+                v-bind="field"
+                id="email"
+                :class="{ 'p-invalid': errorMessage }"
+                placeholder="Введіть email"
+              />
+              <small v-if="errorMessage" class="p-error">{{ errorMessage }}</small>
+            </Field>
+          </div>
         </div>
 
-        <div class="form-group">
-          <Button
-            label="Зберегти"
-            type="submit"
-            class="w-full"
-            :disabled="loading"
-            :loading="loading"
-          />
+        <div class="formgrid grid">
+          <div class="field col-12 md:col-4"></div>
+          <div class="field col-12 md:col-8">
+            <Button
+              label="Зберегти"
+              type="submit"
+              :disabled="loading"
+              :loading="loading"
+            />
+          </div>
         </div>
       </Form>
     </div>
@@ -52,10 +111,12 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue';
-import { ErrorMessage, Field, Form } from "vee-validate";
+import { Field, Form } from "vee-validate";
 import * as yup from "yup";
 import type { UserUpdate } from '@/api/model';
 import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Password from 'primevue/password';
 
 interface User {
   id: number;
@@ -75,8 +136,9 @@ export default defineComponent({
   components: {
     Form,
     Field,
-    ErrorMessage,
     Button,
+    InputText,
+    Password,
   },
   props: {
     currentUser: {
