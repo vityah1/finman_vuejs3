@@ -65,7 +65,7 @@
 			</template>
 
 			<template #content>
-				<div v-if="configs.length === 0" style="text-align: center; padding: 2rem;">
+				<div v-if="isLoading" style="text-align: center; padding: 2rem;">
 					<ProgressSpinner style="width: 50px; height: 50px" />
 					<div style="margin-top: 1rem; color: var(--text-color-secondary);">Завантаження налаштувань...</div>
 				</div>
@@ -531,6 +531,7 @@ export default defineComponent({
 			telegramToken: '',
 			telegramChatId: '',
 			tableFilters: {} as Record<string, any>,
+			isLoading: true,
 		};
 	},
 	computed: {
@@ -689,6 +690,7 @@ export default defineComponent({
 		},
 		async getUserConfig() {
 			try {
+				this.isLoading = true;
 				const response = await ConfigService.getUserConfig();
 				this.configs = response.data;
 				console.log(response.data);
@@ -698,6 +700,8 @@ export default defineComponent({
 			} catch (e) {
 				console.log(e);
 				(this.$refs.myAlert as AlertComponent).showAlert("danger", "Помилка завантаження налаштувань");
+			} finally {
+				this.isLoading = false;
 			}
 		},
 		findCategoryNameById(categoryId: number | string): string {
