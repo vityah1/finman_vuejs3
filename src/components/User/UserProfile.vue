@@ -193,13 +193,13 @@ export default defineComponent({
       return this.$store.state.auth.user;
     },
     userInvitations() {
-      return (this.userInvitationsData as any)?.data || [];
+      return this.userInvitationsData?.data || [];
     },
     isGroupOwner() {
       if (!this.userGroup) return false;
       return this.userGroup.owner_id === this.currentUser.id;
     },
-    groupUsers() {
+    groupUsers(): GroupUser[] {
       const response = this.groupUsersQuery?.data;
       console.log('🔍 groupUsers computed:', {
         hasQuery: !!this.groupUsersQuery,
@@ -209,31 +209,26 @@ export default defineComponent({
         error: this.groupUsersQuery?.error
       });
 
-      if (!response) {
+      if (!response?.data) {
         console.log('⚠️ No response data');
         return [];
       }
 
-      // Handle both {data: [...]} and [...] response formats
-      const data = (response as any).data || response;
+      // Response.data is GroupUserResponse[] from Orval
+      const users = response.data.map((user) => ({
+        ...user,
+        // role is already set by backend, but we can override if needed
+        role: user.id === this.userGroup?.owner_id ? "owner" : (user.role || "member"),
+      } as GroupUser));
 
-      if (Array.isArray(data) && data.length > 0) {
-        const users = data.map((user: GroupUser) => ({
-          ...user,
-          role: user.id === this.userGroup?.owner_id ? "owner" : "member",
-        }));
-        console.log('✅ Mapped users:', users);
-        return users;
-      }
-
-      console.log('⚠️ No users in data array');
-      return [];
+      console.log('✅ Mapped users:', users);
+      return users;
     },
     filteredGroupUsers() {
       if (!this.userGroup || !this.groupUsers || !this.groupUsers.length) return [];
       return this.groupUsers.filter(user => user.id !== this.currentUser.id);
     },
-    activeInvitations() {
+    activeInvitations(): Invitation[] {
       const response = this.groupInvitationsQuery?.data;
       console.log('🔍 activeInvitations computed:', {
         hasQuery: !!this.groupInvitationsQuery,
@@ -243,22 +238,15 @@ export default defineComponent({
         error: this.groupInvitationsQuery?.error
       });
 
-      if (!response) {
+      if (!response?.data) {
         console.log('⚠️ No response data');
         return [];
       }
 
-      // Handle both {data: [...]} and [...] response formats
-      const data = (response as any).data || response;
-
-      if (Array.isArray(data)) {
-        const invitations = data.filter((inv: Invitation) => inv.is_active);
-        console.log('✅ Filtered invitations:', invitations);
-        return invitations;
-      }
-
-      console.log('⚠️ No invitations in data array');
-      return [];
+      // Response.data is GroupInvitationResponse[] from Orval
+      const invitations = response.data.filter((inv) => inv.is_active) as Invitation[];
+      console.log('✅ Filtered invitations:', invitations);
+      return invitations;
     },
     loadingGroupUsers() {
       return this.groupUsersQuery?.isLoading || false;
@@ -271,8 +259,9 @@ export default defineComponent({
     groupsData: {
       handler(newData) {
         console.log('📊 groupsData changed:', newData);
+        // groupsData is AxiosResponse<GroupResponse[]> from Orval
         if (newData?.data && Array.isArray(newData.data) && newData.data.length > 0) {
-          this.userGroup = newData.data[0];
+          this.userGroup = newData.data[0] as Group;
           // Set groupId to trigger queries
           this.groupId = this.userGroup.id;
           console.log('✅ Set groupId:', this.groupId);
