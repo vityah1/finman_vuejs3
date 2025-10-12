@@ -120,108 +120,120 @@
 			</div>
 		</div>
 
-		<!-- Add/Edit Service Modal -->
-		<div class="modal fade" :class="{ show: showAddModal }" 
-			 :style="{ display: showAddModal ? 'block' : 'none' }" 
-			 @click.self="closeModal">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">
-							{{ editingService ? 'Редагувати службу' : 'Додати нову службу' }}
-						</h5>
-						<button type="button" class="btn-close" @click="closeModal"></button>
-					</div>
-					<div class="modal-body">
-						<form @submit.prevent="saveService">
-							<div class="mb-3">
-								<label for="serviceName" class="form-label">Назва служби <span class="text-danger">*</span></label>
-								<input type="text" class="form-control" id="serviceName" 
-									   v-model="serviceForm.name" required 
-									   placeholder="Наприклад: Електроенергія, Газ, Вода">
-							</div>
-							<div class="mb-3">
-								<label for="serviceUnit" class="form-label">Одиниця виміру <span class="text-danger">*</span></label>
-								<input type="text" class="form-control" id="serviceUnit" 
-									   v-model="serviceForm.unit" required 
-									   placeholder="Наприклад: кВт·год, м³, Гкал">
-							</div>
-							<div class="mb-3">
-								<label for="meterNumber" class="form-label">Номер лічильника</label>
-								<input type="text" class="form-control" id="meterNumber" 
-									   v-model="serviceForm.meter_number" 
-									   placeholder="Серійний номер лічильника">
-							</div>
-							<div class="mb-3">
-								<label for="serviceDescription" class="form-label">Опис</label>
-								<textarea class="form-control" id="serviceDescription" rows="2"
-										  v-model="serviceForm.description"
-										  placeholder="Додаткова інформація про службу"></textarea>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" id="serviceActive" 
-									   v-model="serviceForm.is_active">
-								<label class="form-check-label" for="serviceActive">
-									Активна служба
-								</label>
-							</div>
-							<div class="form-check mt-2">
-								<input class="form-check-input" type="checkbox" id="sharedMeter" 
-									   v-model="serviceForm.has_shared_meter">
-								<label class="form-check-label" for="sharedMeter">
-									Спільний показник для групи тарифів
-								</label>
-								<small class="form-text text-muted d-block">
-									Якщо позначено, один показник буде використовуватися для розрахунку декількох тарифів (наприклад, розхід та злив води)
-								</small>
-							</div>
-						</form>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" @click="closeModal">Скасувати</button>
-						<button type="button" class="btn btn-primary" @click="saveService" :disabled="isSaving">
-							{{ isSaving ? 'Збереження...' : 'Зберегти' }}
-						</button>
+		<!-- Add/Edit Service Dialog -->
+		<Dialog
+			v-model:visible="showAddModal"
+			:header="editingService ? 'Редагувати службу' : 'Додати нову службу'"
+			:modal="true"
+			:style="{ width: '550px' }"
+			@hide="closeModal"
+		>
+			<form @submit.prevent="saveService">
+				<div class="mb-3">
+					<label for="serviceName" class="form-label">Назва служби <span class="text-danger">*</span></label>
+					<InputText
+						id="serviceName"
+						v-model="serviceForm.name"
+						required
+						placeholder="Наприклад: Електроенергія, Газ, Вода"
+						class="w-full"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="serviceUnit" class="form-label">Одиниця виміру <span class="text-danger">*</span></label>
+					<InputText
+						id="serviceUnit"
+						v-model="serviceForm.unit"
+						required
+						placeholder="Наприклад: кВт·год, м³, Гкал"
+						class="w-full"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="meterNumber" class="form-label">Номер лічильника</label>
+					<InputText
+						id="meterNumber"
+						v-model="serviceForm.meter_number"
+						placeholder="Серійний номер лічильника"
+						class="w-full"
+					/>
+				</div>
+				<div class="mb-3">
+					<label for="serviceDescription" class="form-label">Опис</label>
+					<Textarea
+						id="serviceDescription"
+						v-model="serviceForm.description"
+						placeholder="Додаткова інформація про службу"
+						rows="2"
+						class="w-full"
+					/>
+				</div>
+				<div class="flex align-items-center mb-3">
+					<Checkbox
+						id="serviceActive"
+						v-model="serviceForm.is_active"
+						:binary="true"
+					/>
+					<label for="serviceActive" class="ml-2">Активна служба</label>
+				</div>
+				<div class="flex align-items-start">
+					<Checkbox
+						id="sharedMeter"
+						v-model="serviceForm.has_shared_meter"
+						:binary="true"
+					/>
+					<div class="ml-2">
+						<label for="sharedMeter">Спільний показник для групи тарифів</label>
+						<small class="text-muted d-block">
+							Якщо позначено, один показник буде використовуватися для розрахунку декількох тарифів (наприклад, розхід та злив води)
+						</small>
 					</div>
 				</div>
-			</div>
-		</div>
+			</form>
 
-		<!-- Delete Confirmation Modal -->
-		<div class="modal fade" :class="{ show: showDeleteModal }" 
-			 :style="{ display: showDeleteModal ? 'block' : 'none' }" 
-			 @click.self="showDeleteModal = false">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Підтвердити видалення</h5>
-						<button type="button" class="btn-close" @click="showDeleteModal = false"></button>
-					</div>
-					<div class="modal-body">
-						<p>Ви дійсно хочете видалити службу "<strong>{{ serviceToDelete?.name }}</strong>"?</p>
-						<p class="text-warning">
-							<i class="fas fa-exclamation-triangle me-2"></i>
-							Ця дія також видалить всі пов'язані тарифи та показники!
-						</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" @click="showDeleteModal = false">Скасувати</button>
-						<button type="button" class="btn btn-danger" @click="deleteService" :disabled="isDeleting">
-							{{ isDeleting ? 'Видалення...' : 'Видалити' }}
-						</button>
-					</div>
-				</div>
-			</div>
-		</div>
+			<template #footer>
+				<Button label="Скасувати" icon="pi pi-times" @click="closeModal" text />
+				<Button
+					:label="isSaving ? 'Збереження...' : 'Зберегти'"
+					icon="pi pi-check"
+					@click="saveService"
+					:disabled="isSaving"
+					:loading="isSaving"
+				/>
+			</template>
+		</Dialog>
 
-		<!-- Modal backdrop -->
-		<div v-if="showAddModal || showDeleteModal" class="modal-backdrop fade show"></div>
+		<!-- Delete Confirmation Dialog -->
+		<Dialog
+			v-model:visible="showDeleteModal"
+			header="Підтвердити видалення"
+			:modal="true"
+			:style="{ width: '450px' }"
+		>
+			<p>Ви дійсно хочете видалити службу "<strong>{{ serviceToDelete?.name }}</strong>"?</p>
+			<Message severity="warn" :closable="false">
+				<i class="fas fa-exclamation-triangle me-2"></i>
+				Ця дія також видалить всі пов'язані тарифи та показники!
+			</Message>
+
+			<template #footer>
+				<Button label="Скасувати" icon="pi pi-times" @click="showDeleteModal = false" text />
+				<Button
+					:label="isDeleting ? 'Видалення...' : 'Видалити'"
+					icon="pi pi-trash"
+					@click="deleteService"
+					severity="danger"
+					:disabled="isDeleting"
+					:loading="isDeleting"
+				/>
+			</template>
+		</Dialog>
 	</div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, reactive, computed, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { 
+import {
 	useGetAddressApiUtilitiesAddressesAddressIdGet,
 	useGetServicesApiUtilitiesServicesGet,
 	useCreateServiceApiUtilitiesServicesPost,
@@ -231,6 +243,12 @@ import {
 	useGetReadingsApiUtilitiesReadingsGet
 } from '@/api/utilities/utilities';
 import type { UtilityServiceCreate, UtilityServiceUpdate } from '@/api/model';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
+import Checkbox from 'primevue/checkbox';
+import Message from 'primevue/message';
 
 interface AddressData {
 	id: number;
@@ -264,6 +282,14 @@ interface ReadingData {
 
 export default defineComponent({
 	name: 'ServiceList',
+	components: {
+		Dialog,
+		Button,
+		InputText,
+		Textarea,
+		Checkbox,
+		Message
+	},
 	setup() {
 		const route = useRoute();
 		const router = useRouter();

@@ -1,59 +1,68 @@
 <template>
-  <!-- Приєднання до групи -->
-  <b-modal v-model="showJoinModal" cancel-title="Скасувати" ok-title="Приєднатися" title="Приєднатися до групи" @ok="joinGroup">
-    <b-form>
-      <b-form-group label="Код запрошення:" label-for="invitation-code">
-        <b-form-input id="invitation-code" v-model="invitationCode" placeholder="Введіть код запрошення" required></b-form-input>
-      </b-form-group>
-    </b-form>
-  </b-modal>
+  <Dialog :visible="props.visible" @update:visible="(value) => emit('update:visible', value)" header="Приєднатися до групи" :modal="true" :style="{width: '450px'}">
+    <div class="p-fluid">
+      <div class="p-field">
+        <label for="invitation-code">Код запрошення</label>
+        <InputText id="invitation-code" v-model="invitationCode" required autofocus />
+      </div>
+    </div>
+    <template #footer>
+      <Button label="Скасувати" icon="pi pi-times" text @click="closeModal"/>
+      <Button label="Приєднатися" icon="pi pi-check" @click="joinGroup" :loading="acceptInvitationMutation.isPending.value"/>
+    </template>
+  </Dialog>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
+<script setup lang="ts">
+import { ref } from 'vue';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
 import {
   useAcceptInvitationApiInvitationsInvitationCodeAcceptPost
 } from '@/api/invitations/invitations';
 import type { AcceptInvitationApiInvitationsInvitationCodeAcceptPostBody } from '@/api/model/acceptInvitationApiInvitationsInvitationCodeAcceptPostBody';
 
-export default defineComponent({
-  name: 'GroupModals',
-  props: {
-    showJoinModal: {
-      type: Boolean,
-      default: false
-    }
-  },
-  emits: ['join-group', 'close-join-modal', 'show-alert'],
-  setup() {
-    const acceptInvitationMutation = useAcceptInvitationApiInvitationsInvitationCodeAcceptPost();
-    
-    return {
-      acceptInvitationMutation
-    };
-  },
-  data() {
-    return {
-      invitationCode: ''
-    };
-  },
-  methods: {
-    async joinGroup() {
-      try {
-        const acceptData: AcceptInvitationApiInvitationsInvitationCodeAcceptPostBody = {};
-        await this.acceptInvitationMutation.mutateAsync({
-          invitationCode: this.invitationCode,
-          data: acceptData
-        });
-        this.$emit('show-alert', 'success', 'Ви успішно приєднались до групи');
-        this.$emit('join-group');
-        this.invitationCode = '';
-        this.$emit('close-join-modal');
-      } catch (error) {
-        console.error('Помилка при приєднанні до групи:', error);
-        this.$emit('show-alert', 'danger', 'Помилка при приєднанні до групи');
-      }
-    }
+// --- Props & Emits ---
+const props = defineProps({
+  visible: {
+    type: Boolean,
+    default: false
   }
 });
+
+const emit = defineEmits(['update:visible', 'join-group', 'show-alert']);
+
+// --- API Mutations ---
+const acceptInvitationMutation = useAcceptInvitationApiInvitationsInvitationCodeAcceptPost();
+
+// --- Component State ---
+const invitationCode = ref('');
+
+// --- Methods ---
+const closeModal = () => {
+  emit('update:visible', false);
+};
+
+const joinGroup = async () => {
+  if (!invitationCode.value) {
+    emit('show-alert', 'warn', 'Введіть код запрошення');
+    return;
+  }
+  try {
+    const acceptData: AcceptInvitationApiInvitationsInvitationCodeAcceptPostBody = {};
+    await acceptInvitationMutation.mutateAsync({
+      invitationCode: invitationCode.value,
+      data: acceptData
+    });
+    emit('show-alert', 'success', 'Ви успішно приєднались до групи');
+    emit('join-group');
+    invitationCode.value = '';
+    closeModal();
+  } catch (error) {
+    console.error('Помилка при приєднанні до групи:', error);
+    emit('show-alert', 'danger', 'Помилка при приєднанні до групи');
+  }
+};
+
 </script>

@@ -453,18 +453,20 @@
 		</div>
 
     <!-- Модальне вікно підтвердження видалення -->
-    <b-modal
-        v-model="showDeleteConfirmModal"
-        id="delete-reading-confirm-modal"
-        title="Підтвердження дії"
-        ok-title="Так, видалити"
-        ok-variant="danger"
-        cancel-title="Ні"
-        @ok="handleDeleteConfirm"
+    <Dialog
+        v-model:visible="showDeleteConfirmModal"
+        header="Підтвердження дії"
+        :modal="true"
+        :style="{ width: '450px' }"
     >
       <p>Ви впевнені, що хочете видалити цей показник?</p>
       <p class="text-muted small">Цю дію не можна буде скасувати.</p>
-    </b-modal>
+
+      <template #footer>
+        <Button label="Ні" icon="pi pi-times" @click="showDeleteConfirmModal = false" text />
+        <Button label="Так, видалити" icon="pi pi-check" @click="handleDeleteConfirm" severity="danger" />
+      </template>
+    </Dialog>
 	</div>
 </template>
 
@@ -526,11 +528,16 @@ interface ReadingData {
 	amount?: number;
 }
 
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
+
 export default defineComponent({
 	name: 'AddReading',
 	components: {
 		PeriodSelector,
-		AlertComponent
+		AlertComponent,
+		Dialog,
+		Button
 	},
 	setup() {
 		const route = useRoute();
@@ -1374,13 +1381,19 @@ export default defineComponent({
 
 		const goBack = () => {
 			if (readingForm.address_id) {
-				router.push({ 
-					name: 'utilities_readings', 
-					params: { addressId: readingForm.address_id } 
+				router.push({
+					name: 'utilities_readings',
+					params: { addressId: readingForm.address_id }
 				});
 			} else {
 				router.push({ name: 'utilities' });
 			}
+		};
+
+		// Load shared meter tariff amounts for editing
+		const loadSharedMeterTariffAmounts = (serviceId: number, period: string) => {
+			console.log('loadSharedMeterTariffAmounts called with:', { serviceId, period });
+			sharedMeterLoadParams.value = { serviceId, period };
 		};
 
 		// Create a reactive ref for loading shared meter data

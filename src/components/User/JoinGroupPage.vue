@@ -1,152 +1,143 @@
 <template>
-  <div class="container">
+  <div class="container mt-4">
     <alert-component ref="myAlert"></alert-component>
 
-    <div v-if="loading" class="text-center my-5">
-      <b-spinner variant="primary"></b-spinner>
+    <div v-if="isLoading" class="text-center my-5">
+      <ProgressSpinner />
       <p class="mt-3">Перевірка запрошення...</p>
     </div>
 
-    <div v-else-if="error" class="text-center my-5">
-      <div class="alert alert-danger">
-        <i class="fas fa-exclamation-circle fa-2x mb-3"></i>
+    <div v-else-if="error" class="my-5">
+      <Message severity="error" :closable="false">
         <h4>Помилка запрошення</h4>
-        <p>{{ error }}</p>
-        <router-link :to="{ name: 'profile' }" class="btn btn-primary mt-3">
-          Повернутися до профілю
-        </router-link>
-      </div>
+        <p>{{ error.message }}</p>
+        <Button label="Повернутися до профілю" @click="router.push({ name: 'profile' })" class="mt-3" />
+      </Message>
     </div>
 
-    <div v-else-if="invitationInfo" class="card my-5 border-0 shadow">
-      <div class="card-header bg-primary text-white">
-        <h3 class="mb-0">Запрошення до групи</h3>
-      </div>
-
-      <div class="card-body p-4">
-        <div class="text-center mb-4">
-          <i class="fas fa-users fa-3x text-primary mb-3"></i>
-          <h4>Вас запрошено приєднатися до сімейної групи</h4>
-        </div>
-
-        <div class="group-info mb-4">
-          <div class="row">
-            <div class="col-md-4 text-muted">Назва групи:</div>
-            <div class="col-md-8 fw-bold">{{ invitationInfo.group.name }}</div>
+    <div v-else-if="invitationInfo">
+      <Card class="my-5 shadow-2">
+        <template #header>
+          <div class="p-3 bg-primary text-white">
+            <h3 class="mb-0">Запрошення до групи</h3>
+          </div>
+        </template>
+        <template #title>
+          <div class="text-center">
+            <i class="pi pi-users" style="font-size: 2.5rem"></i>
+            <h4 class="mt-2">Вас запрошено приєднатися до сімейної групи</h4>
+          </div>
+        </template>
+        <template #content>
+          <div class="group-info p-3 mb-4">
+            <div class="d-flex justify-content-between py-2 border-bottom-1 border-200">
+              <span class="text-muted">Назва групи:</span>
+              <span class="fw-bold">{{ invitationInfo.group.name }}</span>
+            </div>
+            <div v-if="invitationInfo.group.description" class="d-flex justify-content-between py-2 border-bottom-1 border-200">
+              <span class="text-muted">Опис:</span>
+              <span>{{ invitationInfo.group.description }}</span>
+            </div>
+            <div class="d-flex justify-content-between py-2 border-bottom-1 border-200">
+              <span class="text-muted">Власник групи:</span>
+              <span>{{ invitationInfo.creator.fullname || invitationInfo.creator.login }}</span>
+            </div>
+            <div v-if="invitationInfo.expires" class="d-flex justify-content-between py-2">
+              <span class="text-muted">Дійсне до:</span>
+              <span>{{ formatDate(invitationInfo.expires) }}</span>
+            </div>
           </div>
 
-          <div class="row mt-2" v-if="invitationInfo.group.description">
-            <div class="col-md-4 text-muted">Опис:</div>
-            <div class="col-md-8">{{ invitationInfo.group.description }}</div>
+          <div class="text-center mt-4">
+            <Button
+                :label="acceptInvitationMutation.isPending.value ? 'Приєднання...' : 'Приєднатися до групи'"
+                icon="pi pi-check"
+                severity="success"
+                size="large"
+                @click="acceptInvitation"
+                :loading="acceptInvitationMutation.isPending.value"
+            />
+            <div class="mt-3">
+              <router-link :to="{ name: 'profile' }" class="text-muted">
+                Повернутися до профілю
+              </router-link>
+            </div>
           </div>
-
-          <div class="row mt-2">
-            <div class="col-md-4 text-muted">Власник групи:</div>
-            <div class="col-md-8">{{ invitationInfo.creator.fullname || invitationInfo.creator.login }}</div>
-          </div>
-
-          <div class="row mt-2" v-if="invitationInfo.expires">
-            <div class="col-md-4 text-muted">Дійсне до:</div>
-            <div class="col-md-8">{{ formatDate(invitationInfo.expires) }}</div>
-          </div>
-        </div>
-
-        <div class="text-center mt-4">
-          <b-button variant="success" size="lg" @click="acceptInvitation" :disabled="joining">
-            <b-spinner small v-if="joining"></b-spinner>
-            {{ joining ? 'Приєднання...' : 'Приєднатися до групи' }}
-          </b-button>
-
-          <div class="mt-3">
-            <router-link :to="{ name: 'profile' }" class="text-muted">
-              Повернутися до профілю
-            </router-link>
-          </div>
-        </div>
-      </div>
+        </template>
+      </Card>
     </div>
   </div>
 </template>
 
-<script>
-import GroupService from '@/services/GroupService';
+<script setup lang="ts">
+import { ref, onMounted, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { useStore } from 'vuex';
 import moment from 'moment';
+import Button from 'primevue/button';
+import Card from 'primevue/card';
+import ProgressSpinner from 'primevue/progressspinner';
+import Message from 'primevue/message';
+import AlertComponent from '@/components/AlertComponent.vue';
+import {
+  useGetInvitationInfoApiInvitationsInvitationCodeGet,
+  useAcceptInvitationApiInvitationsInvitationCodeAcceptPost
+} from '@/api/invitations/invitations';
+import type { AcceptInvitationApiInvitationsInvitationCodeAcceptPostBody, GroupInvitationResponse } from "@/api/model";
 
-export default {
-  name: 'JoinGroupPage',
-  data() {
-    return {
-      loading: true,
-      joining: false,
-      error: null,
-      invitationInfo: null
-    };
-  },
-  computed: {
-    invitationCode() {
-      return this.$route.params.code;
-    }
-  },
-  methods: {
-    formatDate(dateString) {
-      return moment(dateString).format('DD.MM.YYYY HH:mm');
-    },
+const route = useRoute();
+const router = useRouter();
+const store = useStore();
 
-    async checkInvitation() {
-      this.loading = true;
-      this.error = null;
+const myAlert = ref<InstanceType<typeof AlertComponent> | null>(null);
+const invitationCode = computed(() => route.params.code as string);
 
-      try {
-        const response = await GroupService.checkInvitation(this.invitationCode);
-        this.invitationInfo = response.data;
-
-        // Перевіряємо, чи не прострочене запрошення
-        if (this.invitationInfo.expires && moment(this.invitationInfo.expires).isBefore(moment())) {
-          this.error = 'Термін дії запрошення закінчився';
-          this.invitationInfo = null;
-        }
-      } catch (error) {
-        console.error('Помилка при перевірці запрошення:', error);
-        this.error = 'Запрошення недійсне або його термін закінчився';
-      } finally {
-        this.loading = false;
-      }
-    },
-
-    async acceptInvitation() {
-      this.joining = true;
-
-      try {
-        await GroupService.acceptInvitation(this.invitationCode);
-        this.$refs.myAlert.showAlert('success', 'Ви успішно приєднались до групи');
-        setTimeout(() => {
-          this.$router.push({ name: 'profile' });
-        }, 1500);
-      } catch (error) {
-        console.error('Помилка при приєднанні до групи:', error);
-        this.$refs.myAlert.showAlert('danger', 'Помилка при приєднанні до групи');
-        this.joining = false;
+// --- API Calls ---
+const { data: invitationInfo, error, isLoading } = useGetInvitationInfoApiInvitationsInvitationCodeGet(
+    invitationCode,
+    {
+      query: {
+        enabled: computed(() => !!invitationCode.value),
+        retry: false,
       }
     }
-  },
-  mounted() {
-    if (!this.$store.state.auth.user) {
-      this.$router.push({
-        name: 'login',
-        query: { redirect: this.$route.fullPath }
-      });
-      return;
-    }
+);
 
-    this.checkInvitation();
+const acceptInvitationMutation = useAcceptInvitationApiInvitationsInvitationCodeAcceptPost();
+
+// --- Methods ---
+const formatDate = (dateString: string) => {
+  return moment(dateString).format('DD.MM.YYYY HH:mm');
+};
+
+const acceptInvitation = async () => {
+  try {
+    await acceptInvitationMutation.mutateAsync({ invitationCode: invitationCode.value, data: {} });
+    myAlert.value?.showAlert('success', 'Ви успішно приєднались до групи');
+    setTimeout(() => {
+      router.push({ name: 'profile' });
+    }, 1500);
+  } catch (err) {
+    console.error('Помилка при приєднанні до групи:', err);
+    myAlert.value?.showAlert('danger', 'Помилка при приєднанні до групи');
   }
 };
+
+// --- Lifecycle ---
+onMounted(() => {
+  if (!store.state.auth.user) {
+    router.push({
+      name: 'login',
+      query: { redirect: route.fullPath }
+    });
+  }
+});
+
 </script>
 
 <style scoped>
 .group-info {
   background-color: #f8f9fa;
-  padding: 20px;
   border-radius: 8px;
 }
 </style>

@@ -61,9 +61,8 @@
 
     <!-- Модальні вікна -->
     <group-modals
-      :show-join-modal="showJoinGroupModal"
+      v-model:visible="showJoinGroupModal"
       @join-group="handleJoinGroup"
-      @close-join-modal="showJoinGroupModal = false"
       @show-alert="showAlert"
     />
   </div>
@@ -184,8 +183,7 @@ export default defineComponent({
       userGroup: null as Group | null,
 
       // Модальні вікна
-      showJoinGroupModal: false,
-      invitationCode: ""
+      showJoinGroupModal: false
     };
   },
   computed: {
@@ -358,20 +356,8 @@ export default defineComponent({
       }
     },
 
-    async handleJoinGroup() {
-      try {
-        await this.acceptInvitationMutation.mutateAsync({
-          invitationCode: this.invitationCode,
-          data: {}
-        });
-        this.showAlert("success", "Ви успішно приєднались до групи");
-        this.refetchGroups();
-        this.invitationCode = "";
-        this.showJoinGroupModal = false;
-      } catch (error) {
-        console.error("Помилка при приєднанні до групи:", error);
-        this.showAlert("danger", "Помилка при приєднанні до групи");
-      }
+    handleJoinGroup() {
+      this.refetchGroups();
     }
   },
   mounted() {

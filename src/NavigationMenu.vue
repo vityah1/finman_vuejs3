@@ -1,298 +1,171 @@
 <template>
-	<b-navbar toggleable="lg">
-		<b-navbar-brand>
-			<div v-if="currentUser" class="d-flex align-items-center">
-				<select v-model="selectedCurrency" class="form-control form-control-sm me-2">
-					<option value="USD">USD</option>
-					<option value="EUR">EUR</option>
-					<option value="UAH">UAH</option>
-				</select>
-				<button class="btn btn-sm custom-button" @click.prevent="GoToAddPayment()">
-					<i class="fas fa-plus" style="color: #555;"></i>
-				</button>
-			</div>
-		</b-navbar-brand>
-
-		<b-navbar-toggle target="nav-collapse"></b-navbar-toggle>
-
-		<b-collapse id="nav-collapse" is-nav>
-			<b-navbar-nav>
-				<b-nav-item>
-					<router-link :to="{ path: '/' }" class="nav-link">
-						<i class="fas fa-home"></i>
-					</router-link>
-				</b-nav-item>
-				<!-- Швидкий доступ до поточного місяця -->
-				<b-nav-item v-if="currentUser">
-					<router-link
-						:to="{ name: 'payments_year_month', params: { year: currentYear, month: currentMonth }}"
-						class="nav-link">
-						<i class="fas fa-calendar-day me-1"></i>
-						Поточний
-					</router-link>
-				</b-nav-item>
-
-				<!-- Випадаюче меню Витрати -->
-				<b-nav-item-dropdown v-if="currentUser" text="Витрати">
-					<template #button-content>
-						<i class="fas fa-money-bill-wave me-1"></i> Витрати
-					</template>
-					<b-dropdown-item>
-						<router-link
-							:to="{ name: 'payments', params: {action: 'last', year: currentYear, month: currentMonth, category_id: '_' }}"
-							class="nav-link">
-							<i class="fas fa-history me-1"></i> Останні
-						</router-link>
-					</b-dropdown-item>
-					<b-dropdown-item>
-						<router-link :to="{ name: 'payments_years' }" class="nav-link" @click="refreshYears">
-							<i class="fas fa-calendar-alt me-1"></i> Роки
-						</router-link>
-					</b-dropdown-item>
-				</b-nav-item-dropdown>
-
-				<b-nav-item-dropdown v-if="currentUser" text="Банки">
-					<template #button-content>
-						<i class="fas fa-university"></i> Банки
-					</template>
-					<b-dropdown-item>
-						<router-link :to="{ name: 'mono_payments' }" class="nav-link">
-							<i class="fas fa-paw"></i> Mono
-						</router-link>
-					</b-dropdown-item>
-
-					<b-dropdown-item>
-						<router-link :to="{ name: 'import' }" class="nav-link">
-							<i class="fas fa-file-import"></i> Імпорт
-						</router-link>
-					</b-dropdown-item>
-				</b-nav-item-dropdown>
-
-				<b-nav-item-dropdown v-if="currentUser" text="Комунальні">
-					<template #button-content>
-						<i class="fas fa-home"></i> Комунальні
-					</template>
-					<b-dropdown-item>
-						<router-link :to="{ name: 'utilities' }" class="nav-link">
-							<i class="fas fa-chart-line"></i> Головна
-						</router-link>
-					</b-dropdown-item>
-					<b-dropdown-item>
-						<router-link :to="{ name: 'utilities_addresses' }" class="nav-link">
-							<i class="fas fa-map-marker-alt"></i> Адреси
-						</router-link>
-					</b-dropdown-item>
-					<b-dropdown-item>
-						<router-link :to="{ name: 'utilities_add_reading' }" class="nav-link">
-							<i class="fas fa-plus"></i> Додати показники
-						</router-link>
-					</b-dropdown-item>
-				</b-nav-item-dropdown>
-
-				<b-nav-item-dropdown text="Користувач">
-					<template #button-content>
-						<i class="fas fa-user"></i> Користувач
-					</template>
-
-					<template v-if="!currentUser">
-						<b-dropdown-item>
-							<router-link :to="{ name: 'login' }" class="nav-link">
-								<i class="fas fa-sign-in-alt"></i> Вхід
-							</router-link>
-						</b-dropdown-item>
-						<b-dropdown-item>
-							<router-link :to="{ name: 'register' }" class="nav-link">
-								<i class="fas fa-user-plus"></i> Реєстрація
-							</router-link>
-						</b-dropdown-item>
-					</template>
-
-					<template v-else>
-						<b-dropdown-item>
-							<router-link :to="{ name: 'profile' }" class="nav-link">
-								<i class="fas fa-user"></i> Профіль
-							</router-link>
-						</b-dropdown-item>
-
-						<b-dropdown-divider></b-dropdown-divider>
-						<b-dropdown-item v-if="currentUser">
-							<router-link :to="{ name: 'category' }" class="nav-link">
-								<i class="fas fa-tags"></i> Категорії
-							</router-link>
-						</b-dropdown-item>
-						<b-dropdown-item v-if="currentUser">
-							<router-link :to="{ name: 'config' }" class="nav-link">
-								<i class="fas fa-cog"></i> Налаштування
-							</router-link>
-						</b-dropdown-item>
-						<b-dropdown-divider></b-dropdown-divider>
-						<b-dropdown-item>
-							<a class="nav-link" @click.prevent="logOut">
-								<i class="fas fa-sign-out-alt"></i> Вихід
-							</a>
-						</b-dropdown-item>
-					</template>
-				</b-nav-item-dropdown>
-
-				<b-nav-item>
-					<router-link :to="{ name: 'about' }" class="nav-link">Про програму</router-link>
-				</b-nav-item>
-			</b-navbar-nav>
-		</b-collapse>
-	</b-navbar>
+  <div class="card">
+    <Menubar :model="menuItems">
+      <template #start>
+        <router-link to="/" class="navbar-brand me-2 d-flex align-items-center">
+          <i class="pi pi-home me-2"></i>
+          <span class="fw-bold">FinMan</span>
+        </router-link>
+      </template>
+      <template #end>
+        <div class="d-flex align-items-center gap-2">
+          <Dropdown v-if="currentUser" v-model="selectedCurrency" :options="currencyOptions" placeholder="Валюта" style="width: 6rem;" />
+          <Button v-if="currentUser" icon="pi pi-plus" @click="goToAddPayment" rounded text />
+          <Button type="button" icon="pi pi-user" @click="toggleUserMenu" aria-haspopup="true" aria-controls="overlay_menu" rounded text/>
+          <Menu ref="userMenu" id="overlay_menu" :model="userMenuItems" :popup="true" />
+        </div>
+      </template>
+    </Menubar>
+  </div>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue';
-import AuthService from "./services/auth.service";
-import { refreshQueries } from "./query-client";
+<script setup>
+import { ref, computed } from 'vue';
+import { useStore } from 'vuex';
+import { useRouter } from 'vue-router';
+import Menubar from 'primevue/menubar';
+import Button from 'primevue/button';
+import Dropdown from 'primevue/dropdown';
+import Menu from 'primevue/menu';
 
-export default defineComponent({
-	name: "NavigationMenu",
-	components: {},
-	computed: {
-		currentUser() {
-			try {
-				return (this.$store as any).state.auth.user;
-			} catch {
-				this.logOut();
-				return null;
-			}
-		},
-		currentYear() {
-			return new Date().getFullYear();
-		},
-		currentMonth() {
-			const monthIndex = new Date().getMonth();
-			const month = monthIndex + 1;
-			return month;
-		},
-		category_id() {
-			if (this.$route.params.category_id) {
-				return this.$route.params.category_id;
-			} else {
-				return (this.$store as any).state.sprs.categories?.[0]?.id;
-			}
-		},
-		selectedCurrency: {
-			get() {
-				return (this.$store as any).state.sprs.selectedCurrency;
-			},
-			set(value) {
-				this.$store.dispatch("sprs/updateSelectedCurrency", value);
-			},
-		},
-	},
-	data() {
-		return {
-			year: null as string | null,
-			month: null as string | null,
-			mono_user_id: null as string | null,
-		};
-	},
-	async created() {
-		// Виконуємо перевірку валідності токена при завантаженні
-		if (this.currentUser) {
-			try {
-				const isValid = await AuthService.validateToken();
-				if (!isValid) {
-					console.log("Токен виявився недійсним при завантаженні меню навігації");
-					this.logOut();
-				} else {
-					console.log("Токен підтверджено як валідний при завантаженні меню");
-				}
-			} catch (error) {
-				console.error("Помилка при валідації токена:", error);
-				this.logOut();
-			}
-		}
-	},
-	watch: {
-		"$route.params.year": {
-			handler(newYear: string) {
-				this.year = newYear;
-			},
-			immediate: true,
-		},
-		"$route.params.month": {
-			handler(newMonth: string) {
-				this.month = newMonth;
-			},
-			immediate: true,
-		},
-		"$route.params.mono_user_id": {
-			handler(newMonoUserId: string) {
-				this.mono_user_id = newMonoUserId;
-			},
-			immediate: true,
-		},
-	},
-	methods: {
-		logOut() {
-			try {
-				this.$store.dispatch("auth/logout");
-				this.$router.push({ name: "login" });
-			} catch (error) {
-				console.error("Помилка виходу:", error);
-				this.$router.push({ name: "login" });
-			}
-		},
-		GoToAddPayment() {
-			const currentPath = this.$route.path;
-			const pattern = /^\/payments\/\d{4}\/\d{1,2}\/\d+/;
-			const isMatchingRoute = pattern.test(currentPath);
-			if (isMatchingRoute) {
-				this.$store.commit("setButtonClicked", true);
-			} else {
-				this.$router.push({
-					name: "payments",
-					params: {
-						year: this.currentYear,
-						month: this.currentMonth,
-						category_id: this.category_id,
-					},
-					query: {
-						action: "add",
-					},
-				});
-			}
-		},
-		refreshYears() {
-			// Запускаємо оновлення років при кліку на посилання Years
-			if (this.currentUser) {
-				// Оновлюємо кеш запитів за роками
-				refreshQueries(['api', 'payments', 'years'])
-					.then(() => {
-						console.log("Кеш років платежів успішно оновлено при навігації");
-					})
-					.catch(error => {
-						console.error("Помилка оновлення кешу років при навігації:", error);
-					});
-				
-				// Також робимо додатковий запит для оновлення даних у компоненті
-				const PaymentService = require("./services/PaymentService").default;
-				PaymentService.getPaymentsYears({currency: this.$store.state.sprs.selectedCurrency || "UAH"})
-					.then(() => {
-						console.log("Роки платежів успішно оновлено при навігації");
-					})
-					.catch(error => {
-						console.error("Помилка оновлення років при навігації:", error);
-					});
-			}
-		},
-	},
+const store = useStore();
+const router = useRouter();
+
+// --- State ---
+const userMenu = ref();
+const currentUser = computed(() => store.state.auth.user);
+const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth() + 1;
+
+// --- Currency Selector ---
+const selectedCurrency = computed({
+  get: () => store.state.sprs.selectedCurrency,
+  set: (value) => store.dispatch("sprs/updateSelectedCurrency", value),
 });
+const currencyOptions = ref(['UAH', 'USD', 'EUR']);
+
+// --- Menu Models ---
+const menuItems = computed(() => {
+  if (!currentUser.value) {
+    return [
+      {
+        label: 'Про програму',
+        icon: 'pi pi-info-circle',
+        command: () => router.push('/about')
+      }
+    ];
+  }
+  return [
+    {
+      label: 'Поточний',
+      icon: 'pi pi-calendar',
+      command: () => router.push({ name: 'payments_year_month', params: { year: currentYear, month: currentMonth } })
+    },
+    {
+      label: 'Витрати',
+      icon: 'pi pi-chart-line',
+      items: [
+        {
+          label: 'Останні',
+          icon: 'pi pi-history',
+          command: () => router.push({ name: 'payments', params: {action: 'last', year: currentYear, month: currentMonth, category_id: '_' }})
+        },
+        {
+          label: 'Роки',
+          icon: 'pi pi-calendar-times',
+          command: () => router.push({ name: 'payments_years' })
+        }
+      ]
+    },
+    {
+      label: 'Банки',
+      icon: 'pi pi-building-columns',
+      items: [
+        {
+          label: 'Mono',
+          icon: 'pi pi-credit-card',
+          command: () => router.push({ name: 'mono_payments' })
+        },
+        {
+          label: 'Імпорт',
+          icon: 'pi pi-upload',
+          command: () => router.push({ name: 'import' })
+        }
+      ]
+    },
+    {
+      label: 'Комунальні',
+      icon: 'pi pi-building',
+      items: [
+        {
+          label: 'Головна',
+          icon: 'pi pi-chart-bar',
+          command: () => router.push({ name: 'utilities' })
+        },
+        {
+          label: 'Адреси',
+          icon: 'pi pi-map-marker',
+          command: () => router.push({ name: 'utilities_addresses' })
+        },
+        {
+          label: 'Додати показники',
+          icon: 'pi pi-plus-circle',
+          command: () => router.push({ name: 'utilities_add_reading' })
+        }
+      ]
+    },
+    {
+        label: 'Про програму',
+        icon: 'pi pi-info-circle',
+        command: () => router.push('/about')
+    }
+  ];
+});
+
+const userMenuItems = computed(() => {
+  if (!currentUser.value) {
+    return [
+      { label: 'Вхід', icon: 'pi pi-sign-in', command: () => router.push('/login') },
+      { label: 'Реєстрація', icon: 'pi pi-user-plus', command: () => router.push('/register') }
+    ];
+  }
+  return [
+    { label: `Профіль: ${currentUser.value.login}`, icon: 'pi pi-user', command: () => router.push('/profile') },
+    { separator: true },
+    { label: 'Категорії', icon: 'pi pi-tags', command: () => router.push('/category') },
+    { label: 'Налаштування', icon: 'pi pi-cog', command: () => router.push('/config') },
+    { separator: true },
+    { label: 'Вихід', icon: 'pi pi-sign-out', command: () => logOut() }
+  ];
+});
+
+// --- Methods ---
+const toggleUserMenu = (event) => {
+  userMenu.value.toggle(event);
+};
+
+const logOut = () => {
+  store.dispatch("auth/logout");
+  router.push({ name: "login" });
+};
+
+const goToAddPayment = () => {
+    const category_id = store.state.sprs.categories?.[0]?.id || '_';
+    router.push({
+        name: "payments",
+        params: {
+            year: currentYear,
+            month: currentMonth,
+            category_id: category_id,
+        },
+        query: {
+            action: "add",
+        },
+    });
+};
+
 </script>
 
 <style scoped>
-.custom-button {
-	background-color: #e7e7e7;
-	border-color: #e7e7e7;
-	color: #555;
-}
-
-.custom-button:hover {
-	background-color: #d6d6d6;
-	border-color: #d6d6d6;
-}
+/* Add any necessary styling here */
 </style>

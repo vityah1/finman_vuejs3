@@ -119,179 +119,211 @@
 			</div>
 		</div>
 
-		<!-- Add/Edit Tariff Modal -->
-		<div class="modal fade" :class="{ show: showAddModal }" 
-			 :style="{ display: showAddModal ? 'block' : 'none' }" 
-			 @click.self="closeModal">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">
-							{{ editingTariff ? 'Редагувати тариф' : 'Додати новий тариф' }}
-						</h5>
-						<button type="button" class="btn-close" @click="closeModal"></button>
-					</div>
-					<div class="modal-body">
-						<form @submit.prevent="saveTariff">
-							<div class="mb-3">
-								<label for="tariffName" class="form-label">Назва тарифу <span class="text-danger">*</span></label>
-								<input type="text" class="form-control" id="tariffName" 
-									   v-model="tariffForm.name" required 
-									   placeholder="Наприклад: Денний тариф, Нічний тариф">
-							</div>
-							<div class="row">
-								<div class="col-md-12">
-									<div class="mb-3">
-										<label for="tariffRate" class="form-label">Ставка <span class="text-danger">*</span></label>
-										<input type="number" step="0.01" class="form-control" id="tariffRate" 
-											   v-model="tariffForm.rate" required 
-											   placeholder="0.00">
-									</div>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-md-12">
-									<div class="mb-3">
-										<label for="tariffCurrency" class="form-label">Валюта</label>
-										<select class="form-control" id="tariffCurrency" v-model="tariffForm.currency">
-											<option value="UAH">UAH</option>
-											<option value="USD">USD</option>
-											<option value="EUR">EUR</option>
-										</select>
-									</div>
-								</div>
-							</div>
-							<div class="row">
-								<div class="col-md-6">
-									<div class="mb-3">
-										<label for="validFrom" class="form-label">Дійсний з <span class="text-danger">*</span></label>
-										<input type="date" class="form-control" id="validFrom" 
-											   v-model="tariffForm.valid_from" required>
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="mb-3">
-										<label for="validTo" class="form-label">Дійсний до</label>
-										<input type="date" class="form-control" id="validTo" 
-											   v-model="tariffForm.valid_to">
-										<small class="form-text text-muted">Залиште порожнім для безстрокового тарифу</small>
-									</div>
-								</div>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" id="tariffActive" 
-									   v-model="tariffForm.is_active">
-								<label class="form-check-label" for="tariffActive">
-									Активний тариф
-								</label>
-							</div>
-							
-							<!-- Розширені налаштування -->
-							<hr class="my-3">
-							<h6>Розширені налаштування</h6>
-							
-							<div class="row">
-								<div class="col-md-6">
-									<div class="mb-3">
-										<label for="tariffType" class="form-label">Тип тарифу</label>
-										<select class="form-control" id="tariffType" v-model="tariffForm.tariff_type">
-											<option value="">Стандартний</option>
-											<option value="consumption">Споживання</option>
-											<option value="drainage">Водовідведення</option>
-											<option value="subscription">Абонплата</option>
-											<option value="day">Денний</option>
-											<option value="night">Нічний</option>
-											<option value="apartment">Квартплата</option>
-											<option value="fixed">Фіксований</option>
-										</select>
-									</div>
-								</div>
-								<div class="col-md-6">
-									<div class="mb-3">
-										<label for="groupCode" class="form-label">Код групи</label>
-										<input type="text" class="form-control" id="groupCode" 
-											   v-model="tariffForm.group_code"
-											   placeholder="Наприклад: water_2025">
-										<small class="form-text text-muted">Для групування пов'язаних тарифів</small>
-									</div>
-								</div>
-							</div>
-							
-							<div class="row">
-								<div class="col-md-6">
-									<div class="mb-3">
-										<label for="calculationMethod" class="form-label">Метод розрахунку</label>
-										<select class="form-control" id="calculationMethod" v-model="tariffForm.calculation_method">
-											<option value="standard">Стандартний</option>
-											<option value="percentage">Відсоток від основного</option>
-											<option value="fixed">Фіксована сума</option>
-										</select>
-									</div>
-								</div>
-								<div class="col-md-6" v-if="tariffForm.calculation_method === 'percentage'">
-									<div class="mb-3">
-										<label for="percentageOf" class="form-label">Відсоток</label>
-										<input type="number" step="0.01" class="form-control" id="percentageOf" 
-											   v-model="tariffForm.percentage_of"
-											   placeholder="80">
-										<small class="form-text text-muted">Відсоток від основного тарифу</small>
-									</div>
-								</div>
-							</div>
-						</form>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" @click="closeModal">Скасувати</button>
-						<button type="button" class="btn btn-primary" @click="saveTariff" :disabled="isSaving">
-							{{ isSaving ? 'Збереження...' : 'Зберегти' }}
-						</button>
+		<!-- Add/Edit Tariff Dialog -->
+		<Dialog
+			v-model:visible="showAddModal"
+			:header="editingTariff ? 'Редагувати тариф' : 'Додати новий тариф'"
+			:modal="true"
+			:style="{ width: '650px' }"
+			@hide="closeModal"
+		>
+			<form @submit.prevent="saveTariff">
+				<div class="mb-3">
+					<label for="tariffName" class="form-label">Назва тарифу <span class="text-danger">*</span></label>
+					<InputText
+						id="tariffName"
+						v-model="tariffForm.name"
+						required
+						placeholder="Наприклад: Денний тариф, Нічний тариф"
+						class="w-full"
+					/>
+				</div>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="mb-3">
+							<label for="tariffRate" class="form-label">Ставка <span class="text-danger">*</span></label>
+							<InputNumber
+								id="tariffRate"
+								v-model="tariffForm.rate"
+								required
+								:minFractionDigits="2"
+								:maxFractionDigits="2"
+								placeholder="0.00"
+								class="w-full"
+							/>
+						</div>
 					</div>
 				</div>
-			</div>
-		</div>
-
-		<!-- Delete Confirmation Modal -->
-		<div class="modal fade" :class="{ show: showDeleteModal }" 
-			 :style="{ display: showDeleteModal ? 'block' : 'none' }" 
-			 @click.self="showDeleteModal = false">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Підтвердити видалення</h5>
-						<button type="button" class="btn-close" @click="showDeleteModal = false"></button>
-					</div>
-					<div class="modal-body">
-						<p>Ви дійсно хочете видалити тариф "<strong>{{ tariffToDelete?.name }}</strong>"?</p>
-						<p class="text-warning">
-							<i class="fas fa-exclamation-triangle me-2"></i>
-							Ця дія може вплинути на розрахунки показників!
-						</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" @click="showDeleteModal = false">Скасувати</button>
-						<button type="button" class="btn btn-danger" @click="deleteTariff" :disabled="isDeleting">
-							{{ isDeleting ? 'Видалення...' : 'Видалити' }}
-						</button>
+				<div class="row">
+					<div class="col-md-12">
+						<div class="mb-3">
+							<label for="tariffCurrency" class="form-label">Валюта</label>
+							<Dropdown
+								id="tariffCurrency"
+								v-model="tariffForm.currency"
+								:options="['UAH', 'USD', 'EUR']"
+								class="w-full"
+							/>
+						</div>
 					</div>
 				</div>
-			</div>
-		</div>
+				<div class="row">
+					<div class="col-md-6">
+						<div class="mb-3">
+							<label for="validFrom" class="form-label">Дійсний з <span class="text-danger">*</span></label>
+							<Calendar
+								id="validFrom"
+								v-model="tariffForm.valid_from"
+								dateFormat="yy-mm-dd"
+								required
+								class="w-full"
+							/>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="mb-3">
+							<label for="validTo" class="form-label">Дійсний до</label>
+							<Calendar
+								id="validTo"
+								v-model="tariffForm.valid_to"
+								dateFormat="yy-mm-dd"
+								class="w-full"
+							/>
+							<small class="text-muted">Залиште порожнім для безстрокового тарифу</small>
+						</div>
+					</div>
+				</div>
+				<div class="flex align-items-center mb-3">
+					<Checkbox
+						id="tariffActive"
+						v-model="tariffForm.is_active"
+						:binary="true"
+					/>
+					<label for="tariffActive" class="ml-2">Активний тариф</label>
+				</div>
 
-		<!-- Modal backdrop -->
-		<div v-if="showAddModal || showDeleteModal" class="modal-backdrop fade show"></div>
+				<!-- Розширені налаштування -->
+				<hr class="my-3">
+				<h6>Розширені налаштування</h6>
+
+				<div class="row">
+					<div class="col-md-6">
+						<div class="mb-3">
+							<label for="tariffType" class="form-label">Тип тарифу</label>
+							<Dropdown
+								id="tariffType"
+								v-model="tariffForm.tariff_type"
+								:options="tariffTypeOptions"
+								optionLabel="label"
+								optionValue="value"
+								placeholder="Стандартний"
+								class="w-full"
+							/>
+						</div>
+					</div>
+					<div class="col-md-6">
+						<div class="mb-3">
+							<label for="groupCode" class="form-label">Код групи</label>
+							<InputText
+								id="groupCode"
+								v-model="tariffForm.group_code"
+								placeholder="Наприклад: water_2025"
+								class="w-full"
+							/>
+							<small class="text-muted">Для групування пов'язаних тарифів</small>
+						</div>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-6">
+						<div class="mb-3">
+							<label for="calculationMethod" class="form-label">Метод розрахунку</label>
+							<Dropdown
+								id="calculationMethod"
+								v-model="tariffForm.calculation_method"
+								:options="calculationMethodOptions"
+								optionLabel="label"
+								optionValue="value"
+								class="w-full"
+							/>
+						</div>
+					</div>
+					<div class="col-md-6" v-if="tariffForm.calculation_method === 'percentage'">
+						<div class="mb-3">
+							<label for="percentageOf" class="form-label">Відсоток</label>
+							<InputNumber
+								id="percentageOf"
+								v-model="tariffForm.percentage_of"
+								:minFractionDigits="2"
+								:maxFractionDigits="2"
+								placeholder="80"
+								class="w-full"
+							/>
+							<small class="text-muted">Відсоток від основного тарифу</small>
+						</div>
+					</div>
+				</div>
+			</form>
+
+			<template #footer>
+				<Button label="Скасувати" icon="pi pi-times" @click="closeModal" text />
+				<Button
+					:label="isSaving ? 'Збереження...' : 'Зберегти'"
+					icon="pi pi-check"
+					@click="saveTariff"
+					:disabled="isSaving"
+					:loading="isSaving"
+				/>
+			</template>
+		</Dialog>
+
+		<!-- Delete Confirmation Dialog -->
+		<Dialog
+			v-model:visible="showDeleteModal"
+			header="Підтвердити видалення"
+			:modal="true"
+			:style="{ width: '450px' }"
+		>
+			<p>Ви дійсно хочете видалити тариф "<strong>{{ tariffToDelete?.name }}</strong>"?</p>
+			<Message severity="warn" :closable="false">
+				<i class="fas fa-exclamation-triangle me-2"></i>
+				Ця дія може вплинути на розрахунки показників!
+			</Message>
+
+			<template #footer>
+				<Button label="Скасувати" icon="pi pi-times" @click="showDeleteModal = false" text />
+				<Button
+					:label="isDeleting ? 'Видалення...' : 'Видалити'"
+					icon="pi pi-trash"
+					@click="deleteTariff"
+					severity="danger"
+					:disabled="isDeleting"
+					:loading="isDeleting"
+				/>
+			</template>
+		</Dialog>
 	</div>
 </template>
 
 <script lang="ts">
 import { defineComponent, ref, reactive, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { 
+import {
 	useGetTariffsApiUtilitiesTariffsGet,
 	useGetServiceApiUtilitiesServicesServiceIdGet,
 	useCreateTariffApiUtilitiesTariffsPost,
 	useUpdateTariffApiUtilitiesTariffsTariffIdPatch,
 	useDeleteTariffApiUtilitiesTariffsTariffIdDelete
 } from '@/api/utilities/utilities';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import InputNumber from 'primevue/inputnumber';
+import Dropdown from 'primevue/dropdown';
+import Calendar from 'primevue/calendar';
+import Checkbox from 'primevue/checkbox';
+import Message from 'primevue/message';
 
 interface TariffData {
 	id: number;
@@ -312,6 +344,16 @@ interface TariffData {
 
 export default defineComponent({
 	name: 'TariffList',
+	components: {
+		Dialog,
+		Button,
+		InputText,
+		InputNumber,
+		Dropdown,
+		Calendar,
+		Checkbox,
+		Message
+	},
 	setup() {
 		const route = useRoute();
 		const serviceId = computed(() => parseInt(route.params.serviceId as string));
@@ -323,6 +365,24 @@ export default defineComponent({
 		const tariffToDelete = ref<TariffData | null>(null);
 		const isSaving = ref(false);
 		const isDeleting = ref(false);
+
+		// Dropdown options
+		const tariffTypeOptions = ref([
+			{ label: 'Стандартний', value: '' },
+			{ label: 'Споживання', value: 'consumption' },
+			{ label: 'Водовідведення', value: 'drainage' },
+			{ label: 'Абонплата', value: 'subscription' },
+			{ label: 'Денний', value: 'day' },
+			{ label: 'Нічний', value: 'night' },
+			{ label: 'Квартплата', value: 'apartment' },
+			{ label: 'Фіксований', value: 'fixed' }
+		]);
+
+		const calculationMethodOptions = ref([
+			{ label: 'Стандартний', value: 'standard' },
+			{ label: 'Відсоток від основного', value: 'percentage' },
+			{ label: 'Фіксована сума', value: 'fixed' }
+		]);
 
 		// Form data
 		const tariffForm = reactive({
@@ -504,6 +564,8 @@ export default defineComponent({
 			tariffForm,
 			isSaving,
 			isDeleting,
+			tariffTypeOptions,
+			calculationMethodOptions,
 
 			// Methods
 			formatRate,

@@ -86,91 +86,98 @@
 			</div>
 		</div>
 
-		<!-- Add/Edit Address Modal -->
-		<div class="modal fade" :class="{ show: showAddModal }" 
-			 :style="{ display: showAddModal ? 'block' : 'none' }" 
-			 @click.self="closeModal">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">
-							{{ editingAddress ? 'Редагувати адресу' : 'Додати нову адресу' }}
-						</h5>
-						<button type="button" class="btn-close" @click="closeModal"></button>
-					</div>
-					<div class="modal-body">
-						<form @submit.prevent="saveAddress">
-							<div class="mb-3">
-								<label for="addressName" class="form-label">Назва <span class="text-danger">*</span></label>
-								<input type="text" class="form-control" id="addressName" 
-									   v-model="addressForm.name" required 
-									   placeholder="Наприклад: Квартира, Дача, Офіс">
-							</div>
-							<div class="mb-3">
-								<label for="addressFull" class="form-label">Повна адреса <span class="text-danger">*</span></label>
-								<textarea class="form-control" id="addressFull" rows="2"
-										  v-model="addressForm.address" required
-										  placeholder="Повна адреса з індексом"></textarea>
-							</div>
-							<div class="mb-3">
-								<label for="addressDescription" class="form-label">Опис</label>
-								<textarea class="form-control" id="addressDescription" rows="2"
-										  v-model="addressForm.description"
-										  placeholder="Додаткова інформація про адресу"></textarea>
-							</div>
-							<div class="form-check">
-								<input class="form-check-input" type="checkbox" id="addressActive" 
-									   v-model="addressForm.is_active">
-								<label class="form-check-label" for="addressActive">
-									Активна адреса
-								</label>
-							</div>
-						</form>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" @click="closeModal">Скасувати</button>
-						<button type="button" class="btn btn-primary" @click="saveAddress" :disabled="isSaving">
-							{{ isSaving ? 'Збереження...' : 'Зберегти' }}
-						</button>
-					</div>
+		<!-- Add/Edit Address Dialog -->
+		<Dialog
+			v-model:visible="showAddModal"
+			:header="editingAddress ? 'Редагувати адресу' : 'Додати нову адресу'"
+			:modal="true"
+			:style="{ width: '500px' }"
+			@hide="closeModal"
+		>
+			<form @submit.prevent="saveAddress">
+				<div class="mb-3">
+					<label for="addressName" class="form-label">Назва <span class="text-danger">*</span></label>
+					<InputText
+						id="addressName"
+						v-model="addressForm.name"
+						required
+						placeholder="Наприклад: Квартира, Дача, Офіс"
+						class="w-full"
+					/>
 				</div>
-			</div>
-		</div>
-
-		<!-- Delete Confirmation Modal -->
-		<div class="modal fade" :class="{ show: showDeleteModal }" 
-			 :style="{ display: showDeleteModal ? 'block' : 'none' }" 
-			 @click.self="showDeleteModal = false">
-			<div class="modal-dialog">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">Підтвердити видалення</h5>
-						<button type="button" class="btn-close" @click="showDeleteModal = false"></button>
-					</div>
-					<div class="modal-body">
-						<p>Ви дійсно хочете видалити адресу "<strong>{{ addressToDelete?.name }}</strong>"?</p>
-						<p class="text-warning">
-							<i class="fas fa-exclamation-triangle me-2"></i>
-							Ця дія також видалить всі пов'язані служби, тарифи та показники!
-						</p>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-secondary" @click="showDeleteModal = false">Скасувати</button>
-						<button type="button" class="btn btn-danger" @click="deleteAddress" :disabled="isDeleting">
-							{{ isDeleting ? 'Видалення...' : 'Видалити' }}
-						</button>
-					</div>
+				<div class="mb-3">
+					<label for="addressFull" class="form-label">Повна адреса <span class="text-danger">*</span></label>
+					<Textarea
+						id="addressFull"
+						v-model="addressForm.address"
+						required
+						placeholder="Повна адреса з індексом"
+						rows="2"
+						class="w-full"
+					/>
 				</div>
-			</div>
-		</div>
+				<div class="mb-3">
+					<label for="addressDescription" class="form-label">Опис</label>
+					<Textarea
+						id="addressDescription"
+						v-model="addressForm.description"
+						placeholder="Додаткова інформація про адресу"
+						rows="2"
+						class="w-full"
+					/>
+				</div>
+				<div class="flex align-items-center">
+					<Checkbox
+						id="addressActive"
+						v-model="addressForm.is_active"
+						:binary="true"
+					/>
+					<label for="addressActive" class="ml-2">Активна адреса</label>
+				</div>
+			</form>
 
-		<!-- Modal backdrop -->
-		<div v-if="showAddModal || showDeleteModal" class="modal-backdrop fade show"></div>
+			<template #footer>
+				<Button label="Скасувати" icon="pi pi-times" @click="closeModal" text />
+				<Button
+					:label="isSaving ? 'Збереження...' : 'Зберегти'"
+					icon="pi pi-check"
+					@click="saveAddress"
+					:disabled="isSaving"
+					:loading="isSaving"
+				/>
+			</template>
+		</Dialog>
+
+		<!-- Delete Confirmation Dialog -->
+		<Dialog
+			v-model:visible="showDeleteModal"
+			header="Підтвердити видалення"
+			:modal="true"
+			:style="{ width: '450px' }"
+		>
+			<p>Ви дійсно хочете видалити адресу "<strong>{{ addressToDelete?.name }}</strong>"?</p>
+			<Message severity="warn" :closable="false">
+				<i class="fas fa-exclamation-triangle me-2"></i>
+				Ця дія також видалить всі пов'язані служби, тарифи та показники!
+			</Message>
+
+			<template #footer>
+				<Button label="Скасувати" icon="pi pi-times" @click="showDeleteModal = false" text />
+				<Button
+					:label="isDeleting ? 'Видалення...' : 'Видалити'"
+					icon="pi pi-trash"
+					@click="deleteAddress"
+					severity="danger"
+					:disabled="isDeleting"
+					:loading="isDeleting"
+				/>
+			</template>
+		</Dialog>
 	</div>
 </template>
 <script lang="ts">
 import { defineComponent, ref, reactive, computed, onMounted } from 'vue';
-import { 
+import {
 	useGetAddressesApiUtilitiesAddressesGet,
 	useCreateAddressApiUtilitiesAddressesPost,
 	useUpdateAddressApiUtilitiesAddressesAddressIdPatch,
@@ -179,6 +186,12 @@ import {
 	useGetReadingsApiUtilitiesReadingsGet
 } from '@/api/utilities/utilities';
 import type { UtilityAddressCreate, UtilityAddressUpdate } from '@/api/model';
+import Dialog from 'primevue/dialog';
+import Button from 'primevue/button';
+import InputText from 'primevue/inputtext';
+import Textarea from 'primevue/textarea';
+import Checkbox from 'primevue/checkbox';
+import Message from 'primevue/message';
 
 interface AddressData {
 	id: number;
@@ -203,6 +216,14 @@ interface ReadingData {
 
 export default defineComponent({
 	name: 'AddressList',
+	components: {
+		Dialog,
+		Button,
+		InputText,
+		Textarea,
+		Checkbox,
+		Message
+	},
 	setup() {
 		// Reactive state
 		const showAddModal = ref(false);
