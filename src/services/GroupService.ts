@@ -17,7 +17,7 @@ import {
 import {
   checkInvitationApiInvitationsInvitationCodeGet,
   acceptInvitationApiInvitationsInvitationCodeAcceptPost,
-  checkUserInvitationsApiUsersInvitationsGet,
+  checkUserInvitationsApiInvitationsGet,
   ignoreInvitationApiInvitationsInvitationIdIgnorePost,
   deleteInvitationApiInvitationsInvitationIdDelete
 } from '../api/invitations/invitations';
@@ -208,7 +208,7 @@ class GroupService {
   }
 
   getUserInvitations() {
-    return checkUserInvitationsApiUsersInvitationsGet()
+    return checkUserInvitationsApiInvitationsGet()
       .catch(error => {
         console.error('Помилка отримання запрошень користувача:', error.response?.data || error.message);
         throw error;
