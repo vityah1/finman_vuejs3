@@ -193,7 +193,8 @@ export default defineComponent({
       return this.$store.state.auth.user;
     },
     userInvitations() {
-      return this.userInvitationsData?.data || [];
+      // The ref's value holds the AxiosResponse, so we access value.data
+      return this.userInvitationsData?.value?.data || [];
     },
     isGroupOwner() {
       if (!this.userGroup) return false;
@@ -216,8 +217,8 @@ export default defineComponent({
         return [];
       }
 
-      // TanStack Query returns AxiosResponse, so data is in response.data
-      const data = (response as any)?.data;
+      // The data ref holds the AxiosResponse, so we access value.data
+      const data = response.value?.data;
       console.log('📦 Extracted data:', data, 'isArray:', Array.isArray(data));
 
       if (!data || !Array.isArray(data)) {
@@ -256,8 +257,8 @@ export default defineComponent({
         return [];
       }
 
-      // TanStack Query returns AxiosResponse, so data is in response.data
-      const data = (response as any)?.data;
+      // The data ref holds the AxiosResponse, so we access value.data
+      const data = response.value?.data;
       console.log('📦 Extracted invitations data:', data, 'isArray:', Array.isArray(data));
 
       if (!data || !Array.isArray(data)) {
@@ -271,10 +272,10 @@ export default defineComponent({
       return invitations;
     },
     loadingGroupUsers() {
-      return this.groupUsersQuery?.isLoading || false;
+      return this.groupUsersQuery?.isLoading?.value ?? false;
     },
     loadingInvitations() {
-      return this.groupInvitationsQuery?.isLoading || false;
+      return this.groupInvitationsQuery?.isLoading?.value ?? false;
     }
   },
   watch: {
