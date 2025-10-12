@@ -70,8 +70,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, watch, computed as vueComputed } from 'vue';
-import moment from "moment";
+import { defineComponent, ref, computed as vueComputed } from 'vue';
 
 // Імпортуємо хуки Orval для роботи з групами
 import {
