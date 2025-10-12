@@ -284,17 +284,32 @@
 								</div>
 
 								<div class="d-flex justify-content-between">
-									<button type="button" class="btn btn-secondary" @click="goBack">
-										<i class="fas fa-arrow-left me-2"></i>Назад
-									</button>
+									<Button
+										type="button"
+										label="Назад"
+										icon="pi pi-arrow-left"
+										severity="secondary"
+										@click="goBack"
+									/>
 
-									<div>
-										<button v-if="isEditing" type="button" class="btn btn-danger me-2" @click="promptDeleteReading" :disabled="isDeleting">
-											<i class="fas fa-trash me-2"></i>{{ isDeleting ? 'Видалення...' : 'Видалити' }}
-										</button>
-										<button type="submit" class="btn btn-primary" :disabled="isSaving">
-											<i class="fas fa-save me-2"></i>{{ isSaving ? 'Збереження...' : (isEditing ? 'Оновити' : 'Зберегти') }}
-										</button>
+									<div class="flex gap-2">
+										<Button
+											v-if="isEditing"
+											type="button"
+											:label="isDeleting ? 'Видалення...' : 'Видалити'"
+											icon="pi pi-trash"
+											severity="danger"
+											@click="promptDeleteReading"
+											:disabled="isDeleting"
+											:loading="isDeleting"
+										/>
+										<Button
+											type="submit"
+											:label="isSaving ? 'Збереження...' : (isEditing ? 'Оновити' : 'Зберегти')"
+											icon="pi pi-save"
+											:disabled="isSaving"
+											:loading="isSaving"
+										/>
 									</div>
 								</div>
 							</form>

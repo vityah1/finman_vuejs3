@@ -15,9 +15,12 @@
 							<i class="fas fa-map-marker-alt fa-2x text-primary mb-2"></i>
 							<h5 class="card-title">{{ addressesCount }}</h5>
 							<p class="card-text">Адрес</p>
-							<router-link :to="{ name: 'utilities_addresses' }" class="btn btn-sm btn-outline-primary">
-								Переглянути
-							</router-link>
+							<Button
+								label="Переглянути"
+								outlined
+								size="small"
+								@click="$router.push({ name: 'utilities_addresses' })"
+							/>
 						</div>
 					</div>
 				</div>
@@ -48,9 +51,13 @@
 							<i class="fas fa-plus fa-2x text-info mb-2"></i>
 							<h5 class="card-title">Додати</h5>
 							<p class="card-text">Показники</p>
-							<router-link :to="{ name: 'utilities_add_reading' }" class="btn btn-sm btn-outline-info">
-								Внести
-							</router-link>
+							<Button
+								label="Внести"
+								outlined
+								severity="info"
+								size="small"
+								@click="$router.push({ name: 'utilities_add_reading' })"
+							/>
 						</div>
 					</div>
 				</div>
@@ -105,16 +112,27 @@
 							<h5 class="mb-0"><i class="fas fa-list me-2"></i>Швидкі дії</h5>
 						</div>
 						<div class="card-body">
-							<div class="d-grid gap-2">
-								<router-link :to="{ name: 'utilities_addresses' }" class="btn btn-outline-primary">
-									<i class="fas fa-map-marker-alt me-2"></i>Керувати адресами
-								</router-link>
-								<router-link :to="{ name: 'utilities_add_reading' }" class="btn btn-outline-success">
-									<i class="fas fa-plus me-2"></i>Додати показники
-								</router-link>
-								<button @click="exportData" class="btn btn-outline-info">
-									<i class="fas fa-download me-2"></i>Експортувати дані
-								</button>
+							<div class="flex flex-column gap-2">
+								<Button
+									label="Керувати адресами"
+									icon="pi pi-map-marker"
+									outlined
+									@click="$router.push({ name: 'utilities_addresses' })"
+								/>
+								<Button
+									label="Додати показники"
+									icon="pi pi-plus"
+									outlined
+									severity="success"
+									@click="$router.push({ name: 'utilities_add_reading' })"
+								/>
+								<Button
+									label="Експортувати дані"
+									icon="pi pi-download"
+									outlined
+									severity="info"
+									@click="exportData"
+								/>
 							</div>
 
 							<hr>
@@ -135,11 +153,12 @@
 
 <script lang="ts">
 import { defineComponent, ref, onMounted, computed } from 'vue';
-import { 
+import {
 	useGetAddressesApiUtilitiesAddressesGet,
 	useGetServicesApiUtilitiesServicesGet,
 	useGetReadingsApiUtilitiesReadingsGet
 } from '@/api/utilities/utilities';
+import Button from 'primevue/button';
 
 interface ReadingData {
 	address_id: number;
@@ -164,6 +183,9 @@ interface ServiceData {
 
 export default defineComponent({
 	name: 'UtilitiesMain',
+	components: {
+		Button
+	},
 	setup() {
 		const currentPeriod = new Date().toISOString().slice(0, 7); // YYYY-MM format
 

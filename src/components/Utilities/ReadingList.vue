@@ -4,9 +4,12 @@
 			<div class="alert alert-warning">
 				<i class="fas fa-exclamation-triangle me-2"></i>
 				Невірна адреса. Будь ласка, оберіть адресу зі списку.
-				<router-link :to="{ name: 'utilities_addresses' }" class="btn btn-sm btn-primary ms-3">
-					Перейти до адрес
-				</router-link>
+				<Button
+					label="Перейти до адрес"
+					size="small"
+					class="ms-3"
+					@click="$router.push({ name: 'utilities_addresses' })"
+				/>
 			</div>
 		</div>
 		<div v-else class="container-fluid">
@@ -29,10 +32,11 @@
 					</p>
 				</div>
 				<div class="col-sm-4 text-end">
-					<router-link :to="{ name: 'utilities_add_reading', query: { addressId: addressId } }" 
-								class="btn btn-primary">
-						<i class="fas fa-plus me-2"></i>Додати показники
-					</router-link>
+					<Button
+						label="Додати показники"
+						icon="pi pi-plus"
+						@click="$router.push({ name: 'utilities_add_reading', query: { addressId: addressId } })"
+					/>
 				</div>
 			</div>
 
@@ -53,9 +57,14 @@
 				</div>
 				<div class="col-md-3"></div>
 				<div class="col-md-3 d-flex align-items-end">
-					<button class="btn btn-outline-secondary w-100" @click="resetFilters">
-						<i class="fas fa-times me-2"></i>Скинути фільтри
-					</button>
+					<Button
+						label="Скинути фільтри"
+						icon="pi pi-times"
+						outlined
+						severity="secondary"
+						class="w-100"
+						@click="resetFilters"
+					/>
 				</div>
 			</div>
 
@@ -73,10 +82,11 @@
 						<p class="text-muted">
 							{{ hasFilters ? 'Спробуйте змінити фільтри' : 'Додайте перші показники лічильників' }}
 						</p>
-						<router-link :to="{ name: 'utilities_add_reading', query: { addressId: addressId } }" 
-									class="btn btn-primary">
-							<i class="fas fa-plus me-2"></i>Додати показники
-						</router-link>
+						<Button
+							label="Додати показники"
+							icon="pi pi-plus"
+							@click="$router.push({ name: 'utilities_add_reading', query: { addressId: addressId } })"
+						/>
 					</div>
 				</div>
 			</div>
@@ -103,6 +113,7 @@ import {
 	useGetLatestPeriodWithReadingsEndpointApiUtilitiesReadingsLatestPeriodAddressIdGet
 } from '@/api/utilities/utilities';
 import GroupedReadings from './GroupedReadings.vue';
+import Button from 'primevue/button';
 import MonthSelector from './MonthSelector.vue';
 
 interface AddressData {
@@ -140,7 +151,8 @@ export default defineComponent({
 	name: 'ReadingList',
 	components: {
 		GroupedReadings,
-		MonthSelector
+		MonthSelector,
+		Button
 	},
 	setup() {
 		const route = useRoute();
