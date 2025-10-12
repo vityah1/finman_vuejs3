@@ -35,11 +35,13 @@
       :current-user-id="currentUser.id"
       @member-removed="handleMemberRemoved"
       @relation-updated="handleRelationUpdated"
+      @show-invite-modal="handleShowInviteModal"
       @show-alert="showAlert"
     />
 
     <!-- Компонент активних запрошень -->
     <user-active-invitations
+      ref="activeInvitationsComponent"
       v-if="userGroup && isGroupOwner"
       :user-group="userGroup"
       :active-invitations="activeInvitations"
@@ -68,7 +70,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent, ref, watch, computed as vueComputed } from 'vue';
 import moment from "moment";
 
 // Імпортуємо хуки Orval для роботи з групами
@@ -137,32 +139,55 @@ export default defineComponent({
   setup() {
     // Хуки для роботи з групами
     const { data: groupsData, refetch: refetchGroups } = useGetGroupsApiGroupsGet();
-    
+
     // Хуки для запрошень користувача
     const { data: userInvitationsData, refetch: refetchUserInvitations } = useCheckUserInvitationsApiInvitationsGet();
     const acceptInvitationMutation = useAcceptInvitationApiInvitationsInvitationCodeAcceptPost();
-    
+
+    // Reactive group ID for fetching users and invitations
+    const groupId = ref<number | null>(null);
+
+    // Setup queries for group users and invitations
+    const groupUsersQuery = useGetGroupUsersApiGroupsGroupIdUsersGet(
+      vueComputed(() => groupId.value as number),
+      {
+        query: {
+          enabled: vueComputed(() => groupId.value !== null)
+        }
+      }
+    );
+
+    const groupInvitationsQuery = useGetGroupInvitationsApiGroupsGroupIdInvitationsGet(
+      vueComputed(() => groupId.value as number),
+      {
+        query: {
+          enabled: vueComputed(() => groupId.value !== null)
+        }
+      }
+    );
+
     return {
       groupsData,
       refetchGroups,
       userInvitationsData,
       refetchUserInvitations,
-      acceptInvitationMutation
+      acceptInvitationMutation,
+      groupId,
+      groupUsersQuery,
+      groupInvitationsQuery
     };
   },
   data() {
     return {
       loading: false,
-      
+
       // Дані для груп
       userGroup: null as Group | null,
-      loadingGroupUsers: false,
       groupUsers: [] as GroupUser[],
-      
+
       // Запрошення
-      loadingInvitations: false,
       activeInvitations: [] as Invitation[],
-      
+
       // Модальні вікна
       showJoinGroupModal: false,
       invitationCode: ""
@@ -182,6 +207,12 @@ export default defineComponent({
     filteredGroupUsers() {
       if (!this.userGroup || !this.groupUsers || !this.groupUsers.length) return [];
       return this.groupUsers.filter(user => user.id !== this.currentUser.id);
+    },
+    loadingGroupUsers() {
+      return this.groupUsersQuery?.isLoading || false;
+    },
+    loadingInvitations() {
+      return this.groupInvitationsQuery?.isLoading || false;
     }
   },
   watch: {
@@ -189,13 +220,35 @@ export default defineComponent({
       handler(newData) {
         if (newData?.data && Array.isArray(newData.data) && newData.data.length > 0) {
           this.userGroup = newData.data[0];
-          this.fetchGroupUsers();
-          if (this.isGroupOwner) {
-            this.fetchActiveInvitations();
-          }
+          // Set groupId to trigger queries
+          this.groupId = this.userGroup.id;
         } else {
           this.userGroup = null;
+          this.groupId = null;
           this.groupUsers = [];
+          this.activeInvitations = [];
+        }
+      },
+      immediate: true
+    },
+    'groupUsersQuery.data': {
+      handler(newData) {
+        if (newData && (newData as any).data) {
+          this.groupUsers = (newData as any).data.map((user: GroupUser) => ({
+            ...user,
+            role: user.id === this.userGroup!.owner_id ? "owner" : "member",
+          }));
+        } else {
+          this.groupUsers = [];
+        }
+      },
+      immediate: true
+    },
+    'groupInvitationsQuery.data': {
+      handler(newData) {
+        if (newData && (newData as any).data) {
+          this.activeInvitations = (newData as any).data.filter((inv: Invitation) => inv.is_active);
+        } else {
           this.activeInvitations = [];
         }
       },
@@ -208,51 +261,6 @@ export default defineComponent({
       this.$refs.myAlert.showAlert(type, message);
     },
 
-    // Методи для завантаження даних
-    async fetchGroupUsers() {
-      if (!this.userGroup) return;
-
-      this.loadingGroupUsers = true;
-      try {
-        const { data } = useGetGroupUsersApiGroupsGroupIdUsersGet(this.userGroup.id);
-        await this.$nextTick();
-        
-        if (data.value && Array.isArray((data.value as any).data)) {
-          this.groupUsers = (data.value as any).data.map((user: GroupUser) => ({
-            ...user,
-            role: user.id === this.userGroup!.owner_id ? "owner" : "member",
-          }));
-        } else {
-          this.groupUsers = [];
-        }
-      } catch (error) {
-        console.error("Помилка при отриманні користувачів групи:", error);
-        this.groupUsers = [];
-      } finally {
-        this.loadingGroupUsers = false;
-      }
-    },
-
-    async fetchActiveInvitations() {
-      if (!this.userGroup) return;
-
-      this.loadingInvitations = true;
-      try {
-        const { data } = useGetGroupInvitationsApiGroupsGroupIdInvitationsGet(this.userGroup.id);
-        await this.$nextTick();
-        
-        if (data.value && Array.isArray((data.value as any).data)) {
-          this.activeInvitations = (data.value as any).data.filter((inv: Invitation) => inv.is_active);
-        } else {
-          this.activeInvitations = [];
-        }
-      } catch (error) {
-        console.error("Помилка при отриманні запрошень:", error);
-        this.activeInvitations = [];
-      } finally {
-        this.loadingInvitations = false;
-      }
-    },
 
     // Обробники подій від дочірніх компонентів
     handleInvitationAccepted() {
@@ -275,23 +283,38 @@ export default defineComponent({
     },
 
     handleMemberRemoved() {
-      this.fetchGroupUsers();
+      if (this.groupUsersQuery?.refetch) {
+        this.groupUsersQuery.refetch();
+      }
     },
 
     handleRelationUpdated() {
-      this.fetchGroupUsers();
+      if (this.groupUsersQuery?.refetch) {
+        this.groupUsersQuery.refetch();
+      }
     },
 
     handleInvitationCreated() {
-      this.fetchActiveInvitations();
+      if (this.groupInvitationsQuery?.refetch) {
+        this.groupInvitationsQuery.refetch();
+      }
     },
 
     handleInvitationRevoked() {
-      this.fetchActiveInvitations();
+      if (this.groupInvitationsQuery?.refetch) {
+        this.groupInvitationsQuery.refetch();
+      }
     },
 
     handleUserUpdated() {
       // Оновлення користувача через Vuex
+    },
+
+    handleShowInviteModal() {
+      // Open invite modal in UserActiveInvitations component
+      if (this.$refs.activeInvitationsComponent) {
+        (this.$refs.activeInvitationsComponent as any).showInviteModal = true;
+      }
     },
 
     async handleJoinGroup() {
