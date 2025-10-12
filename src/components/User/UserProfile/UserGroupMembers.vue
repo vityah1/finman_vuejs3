@@ -47,7 +47,7 @@
               <b-dropdown-item @click="openSetRelationModal(user)">
                 <i class="fas fa-user-tag"></i> Встановити відносини
               </b-dropdown-item>
-              <b-dropdown-item variant="danger" @click="confirmRemoveUser(user)">
+              <b-dropdown-item variant="danger" @click="promptRemoveUser(user)">
                 <i class="fas fa-user-times text-danger"></i> Видалити з групи
               </b-dropdown-item>
             </b-dropdown>
@@ -71,6 +71,19 @@
         </b-form-select>
       </b-form-group>
     </b-form>
+  </b-modal>
+
+  <!-- Модальне вікно підтвердження видалення учасника -->
+  <b-modal
+      v-model="showRemoveConfirmModal"
+      id="remove-user-confirm-modal"
+      title="Підтвердження дії"
+      ok-title="Так, видалити"
+      ok-variant="danger"
+      cancel-title="Ні"
+      @ok="handleRemoveUserConfirm"
+  >
+    <p>Ви впевнені, що хочете видалити користувача <strong>{{ userToRemove ? (userToRemove.fullname || userToRemove.login) : '' }}</strong> з групи?</p>
   </b-modal>
 </template>
 
@@ -139,7 +152,9 @@ export default defineComponent({
     return {
       showSetRelationModal: false,
       selectedUser: null as GroupUser | null,
-      newRelationType: ''
+      newRelationType: '',
+      showRemoveConfirmModal: false,
+      userToRemove: null as GroupUser | null,
     };
   },
   methods: {
@@ -195,22 +210,27 @@ export default defineComponent({
       }
     },
 
-    async confirmRemoveUser(user: GroupUser) {
-      if (!this.userGroup) return;
-      
-      if (confirm(`Видалити користувача ${user.fullname || user.login} з групи?`)) {
-        try {
-          await this.removeUserMutation.mutateAsync({
-            groupId: this.userGroup.id,
-            userIdToRemove: user.id
-          });
+    promptRemoveUser(user: GroupUser) {
+      this.userToRemove = user;
+      this.showRemoveConfirmModal = true;
+    },
 
-          this.$emit('show-alert', 'success', 'Користувача видалено з групи');
-          this.$emit('member-removed');
-        } catch (error) {
-          console.error('Помилка при видаленні користувача:', error);
-          this.$emit('show-alert', 'danger', 'Помилка при видаленні користувача');
-        }
+    async handleRemoveUserConfirm() {
+      if (!this.userGroup || !this.userToRemove) return;
+
+      try {
+        await this.removeUserMutation.mutateAsync({
+          groupId: this.userGroup.id,
+          userIdToRemove: this.userToRemove.id
+        });
+
+        this.$emit('show-alert', 'success', 'Користувача видалено з групи');
+        this.$emit('member-removed');
+      } catch (error) {
+        console.error('Помилка при видаленні користувача:', error);
+        this.$emit('show-alert', 'danger', 'Помилка при видаленні користувача');
+      } finally {
+        this.userToRemove = null;
       }
     }
   }

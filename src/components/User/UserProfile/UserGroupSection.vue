@@ -24,7 +24,7 @@
             </b-button>
           </div>
           <div v-else class="ms-auto">
-            <b-button size="sm" variant="outline-danger" @click="confirmLeaveGroup">
+            <b-button size="sm" variant="outline-danger" @click="promptLeaveGroup">
               <i class="fas fa-sign-out-alt"></i> Вийти з групи
             </b-button>
           </div>
@@ -62,6 +62,20 @@
         <b-form-textarea id="edit-group-description" v-model="editingGroup.description" placeholder="Опис групи"></b-form-textarea>
       </b-form-group>
     </b-form>
+  </b-modal>
+
+  <!-- Модальне вікно підтвердження виходу з групи -->
+  <b-modal
+      v-model="showLeaveConfirmModal"
+      id="leave-group-confirm-modal"
+      title="Підтвердження дії"
+      ok-title="Так, вийти"
+      ok-variant="danger"
+      cancel-title="Ні"
+      @ok="handleLeaveGroupConfirm"
+  >
+    <p>Ви впевнені, що хочете вийти з групи <strong>{{ userGroup ? userGroup.name : '' }}</strong>?</p>
+    <p class="text-muted small">Цю дію не можна буде скасувати.</p>
   </b-modal>
 </template>
 
@@ -110,6 +124,7 @@ export default defineComponent({
     return {
       showCreateGroupModal: false,
       showEditGroupModal: false,
+      showLeaveConfirmModal: false,
       newGroup: {
         name: '',
         description: ''
@@ -172,18 +187,20 @@ export default defineComponent({
       }
     },
 
-    async confirmLeaveGroup() {
+    promptLeaveGroup() {
+      this.showLeaveConfirmModal = true;
+    },
+
+    async handleLeaveGroupConfirm() {
       if (!this.userGroup) return;
-      
-      if (confirm('Ви впевнені, що хочете вийти з групи?')) {
-        try {
-          await this.leaveGroupMutation.mutateAsync({ groupId: this.userGroup.id });
-          this.$emit('show-alert', 'success', 'Ви вийшли з групи');
-          this.$emit('group-left');
-        } catch (error) {
-          console.error('Помилка при виході з групи:', error);
-          this.$emit('show-alert', 'danger', 'Помилка при виході з групи');
-        }
+
+      try {
+        await this.leaveGroupMutation.mutateAsync({ groupId: this.userGroup.id });
+        this.$emit('show-alert', 'success', 'Ви вийшли з групи');
+        this.$emit('group-left');
+      } catch (error) {
+        console.error('Помилка при виході з групи:', error);
+        this.$emit('show-alert', 'danger', 'Помилка при виході з групи');
       }
     }
   }

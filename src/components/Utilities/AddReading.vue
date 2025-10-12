@@ -289,7 +289,7 @@
 									</button>
 
 									<div>
-										<button v-if="isEditing" type="button" class="btn btn-danger me-2" @click="deleteReading" :disabled="isDeleting">
+										<button v-if="isEditing" type="button" class="btn btn-danger me-2" @click="promptDeleteReading" :disabled="isDeleting">
 											<i class="fas fa-trash me-2"></i>{{ isDeleting ? 'Видалення...' : 'Видалити' }}
 										</button>
 										<button type="submit" class="btn btn-primary" :disabled="isSaving">
@@ -451,6 +451,20 @@
 				</div>
 			</div>
 		</div>
+
+    <!-- Модальне вікно підтвердження видалення -->
+    <b-modal
+        v-model="showDeleteConfirmModal"
+        id="delete-reading-confirm-modal"
+        title="Підтвердження дії"
+        ok-title="Так, видалити"
+        ok-variant="danger"
+        cancel-title="Ні"
+        @ok="handleDeleteConfirm"
+    >
+      <p>Ви впевнені, що хочете видалити цей показник?</p>
+      <p class="text-muted small">Цю дію не можна буде скасувати.</p>
+    </b-modal>
 	</div>
 </template>
 
@@ -526,6 +540,7 @@ export default defineComponent({
 		const isSaving = ref(false);
 		const myAlert = ref(null);
 		const isDeleting = ref(false);
+    const showDeleteConfirmModal = ref(false);
 		const lastReadingHint = ref('');
 		const formSubmitted = ref(false);
 		const editReadingId = computed(() => route.query.editReadingId ? parseInt(route.query.editReadingId as string) : null);
@@ -1435,36 +1450,30 @@ export default defineComponent({
 				sharedMeterLoadParams.value = null;
 			}
 		});
-		
-		const loadSharedMeterTariffAmounts = (serviceId: number, period: string) => {
-			sharedMeterLoadParams.value = { serviceId, period };
-		};
 
-		const deleteReading = async () => {
-			if (!editReadingId.value) {
-				return;
-			}
-			
-			if (!confirm('Ви впевнені, що хочете видалити цей показник?')) {
-				return;
-			}
-			
-			isDeleting.value = true;
-			
-			try {
-				await deleteReadingMutation.mutateAsync({
-					readingId: editReadingId.value
-				});
-				
-				// Повертаємось назад після успішного видалення
-				goBack();
-			} catch (error) {
-				console.error('Error deleting reading:', error);
-				alert('Помилка при видаленні показника');
-			} finally {
-				isDeleting.value = false;
-			}
-		};
+    const promptDeleteReading = () => {
+      showDeleteConfirmModal.value = true;
+    };
+
+    const handleDeleteConfirm = async () => {
+      if (!editReadingId.value) {
+        return;
+      }
+      isDeleting.value = true;
+      try {
+        await deleteReadingMutation.mutateAsync({
+          readingId: editReadingId.value
+        });
+        goBack();
+      } catch (error) {
+        console.error('Error deleting reading:', error);
+        if (myAlert.value) {
+          myAlert.value.showAlert('danger', 'Помилка при видаленні показника');
+        }
+      } finally {
+        isDeleting.value = false;
+      }
+    };
 
 		// Watchers
 		watch([() => readingForm.current_reading, () => readingForm.previous_reading], 
@@ -1636,6 +1645,7 @@ export default defineComponent({
 			editReadingId,
 			lastReadingHint,
 			formSubmitted,
+      showDeleteConfirmModal,
 			addresses,
 			filteredServices,
 			selectedService,
@@ -1668,7 +1678,8 @@ export default defineComponent({
 			calculateTariffAmount,
 			calculateTotalAmount,
 			saveReading,
-			deleteReading,
+			promptDeleteReading,
+      handleDeleteConfirm,
 			goBack,
 			loadSharedMeterTariffAmounts
 		};

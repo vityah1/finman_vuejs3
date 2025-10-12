@@ -253,6 +253,20 @@
 				<PButton label="Так" icon="pi pi-check" severity="danger" @click="deletePayment" />
 			</template>
 		</Dialog>
+
+    <!-- Bulk Delete Confirmation -->
+    <Dialog
+        v-model:visible="showBulkDeleteConfirm"
+        header="Підтвердження видалення"
+        :modal="true"
+        :style="{ width: '350px' }"
+    >
+      <p>Ви впевнені, що хочете видалити <strong>{{ selectedPayments.length }}</strong> платежів?</p>
+      <template #footer>
+        <PButton label="Ні" icon="pi pi-times" text @click="showBulkDeleteConfirm = false" />
+        <PButton label="Так" icon="pi pi-check" severity="danger" @click="handleBulkDeleteConfirm" />
+      </template>
+    </Dialog>
 </template>
 
 <script>
@@ -293,6 +307,7 @@ export default defineComponent({
 			loading: false,
 			showModal: false,
 			showDeleteConfirm: false,
+      showBulkDeleteConfirm: false,
 			showBulkCategoryDialog: false,
 			bulkCategoryId: null,
 			okTitle: "Редагувати",
@@ -664,27 +679,30 @@ export default defineComponent({
 			return this.selectedPayments && this.selectedPayments.some(p => p.id === paymentId);
 		},
 
-		async confirmBulkDelete() {
-			if (!this.selectedPayments.length) return;
-			if (confirm(`Ви впевнені, що хочете видалити ${this.selectedPayments.length} платежів?`)) {
-				try {
-					for (const payment of this.selectedPayments) {
-						await PaymentService.deletePayment(payment.id);
-					}
-					this.selectedPayments = [];
-					await this.getPayments();
-					if (this.$refs.myAlert) {
-						this.$refs.myAlert.showAlert("success", "Платежі успішно видалено");
-					}
-				} catch (e) {
-					logError(e, "PmtYearMonCat bulkDelete");
-					const errorMessage = getErrorMessage(e, "Помилка видалення платежів");
-					if (this.$refs.myAlert) {
-						this.$refs.myAlert.showAlert("danger", errorMessage);
-					}
-				}
-			}
-		},
+    confirmBulkDelete() {
+      if (!this.selectedPayments.length) return;
+      this.showBulkDeleteConfirm = true;
+    },
+
+    async handleBulkDeleteConfirm() {
+      this.showBulkDeleteConfirm = false;
+      try {
+        for (const payment of this.selectedPayments) {
+          await PaymentService.deletePayment(payment.id);
+        }
+        this.selectedPayments = [];
+        await this.getPayments();
+        if (this.$refs.myAlert) {
+          this.$refs.myAlert.showAlert("success", "Платежі успішно видалено");
+        }
+      } catch (e) {
+        logError(e, "PmtYearMonCat bulkDelete");
+        const errorMessage = getErrorMessage(e, "Помилка видалення платежів");
+        if (this.$refs.myAlert) {
+          this.$refs.myAlert.showAlert("danger", errorMessage);
+        }
+      }
+    },
 
 		togglePaymentSelection(paymentId) {
 			const payment = this.payments.find(p => p.id === paymentId);
