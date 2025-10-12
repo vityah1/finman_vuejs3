@@ -37,7 +37,7 @@
             <b-button size="sm" variant="outline-secondary" @click="copyInvitationLink(invitation)">
               <i class="fas fa-copy"></i>
             </b-button>
-            <b-button class="ms-2" size="sm" variant="outline-danger" @click="revokeInvitation(invitation.id)">
+            <b-button class="ms-2" size="sm" variant="outline-danger" @click="promptRevokeInvitation(invitation)">
               <i class="fas fa-times"></i>
             </b-button>
           </div>
@@ -98,6 +98,23 @@
           Запрошення буде пов'язане з користувачем, який має email: {{ lastCreatedInvitation.email }}
         </div>
       </div>
+    </div>
+  </b-modal>
+  
+  <!-- Модальне вікно підтвердження скасування запрошення -->
+  <b-modal
+      v-model="showRevokeConfirmModal"
+      id="revoke-confirm-modal"
+      title="Підтвердження дії"
+      ok-title="Так, скасувати"
+      ok-variant="danger"
+      cancel-title="Ні"
+      @ok="handleRevokeConfirm"
+  >
+    <p>Ви впевнені, що хочете скасувати це запрошення?</p>
+    <div v-if="invitationToRevoke">
+      <strong>Код:</strong> {{ invitationToRevoke.invitation_code }}<br>
+      <strong v-if="invitationToRevoke.email">Email:</strong> {{ invitationToRevoke.email }}
     </div>
   </b-modal>
 </template>
@@ -163,6 +180,8 @@ export default defineComponent({
     return {
       showInviteModal: false,
       showInvitationInfoModal: false,
+      showRevokeConfirmModal: false,
+      invitationToRevoke: null as Invitation | null,
       lastCreatedInvitation: null as Invitation | null,
       newInvitation: {
         email: '',
@@ -224,16 +243,23 @@ export default defineComponent({
       this.copyToClipboard(inviteUrl);
     },
 
-    async revokeInvitation(invitationId: number) {
-      if (confirm('Скасувати це запрошення?')) {
-        try {
-          await this.deleteInvitationMutation.mutateAsync({ invitationId });
-          this.$emit('show-alert', 'success', 'Запрошення скасовано');
-          this.$emit('invitation-revoked');
-        } catch (error) {
-          console.error('Помилка при скасуванні запрошення:', error);
-          this.$emit('show-alert', 'danger', 'Помилка при скасуванні запрошення');
-        }
+    promptRevokeInvitation(invitation: Invitation) {
+      this.invitationToRevoke = invitation;
+      this.showRevokeConfirmModal = true;
+    },
+
+    async handleRevokeConfirm() {
+      if (!this.invitationToRevoke) return;
+
+      try {
+        await this.deleteInvitationMutation.mutateAsync({ invitationId: this.invitationToRevoke.id });
+        this.$emit('show-alert', 'success', 'Запрошення скасовано');
+        this.$emit('invitation-revoked');
+      } catch (error) {
+        console.error('Помилка при скасуванні запрошення:', error);
+        this.$emit('show-alert', 'danger', 'Помилка при скасуванні запрошення');
+      } finally {
+        this.invitationToRevoke = null;
       }
     }
   }
