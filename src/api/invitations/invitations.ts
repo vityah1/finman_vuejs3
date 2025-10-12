@@ -482,25 +482,23 @@ export const useDeleteInvitationApiInvitationsInvitationIdDelete = <
  * Перевірка наявності запрошень для поточного користувача
  * @summary Check User Invitations
  */
-export const checkUserInvitationsApiUsersInvitationsGet = (
+export const checkUserInvitationsApiInvitationsGet = (
   options?: AxiosRequestConfig
 ): Promise<AxiosResponse<unknown>> => {
-  return axios.get(`/api/users/invitations`, options);
+  return axios.get(`/api/invitations`, options);
 };
 
-export const getCheckUserInvitationsApiUsersInvitationsGetQueryKey = () => {
-  return ["api", "users", "invitations"] as const;
+export const getCheckUserInvitationsApiInvitationsGetQueryKey = () => {
+  return ["api", "invitations"] as const;
 };
 
-export const getCheckUserInvitationsApiUsersInvitationsGetQueryOptions = <
-  TData = Awaited<
-    ReturnType<typeof checkUserInvitationsApiUsersInvitationsGet>
-  >,
+export const getCheckUserInvitationsApiInvitationsGetQueryOptions = <
+  TData = Awaited<ReturnType<typeof checkUserInvitationsApiInvitationsGet>>,
   TError = AxiosError<HTTPValidationError>
 >(options?: {
   query?: Partial<
     UseQueryOptions<
-      Awaited<ReturnType<typeof checkUserInvitationsApiUsersInvitationsGet>>,
+      Awaited<ReturnType<typeof checkUserInvitationsApiInvitationsGet>>,
       TError,
       TData
     >
@@ -509,39 +507,37 @@ export const getCheckUserInvitationsApiUsersInvitationsGetQueryOptions = <
 }) => {
   const { query: queryOptions, axios: axiosOptions } = options ?? {};
 
-  const queryKey = getCheckUserInvitationsApiUsersInvitationsGetQueryKey();
+  const queryKey = getCheckUserInvitationsApiInvitationsGetQueryKey();
 
   const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof checkUserInvitationsApiUsersInvitationsGet>>
+    Awaited<ReturnType<typeof checkUserInvitationsApiInvitationsGet>>
   > = ({ signal }) =>
-    checkUserInvitationsApiUsersInvitationsGet({ signal, ...axiosOptions });
+    checkUserInvitationsApiInvitationsGet({ signal, ...axiosOptions });
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof checkUserInvitationsApiUsersInvitationsGet>>,
+    Awaited<ReturnType<typeof checkUserInvitationsApiInvitationsGet>>,
     TError,
     TData
   >;
 };
 
-export type CheckUserInvitationsApiUsersInvitationsGetQueryResult = NonNullable<
-  Awaited<ReturnType<typeof checkUserInvitationsApiUsersInvitationsGet>>
+export type CheckUserInvitationsApiInvitationsGetQueryResult = NonNullable<
+  Awaited<ReturnType<typeof checkUserInvitationsApiInvitationsGet>>
 >;
-export type CheckUserInvitationsApiUsersInvitationsGetQueryError =
+export type CheckUserInvitationsApiInvitationsGetQueryError =
   AxiosError<HTTPValidationError>;
 
 /**
  * @summary Check User Invitations
  */
 
-export function useCheckUserInvitationsApiUsersInvitationsGet<
-  TData = Awaited<
-    ReturnType<typeof checkUserInvitationsApiUsersInvitationsGet>
-  >,
+export function useCheckUserInvitationsApiInvitationsGet<
+  TData = Awaited<ReturnType<typeof checkUserInvitationsApiInvitationsGet>>,
   TError = AxiosError<HTTPValidationError>
 >(options?: {
   query?: Partial<
     UseQueryOptions<
-      Awaited<ReturnType<typeof checkUserInvitationsApiUsersInvitationsGet>>,
+      Awaited<ReturnType<typeof checkUserInvitationsApiInvitationsGet>>,
       TError,
       TData
     >
@@ -551,7 +547,7 @@ export function useCheckUserInvitationsApiUsersInvitationsGet<
   queryKey: DataTag<QueryKey, TData, TError>;
 } {
   const queryOptions =
-    getCheckUserInvitationsApiUsersInvitationsGetQueryOptions(options);
+    getCheckUserInvitationsApiInvitationsGetQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryReturnType<TData, TError> & {
     queryKey: DataTag<QueryKey, TData, TError>;
