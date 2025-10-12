@@ -20,9 +20,7 @@
 					</p>
 				</div>
 				<div class="col-sm-4 text-end">
-					<button class="btn btn-primary" @click="showAddModal = true" :disabled="!currentAddress">
-						<i class="fas fa-plus me-2"></i>Додати службу
-					</button>
+					<Button label="Додати службу" icon="pi pi-plus" @click="showAddModal = true" :disabled="!currentAddress" />
 				</div>
 			</div>
 
@@ -45,9 +43,7 @@
 						<i class="fas fa-cogs fa-3x text-muted mb-3"></i>
 						<h5>Служб ще не додано</h5>
 						<p class="text-muted">Додайте комунальні служби для цієї адреси</p>
-						<button class="btn btn-primary" @click="showAddModal = true">
-							<i class="fas fa-plus me-2"></i>Додати першу службу
-						</button>
+						<Button label="Додати першу службу" icon="pi pi-plus" @click="showAddModal = true" />
 					</div>
 				</div>
 			</div>
@@ -58,17 +54,17 @@
 						<div class="card-body">
 							<div class="d-flex justify-content-between align-items-start mb-2">
 								<h5 class="card-title mb-0">{{ service.name }}</h5>
-								<div class="btn-group btn-group-sm">
-									<button class="btn btn-outline-primary" @click="editService(service)" title="Редагувати">
-										<i class="fas fa-edit"></i>
-									</button>
-									<router-link :to="{ name: 'utilities_tariffs', params: { serviceId: service.id } }" 
-												class="btn btn-outline-info" title="Тарифи">
-										<i class="fas fa-money-bill"></i>
-									</router-link>
-									<button class="btn btn-outline-danger" @click="confirmDelete(service)" title="Видалити">
-										<i class="fas fa-trash"></i>
-									</button>
+								<div class="flex gap-2">
+									<Button icon="pi pi-pencil" @click="editService(service)" title="Редагувати" outlined size="small" />
+									<Button
+										icon="pi pi-dollar"
+										@click="$router.push({ name: 'utilities_tariffs', params: { serviceId: service.id } })"
+										title="Тарифи"
+										outlined
+										severity="info"
+										size="small"
+									/>
+									<Button icon="pi pi-trash" @click="confirmDelete(service)" title="Видалити" outlined severity="danger" size="small" />
 								</div>
 							</div>
 							
@@ -100,15 +96,24 @@
 								</div>
 							</div>
 
-							<div class="d-grid gap-2 d-md-flex">
-								<router-link :to="{ name: 'utilities_tariffs', params: { serviceId: service.id } }" 
-											class="btn btn-sm btn-outline-primary flex-fill">
-									<i class="fas fa-money-bill me-1"></i>Тарифи
-								</router-link>
-								<button class="btn btn-sm btn-outline-success flex-fill" 
-										@click="addReading(service)">
-									<i class="fas fa-plus me-1"></i>Показник
-								</button>
+							<div class="flex gap-2">
+								<Button
+									label="Тарифи"
+									icon="pi pi-dollar"
+									outlined
+									size="small"
+									class="flex-1"
+									@click="$router.push({ name: 'utilities_tariffs', params: { serviceId: service.id } })"
+								/>
+								<Button
+									label="Показник"
+									icon="pi pi-plus"
+									outlined
+									severity="success"
+									size="small"
+									class="flex-1"
+									@click="addReading(service)"
+								/>
 							</div>
 
 							<div v-if="!service.is_active" class="mt-2">

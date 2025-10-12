@@ -6,9 +6,7 @@
 					<h2><i class="fas fa-map-marker-alt me-2"></i>Адреси</h2>
 				</div>
 				<div class="col-sm-6 text-end">
-					<button class="btn btn-primary" @click="showAddModal = true">
-						<i class="fas fa-plus me-2"></i>Додати адресу
-					</button>
+					<Button label="Додати адресу" icon="pi pi-plus" @click="showAddModal = true" />
 				</div>
 			</div>
 
@@ -24,9 +22,7 @@
 						<i class="fas fa-home fa-3x text-muted mb-3"></i>
 						<h5>Адрес ще не додано</h5>
 						<p class="text-muted">Почніть з додавання вашої першої адреси</p>
-						<button class="btn btn-primary" @click="showAddModal = true">
-							<i class="fas fa-plus me-2"></i>Додати першу адресу
-						</button>
+						<Button label="Додати першу адресу" icon="pi pi-plus" @click="showAddModal = true" />
 					</div>
 				</div>
 			</div>
@@ -37,13 +33,9 @@
 						<div class="card-body">
 							<div class="d-flex justify-content-between align-items-start mb-2">
 								<h5 class="card-title mb-0">{{ address.name }}</h5>
-								<div class="btn-group btn-group-sm">
-									<button class="btn btn-outline-primary" @click="editAddress(address)" title="Редагувати">
-										<i class="fas fa-edit"></i>
-									</button>
-									<button class="btn btn-outline-danger" @click="confirmDelete(address)" title="Видалити">
-										<i class="fas fa-trash"></i>
-									</button>
+								<div class="flex gap-2">
+									<Button icon="pi pi-pencil" @click="editAddress(address)" title="Редагувати" outlined size="small" />
+									<Button icon="pi pi-trash" @click="confirmDelete(address)" title="Видалити" outlined severity="danger" size="small" />
 								</div>
 							</div>
 							
@@ -69,15 +61,24 @@
 							</div>
 
 							<div class="mt-3">
-								<div class="d-grid gap-2 d-md-flex">
-									<router-link :to="{ name: 'utilities_services', params: { addressId: address.id } }" 
-												class="btn btn-sm btn-outline-primary flex-fill">
-										<i class="fas fa-cogs me-1"></i>Служби
-									</router-link>
-									<router-link :to="{ name: 'utilities_readings', params: { addressId: address.id } }" 
-												class="btn btn-sm btn-outline-success flex-fill">
-										<i class="fas fa-chart-line me-1"></i>Показники
-									</router-link>
+								<div class="flex gap-2">
+									<Button
+										label="Служби"
+										icon="pi pi-cog"
+										outlined
+										size="small"
+										class="flex-1"
+										@click="$router.push({ name: 'utilities_services', params: { addressId: address.id } })"
+									/>
+									<Button
+										label="Показники"
+										icon="pi pi-chart-line"
+										outlined
+										severity="success"
+										size="small"
+										class="flex-1"
+										@click="$router.push({ name: 'utilities_readings', params: { addressId: address.id } })"
+									/>
 								</div>
 							</div>
 						</div>

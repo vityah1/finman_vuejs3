@@ -20,12 +20,14 @@
 					<h2><i class="fas fa-money-bill me-2"></i>Тарифи</h2>
 				</div>
 				<div class="col-sm-6 text-end">
-					<router-link :to="getServicesRoute()" class="btn btn-secondary me-2">
-						<i class="fas fa-arrow-left me-2"></i>Назад до служб
-					</router-link>
-					<button class="btn btn-primary" @click="showAddModal = true">
-						<i class="fas fa-plus me-2"></i>Додати тариф
-					</button>
+					<Button
+						label="Назад до служб"
+						icon="pi pi-arrow-left"
+						severity="secondary"
+						class="me-2"
+						@click="$router.push(getServicesRoute())"
+					/>
+					<Button label="Додати тариф" icon="pi pi-plus" @click="showAddModal = true" />
 				</div>
 			</div>
 
@@ -41,9 +43,7 @@
 						<i class="fas fa-money-bill fa-3x text-muted mb-3"></i>
 						<h5>Тарифів ще не додано</h5>
 						<p class="text-muted">Додайте тарифи для розрахунку вартості</p>
-						<button class="btn btn-primary" @click="showAddModal = true">
-							<i class="fas fa-plus me-2"></i>Додати перший тариф
-						</button>
+						<Button label="Додати перший тариф" icon="pi pi-plus" @click="showAddModal = true" />
 					</div>
 				</div>
 			</div>
@@ -103,13 +103,9 @@
 									<span v-else class="badge bg-secondary">Неактивний</span>
 								</td>
 								<td>
-									<div class="btn-group btn-group-sm">
-										<button class="btn btn-outline-primary" @click="editTariff(tariff)">
-											<i class="fas fa-edit"></i>
-										</button>
-										<button class="btn btn-outline-danger" @click="confirmDelete(tariff)">
-											<i class="fas fa-trash"></i>
-										</button>
+									<div class="flex gap-2">
+										<Button icon="pi pi-pencil" @click="editTariff(tariff)" outlined size="small" />
+										<Button icon="pi pi-trash" @click="confirmDelete(tariff)" outlined severity="danger" size="small" />
 									</div>
 								</td>
 							</tr>

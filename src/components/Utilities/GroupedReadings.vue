@@ -149,12 +149,14 @@
 									<td class="text-end">{{ formatCurrency(reading.amount) }}</td>
 									<td class="text-center">
 										<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
-										<button v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)" 
-												class="btn btn-sm btn-outline-primary" 
-												@click="editReading(reading.id)"
-												title="Редагувати">
-											<i class="fas fa-edit"></i>
-										</button>
+										<Button
+											v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)"
+											icon="pi pi-pencil"
+											@click="editReading(reading.id)"
+											title="Редагувати"
+											outlined
+											size="small"
+										/>
 									</td>
 								</tr>
 							</tbody>
@@ -178,12 +180,15 @@
 										<small v-if="reading.tariff_name" class="text-muted">{{ reading.tariff_name }}</small>
 									</div>
 									<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
-									<button v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)" 
-											class="btn btn-sm btn-outline-primary ms-2" 
-											@click="editReading(reading.id)"
-											title="Редагувати">
-										<i class="fas fa-edit"></i>
-									</button>
+									<Button
+										v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)"
+										icon="pi pi-pencil"
+										@click="editReading(reading.id)"
+										title="Редагувати"
+										outlined
+										size="small"
+										class="ms-2"
+									/>
 								</div>
 								
 								<div class="row mt-2">
@@ -276,12 +281,14 @@
 									<td class="text-end">{{ formatCurrency(reading.amount) }}</td>
 									<td class="text-center">
 										<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
-										<button v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)" 
-												class="btn btn-sm btn-outline-primary" 
-												@click="editReading(reading.id)"
-												title="Редагувати">
-											<i class="fas fa-edit"></i>
-										</button>
+										<Button
+											v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)"
+											icon="pi pi-pencil"
+											@click="editReading(reading.id)"
+											title="Редагувати"
+											outlined
+											size="small"
+										/>
 									</td>
 								</tr>
 							</tbody>
@@ -306,12 +313,15 @@
 										<small v-else-if="reading.tariff?.calculation_method === 'fixed'" class="text-muted badge bg-info">Фіксована сума</small>
 									</div>
 									<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
-									<button v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)" 
-											class="btn btn-sm btn-outline-primary ms-2" 
-											@click="editReading(reading.id)"
-											title="Редагувати">
-										<i class="fas fa-edit"></i>
-									</button>
+									<Button
+										v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)"
+										icon="pi pi-pencil"
+										@click="editReading(reading.id)"
+										title="Редагувати"
+										outlined
+										size="small"
+										class="ms-2"
+									/>
 								</div>
 								
 								<div class="row mt-2">
@@ -359,6 +369,7 @@ import { defineComponent, ref, computed, watch, toRefs, watchEffect } from 'vue'
 import { useRouter } from 'vue-router';
 import { useGetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet } from '@/api/utilities/utilities';
 import type { GroupedReadingsResponse } from '@/api/model/groupedReadingsResponse';
+import Button from 'primevue/button';
 
 // Розширюємо тип для включення service_id
 interface ExtendedGroupedReadingItem {
@@ -379,6 +390,9 @@ interface ExtendedGroupedReadingItem {
 
 export default defineComponent({
 	name: 'GroupedReadings',
+	components: {
+		Button
+	},
 	props: {
 		addressId: {
 			type: Number,
