@@ -212,6 +212,34 @@
 			</template>
 		</Dialog>
 
+		<!-- Bulk Category Change Dialog -->
+		<Dialog
+			v-model:visible="showBulkCategoryDialog"
+			header="Змінити категорію для вибраних записів"
+			:modal="true"
+			:style="{ width: '450px' }"
+		>
+			<div style="margin-bottom: 1rem;">
+				<p style="margin-bottom: 1rem;">
+					Ви збираєтесь змінити категорію для <strong>{{ selectedPayments.length }}</strong> записів.
+				</p>
+				<label for="bulk-category" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Нова категорія:</label>
+				<Dropdown
+					v-model="bulkCategoryId"
+					:options="formattedCategories"
+					optionLabel="name"
+					optionValue="id"
+					placeholder="Виберіть категорію"
+					id="bulk-category"
+					style="width: 100%;" />
+			</div>
+
+			<template #footer>
+				<PButton label="Скасувати" icon="pi pi-times" text @click="showBulkCategoryDialog = false" />
+				<PButton label="Змінити" icon="pi pi-check" @click="saveBulkCategoryChange" :disabled="!bulkCategoryId" />
+			</template>
+		</Dialog>
+
 		<!-- Delete Confirmation -->
 		<Dialog
 			v-model:visible="showDeleteConfirm"
@@ -265,6 +293,8 @@ export default defineComponent({
 			loading: false,
 			showModal: false,
 			showDeleteConfirm: false,
+			showBulkCategoryDialog: false,
+			bulkCategoryId: null,
 			okTitle: "Редагувати",
 			currentPayment: {
 				category_id: this.$store.state.sprs.categories && this.$store.state.sprs.categories.length > 0 ? this.$store.state.sprs.categories[0].id : null,
@@ -437,6 +467,73 @@ export default defineComponent({
 					this.currentPayment.currency = this.$store.state.sprs.selectedCurrency || "UAH";
 				}
 				this.showModal = true;
+			}
+		},
+
+		openBulkCategoryChange() {
+			if (!this.selectedPayments || this.selectedPayments.length === 0) {
+				if (this.$refs.myAlert) {
+					this.$refs.myAlert.showAlert("warning", "Не вибрано жодного платежу");
+				}
+				return;
+			}
+			this.bulkCategoryId = null;
+			this.showBulkCategoryDialog = true;
+		},
+
+		async saveBulkCategoryChange() {
+			if (!this.bulkCategoryId) {
+				if (this.$refs.myAlert) {
+					this.$refs.myAlert.showAlert("warning", "Виберіть категорію");
+				}
+				return;
+			}
+
+			try {
+				let successCount = 0;
+				let errorCount = 0;
+
+				for (const payment of this.selectedPayments) {
+					try {
+						const updatedPayment = {
+							...payment,
+							category_id: this.bulkCategoryId
+						};
+						
+						// Ensure rdate is in correct format
+						if (updatedPayment.rdate instanceof Date) {
+							updatedPayment.rdate = updatedPayment.rdate.toISOString().split('T')[0];
+						} else if (typeof updatedPayment.rdate === 'string' && updatedPayment.rdate.includes('T')) {
+							updatedPayment.rdate = updatedPayment.rdate.split('T')[0];
+						}
+
+						await PaymentService.updatePayment(payment.id, updatedPayment);
+						successCount++;
+					} catch (error) {
+						errorCount++;
+						logError(error, `PmtYearMonCat saveBulkCategoryChange for payment ${payment.id}`);
+					}
+				}
+
+				this.showBulkCategoryDialog = false;
+				this.selectedPayments = [];
+				await this.getPayments();
+
+				if (errorCount === 0) {
+					if (this.$refs.myAlert) {
+						this.$refs.myAlert.showAlert("success", `Категорію успішно змінено для ${successCount} записів`);
+					}
+				} else {
+					if (this.$refs.myAlert) {
+						this.$refs.myAlert.showAlert("warning", `Змінено: ${successCount}, Помилок: ${errorCount}`);
+					}
+				}
+			} catch (e) {
+				logError(e, "PmtYearMonCat saveBulkCategoryChange");
+				const errorMessage = getErrorMessage(e, "Помилка зміни категорії");
+				if (this.$refs.myAlert) {
+					this.$refs.myAlert.showAlert("danger", errorMessage);
+				}
 			}
 		},
 
