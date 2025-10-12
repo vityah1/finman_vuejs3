@@ -25,8 +25,10 @@ import type { MaybeRef } from "vue";
 import type {
   GroupCreate,
   GroupInvitationCreate,
+  GroupInvitationResponse,
   GroupUpdate,
   GroupUserAdd,
+  GroupUserResponse,
   GroupUserUpdate,
   HTTPValidationError,
 } from ".././model";
@@ -148,7 +150,7 @@ export const useUpdateUserRelationApiGroupsGroupIdUsersUserIdPatch = <
 export const getGroupInvitationsApiGroupsGroupIdInvitationsGet = (
   groupId: MaybeRef<number>,
   options?: AxiosRequestConfig
-): Promise<AxiosResponse<unknown>> => {
+): Promise<AxiosResponse<GroupInvitationResponse[]>> => {
   groupId = unref(groupId);
 
   return axios.get(`/api/groups/${groupId}/invitations`, options);
@@ -896,7 +898,7 @@ export const useLeaveGroupApiGroupsGroupIdLeavePost = <
 export const getGroupUsersApiGroupsGroupIdUsersGet = (
   groupId: MaybeRef<number>,
   options?: AxiosRequestConfig
-): Promise<AxiosResponse<unknown>> => {
+): Promise<AxiosResponse<GroupUserResponse[]>> => {
   groupId = unref(groupId);
 
   return axios.get(`/api/groups/${groupId}/users`, options);

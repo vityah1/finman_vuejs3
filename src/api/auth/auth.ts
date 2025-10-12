@@ -462,7 +462,7 @@ export const useEditUserApiUsersUserIdPatch = <
   return useMutation(mutationOptions);
 };
 /**
- * Отримання списку всіх користувачів
+ * Отримання списку всіх користувачів (тільки для адміністраторів)
  * @summary Get Users
  */
 export const getUsersApiUsersGet = (
@@ -477,7 +477,7 @@ export const getGetUsersApiUsersGetQueryKey = () => {
 
 export const getGetUsersApiUsersGetQueryOptions = <
   TData = Awaited<ReturnType<typeof getUsersApiUsersGet>>,
-  TError = AxiosError<unknown>
+  TError = AxiosError<HTTPValidationError>
 >(options?: {
   query?: Partial<
     UseQueryOptions<
@@ -506,7 +506,7 @@ export const getGetUsersApiUsersGetQueryOptions = <
 export type GetUsersApiUsersGetQueryResult = NonNullable<
   Awaited<ReturnType<typeof getUsersApiUsersGet>>
 >;
-export type GetUsersApiUsersGetQueryError = AxiosError<unknown>;
+export type GetUsersApiUsersGetQueryError = AxiosError<HTTPValidationError>;
 
 /**
  * @summary Get Users
@@ -514,7 +514,7 @@ export type GetUsersApiUsersGetQueryError = AxiosError<unknown>;
 
 export function useGetUsersApiUsersGet<
   TData = Awaited<ReturnType<typeof getUsersApiUsersGet>>,
-  TError = AxiosError<unknown>
+  TError = AxiosError<HTTPValidationError>
 >(options?: {
   query?: Partial<
     UseQueryOptions<
