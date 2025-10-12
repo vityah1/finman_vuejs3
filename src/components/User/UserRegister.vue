@@ -39,13 +39,13 @@
         </div>  
 
           <div class="form-group">
-            <button class="btn btn-primary btn-block" :disabled="loading">
-              <span
-                v-show="loading"
-                class="spinner-border spinner-border-sm"
-              ></span>
-              Реєстрація
-            </button>
+            <Button
+              label="Реєстрація"
+              type="submit"
+              class="w-full"
+              :disabled="loading"
+              :loading="loading"
+            />
           </div>
         </div>
       </Form>
@@ -64,6 +64,7 @@
 <script>
 import { Form, Field, ErrorMessage } from "vee-validate";
 import * as yup from "yup";
+import Button from 'primevue/button';
 
 export default {
   name: "UserRegister",
@@ -71,6 +72,7 @@ export default {
     Form,
     Field,
     ErrorMessage,
+    Button,
   },
   data() {
     const schema = yup.object().shape({

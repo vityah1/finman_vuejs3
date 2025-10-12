@@ -37,10 +37,13 @@
         </div>
 
         <div class="form-group">
-          <button :disabled="loading" class="btn btn-primary btn-block">
-            <span v-show="loading" class="spinner-border spinner-border-sm"></span>
-            Зберегти
-          </button>
+          <Button
+            label="Зберегти"
+            type="submit"
+            class="w-full"
+            :disabled="loading"
+            :loading="loading"
+          />
         </div>
       </Form>
     </div>
@@ -52,6 +55,7 @@ import { defineComponent, PropType } from 'vue';
 import { ErrorMessage, Field, Form } from "vee-validate";
 import * as yup from "yup";
 import type { UserUpdate } from '@/api/model';
+import Button from 'primevue/button';
 
 interface User {
   id: number;
@@ -72,6 +76,7 @@ export default defineComponent({
     Form,
     Field,
     ErrorMessage,
+    Button,
   },
   props: {
     currentUser: {

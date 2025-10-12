@@ -19,18 +19,15 @@
         </div>
 
         <div class="form-group">
-          <button
-            class="btn btn-primary btn-block clsMenu"
+          <Button
+            label="Увійти"
+            type="submit"
+            class="w-full clsMenu"
             :disabled="loading"
+            :loading="loading"
             data-bs-toggle="collapse"
             data-bs-target=".navbar-collapse.show"
-          >
-            <span
-              v-show="loading"
-              class="spinner-border spinner-border-sm"
-            ></span>
-            <span>Увійти</span>
-          </button>
+          />
         </div>
 
         <div class="form-group">
@@ -48,6 +45,7 @@ import { Form, Field, ErrorMessage } from "vee-validate";
 import * as yup from "yup";
 import PaymentService from "../../services/PaymentService";
 import { refreshAllData } from "../../query-client";
+import Button from 'primevue/button';
 
 export default {
   name: "UserLogin",
@@ -55,6 +53,7 @@ export default {
     Form,
     Field,
     ErrorMessage,
+    Button,
   },
   data() {
     const schema = yup.object().shape({
