@@ -2,9 +2,9 @@
   <!-- Інформація про запрошення користувача -->
   <div v-if="userInvitations && userInvitations.length > 0" class="mb-4">
     <Message severity="info" :closable="false">
-      <div class="d-flex justify-content-between align-items-center w-100">
+      <div class="flex justify-content-between align-items-center w-100">
         <div>
-          <i class="pi pi-envelope me-2"></i>
+          <i class="pi pi-envelope mr-2"></i>
           <strong>У вас є запрошення до групи!</strong>
         </div>
         <Button :label="`Переглянути ( ${userInvitations.length} )`" size="small" @click="showInvitationsModal = true" />
@@ -19,25 +19,25 @@
         <h5>Запрошення до групи: {{ invitation.group?.name }}</h5>
         <p v-if="invitation.group?.description" class="text-muted">{{ invitation.group.description }}</p>
 
-        <div class="d-flex mb-2">
-          <span class="text-muted me-2">Від:</span>
+        <div class="flex mb-2">
+          <span class="text-muted mr-2">Від:</span>
           <strong>{{ invitation.creator?.fullname || invitation.creator?.login }}</strong>
         </div>
 
-        <div v-if="invitation.expires" class="d-flex mb-2">
-          <span class="text-muted me-2">Дійсне до:</span>
+        <div v-if="invitation.expires" class="flex mb-2">
+          <span class="text-muted mr-2">Дійсне до:</span>
           <strong>{{ formatDate(invitation.expires) }}</strong>
         </div>
 
         <div class="mt-3">
           <Button label="Прийняти" icon="pi pi-check" severity="success" @click="acceptInvitation(invitation.invitation_code)" :loading="acceptInvitationMutation.isPending.value" />
-          <Button label="Ігнорувати" icon="pi pi-times" severity="secondary" outlined class="ms-2" @click="ignoreInvitation(invitation.id)" :loading="ignoreInvitationMutation.isPending.value" />
+          <Button label="Ігнорувати" icon="pi pi-times" severity="secondary" outlined class="ml-2" @click="ignoreInvitation(invitation.id)" :loading="ignoreInvitationMutation.isPending.value" />
         </div>
       </div>
     </div>
 
     <div v-else class="text-center py-3">
-      <p class="mb-0">Немає активних запрошень</p>
+      <p class="m-0">Немає активних запрошень</p>
     </div>
 
     <template #footer>

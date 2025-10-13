@@ -1,8 +1,8 @@
 <template>
   <Card class="mb-4">
     <template #title>
-      <div class="d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">Активні запрошення</h4>
+      <div class="flex justify-content-between align-items-center">
+        <h4 class="m-0">Активні запрошення</h4>
         <Button label="Створити запрошення" icon="pi pi-user-plus" severity="success" @click="showInviteModal = true" />
       </div>
     </template>
@@ -17,7 +17,7 @@
       </div>
 
       <div v-else class="invitations-list">
-        <div v-for="invitation in activeInvitations" :key="invitation.id" class="invitation-card p-3 mb-2 border rounded d-flex align-items-center justify-content-between">
+        <div v-for="invitation in activeInvitations" :key="invitation.id" class="invitation-card p-3 mb-2 border rounded flex align-items-center justify-content-between">
           <div class="flex-grow-1">
             <div class="code mb-1">
               <strong>Код:</strong> {{ invitation.invitation_code }}
@@ -32,7 +32,7 @@
               Діє до: {{ formatDate(invitation.expires) }}
             </div>
           </div>
-          <div class="d-flex gap-2">
+          <div class="flex gap-2">
             <Button icon="pi pi-copy" text rounded @click="copyInvitationLink(invitation)" />
             <Button icon="pi pi-times" severity="danger" text rounded @click="promptRevokeInvitation(invitation)" />
           </div>

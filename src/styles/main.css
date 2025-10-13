@@ -219,6 +219,167 @@ body {
   resize: vertical;
 }
 
+/* Bootstrap to PrimeFlex migration helpers */
+/* Card styles */
+.card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+}
+
+.card-header {
+  background: var(--surface-50);
+  border-bottom: 1px solid var(--surface-border);
+  padding: 1rem;
+  font-weight: 600;
+}
+
+.card-body {
+  padding: 1rem;
+}
+
+/* Alert/Message styles */
+.alert {
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 1rem;
+  border: 1px solid transparent;
+}
+
+.alert-danger {
+  background: var(--red-50);
+  border-color: var(--red-200);
+  color: var(--red-900);
+}
+
+.alert-warning {
+  background: var(--yellow-50);
+  border-color: var(--yellow-200);
+  color: var(--yellow-900);
+}
+
+.alert-info {
+  background: var(--blue-50);
+  border-color: var(--blue-200);
+  color: var(--blue-900);
+}
+
+.alert-success {
+  background: var(--green-50);
+  border-color: var(--green-200);
+  color: var(--green-900);
+}
+
+/* Badge styles */
+.badge {
+  display: inline-block;
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1;
+  border-radius: var(--border-radius);
+}
+
+.bg-info {
+  background: var(--blue-500);
+  color: white;
+}
+
+.bg-success {
+  background: var(--green-500);
+  color: white;
+}
+
+.bg-warning {
+  background: var(--yellow-500);
+  color: white;
+}
+
+.bg-danger {
+  background: var(--red-500);
+  color: white;
+}
+
+/* Table styles */
+.table-responsive {
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th,
+.table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid var(--surface-border);
+}
+
+.table thead th {
+  background: var(--surface-50);
+  font-weight: 600;
+  text-align: left;
+}
+
+.table-sm th,
+.table-sm td {
+  padding: 0.5rem;
+}
+
+/* Text utilities */
+.text-muted {
+  color: var(--text-color-secondary);
+}
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-success {
+  color: var(--green-600);
+}
+
+.text-danger {
+  color: var(--red-600);
+}
+
+.text-warning {
+  color: var(--yellow-600);
+}
+
+.text-info {
+  color: var(--blue-600);
+}
+
+/* Utility classes that PrimeFlex doesn't have */
+.no-underline {
+  text-decoration: none;
+}
+
+.small {
+  font-size: 0.875rem;
+}
+
+.h5 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.h4 {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0;
+}
+
+.h3 {
+  font-size: 1.75rem;
+  font-weight: 500;
+  margin: 0;
+}
+
 .p-error {
   color: #e24c4c;
   font-size: 0.75rem;

@@ -19,7 +19,7 @@
       <Card class="my-5 shadow-2">
         <template #header>
           <div class="p-3 bg-primary text-white">
-            <h3 class="mb-0">Запрошення до групи</h3>
+            <h3 class="m-0">Запрошення до групи</h3>
           </div>
         </template>
         <template #title>
@@ -30,19 +30,19 @@
         </template>
         <template #content>
           <div class="group-info p-3 mb-4">
-            <div class="d-flex justify-content-between py-2 border-bottom-1 border-200">
+            <div class="flex justify-content-between py-2 border-bottom-1 border-200">
               <span class="text-muted">Назва групи:</span>
-              <span class="fw-bold">{{ invitationInfo.group.name }}</span>
+              <span class="font-bold">{{ invitationInfo.group.name }}</span>
             </div>
-            <div v-if="invitationInfo.group.description" class="d-flex justify-content-between py-2 border-bottom-1 border-200">
+            <div v-if="invitationInfo.group.description" class="flex justify-content-between py-2 border-bottom-1 border-200">
               <span class="text-muted">Опис:</span>
               <span>{{ invitationInfo.group.description }}</span>
             </div>
-            <div class="d-flex justify-content-between py-2 border-bottom-1 border-200">
+            <div class="flex justify-content-between py-2 border-bottom-1 border-200">
               <span class="text-muted">Власник групи:</span>
               <span>{{ invitationInfo.creator.fullname || invitationInfo.creator.login }}</span>
             </div>
-            <div v-if="invitationInfo.expires" class="d-flex justify-content-between py-2">
+            <div v-if="invitationInfo.expires" class="flex justify-content-between py-2">
               <span class="text-muted">Дійсне до:</span>
               <span>{{ formatDate(invitationInfo.expires) }}</span>
             </div>

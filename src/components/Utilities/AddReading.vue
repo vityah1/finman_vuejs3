@@ -1,33 +1,28 @@
 <template>
 	<div class="add-reading">
 		<alert-component ref="myAlert"></alert-component>
-		<div class="container-fluid">
-			<div class="row mb-4">
-				<div class="col-12">
-					<nav aria-label="breadcrumb">
-						<ol class="breadcrumb">
-							<li class="breadcrumb-item">
-								<router-link :to="{ name: 'utilities' }">Комунальні</router-link>
-							</li>
-							<li class="breadcrumb-item">
-								<router-link :to="{ name: 'utilities_addresses' }">Адреси</router-link>
-							</li>
-							<li class="breadcrumb-item active">Додати показники</li>
-						</ol>
-					</nav>
-					<h2><i class="fas fa-plus me-2"></i>{{ isEditing ? 'Редагувати' : 'Додати' }} показники лічильників</h2>
-					<p class="text-muted">{{ isEditing ? 'Редагуйте' : 'Внесіть поточні' }} показники ваших лічильників</p>
-				</div>
-			</div>
 
-			<div class="row">
-				<div class="col-lg-8">
-					<div class="card">
-						<div class="card-header">
-							<h5 class="mb-0"><i class="fas fa-edit me-2"></i>{{ isEditing ? 'Редагування' : 'Форма внесення' }} показників</h5>
-						</div>
-						<div class="card-body">
-							<form @submit.prevent="saveReading">
+		<div class="mb-4">
+			<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
+				<template #item="{ item }">
+					<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
+						<span class="p-menuitem-text">{{ item.label }}</span>
+					</router-link>
+					<span v-else class="p-menuitem-text">{{ item.label }}</span>
+				</template>
+			</Breadcrumb>
+			<h2><i class="fas fa-plus mr-2"></i>{{ isEditing ? 'Редагувати' : 'Додати' }} показники лічильників</h2>
+			<p class="text-muted">{{ isEditing ? 'Редагуйте' : 'Внесіть поточні' }} показники ваших лічильників</p>
+		</div>
+
+		<div class="grid">
+			<div class="col-12 lg:col-8">
+				<Card>
+					<template #title>
+						<i class="fas fa-edit mr-2"></i>{{ isEditing ? 'Редагування' : 'Форма внесення' }} показників
+					</template>
+					<template #content>
+						<form @submit.prevent="saveReading">
 								<div class="formgrid grid">
 									<div class="field col-12 md:col-2">
 										<label for="addressSelect">Адреса <span style="color: var(--red-500)">*</span></label>
@@ -112,7 +107,7 @@
 										</Dropdown>
 										<Message v-else severity="info" :closable="false">
 											Для цієї служби будуть автоматично розраховані суми за всіма тарифами:
-											<ul class="mb-0 mt-2">
+											<ul class="m-0 mt-2">
 												<li v-for="tariff in availableTariffs" :key="tariff.id">
 													{{ tariff.name }} - {{ formatRate(tariff.rate) }} {{ tariff.currency }}/{{ selectedService?.unit }}
 												</li>
@@ -143,7 +138,7 @@
 									<!-- Для служб зі спільним показником (звичайних) -->
 									<Message severity="info" :closable="false" class="mb-3">
 										<strong>Спільний показник для всіх тарифів</strong>
-										<p class="mb-0 mt-2">
+										<p class="m-0 mt-2">
 											Ця служба використовує один показник для розрахунку тарифів споживання.
 											Введіть поточний показник, і система автоматично розрахує суми за всіма тарифами (включаючи фіксовані платежі).
 										</p>
@@ -333,7 +328,7 @@
 									</div>
 								</div>
 
-								<div class="d-flex justify-content-between">
+								<div class="flex justify-content-between">
 									<Button
 										type="button"
 										label="Назад"
@@ -363,16 +358,16 @@
 									</div>
 								</div>
 							</form>
-						</div>
-					</div>
+						</template>
+					</Card>
 				</div>
 
-				<div class="col-lg-4">
-					<div class="card">
-						<div class="card-header">
-							<h5 class="mb-0"><i class="fas fa-calculator me-2"></i>Розрахунок</h5>
-						</div>
-						<div class="card-body">
+				<div class="col-12 lg:col-4">
+					<Card>
+						<template #title>
+							<i class="fas fa-calculator mr-2"></i>Розрахунок
+						</template>
+						<template #content>
 							<div v-if="!calculationData.consumption && !selectedService?.has_shared_meter" class="text-center text-muted">
 								<i class="fas fa-info-circle fa-2x mb-3"></i>
 								<p>Заповніть показники для автоматичного розрахунку</p>
@@ -388,9 +383,9 @@
 								<div class="mb-3" v-else>
 									<h6>Споживання</h6>
 									<div class="small text-muted">По тарифах:</div>
-									<div v-for="tariff in availableTariffs" :key="tariff.id" class="d-flex justify-content-between">
+									<div v-for="tariff in availableTariffs" :key="tariff.id" class="flex justify-content-between">
 										<span>{{ tariff.name }}:</span>
-										<span class="text-primary fw-bold">
+										<span class="text-primary font-bold">
 											{{ getTariffConsumption(tariff) }} 
 											<small class="text-muted">{{ selectedService?.unit }}</small>
 										</span>
@@ -403,7 +398,7 @@
 										<tbody>
 											<tr v-for="tariff in availableTariffs" :key="tariff.id">
 												<td>{{ tariff.name }}</td>
-												<td class="text-end">
+												<td class="text-right">
 													<span v-if="tariff.tariff_type !== 'subscription'">
 														{{ formatRate(tariff.rate) }} × {{ getTariffConsumption(tariff) }}
 													</span>
@@ -411,15 +406,15 @@
 														Фіксовано
 													</span>
 												</td>
-												<td class="text-end fw-bold">
+												<td class="text-right font-bold">
 													{{ formatCurrency(calculateTariffAmount(tariff)) }}
 												</td>
 											</tr>
 										</tbody>
 										<tfoot>
-											<tr class="fw-bold">
+											<tr class="font-bold">
 												<td colspan="2">Всього до сплати:</td>
-												<td class="text-end text-success h5">{{ formatCurrency(calculateTotalAmount()) }}</td>
+												<td class="text-right text-success h5">{{ formatCurrency(calculateTotalAmount()) }}</td>
 											</tr>
 										</tfoot>
 									</table>
@@ -439,7 +434,7 @@
 									<div v-if="selectedTariff">
 										{{ selectedTariff.name }}<br>
 										<strong>{{ formatRate(selectedTariff.rate) }} {{ selectedTariff.currency }}</strong>
-										<small class="text-muted d-block">за {{ selectedService?.unit }}</small>
+										<small class="text-muted block">за {{ selectedService?.unit }}</small>
 									</div>
 									<div v-else class="text-muted">Тариф не обрано</div>
 								</div>
@@ -458,80 +453,79 @@
 									{{ calculationData.consumption }} × {{ formatRate(selectedTariff?.rate || 0) }} = {{ formatCurrency(calculationData.cost) }}
 								</div>
 							</div>
-						</div>
-					</div>
+						</template>
+					</Card>
 
-					<div class="card mt-3">
-						<div class="card-header">
-							<h5 class="mb-0"><i class="fas fa-history me-2"></i>Останні показники</h5>
-						</div>
-						<div class="card-body">
+					<Card class="mt-3">
+						<template #title>
+							<i class="fas fa-history mr-2"></i>Останні показники
+						</template>
+						<template #content>
 							<div v-if="recentReadings.length === 0" class="text-center text-muted">
 								<i class="fas fa-clock fa-2x mb-3"></i>
 								<p>Історія показників порожня</p>
 							</div>
 							<div v-else>
-								<div v-for="reading in recentReadings" :key="`${reading.service_id}-${reading.period}`" 
+								<div v-for="reading in recentReadings" :key="`${reading.service_id}-${reading.period}`"
 									 class="mb-2 p-2 bg-light rounded">
-									<div class="d-flex justify-content-between">
+									<div class="flex justify-content-between">
 										<div>
 											<strong>{{ getServiceName(reading.service_id) }}</strong>
-											<small class="text-muted d-block">{{ formatPeriod(reading.period) }}</small>
+											<small class="text-muted block">{{ formatPeriod(reading.period) }}</small>
 										</div>
-										<div class="text-end">
+										<div class="text-right">
 											<div>{{ reading.current_reading }}</div>
 											<small class="text-muted">{{ formatCurrency(reading.amount) }}</small>
 										</div>
 									</div>
 								</div>
 							</div>
-						</div>
-					</div>
+						</template>
+					</Card>
 
-					<div class="card mt-3">
-						<div class="card-header">
-							<h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Поради</h5>
-						</div>
-						<div class="card-body">
+					<Card class="mt-3">
+						<template #title>
+							<i class="fas fa-lightbulb mr-2"></i>Поради
+						</template>
+						<template #content>
 							<ul class="list-unstyled small">
 								<li class="mb-2">
-									<i class="fas fa-check text-success me-2"></i>
+									<i class="fas fa-check text-success mr-2"></i>
 									Знімайте показники в один і той же день місяця
 								</li>
 								<li class="mb-2">
-									<i class="fas fa-check text-success me-2"></i>
+									<i class="fas fa-check text-success mr-2"></i>
 									Перевіряйте правильність введених даних
 								</li>
 								<li class="mb-2">
-									<i class="fas fa-check text-success me-2"></i>
+									<i class="fas fa-check text-success mr-2"></i>
 									Фотографуйте лічильники для підтвердження
 								</li>
 								<li class="mb-2">
-									<i class="fas fa-check text-success me-2"></i>
+									<i class="fas fa-check text-success mr-2"></i>
 									Ведіть регулярний облік споживання
 								</li>
 							</ul>
-						</div>
-					</div>
+						</template>
+					</Card>
 				</div>
 			</div>
-		</div>
 
-    <!-- Модальне вікно підтвердження видалення -->
-    <Dialog
-        v-model:visible="showDeleteConfirmModal"
-        header="Підтвердження дії"
-        :modal="true"
-        :style="{ width: '450px' }"
-    >
-      <p>Ви впевнені, що хочете видалити цей показник?</p>
-      <p class="text-muted small">Цю дію не можна буде скасувати.</p>
+		<!-- Модальне вікно підтвердження видалення -->
+		<Dialog
+			v-model:visible="showDeleteConfirmModal"
+			header="Підтвердження дії"
+			:modal="true"
+			:style="{ width: '450px' }"
+		>
+			<p>Ви впевнені, що хочете видалити цей показник?</p>
+			<p class="text-muted small">Цю дію не можна буде скасувати.</p>
 
-      <template #footer>
-        <Button label="Ні" icon="pi pi-times" @click="showDeleteConfirmModal = false" text />
-        <Button label="Так, видалити" icon="pi pi-check" @click="handleDeleteConfirm" severity="danger" />
-      </template>
-    </Dialog>
+			<template #footer>
+				<Button label="Ні" icon="pi pi-times" @click="showDeleteConfirmModal = false" text />
+				<Button label="Так, видалити" icon="pi pi-check" @click="handleDeleteConfirm" severity="danger" />
+			</template>
+		</Dialog>
 	</div>
 </template>
 
@@ -602,6 +596,8 @@ import Message from 'primevue/message';
 import Panel from 'primevue/panel';
 import Textarea from 'primevue/textarea';
 import Checkbox from 'primevue/checkbox';
+import Breadcrumb from 'primevue/breadcrumb';
+import Card from 'primevue/card';
 
 export default defineComponent({
 	name: 'AddReading',
@@ -616,7 +612,9 @@ export default defineComponent({
 		Message,
 		Panel,
 		Textarea,
-		Checkbox
+		Checkbox,
+		Breadcrumb,
+		Card
 	},
 	setup() {
 		const route = useRoute();
@@ -1724,6 +1722,14 @@ export default defineComponent({
 			}
 		});
 
+		// Breadcrumb
+		const breadcrumbHome = { icon: 'pi pi-home', route: { name: 'utilities' } };
+		const breadcrumbItems = computed(() => [
+			{ label: 'Комунальні', route: { name: 'utilities' } },
+			{ label: 'Адреси', route: { name: 'utilities_addresses' } },
+			{ label: isEditing.value ? 'Редагувати показники' : 'Додати показники' }
+		]);
+
 		return {
 			// Data
 			readingForm,
@@ -1749,6 +1755,8 @@ export default defineComponent({
 			isFixedAmountService,
 			groupedTariffs,
 			hasSharedMeterWithFixedAmounts,
+			breadcrumbHome,
+			breadcrumbItems,
 
 			// Methods
 			getDefaultPeriod,
@@ -1780,44 +1788,7 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.add-reading {
-	padding: 20px 0;
-}
-
-.breadcrumb {
-	background: none;
-	padding: 0;
-}
-
-.card {
-	border: none;
-	box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
 .bg-light {
-	background-color: #f8f9fa !important;
-}
-
-.input-group-text {
-	background-color: #e9ecef;
-	border-color: #ced4da;
-}
-
-.form-control:focus {
-	border-color: #0d6efd;
-	box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
-}
-
-.btn-primary {
-	background-color: #0d6efd;
-	border-color: #0d6efd;
-}
-
-.text-primary {
-	color: #0d6efd !important;
-}
-
-.text-success {
-	color: #198754 !important;
+	background-color: var(--surface-100);
 }
 </style>

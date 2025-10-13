@@ -9,7 +9,7 @@
 			<div class="row">
 				<div class="col-md-10 offset-md-1 col-lg-8 offset-lg-2">
 					<div class="page-header mb-compact">
-						<h3 class="mb-0"><i class="pi pi-calendar me-2"></i>Витрати за роками</h3>
+						<h3 class="m-0"><i class="pi pi-calendar mr-2"></i>Витрати за роками</h3>
 					</div>
 
 					<!-- Summary cards -->
@@ -50,14 +50,14 @@
 									<Column field="year" header="Рік" class="text-center" style="width: 30%">
 										<template #body="{ data }">
 											<router-link
-												class="year-link fw-bold"
+												class="year-link font-bold"
 												:to="{ name: 'payments_year', params: { year: data.year } }"
 											>
-												<i class="pi pi-calendar me-1"></i>{{ data.year }}
+												<i class="pi pi-calendar mr-1"></i>{{ data.year }}
 											</router-link>
 										</template>
 									</Column>
-									<Column field="amount" header="Сума" class="text-end" style="width: 50%">
+									<Column field="amount" header="Сума" class="text-right" style="width: 50%">
 										<template #body="{ data }">
 											<span class="amount-cell">
 												{{ formatAmount(data.amount) }}
@@ -85,10 +85,10 @@
 								<div class="card-row">
 									<div class="card-content">
 										<router-link
-											class="year-link fw-bold"
+											class="year-link font-bold"
 											:to="{ name: 'payments_year', params: { year: year.year } }"
 										>
-											<i class="pi pi-calendar me-1"></i>{{ year.year }} рік
+											<i class="pi pi-calendar mr-1"></i>{{ year.year }} рік
 										</router-link>
 										<small class="text-muted">Транзакцій: {{ year.cnt }}</small>
 									</div>

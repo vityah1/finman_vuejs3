@@ -1,9 +1,11 @@
 <template>
 <link crossorigin="anonymous" href="https://use.fontawesome.com/releases/v5.2.0/css/all.css" integrity="sha384-hWVjflwFxL6sNzntih27bfxkr27PmbbK/iSvJ+a4+0owXq79v+lsFkW54bOGbiDQ" rel="stylesheet">
-	<div class="container">
+	<div class="layout-wrapper">
 		<NavigationMenu />
-		<div>
-			<router-view :key="$router.fullPath" />
+		<div class="layout-main">
+			<div class="layout-content">
+				<router-view :key="$router.fullPath" />
+			</div>
 		</div>
 	</div>
 </template>
@@ -22,4 +24,30 @@ export default {
 <style>
 /* Import global design system */
 @import './styles/main.css';
+
+.layout-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.layout-content {
+  flex: 1;
+  padding: 1.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+@media (min-width: 1400px) {
+  .layout-content {
+    max-width: 1300px;
+  }
+}
 </style>

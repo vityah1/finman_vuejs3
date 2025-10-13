@@ -1,6 +1,6 @@
 <template>
 	<div class="period-selector">
-		<div class="d-flex gap-2">
+		<div class="flex gap-2">
 			<select 
 				class="form-select"
 				v-model="selectedMonth"

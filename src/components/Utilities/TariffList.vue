@@ -1,46 +1,44 @@
 <template>
 	<div class="tariff-list">
-		<div class="container-fluid">
-			<div class="row mb-4">
-				<div class="col-sm-6">
-					<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
-						<template #item="{ item }">
-							<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
-								<span class="p-menuitem-text">{{ item.label }}</span>
-							</router-link>
-							<span v-else class="p-menuitem-text">{{ item.label }}</span>
-						</template>
-					</Breadcrumb>
-					<h2><i class="fas fa-money-bill me-2"></i>Тарифи</h2>
-				</div>
-				<div class="col-sm-6 text-end">
+		<div class="mb-4">
+			<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
+				<template #item="{ item }">
+					<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
+						<span class="p-menuitem-text">{{ item.label }}</span>
+					</router-link>
+					<span v-else class="p-menuitem-text">{{ item.label }}</span>
+				</template>
+			</Breadcrumb>
+			<div class="flex justify-content-between align-items-center">
+				<h2><i class="fas fa-money-bill mr-2"></i>Тарифи</h2>
+				<div class="flex gap-2">
 					<Button
 						label="Назад до служб"
 						icon="pi pi-arrow-left"
 						severity="secondary"
-						class="me-2"
 						@click="$router.push(getServicesRoute())"
 					/>
 					<Button label="Додати тариф" icon="pi pi-plus" @click="showAddModal = true" />
 				</div>
 			</div>
+		</div>
 
-			<div v-if="isLoading" class="text-center">
-				<ProgressSpinner />
-			</div>
+		<div v-if="isLoading" class="text-center">
+			<ProgressSpinner />
+		</div>
 
-			<div v-else-if="tariffs.length === 0" class="text-center">
-				<div class="card">
-					<div class="card-body">
-						<i class="fas fa-money-bill fa-3x text-muted mb-3"></i>
-						<h5>Тарифів ще не додано</h5>
-						<p class="text-muted">Додайте тарифи для розрахунку вартості</p>
-						<Button label="Додати перший тариф" icon="pi pi-plus" @click="showAddModal = true" />
-					</div>
-				</div>
-			</div>
+		<div v-else-if="tariffs.length === 0" class="text-center">
+			<Card>
+				<template #content>
+					<i class="fas fa-money-bill fa-3x text-muted mb-3"></i>
+					<h5>Тарифів ще не додано</h5>
+					<p class="text-muted">Додайте тарифи для розрахунку вартості</p>
+					<Button label="Додати перший тариф" icon="pi pi-plus" @click="showAddModal = true" />
+				</template>
+			</Card>
+		</div>
 
-			<div v-else>
+		<div v-else>
 				<div class="table-responsive">
 					<table class="table table-hover">
 						<thead>
@@ -68,7 +66,7 @@
 								<td>
 									<strong>{{ formatRate(tariff.rate) }}</strong>
 									<span v-if="tariff.calculation_method === 'percentage' && tariff.percentage_of"
-										  class="text-muted d-block">
+										  class="text-muted block">
 										<small>({{ tariff.percentage_of }}% від основного)</small>
 									</span>
 								</td>
@@ -82,13 +80,13 @@
 									<Tag v-else severity="primary" value="Інтерфейс" />
 								</td>
 								<td>
-									<small class="text-muted d-block">
+									<small class="text-muted block">
 										з {{ formatDate(tariff.valid_from) }}
 									</small>
-									<small v-if="tariff.valid_to" class="text-muted d-block">
+									<small v-if="tariff.valid_to" class="text-muted block">
 										до {{ formatDate(tariff.valid_to) }}
 									</small>
-									<small v-else class="text-muted d-block">безстроково</small>
+									<small v-else class="text-muted block">безстроково</small>
 								</td>
 								<td>
 									<Tag v-if="tariff.is_active" severity="success" value="Активний" />
@@ -105,7 +103,6 @@
 					</table>
 				</div>
 			</div>
-		</div>
 
 		<!-- Add/Edit Tariff Dialog -->
 		<Dialog
@@ -320,6 +317,7 @@ import Calendar from 'primevue/calendar';
 import Checkbox from 'primevue/checkbox';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
+import Card from 'primevue/card';
 
 interface TariffData {
 	id: number;
@@ -351,7 +349,8 @@ export default defineComponent({
 		Message,
 		ProgressSpinner,
 		Tag,
-		Breadcrumb
+		Breadcrumb,
+		Card
 	},
 	setup() {
 		const route = useRoute();

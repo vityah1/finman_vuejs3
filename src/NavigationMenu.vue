@@ -1,21 +1,23 @@
 <template>
-  <div class="card">
-    <Menubar :model="menuItems">
-      <template #start>
-        <router-link to="/" class="navbar-brand me-2 d-flex align-items-center">
-          <i class="pi pi-home me-2"></i>
-          <span class="fw-bold">FinMan</span>
-        </router-link>
-      </template>
-      <template #end>
-        <div class="d-flex align-items-center gap-2">
-          <Dropdown v-if="currentUser" v-model="selectedCurrency" :options="currencyOptions" placeholder="Валюта" style="width: 6rem;" />
-          <Button v-if="currentUser" icon="pi pi-plus" @click="goToAddPayment" rounded text />
-          <Button type="button" icon="pi pi-user" @click="toggleUserMenu" aria-haspopup="true" aria-controls="overlay_menu" rounded text/>
-          <Menu ref="userMenu" id="overlay_menu" :model="userMenuItems" :popup="true" />
-        </div>
-      </template>
-    </Menubar>
+  <div class="menubar-wrapper">
+    <div class="menubar-container">
+      <Menubar :model="menuItems">
+        <template #start>
+          <router-link to="/" class="flex align-items-center mr-2 no-underline">
+            <i class="pi pi-home mr-2"></i>
+            <span class="font-bold">FinMan</span>
+          </router-link>
+        </template>
+        <template #end>
+          <div class="flex align-items-center gap-2">
+            <Dropdown v-if="currentUser" v-model="selectedCurrency" :options="currencyOptions" placeholder="Валюта" style="width: 6rem;" />
+            <Button v-if="currentUser" icon="pi pi-plus" @click="goToAddPayment" rounded text />
+            <Button type="button" icon="pi pi-user" @click="toggleUserMenu" aria-haspopup="true" aria-controls="overlay_menu" rounded text/>
+            <Menu ref="userMenu" id="overlay_menu" :model="userMenuItems" :popup="true" />
+          </div>
+        </template>
+      </Menubar>
+    </div>
   </div>
 </template>
 
@@ -167,5 +169,27 @@ const goToAddPayment = () => {
 </script>
 
 <style scoped>
-/* Add any necessary styling here */
+.menubar-wrapper {
+  border-bottom: 1px solid var(--surface-border);
+  background: var(--surface-card);
+}
+
+.menubar-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+@media (min-width: 1400px) {
+  .menubar-container {
+    max-width: 1300px;
+  }
+}
+
+.menubar-container :deep(.p-menubar) {
+  border: none;
+  border-radius: 0;
+  background: transparent;
+  padding: 0;
+}
 </style>

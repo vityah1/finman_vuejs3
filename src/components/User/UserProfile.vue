@@ -1,5 +1,5 @@
 <template>
-  <div v-if="currentUser" class="container">
+  <div v-if="currentUser" class="px-3 py-2">
     <alert-component ref="myAlert"></alert-component>
 
     <!-- Компонент запрошень користувача -->

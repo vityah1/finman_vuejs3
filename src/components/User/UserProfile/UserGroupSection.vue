@@ -2,8 +2,8 @@
   <!-- Секція інформації про групу -->
   <Card class="mb-4">
     <template #title>
-      <div class="d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">Моя сімейна група</h4>
+      <div class="flex justify-content-between align-items-center">
+        <h4 class="m-0">Моя сімейна група</h4>
         <div v-if="!userGroup">
           <Button
               label="Створити групу"
@@ -20,7 +20,7 @@
         <h5>{{ userGroup.name }}</h5>
         <p class="text-muted">{{ userGroup.description }}</p>
 
-        <div class="d-flex align-items-center mb-3">
+        <div class="flex align-items-center mb-3">
           <Tag :value="isGroupOwner ? 'Власник' : 'Учасник'" severity="info" />
           <div v-if="isGroupOwner" class="ms-auto">
             <Button

@@ -2,7 +2,7 @@
   <!-- Базова інформація профілю -->
   <div class="card mb-4">
     <div class="card-header">
-      <h4 class="mb-0">Особиста інформація</h4>
+      <h4 class="m-0">Особиста інформація</h4>
     </div>
     <div class="card-body">
       <Form :validation-schema="schema" @submit="editUser" style="max-width: 800px;">

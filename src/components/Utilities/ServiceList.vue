@@ -1,122 +1,119 @@
 <template>
 	<div class="service-list">
-		<div class="container-fluid">
-			<div class="row mb-4">
-				<div class="col-sm-8">
-					<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
-						<template #item="{ item }">
-							<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
-								<span class="p-menuitem-text">{{ item.label }}</span>
-							</router-link>
-							<span v-else class="p-menuitem-text">{{ item.label }}</span>
-						</template>
-					</Breadcrumb>
-					<h2><i class="fas fa-cogs me-2"></i>Комунальні служби</h2>
-					<p v-if="currentAddress" class="text-muted">
-						<i class="fas fa-map-marker-alt me-2"></i>{{ currentAddress.address }}
-					</p>
-				</div>
-				<div class="col-sm-4 text-end">
-					<Button label="Додати службу" icon="pi pi-plus" @click="showAddModal = true" :disabled="!currentAddress" />
-				</div>
+		<div class="mb-4">
+			<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
+				<template #item="{ item }">
+					<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
+						<span class="p-menuitem-text">{{ item.label }}</span>
+					</router-link>
+					<span v-else class="p-menuitem-text">{{ item.label }}</span>
+				</template>
+			</Breadcrumb>
+			<div class="flex justify-content-between align-items-center mb-2">
+				<h2><i class="fas fa-cogs mr-2"></i>Комунальні служби</h2>
+				<Button label="Додати службу" icon="pi pi-plus" @click="showAddModal = true" :disabled="!currentAddress" />
 			</div>
+			<p v-if="currentAddress" class="text-muted">
+				<i class="fas fa-map-marker-alt mr-2"></i>{{ currentAddress.address }}
+			</p>
+		</div>
 
-			<div v-if="isLoading" class="text-center">
-				<ProgressSpinner />
-			</div>
+		<div v-if="isLoading" class="text-center">
+			<ProgressSpinner />
+		</div>
 
-			<div v-else-if="!currentAddress" class="text-center">
-				<div class="alert alert-warning">
-					<i class="fas fa-exclamation-triangle me-2"></i>
-					Адресу не знайдено
-				</div>
-			</div>
+		<div v-else-if="!currentAddress" class="text-center">
+			<Message severity="warn" :closable="false">
+				<i class="fas fa-exclamation-triangle mr-2"></i>
+				Адресу не знайдено
+			</Message>
+		</div>
 
-			<div v-else-if="services.length === 0" class="text-center">
-				<div class="card">
-					<div class="card-body">
-						<i class="fas fa-cogs fa-3x text-muted mb-3"></i>
-						<h5>Служб ще не додано</h5>
-						<p class="text-muted">Додайте комунальні служби для цієї адреси</p>
-						<Button label="Додати першу службу" icon="pi pi-plus" @click="showAddModal = true" />
-					</div>
-				</div>
-			</div>
+		<div v-else-if="services.length === 0" class="text-center">
+			<Card>
+				<template #content>
+					<i class="fas fa-cogs fa-3x text-muted mb-3"></i>
+					<h5>Служб ще не додано</h5>
+					<p class="text-muted">Додайте комунальні служби для цієї адреси</p>
+					<Button label="Додати першу службу" icon="pi pi-plus" @click="showAddModal = true" />
+				</template>
+			</Card>
+		</div>
 
-			<div v-else class="row">
-				<div v-for="service in services" :key="service.id" class="col-lg-6 col-xl-4 mb-3">
-					<div class="card service-card">
-						<div class="card-body">
-							<div class="d-flex justify-content-between align-items-start mb-2">
-								<h5 class="card-title mb-0">{{ service.name }}</h5>
-								<div class="flex gap-2">
-									<Button icon="pi pi-pencil" @click="editService(service)" title="Редагувати" outlined size="small" />
-									<Button
-										icon="pi pi-dollar"
-										@click="$router.push({ name: 'utilities_tariffs', params: { serviceId: service.id } })"
-										title="Тарифи"
-										outlined
-										severity="info"
-										size="small"
-									/>
-									<Button icon="pi pi-trash" @click="confirmDelete(service)" title="Видалити" outlined severity="danger" size="small" />
-								</div>
-							</div>
-							
-							<div class="mb-3">
-								<small class="text-muted d-block">
-									<i class="fas fa-ruler me-1"></i>Одиниця: {{ service.unit }}
-								</small>
-								<small v-if="service.meter_number" class="text-muted d-block">
-									<i class="fas fa-barcode me-1"></i>Лічильник: {{ service.meter_number }}
-								</small>
-								<small v-if="service.has_shared_meter" class="text-muted d-block">
-									<i class="fas fa-link me-1"></i>Спільний показник для групи тарифів
-								</small>
-								<small v-if="service.description" class="text-muted d-block">
-									{{ service.description }}
-								</small>
-							</div>
-
-							<div class="row text-center mb-3">
-								<div class="col-6">
-									<div class="border-end">
-										<h6 class="mb-0">{{ getTariffsCount(service.id) }}</h6>
-										<small class="text-muted">Тарифів</small>
-									</div>
-								</div>
-								<div class="col-6">
-									<h6 class="mb-0">{{ getLastReading(service.id) }}</h6>
-									<small class="text-muted">Останній показник</small>
-								</div>
-							</div>
-
+		<div v-else class="grid">
+			<div v-for="service in services" :key="service.id" class="col-12 md:col-6">
+				<Card class="service-card">
+					<template #title>
+						<div class="flex justify-content-between align-items-start">
+							<span>{{ service.name }}</span>
 							<div class="flex gap-2">
+								<Button icon="pi pi-pencil" @click="editService(service)" title="Редагувати" outlined size="small" />
 								<Button
-									label="Тарифи"
 									icon="pi pi-dollar"
-									outlined
-									size="small"
-									class="flex-1"
 									@click="$router.push({ name: 'utilities_tariffs', params: { serviceId: service.id } })"
-								/>
-								<Button
-									label="Показник"
-									icon="pi pi-plus"
+									title="Тарифи"
 									outlined
-									severity="success"
+									severity="info"
 									size="small"
-									class="flex-1"
-									@click="addReading(service)"
 								/>
-							</div>
-
-							<div v-if="!service.is_active" class="mt-2">
-								<span class="badge bg-secondary">Неактивна</span>
+								<Button icon="pi pi-trash" @click="confirmDelete(service)" title="Видалити" outlined severity="danger" size="small" />
 							</div>
 						</div>
-					</div>
-				</div>
+					</template>
+					<template #content>
+						<div class="mb-3">
+							<small class="text-muted block">
+								<i class="fas fa-ruler mr-1"></i>Одиниця: {{ service.unit }}
+							</small>
+							<small v-if="service.meter_number" class="text-muted block">
+								<i class="fas fa-barcode mr-1"></i>Лічильник: {{ service.meter_number }}
+							</small>
+							<small v-if="service.has_shared_meter" class="text-muted block">
+								<i class="fas fa-link mr-1"></i>Спільний показник для групи тарифів
+							</small>
+							<small v-if="service.description" class="text-muted block">
+								{{ service.description }}
+							</small>
+						</div>
+
+						<div class="grid text-center mb-3">
+							<div class="col-6">
+								<div class="border-right-1 surface-border">
+									<h6 class="m-0">{{ getTariffsCount(service.id) }}</h6>
+									<small class="text-muted">Тарифів</small>
+								</div>
+							</div>
+							<div class="col-6">
+								<h6 class="m-0">{{ getLastReading(service.id) }}</h6>
+								<small class="text-muted">Останній показник</small>
+							</div>
+						</div>
+
+						<div class="flex gap-2">
+							<Button
+								label="Тарифи"
+								icon="pi pi-dollar"
+								outlined
+								size="small"
+								class="flex-1"
+								@click="$router.push({ name: 'utilities_tariffs', params: { serviceId: service.id } })"
+							/>
+							<Button
+								label="Показник"
+								icon="pi pi-plus"
+								outlined
+								severity="success"
+								size="small"
+								class="flex-1"
+								@click="addReading(service)"
+							/>
+						</div>
+
+						<div v-if="!service.is_active" class="mt-2">
+							<Tag severity="secondary" value="Неактивна" />
+						</div>
+					</template>
+				</Card>
 			</div>
 		</div>
 
@@ -279,6 +276,8 @@ import Checkbox from 'primevue/checkbox';
 import Message from 'primevue/message';
 import ProgressSpinner from 'primevue/progressspinner';
 import Breadcrumb from 'primevue/breadcrumb';
+import Card from 'primevue/card';
+import Tag from 'primevue/tag';
 
 interface AddressData {
 	id: number;
@@ -320,7 +319,9 @@ export default defineComponent({
 		Checkbox,
 		Message,
 		ProgressSpinner,
-		Breadcrumb
+		Breadcrumb,
+		Card,
+		Tag
 	},
 	setup() {
 		const route = useRoute();

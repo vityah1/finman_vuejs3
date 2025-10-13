@@ -6,7 +6,7 @@
 				<Button
 					label="Перейти до адрес"
 					size="small"
-					class="ms-3"
+					class="ml-3"
 					@click="$router.push({ name: 'utilities_addresses' })"
 				/>
 			</Message>
@@ -22,12 +22,12 @@
 							<span v-else class="p-menuitem-text">{{ item.label }}</span>
 						</template>
 					</Breadcrumb>
-					<h2><i class="fas fa-chart-line me-2"></i>Показники лічильників</h2>
+					<h2><i class="fas fa-chart-line mr-2"></i>Показники лічильників</h2>
 					<p v-if="currentAddress" class="text-muted">
-						<i class="fas fa-map-marker-alt me-2"></i>{{ currentAddress.address }}
+						<i class="fas fa-map-marker-alt mr-2"></i>{{ currentAddress.address }}
 					</p>
 				</div>
-				<div class="col-sm-4 text-end">
+				<div class="col-sm-4 text-right">
 					<Button
 						label="Додати показники"
 						icon="pi pi-plus"

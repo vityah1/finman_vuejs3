@@ -4,6 +4,7 @@ import PaymentService from "../services/PaymentService";
 import AuthService from "../services/auth.service";
 import type { AxiosResponse } from 'axios';
 import { useStore } from 'vuex';
+import Card from 'primevue/card';
 
 interface AboutResponse {
   data: string;
@@ -11,6 +12,9 @@ interface AboutResponse {
 
 export default defineComponent({
   name: "AboutPage",
+  components: {
+    Card
+  },
   data() {
     return {
       htmlContent: "",
@@ -59,11 +63,13 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="container">
-    <header class="jumbotron">
-      <h3>Про програму</h3>
-    </header>
-    <div v-html="htmlContent"></div>
-    {{ content }}
+  <div>
+    <h2 class="mb-4"><i class="pi pi-info-circle mr-2"></i>Про програму</h2>
+    <Card>
+      <template #content>
+        <div v-html="htmlContent"></div>
+        {{ content }}
+      </template>
+    </Card>
   </div>
 </template>

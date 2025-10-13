@@ -72,7 +72,7 @@
         </div>
 
         <!-- Mobile pagination -->
-        <div v-if="paginator" class="d-flex justify-content-center mt-3">
+        <div v-if="paginator" class="flex justify-content-center mt-3">
           <Paginator
             :rows="rows"
             :totalRecords="data.length"

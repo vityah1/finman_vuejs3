@@ -9,11 +9,7 @@ import { queryClient } from './query-client'
 import './axios-config'
 import { getErrorMessage, logError } from '@/utils/errorHandler'
 
-import BootstrapVueNext from "bootstrap-vue-next"
-import "bootstrap/dist/css/bootstrap.css"
-import "bootstrap-vue-next/dist/bootstrap-vue-next.css"
-
-// PrimeVue imports - NO CUSTOM THEME, JUST DEFAULTS
+// PrimeVue imports
 import PrimeVue from 'primevue/config'
 import Lara from '@primevue/themes/lara'
 import 'primeicons/primeicons.css'                            // Icons
@@ -60,7 +56,6 @@ window.addEventListener('unhandledrejection', (event) => {
 
 // Додаємо момент до глобальних властивостей з типізацією
 app.config.globalProperties.$moment = moment
-app.use(BootstrapVueNext)
 app.use(PrimeVue, {
   ripple: true,
   theme: {

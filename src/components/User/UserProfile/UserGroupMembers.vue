@@ -1,8 +1,8 @@
 <template>
   <Card class="mb-4">
     <template #title>
-      <div class="d-flex justify-content-between align-items-center">
-        <h4 class="mb-0">Учасники групи</h4>
+      <div class="flex justify-content-between align-items-center">
+        <h4 class="m-0">Учасники групи</h4>
         <div v-if="isGroupOwner">
           <Button label="Запросити" icon="pi pi-user-plus" severity="success" @click="emit('show-invite-modal')" />
         </div>
@@ -19,17 +19,17 @@
       </div>
 
       <div v-else class="group-members">
-        <div v-for="user in groupUsers" :key="user.id" class="user-card p-3 mb-2 border rounded d-flex align-items-center">
-          <Avatar icon="pi pi-user" size="large" shape="circle" class="me-3" />
+        <div v-for="user in groupUsers" :key="user.id" class="user-card p-3 mb-2 border rounded flex align-items-center">
+          <Avatar icon="pi pi-user" size="large" shape="circle" class="mr-3" />
           <div class="flex-grow-1">
             <h5 class="mb-1">{{ user.fullname || user.login }}</h5>
-            <div class="d-flex align-items-center flex-wrap gap-2">
+            <div class="flex align-items-center flex-wrap gap-2">
               <Tag :value="getFormattedRole(user)" :severity="user.role === 'owner' ? 'danger' : 'info'" />
               <Tag v-if="user.relation_type" :value="getFormattedRelation(user)" severity="success" />
             </div>
             <div class="user-details small text-muted mt-2">
-              <div v-if="user.email"><i class="pi pi-envelope me-1"></i> {{ user.email }}</div>
-              <div v-if="user.phone"><i class="pi pi-phone me-1"></i> {{ user.phone }}</div>
+              <div v-if="user.email"><i class="pi pi-envelope mr-1"></i> {{ user.email }}</div>
+              <div v-if="user.phone"><i class="pi pi-phone mr-1"></i> {{ user.phone }}</div>
             </div>
           </div>
           <div v-if="isGroupOwner && user.id !== currentUserId" class="ms-auto">

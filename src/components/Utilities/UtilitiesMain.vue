@@ -3,7 +3,7 @@
 		<div class="container-fluid">
 			<div class="row mb-4">
 				<div class="col-12">
-					<h2><i class="fas fa-home me-2"></i>Комунальні послуги</h2>
+					<h2><i class="fas fa-home mr-2"></i>Комунальні послуги</h2>
 					<p class="text-muted">Управління адресами, службами та показниками лічильників</p>
 				</div>
 			</div>
@@ -67,14 +67,14 @@
 				<div class="col-lg-8">
 					<div class="card">
 						<div class="card-header">
-							<h5 class="mb-0"><i class="fas fa-chart-line me-2"></i>Останні показники</h5>
+							<h5 class="m-0"><i class="fas fa-chart-line mr-2"></i>Останні показники</h5>
 						</div>
 						<div class="card-body">
 							<div v-if="isLoadingReadings" class="text-center">
 								<ProgressSpinner />
 							</div>
 							<div v-else-if="latestReadings.length === 0" class="text-center text-muted">
-								<i class="fas fa-info-circle me-2"></i>Показники ще не додані
+								<i class="fas fa-info-circle mr-2"></i>Показники ще не додані
 							</div>
 							<div v-else class="table-responsive">
 								<table class="table table-hover">
@@ -107,7 +107,7 @@
 				<div class="col-lg-4">
 					<div class="card">
 						<div class="card-header">
-							<h5 class="mb-0"><i class="fas fa-list me-2"></i>Швидкі дії</h5>
+							<h5 class="m-0"><i class="fas fa-list mr-2"></i>Швидкі дії</h5>
 						</div>
 						<div class="card-body">
 							<div class="flex flex-column gap-2">
@@ -135,11 +135,11 @@
 
 							<hr>
 
-							<h6><i class="fas fa-info-circle me-2"></i>Підказки</h6>
+							<h6><i class="fas fa-info-circle mr-2"></i>Підказки</h6>
 							<ul class="list-unstyled small text-muted">
-								<li><i class="fas fa-lightbulb me-1"></i>Регулярно вносьте показники</li>
-								<li><i class="fas fa-chart-line me-1"></i>Аналізуйте споживання</li>
-								<li><i class="fas fa-money-bill me-1"></i>Відстежуйте витрати</li>
+								<li><i class="fas fa-lightbulb mr-1"></i>Регулярно вносьте показники</li>
+								<li><i class="fas fa-chart-line mr-1"></i>Аналізуйте споживання</li>
+								<li><i class="fas fa-money-bill mr-1"></i>Відстежуйте витрати</li>
 							</ul>
 						</div>
 					</div>
