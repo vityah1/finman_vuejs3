@@ -95,12 +95,6 @@ const routes: Array<RouteRecordRaw> = [
 	},
 	// Utilities routes
 	{
-		path: "/utilities",
-		name: "utilities",
-		component: () => import("./components/Utilities/UtilitiesMain.vue"),
-		meta: { requiresAuth: true },
-	},
-	{
 		path: "/utilities/addresses",
 		name: "utilities_addresses",
 		component: () => import("./components/Utilities/AddressList.vue"),

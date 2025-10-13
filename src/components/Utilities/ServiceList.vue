@@ -367,8 +367,9 @@ export default defineComponent({
 		});
 
 		// Breadcrumb
-		const breadcrumbHome = { icon: 'pi pi-home', route: { name: 'utilities' } };
+		const breadcrumbHome = { icon: 'pi pi-home', route: '/' };
 		const breadcrumbItems = computed(() => [
+			{ label: 'Комунальні' },
 			{ label: 'Адреси', route: { name: 'utilities_addresses' } },
 			{ label: currentAddress.value?.name || 'Служби' }
 		]);

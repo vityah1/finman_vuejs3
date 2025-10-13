@@ -1723,9 +1723,9 @@ export default defineComponent({
 		});
 
 		// Breadcrumb
-		const breadcrumbHome = { icon: 'pi pi-home', route: { name: 'utilities' } };
+		const breadcrumbHome = { icon: 'pi pi-home', route: '/' };
 		const breadcrumbItems = computed(() => [
-			{ label: 'Комунальні', route: { name: 'utilities' } },
+			{ label: 'Комунальні' },
 			{ label: 'Адреси', route: { name: 'utilities_addresses' } },
 			{ label: isEditing.value ? 'Редагувати показники' : 'Додати показники' }
 		]);

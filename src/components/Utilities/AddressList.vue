@@ -256,8 +256,9 @@ export default defineComponent({
 	},
 	setup() {
 		// Breadcrumb
-		const breadcrumbHome = { icon: 'pi pi-home', route: { name: 'utilities' } };
+		const breadcrumbHome = { icon: 'pi pi-home', route: '/' };
 		const breadcrumbItems = ref([
+			{ label: 'Комунальні' },
 			{ label: 'Адреси' }
 		]);
 

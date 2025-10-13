@@ -100,11 +100,6 @@ const menuItems = computed(() => {
       icon: 'pi pi-building',
       items: [
         {
-          label: 'Головна',
-          icon: 'pi pi-chart-bar',
-          command: () => router.push({ name: 'utilities' })
-        },
-        {
           label: 'Адреси',
           icon: 'pi pi-map-marker',
           command: () => router.push({ name: 'utilities_addresses' })

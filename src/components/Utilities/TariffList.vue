@@ -359,8 +359,9 @@ export default defineComponent({
 		const addressId = computed(() => route.params.addressId ? parseInt(route.params.addressId as string) : null);
 
 		// Breadcrumb
-		const breadcrumbHome = { icon: 'pi pi-home', route: { name: 'utilities' } };
+		const breadcrumbHome = { icon: 'pi pi-home', route: '/' };
 		const breadcrumbItems = computed(() => [
+			{ label: 'Комунальні' },
 			{ label: 'Адреси', route: { name: 'utilities_addresses' } },
 			{ label: 'Служби', route: addressId.value ? { name: 'utilities_services', params: { addressId: addressId.value } } : null },
 			{ label: 'Тарифи' }
