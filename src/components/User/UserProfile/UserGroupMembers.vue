@@ -3,9 +3,9 @@
     <template #title>
       <div class="flex justify-content-between align-items-center">
         <h4 class="m-0">Учасники групи</h4>
-        <div v-if="isGroupOwner">
-          <Button label="Запросити" icon="pi pi-user-plus" severity="success" @click="emit('show-invite-modal')" />
-        </div>
+<!--        <div v-if="isGroupOwner">-->
+<!--          <Button label="Запросити" icon="pi pi-user-plus" severity="success" @click="emit('show-invite-modal')" />-->
+<!--        </div>-->
       </div>
     </template>
     <template #content>

@@ -16,18 +16,11 @@
 		</Message>
 		<div v-else-if="groupedData">
 			<!-- Загальна сума (показуємо вгорі) -->
-			<Card class="mb-4 total-card">
+			<Card class="mb-3 total-summary-card">
 				<template #content>
-					<!-- Десктопна версія -->
-					<div class="flex justify-content-between align-items-center hidden md:flex">
-						<h5 class="m-0">Загальна сума за період {{ filteredGroupedData.period }}:</h5>
-						<h3 class="m-0 text-primary font-bold">{{ formatCurrency(totalAmount) }}</h3>
-					</div>
-
-					<!-- Мобільна версія - компактно -->
-					<div class="text-center md:hidden">
-						<div class="text-muted small mb-2">{{ filteredGroupedData.period }}</div>
-						<h3 class="m-0 text-primary font-bold">{{ formatCurrency(totalAmount) }}</h3>
+					<div class="flex justify-content-between align-items-center">
+						<div class="total-label">Загальна сума за період:</div>
+						<div class="total-amount">{{ formatCurrency(totalAmount) }}</div>
 					</div>
 				</template>
 			</Card>
@@ -36,117 +29,76 @@
 			<div v-if="filteredGroupedData.service_groups && filteredGroupedData.service_groups.length > 0">
 				<Card v-for="group in filteredGroupedData.service_groups" :key="group.group_name" class="mb-4">
 					<template #title>
-						<div class="flex align-items-center">
-							<i class="pi pi-th-large mr-2"></i>
-							{{ getGroupTitle(group.group_name) }}
-							<Tag v-if="group?.has_shared_meter" severity="info" class="ml-2">
-								<i class="pi pi-link mr-1"></i>Спільний показник
-							</Tag>
+						<div class="flex align-items-center justify-content-between flex-wrap gap-2">
+							<div class="flex align-items-center gap-2">
+								<i class="pi pi-th-large"></i>
+								<span>{{ getGroupTitle(group.group_name) }}</span>
+								<Tag
+									v-if="group?.has_shared_meter"
+									severity="info"
+									v-tooltip.top="'Один показник використовується для розрахунку всіх тарифів цієї групи'"
+								>
+									<i class="pi pi-link mr-1"></i>Спільний лічильник
+								</Tag>
+							</div>
+							<!-- Показники в заголовку ТІЛЬКИ для спільного лічильника -->
+							<div v-if="group?.has_shared_meter && group.readings.length > 0" class="meter-display">
+								<span class="current-reading">{{ getSharedMeterReading(group) }}</span>
+								<span v-if="getSharedMeterPreviousReading(group)" class="reading-diff">
+									- {{ getSharedMeterPreviousReading(group) }} =
+									<strong>{{
+										typeof getSharedMeterReading(group) === 'number'
+											? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0))
+											: 0
+									}}</strong>
+								</span>
+							</div>
 						</div>
 					</template>
 					<template #content>
-						<!-- Спільний показник для групи (показуємо один раз) -->
-						<Message v-if="group?.has_shared_meter && group.readings.length > 0" severity="info" :closable="false" class="mb-3">
-							<!-- Десктопна версія -->
-							<div class="hidden md:block">
-								<div class="flex justify-content-between align-items-center">
-									<div>
-										<strong><i class="pi pi-gauge mr-2"></i>Спільний показник лічильника:</strong>
-										<span class="text-xl font-bold ml-2">{{ getSharedMeterReading(group) }}</span>
-										<span v-if="getSharedMeterPreviousReading(group)" class="text-muted ml-2">
-											(попередній: {{ getSharedMeterPreviousReading(group) }})
-										</span>
-									</div>
-									<div class="text-right">
-										<small class="text-muted">Споживання:</small><br>
-										<strong>{{
-											typeof getSharedMeterReading(group) === 'number'
-												? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0))
-												: 'Немає даних'
-										}}</strong>
-									</div>
-								</div>
-								<Divider />
-								<small class="text-muted">
-									<i class="pi pi-info-circle mr-1"></i>
-									Один показник використовується для розрахунку всіх тарифів цієї групи
-								</small>
-							</div>
-
-							<!-- Мобільна версія - компактна -->
-							<div class="md:hidden text-center">
-								<div class="mb-2">
-									<i class="pi pi-gauge mr-2"></i>
-									<strong>Показник: {{ getSharedMeterReading(group) }}</strong>
-									<span v-if="getSharedMeterPreviousReading(group)" class="text-muted ml-2">
-										(було: {{ getSharedMeterPreviousReading(group) }})
-									</span>
-								</div>
-								<small class="text-muted">
-									Споживання: <strong>{{
-										typeof getSharedMeterReading(group) === 'number'
-											? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0))
-											: 'Немає даних'
-									}}</strong>
-								</small>
-							</div>
-						</Message>
 					<!-- Деталізація за службами/тарифами -->
-					<!-- Десктопна версія -->
-					<div class="table-responsive mb-3 hidden md:block">
-						<table class="table table-sm">
+					<div class="table-responsive">
+						<table class="table table-sm readings-table">
 							<thead>
 								<tr>
-									<th>Служба/Тариф</th>
-									<th class="text-right">Показник</th>
+									<th>Тариф</th>
+									<th v-if="!group?.has_shared_meter" class="text-right">Показник</th>
 									<th class="text-right">Споживання</th>
-									<th class="text-right">Тариф</th>
+									<th class="text-right">Ціна</th>
 									<th class="text-right">Сума</th>
 									<th class="text-center" style="width: 50px;">Дії</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr v-for="reading in group.readings as ExtendedGroupedReadingItem[]" :key="reading.id">
-									<td>
-										{{ reading.service_name }}
-										<span v-if="reading.tariff_name" class="text-muted">
-											<br><small>{{ reading.tariff_name }}</small>
-										</span>
-										<span v-if="reading.tariff_type === 'consumption' && reading.service_name.includes('Газ')" 
-											  class="badge bg-info ml-2" 
-											  :title="`Тариф діє з 01.02.2025`">
-											<i class="pi pi-info-circle"></i>
-										</span>
+									<td class="tariff-name">
+										{{ reading.tariff_name || reading.service_name }}
 									</td>
-									<td class="text-right">
-										<span v-if="!group?.has_shared_meter">
-											{{ reading.current_reading }}
-											<span class="text-muted small block" v-if="reading.previous_reading">
-												(попер. {{ reading.previous_reading }})
-											</span>
+									<td v-if="!group?.has_shared_meter" class="text-right">
+										<span v-if="reading.tariff_type === 'subscription'">
+											-
 										</span>
-										<span v-else class="text-muted">
-											<small>Спільний показник</small>
+										<span v-else class="meter-inline">
+											<span class="current-reading">{{ reading.current_reading }}</span>
+											<span v-if="reading.previous_reading" class="reading-diff">
+												- {{ reading.previous_reading }} = <strong>{{ reading.consumption || 0 }}</strong>
+											</span>
 										</span>
 									</td>
 									<td class="text-right">
 										<span v-if="reading.tariff_type === 'subscription'">-</span>
-										<span v-else>{{ reading.consumption || 0 }}</span>
+										<span v-else class="consumption-value">{{ reading.consumption || 0 }}</span>
 									</td>
 									<td class="text-right">
-										<span v-if="reading.tariff_type === 'subscription'">
+										<span v-if="reading.tariff_type === 'subscription'" class="subscription-label">
 											Абонплата
 										</span>
-										<span v-else-if="reading.tariff">
-											{{ formatRate(reading.tariff.rate) }}
-											<span class="text-muted small block" v-if="reading.tariff_type === 'consumption'">
-												грн/{{ getServiceUnit(reading.service_id) }}
-											</span>
+										<span v-else-if="reading.tariff" class="tariff-rate">
+											{{ formatRate(reading.tariff.rate) }} грн/{{ getServiceUnit(reading.service_id) }}
 										</span>
 									</td>
-									<td class="text-right">{{ formatCurrency(reading.amount) }}</td>
+									<td class="text-right amount-cell">{{ formatCurrency(reading.amount) }}</td>
 									<td class="text-center">
-										<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
 										<Button
 											v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)"
 											icon="pi pi-pencil"
@@ -157,13 +109,12 @@
 										/>
 									</td>
 								</tr>
-							</tbody>
-							<tfoot>
-								<tr class="font-bold">
-									<td colspan="5">Загальна сума по групі:</td>
-									<td class="text-right text-primary">{{ formatCurrency(group.total_amount) }}</td>
+								<tr class="total-row">
+									<td :colspan="group?.has_shared_meter ? 3 : 4" class="text-right total-label">Загальна сума:</td>
+									<td class="text-right total-value">{{ formatCurrency(group.total_amount) }}</td>
+									<td></td>
 								</tr>
-							</tfoot>
+							</tbody>
 						</table>
 					</div>
 					
@@ -224,62 +175,57 @@
 			<!-- Окремі служби без груп -->
 			<Card v-for="service in filteredGroupedData.services" :key="service.service_id" class="mb-4">
 				<template #title>
-					<div class="flex align-items-center">
-						<i class="pi pi-gauge mr-2"></i>
-						{{ service.service_name }}
+					<div class="flex align-items-center gap-2">
+						<i class="pi pi-gauge"></i>
+						<span>{{ service.service_name }}</span>
 					</div>
 				</template>
 				<template #content>
 					<!-- Десктопна версія таблиці -->
-					<div class="table-responsive hidden md:block">
-						<table class="table table-sm">
+					<div class="table-responsive">
+						<table class="table table-sm readings-table">
 							<thead>
 								<tr>
 									<th>Тариф</th>
 									<th class="text-right">Показник</th>
 									<th class="text-right">Споживання</th>
-									<th class="text-right">Ставка</th>
+									<th class="text-right">Ціна</th>
 									<th class="text-right">Сума</th>
 									<th class="text-center" style="width: 50px;">Дії</th>
 								</tr>
 							</thead>
 							<tbody>
 								<tr v-for="reading in service.readings as ExtendedGroupedReadingItem[]" :key="reading.id">
-									<td>{{ reading.tariff_name || 'Без тарифу' }}</td>
+									<td class="tariff-name">{{ reading.tariff_name || 'Без тарифу' }}</td>
 									<td class="text-right">
-										<span v-if="reading.tariff?.calculation_method === 'fixed'">
+										<span v-if="reading.tariff_type === 'subscription' || reading.tariff?.calculation_method === 'fixed'">
 											-
 										</span>
-										<span v-else>
-											{{ reading.current_reading }}
-											<span class="text-muted small block" v-if="reading.previous_reading">
-												(попер. {{ reading.previous_reading }})
+										<span v-else class="meter-inline">
+											<span class="current-reading">{{ reading.current_reading }}</span>
+											<span v-if="reading.previous_reading" class="reading-diff">
+												- {{ reading.previous_reading }} = <strong>{{ reading.consumption || 0 }}</strong>
 											</span>
 										</span>
 									</td>
 									<td class="text-right">
 										<span v-if="reading.tariff_type === 'subscription' || reading.tariff?.calculation_method === 'fixed'">-</span>
-										<span v-else>{{ reading.consumption || 0 }} {{ service.unit }}</span>
+										<span v-else class="consumption-value">{{ reading.consumption || 0 }}</span>
 									</td>
 									<td class="text-right">
-										<span v-if="reading.tariff_type === 'subscription'">
+										<span v-if="reading.tariff_type === 'subscription'" class="subscription-label">
 											Абонплата
 										</span>
-										<span v-else-if="reading.tariff?.calculation_method === 'fixed'">
+										<span v-else-if="reading.tariff?.calculation_method === 'fixed'" class="subscription-label">
 											Фіксована сума
 										</span>
-										<span v-else-if="reading.tariff">
-											{{ formatRate(reading.tariff.rate) }}
-											<span class="text-muted small block" v-if="reading.tariff_type === 'consumption'">
-												грн/{{ getServiceUnit(reading.service_id) }}
-											</span>
+										<span v-else-if="reading.tariff" class="tariff-rate">
+											{{ formatRate(reading.tariff.rate) }} грн/{{ getServiceUnit(reading.service_id) }}
 										</span>
 									</td>
-									<td class="text-right">{{ formatCurrency(reading.amount) }}</td>
+									<td class="text-right amount-cell">{{ formatCurrency(reading.amount) }}</td>
 									<td class="text-center">
-										<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
 										<Button
-											v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)"
 											icon="pi pi-pencil"
 											@click="editReading(reading.id)"
 											title="Редагувати"
@@ -288,13 +234,12 @@
 										/>
 									</td>
 								</tr>
-							</tbody>
-							<tfoot>
-								<tr class="font-bold">
-									<td colspan="5">Всього:</td>
-									<td class="text-right text-primary">{{ formatCurrency(service.total_amount) }}</td>
+								<tr class="total-row">
+									<td colspan="5" class="text-right total-label">Загальна сума:</td>
+									<td class="text-right total-value">{{ formatCurrency(service.total_amount) }}</td>
+									<td></td>
 								</tr>
-							</tfoot>
+							</tbody>
 						</table>
 					</div>
 					
@@ -624,13 +569,156 @@ export default defineComponent({
 	margin-top: 1rem;
 }
 
-.total-card :deep(.p-card-content) {
-	padding: 1.5rem;
-	background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
-	border-radius: var(--border-radius);
+/* Total summary card */
+.total-summary-card :deep(.p-card-content) {
+	padding: 0.875rem 1.25rem;
 }
 
-.table-sm td, .table-sm th {
-	padding: 0.5rem;
+.total-label {
+	font-size: 1rem;
+	font-weight: 600;
+	color: #2c3e50;
+}
+
+.total-amount {
+	font-size: 1.75rem;
+	font-weight: 700;
+	color: var(--primary-color);
+}
+
+/* Meter display in card title (for shared meters only) */
+.meter-display {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 0.95rem;
+	color: #495057;
+}
+
+.meter-display .current-reading {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--primary-color);
+}
+
+.meter-display .reading-diff {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: 0.9rem;
+	color: #6c757d;
+}
+
+.meter-display .reading-diff strong {
+	font-size: 1.125rem;
+	color: #2c3e50;
+}
+
+/* Meter display inline in table (for non-shared meters) */
+.meter-inline {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.375rem;
+	white-space: nowrap;
+}
+
+.meter-inline .current-reading {
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: var(--primary-color);
+}
+
+.meter-inline .reading-diff {
+	font-size: 0.875rem;
+	color: #6c757d;
+}
+
+.meter-inline .reading-diff strong {
+	font-size: 1rem;
+	color: #2c3e50;
+}
+
+/* Readings table */
+.readings-table {
+	margin-bottom: 0;
+}
+
+.readings-table td,
+.readings-table th {
+	padding: 0.375rem 0.5rem;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.readings-table thead th {
+	padding-top: 0.25rem;
+	padding-bottom: 0.375rem;
+	font-weight: 600;
+	color: #2c3e50;
+	background-color: #f8f9fa;
+	border-bottom: 2px solid #dee2e6;
+}
+
+.tariff-name {
+	font-weight: 500;
+	color: #2c3e50;
+}
+
+.consumption-value {
+	font-weight: 600;
+}
+
+.tariff-rate {
+	font-size: 0.9rem;
+	color: #495057;
+}
+
+.subscription-label {
+	font-size: 0.875rem;
+	color: #6c757d;
+	font-style: italic;
+}
+
+.amount-cell {
+	font-weight: 600;
+	color: #2c3e50;
+}
+
+/* Total row */
+.total-row {
+	border-top: 2px solid #dee2e6;
+}
+
+.total-row .total-label {
+	font-weight: 600;
+	color: #2c3e50;
+	padding-top: 0.75rem;
+	padding-bottom: 0.75rem;
+}
+
+.total-row .total-value {
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: var(--primary-color);
+	padding-top: 0.75rem;
+	padding-bottom: 0.75rem;
+}
+
+@media (max-width: 768px) {
+	.total-amount {
+		font-size: 1.5rem;
+	}
+
+	.reading-value {
+		font-size: 1.125rem;
+	}
+
+	.consumption-value {
+		font-size: 1rem;
+	}
+
+	.group-total .total-value {
+		font-size: 1.125rem;
+	}
 }
 </style>

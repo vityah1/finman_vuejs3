@@ -20,9 +20,9 @@
         <h5>{{ userGroup.name }}</h5>
         <p class="text-muted">{{ userGroup.description }}</p>
 
-        <div class="flex align-items-center mb-3">
+        <div class="flex align-items-center justify-content-between mb-3">
           <Tag :value="isGroupOwner ? 'Власник' : 'Учасник'" severity="info" />
-          <div v-if="isGroupOwner" class="ms-auto">
+          <div v-if="isGroupOwner">
             <Button
                 label="Редагувати"
                 icon="pi pi-pencil"
@@ -32,7 +32,7 @@
                 @click="showEditGroupModal = true"
             />
           </div>
-          <div v-else class="ms-auto">
+          <div v-else>
             <Button
                 label="Вийти з групи"
                 icon="pi pi-sign-out"
@@ -59,45 +59,113 @@
   </Card>
 
   <!-- Модальні вікна для створення та редагування групи -->
-  <Dialog v-model:visible="showCreateGroupModal" header="Створення сімейної групи" :modal="true" :style="{width: '450px'}">
-    <div class="p-fluid">
-      <div class="p-field mb-3">
-        <label for="group-name">Назва групи</label>
-        <InputText id="group-name" v-model="newGroup.name" required autofocus />
+  <Dialog
+    v-model:visible="showCreateGroupModal"
+    header="Створення сімейної групи"
+    :modal="true"
+    :style="{width: '540px'}"
+  >
+    <div class="flex flex-col gap-4 py-2">
+      <div class="field-group">
+        <label for="group-name" class="field-label">Назва групи</label>
+        <InputText
+          id="group-name"
+          v-model="newGroup.name"
+          placeholder="Наприклад: Сім'я Іваненків"
+          required
+          autofocus
+          class="w-full"
+        />
       </div>
-      <div class="p-field">
-        <label for="group-description">Опис</label>
-        <Textarea id="group-description" v-model="newGroup.description"
-			rows="3"
-			cols="50"
-			auto-resize
-		/>
+
+      <div class="field-group">
+        <label for="group-description" class="field-label">
+          Опис
+          <span class="optional-label">(необов'язково)</span>
+        </label>
+        <Textarea
+          id="group-description"
+          v-model="newGroup.description"
+          placeholder="Короткий опис групи"
+          rows="3"
+          auto-resize
+          class="w-full"
+        />
       </div>
     </div>
+
     <template #footer>
-      <Button label="Скасувати" icon="pi pi-times" text @click="showCreateGroupModal = false"/>
-      <Button label="Створити" icon="pi pi-check" @click="createGroup" :loading="createGroupMutation.isPending.value"/>
+      <div class="flex justify-content-end gap-3">
+        <Button
+          label="Скасувати"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          @click="showCreateGroupModal = false"
+        />
+        <Button
+          label="Створити"
+          icon="pi pi-check"
+          severity="success"
+          @click="createGroup"
+          :loading="createGroupMutation.isPending.value"
+        />
+      </div>
     </template>
   </Dialog>
 
-  <Dialog v-model:visible="showEditGroupModal" header="Редагування групи" :modal="true" :style="{width: '450px'}">
-    <div class="p-fluid">
-      <div class="p-field mb-3">
-        <label for="edit-group-name">Назва групи</label>
-        <InputText id="edit-group-name" v-model="editingGroup.name" required autofocus />
+  <Dialog
+    v-model:visible="showEditGroupModal"
+    header="Редагування групи"
+    :modal="true"
+    :style="{width: '540px'}"
+  >
+    <div class="flex flex-col gap-4 py-2">
+      <div class="field-group">
+        <label for="edit-group-name" class="field-label">Назва групи</label>
+        <InputText
+          id="edit-group-name"
+          v-model="editingGroup.name"
+          placeholder="Наприклад: Сім'я Іваненків"
+          required
+          autofocus
+          class="w-full"
+        />
       </div>
-      <div class="p-field">
-        <label for="edit-group-description">Опис</label>
-        <Textarea id="edit-group-description" v-model="editingGroup.description"
-			rows="3"
-			cols="50"
-			auto-resize
-		/>
+
+      <div class="field-group">
+        <label for="edit-group-description" class="field-label">
+          Опис
+          <span class="optional-label">(необов'язково)</span>
+        </label>
+        <Textarea
+          id="edit-group-description"
+          v-model="editingGroup.description"
+          placeholder="Короткий опис групи"
+          rows="3"
+          auto-resize
+          class="w-full"
+        />
       </div>
     </div>
+
     <template #footer>
-      <Button label="Скасувати" icon="pi pi-times" text @click="showEditGroupModal = false"/>
-      <Button label="Зберегти" icon="pi pi-check" @click="updateGroup" :loading="updateGroupMutation.isPending.value"/>
+      <div class="flex justify-content-end gap-3">
+        <Button
+          label="Скасувати"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          @click="showEditGroupModal = false"
+        />
+        <Button
+          label="Зберегти"
+          icon="pi pi-check"
+          severity="success"
+          @click="updateGroup"
+          :loading="updateGroupMutation.isPending.value"
+        />
+      </div>
     </template>
   </Dialog>
 
@@ -244,5 +312,27 @@ const handleLeaveGroupConfirm = async () => {
 .group-info {
   border-left: 4px solid var(--primary-color);
   padding-left: 15px;
+}
+
+/* Form field styling */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #2c3e50;
+  margin-bottom: 0.25rem;
+}
+
+.optional-label {
+  font-weight: 400;
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-left: 0.25rem;
 }
 </style>

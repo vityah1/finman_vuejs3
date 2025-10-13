@@ -42,50 +42,136 @@
   </Card>
 
   <!-- Модальне вікно для створення запрошення -->
-  <Dialog v-model:visible="showInviteModal" header="Запросити до групи" :modal="true" :style="{width: '450px'}">
-    <div class="p-fluid">
-      <div class="p-field mb-3">
-        <label for="invite-email">Електронна пошта (необов'язково)</label>
-        <InputText id="invite-email" v-model="newInvitation.email" type="email" />
+  <Dialog
+    v-model:visible="showInviteModal"
+    header="Запросити до групи"
+    :modal="true"
+    :style="{width: '540px'}"
+  >
+    <div class="flex flex-col gap-4 py-2">
+      <div class="field-group">
+        <label for="invite-email" class="field-label">
+          Електронна пошта
+          <span class="optional-label">(необов'язково)</span>
+        </label>
+        <InputText
+          id="invite-email"
+          v-model="newInvitation.email"
+          type="email"
+          placeholder="example@email.com"
+          class="w-full"
+        />
+        <small class="field-description">
+          <i class="pi pi-info-circle"></i>
+          Якщо вказано, запрошення буде пов'язане з цією адресою
+        </small>
       </div>
-      <div class="p-field">
-        <label for="invite-expires">Термін дії</label>
-        <Dropdown id="invite-expires" v-model="newInvitation.expiresOption" :options="expiresOptions" optionLabel="label" optionValue="value" />
+
+      <div class="field-group">
+        <label for="invite-expires" class="field-label">Термін дії</label>
+        <Dropdown
+          id="invite-expires"
+          v-model="newInvitation.expiresOption"
+          :options="expiresOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Оберіть термін дії"
+          class="w-full"
+        />
       </div>
     </div>
+
     <template #footer>
-      <Button label="Скасувати" icon="pi pi-times" text @click="showInviteModal = false"/>
-      <Button label="Створити" icon="pi pi-check" @click="createInvitation" :loading="createInvitationMutation.isPending.value"/>
+      <div class="flex justify-content-end gap-3">
+        <Button
+          label="Скасувати"
+          icon="pi pi-times"
+          severity="secondary"
+          outlined
+          @click="showInviteModal = false"
+        />
+        <Button
+          label="Створити"
+          icon="pi pi-check"
+          severity="success"
+          @click="createInvitation"
+          :loading="createInvitationMutation.isPending.value"
+        />
+      </div>
     </template>
   </Dialog>
 
   <!-- Інформація про створене запрошення -->
-  <Dialog v-model:visible="showInvitationInfoModal" header="Інформація про запрошення" :modal="true" :style="{width: '500px'}" v-if="lastCreatedInvitation">
-    <p>Запрошення успішно створено!</p>
-    <div class="p-fluid mt-3">
-      <div class="p-field mb-3">
-        <label for="invitation-code">Код запрошення</label>
+  <Dialog
+    v-model:visible="showInvitationInfoModal"
+    header="Запрошення успішно створено!"
+    :modal="true"
+    :style="{width: '550px'}"
+    v-if="lastCreatedInvitation"
+  >
+    <Message severity="success" :closable="false" class="mb-4">
+      <div class="flex align-items-center">
+        <i class="pi pi-check-circle mr-2"></i>
+        <span>Поділіться кодом або посиланням з користувачем для приєднання до групи</span>
+      </div>
+    </Message>
+
+    <div class="invitation-info">
+      <div class="field mb-4">
+        <label for="invitation-code" class="font-semibold mb-2 block">Код запрошення</label>
         <InputGroup>
-          <InputText id="invitation-code" readonly :value="lastCreatedInvitation?.invitation_code || ''" />
-          <Button icon="pi pi-copy" @click="copyToClipboard(lastCreatedInvitation?.invitation_code || '')" />
+          <InputText
+            id="invitation-code"
+            readonly
+            :value="lastCreatedInvitation?.invitation_code || ''"
+            class="font-mono"
+          />
+          <Button
+            icon="pi pi-copy"
+            severity="secondary"
+            @click="copyToClipboard(lastCreatedInvitation?.invitation_code || '')"
+            v-tooltip.top="'Копіювати код'"
+          />
         </InputGroup>
       </div>
-      <div class="p-field">
-        <label for="invitation-link">Посилання</label>
+
+      <div class="field mb-4">
+        <label for="invitation-link" class="font-semibold mb-2 block">Посилання для приєднання</label>
         <InputGroup>
-          <InputText id="invitation-link" readonly :value="invitationLink" />
-          <Button icon="pi pi-copy" @click="copyToClipboard(invitationLink)" />
+          <InputText
+            id="invitation-link"
+            readonly
+            :value="invitationLink"
+            class="text-sm"
+          />
+          <Button
+            icon="pi pi-copy"
+            severity="secondary"
+            @click="copyToClipboard(invitationLink)"
+            v-tooltip.top="'Копіювати посилання'"
+          />
         </InputGroup>
       </div>
-    </div>
-    <div class="mt-3 small">
-      Поділіться цим кодом або посиланням з користувачем, щоб він міг приєднатись до вашої групи.
-      <div v-if="lastCreatedInvitation?.email" class="text-muted mt-2">
-        Запрошення буде пов'язане з користувачем, який має email: {{ lastCreatedInvitation.email }}
+
+      <div v-if="lastCreatedInvitation?.email" class="field">
+        <Message severity="info" :closable="false">
+          <div class="flex align-items-center">
+            <i class="pi pi-envelope mr-2"></i>
+            <span>Запрошення пов'язане з email: <strong>{{ lastCreatedInvitation.email }}</strong></span>
+          </div>
+        </Message>
       </div>
     </div>
+
     <template #footer>
-      <Button label="OK" @click="showInvitationInfoModal = false" autofocus/>
+      <div class="flex justify-content-end">
+        <Button
+          label="Зрозуміло"
+          icon="pi pi-check"
+          @click="showInvitationInfoModal = false"
+          autofocus
+        />
+      </div>
     </template>
   </Dialog>
 
@@ -114,6 +200,7 @@ import InputText from 'primevue/inputtext';
 import Dropdown from 'primevue/dropdown';
 import ProgressSpinner from 'primevue/progressspinner';
 import InputGroup from 'primevue/inputgroup';
+import Message from 'primevue/message';
 import {
   useCreateGroupInvitationApiGroupsGroupIdInvitationsPost
 } from '@/api/groups/groups';
@@ -259,6 +346,65 @@ const handleRevokeConfirm = async () => {
 }
 
 .gap-2 {
-    gap: 0.5rem;
+  gap: 0.5rem;
+}
+
+/* Form field styling */
+.field-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.field-label {
+  display: block;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #2c3e50;
+  margin-bottom: 0.25rem;
+}
+
+.optional-label {
+  font-weight: 400;
+  color: #6c757d;
+  font-size: 0.875rem;
+  margin-left: 0.25rem;
+}
+
+.field-description {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  color: #6c757d;
+  font-size: 0.875rem;
+  line-height: 1.4;
+  margin-top: 0.25rem;
+}
+
+.field-description .pi {
+  color: #6366f1;
+  font-size: 0.875rem;
+  margin-top: 0.125rem;
+  flex-shrink: 0;
+}
+
+.text-muted {
+  color: #6c757d;
+  font-size: 0.875rem;
+}
+
+.font-mono {
+  font-family: 'Courier New', monospace;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+}
+
+.font-semibold {
+  font-weight: 600;
+}
+
+/* Info modal styling */
+.invitation-info {
+  padding: 0.5rem 0;
 }
 </style>

@@ -35,15 +35,15 @@
 			</div>
 
 			<!-- Filters -->
-			<Card class="mb-4">
+			<Card class="mb-3 filters-card">
 				<template #content>
-					<div class="formgrid grid">
-						<div class="field col-12 md:col-6">
-							<label for="periodFilter" class="font-semibold mb-2 block">Період</label>
+					<div class="flex flex-wrap gap-3 align-items-end">
+						<div class="filter-field">
+							<label for="periodFilter" class="filter-label">Період</label>
 							<MonthSelector v-model="selectedPeriod" />
 						</div>
-						<div class="field col-12 md:col-6">
-							<label for="serviceFilter" class="font-semibold mb-2 block">Служба</label>
+						<div class="filter-field">
+							<label for="serviceFilter" class="filter-label">Служба</label>
 							<Dropdown
 								id="serviceFilter"
 								v-model="selectedService"
@@ -52,17 +52,16 @@
 								optionValue="id"
 								placeholder="Всі служби"
 								showClear
-								class="w-full"
+								class="filter-dropdown"
 							/>
 						</div>
-					</div>
-					<div class="flex justify-content-end">
 						<Button
-							label="Скинути фільтри"
+							label="Скинути"
 							icon="pi pi-times"
 							outlined
 							severity="secondary"
 							@click="resetFilters"
+							class="reset-button"
 						/>
 					</div>
 				</template>
@@ -484,5 +483,46 @@ export default defineComponent({
 .pagination .page-item.active .page-link {
 	background-color: #0d6efd;
 	border-color: #0d6efd;
+}
+
+/* Filters styling */
+.filters-card :deep(.p-card-content) {
+	padding: 1rem;
+}
+
+.filter-field {
+	flex: 0 0 auto;
+	min-width: 200px;
+}
+
+.filter-label {
+	display: block;
+	font-weight: 600;
+	font-size: 0.875rem;
+	color: #2c3e50;
+	margin-bottom: 0.5rem;
+}
+
+.filter-dropdown {
+	min-width: 200px;
+}
+
+.reset-button {
+	margin-top: auto;
+}
+
+@media (max-width: 768px) {
+	.filter-field {
+		flex: 1 1 100%;
+		min-width: 100%;
+	}
+
+	.filter-dropdown {
+		width: 100%;
+	}
+
+	.reset-button {
+		width: 100%;
+	}
 }
 </style>
