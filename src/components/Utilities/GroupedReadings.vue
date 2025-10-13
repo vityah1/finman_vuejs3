@@ -3,94 +3,94 @@
 		<div v-if="loading" class="text-center p-4">
 			<ProgressSpinner />
 		</div>
-		<div v-else-if="error" class="alert alert-danger">
+		<Message v-else-if="error" severity="error" :closable="false">
 			<i class="fas fa-exclamation-triangle mr-2"></i>
 			Помилка при завантаженні даних: {{ error.message }}
 			<pre v-if="error.response?.data">{{ JSON.stringify(error.response.data, null, 2) }}</pre>
-		</div>
-		<div v-else-if="groupedData && (!groupedData.service_groups || groupedData.service_groups.length === 0) && (!groupedData.services || groupedData.services.length === 0)" class="alert alert-warning">
+		</Message>
+		<Message v-else-if="groupedData && (!groupedData.service_groups || groupedData.service_groups.length === 0) && (!groupedData.services || groupedData.services.length === 0)" severity="warn" :closable="false">
 			<i class="fas fa-exclamation-triangle mr-2"></i>
 			Немає показників за обраний період ({{ period }}).
 			<br>
 			<small class="text-muted">Останні показники доступні за {{ formatPeriod(groupedData.period) }}</small>
-		</div>
+		</Message>
 		<div v-else-if="groupedData">
 			<!-- Загальна сума (показуємо вгорі) -->
-			<div class="card mb-4">
-				<div class="card-body">
+			<Card class="mb-4 total-card">
+				<template #content>
 					<!-- Десктопна версія -->
 					<div class="flex justify-content-between align-items-center hidden md:flex">
 						<h5 class="m-0">Загальна сума за період {{ filteredGroupedData.period }}:</h5>
-						<h4 class="m-0 text-primary">{{ formatCurrency(totalAmount) }}</h4>
+						<h3 class="m-0 text-primary font-bold">{{ formatCurrency(totalAmount) }}</h3>
 					</div>
 
 					<!-- Мобільна версія - компактно -->
 					<div class="text-center md:hidden">
-						<div class="text-muted small">{{ filteredGroupedData.period }}</div>
-						<h4 class="m-0 text-primary">{{ formatCurrency(totalAmount) }}</h4>
+						<div class="text-muted small mb-2">{{ filteredGroupedData.period }}</div>
+						<h3 class="m-0 text-primary font-bold">{{ formatCurrency(totalAmount) }}</h3>
 					</div>
-				</div>
-			</div>
+				</template>
+			</Card>
 			
 			<!-- Групи служб (електрика, вода) -->
 			<div v-if="filteredGroupedData.service_groups && filteredGroupedData.service_groups.length > 0">
-				<div v-for="group in filteredGroupedData.service_groups" :key="group.group_name" class="card mb-4">
-				<div class="card-header">
-					<h5 class="m-0">
-						<i class="fas fa-layer-group mr-2"></i>
-						{{ getGroupTitle(group.group_name) }}
-						<span v-if="group?.has_shared_meter" class="badge bg-info ml-2">
-							<i class="fas fa-link mr-1"></i>Спільний показник
-						</span>
-					</h5>
-				</div>
-				<div class="card-body">
-					<!-- Спільний показник для групи (показуємо один раз) -->
-					<div v-if="group?.has_shared_meter && group.readings.length > 0" class="alert alert-info mb-3">
-						<!-- Десктопна версія -->
-						<div class="hidden md:block">
-							<div class="flex justify-content-between align-items-center">
-								<div>
-									<strong><i class="fas fa-tachometer-alt mr-2"></i>Спільний показник лічильника:</strong>
-									<span class="h5 ml-2">{{ getSharedMeterReading(group) }}</span>
+				<Card v-for="group in filteredGroupedData.service_groups" :key="group.group_name" class="mb-4">
+					<template #title>
+						<div class="flex align-items-center">
+							<i class="fas fa-layer-group mr-2"></i>
+							{{ getGroupTitle(group.group_name) }}
+							<Tag v-if="group?.has_shared_meter" severity="info" class="ml-2">
+								<i class="fas fa-link mr-1"></i>Спільний показник
+							</Tag>
+						</div>
+					</template>
+					<template #content>
+						<!-- Спільний показник для групи (показуємо один раз) -->
+						<Message v-if="group?.has_shared_meter && group.readings.length > 0" severity="info" :closable="false" class="mb-3">
+							<!-- Десктопна версія -->
+							<div class="hidden md:block">
+								<div class="flex justify-content-between align-items-center">
+									<div>
+										<strong><i class="fas fa-tachometer-alt mr-2"></i>Спільний показник лічильника:</strong>
+										<span class="text-xl font-bold ml-2">{{ getSharedMeterReading(group) }}</span>
+										<span v-if="getSharedMeterPreviousReading(group)" class="text-muted ml-2">
+											(попередній: {{ getSharedMeterPreviousReading(group) }})
+										</span>
+									</div>
+									<div class="text-right">
+										<small class="text-muted">Споживання:</small><br>
+										<strong>{{
+											typeof getSharedMeterReading(group) === 'number'
+												? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0))
+												: 'Немає даних'
+										}}</strong>
+									</div>
+								</div>
+								<Divider />
+								<small class="text-muted">
+									<i class="fas fa-info-circle mr-1"></i>
+									Один показник використовується для розрахунку всіх тарифів цієї групи
+								</small>
+							</div>
+
+							<!-- Мобільна версія - компактна -->
+							<div class="md:hidden text-center">
+								<div class="mb-2">
+									<i class="fas fa-tachometer-alt mr-2"></i>
+									<strong>Показник: {{ getSharedMeterReading(group) }}</strong>
 									<span v-if="getSharedMeterPreviousReading(group)" class="text-muted ml-2">
-										(попередній: {{ getSharedMeterPreviousReading(group) }})
+										(було: {{ getSharedMeterPreviousReading(group) }})
 									</span>
 								</div>
-								<div class="text-right">
-									<small class="text-muted">Споживання:</small><br>
-									<strong>{{
+								<small class="text-muted">
+									Споживання: <strong>{{
 										typeof getSharedMeterReading(group) === 'number'
 											? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0))
 											: 'Немає даних'
 									}}</strong>
-								</div>
+								</small>
 							</div>
-							<hr class="my-2">
-							<small class="text-muted">
-								<i class="fas fa-info-circle mr-1"></i>
-								Один показник використовується для розрахунку всіх тарифів цієї групи
-							</small>
-						</div>
-
-						<!-- Мобільна версія - компактна -->
-						<div class="md:hidden text-center">
-							<div class="mb-2">
-								<i class="fas fa-tachometer-alt mr-2"></i>
-								<strong>Показник: {{ getSharedMeterReading(group) }}</strong>
-								<span v-if="getSharedMeterPreviousReading(group)" class="text-muted ml-2">
-									(було: {{ getSharedMeterPreviousReading(group) }})
-								</span>
-							</div>
-							<small class="text-muted">
-								Споживання: <strong>{{
-									typeof getSharedMeterReading(group) === 'number'
-										? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0))
-										: 'Немає даних'
-								}}</strong>
-							</small>
-						</div>
-					</div>
+						</Message>
 					<!-- Деталізація за службами/тарифами -->
 					<!-- Десктопна версія -->
 					<div class="table-responsive mb-3 hidden md:block">
@@ -169,12 +169,11 @@
 					
 					<!-- Мобільна версія - карточки -->
 					<div class="md:hidden">
-						<div v-for="reading in group.readings as ExtendedGroupedReadingItem[]" :key="reading.id" 
-							 class="card mb-2">
-							<div class="card-body p-3">
+						<Card v-for="reading in group.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mb-2">
+							<template #content>
 								<div class="flex justify-content-between align-items-start">
 									<div class="flex-grow-1">
-										<h6 class="card-title mb-1">{{ reading.service_name }}</h6>
+										<h6 class="mb-1">{{ reading.service_name }}</h6>
 										<small v-if="reading.tariff_name" class="text-muted">{{ reading.tariff_name }}</small>
 									</div>
 									<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
@@ -188,8 +187,8 @@
 										class="ml-2"
 									/>
 								</div>
-								
-								<div class="row mt-2">
+
+								<div class="grid mt-2">
 									<div class="col-6" v-if="!group?.has_shared_meter && reading.current_reading">
 										<small class="text-muted">Останній показник:</small><br>
 										<strong>{{ reading.current_reading }}</strong>
@@ -199,9 +198,9 @@
 										<strong class="text-success">{{ formatCurrency(reading.amount) }}</strong>
 									</div>
 								</div>
-								
+
 								<!-- Додаткова інформація при розгортанні -->
-								<div v-if="reading.tariff_type !== 'subscription' && reading.consumption" class="mt-2 pt-2 border-top">
+								<div v-if="reading.tariff_type !== 'subscription' && reading.consumption" class="mt-2 pt-2 border-top-1 surface-border">
 									<small class="text-muted">
 										Споживання: <strong>{{ reading.consumption }}</strong> {{ getServiceUnit(reading.service_id) }}
 										<span v-if="reading.tariff">
@@ -209,28 +208,28 @@
 										</span>
 									</small>
 								</div>
-							</div>
-						</div>
-						
+							</template>
+						</Card>
+
 						<!-- Підсумок для групи на мобільному -->
-						<div class="alert alert-success flex justify-content-between align-items-center">
+						<Message severity="success" :closable="false" class="flex justify-content-between align-items-center">
 							<strong>Загальна сума по групі:</strong>
-							<span class="h5 m-0 text-success">{{ formatCurrency(group.total_amount) }}</span>
-						</div>
+							<span class="text-xl font-bold text-success ml-3">{{ formatCurrency(group.total_amount) }}</span>
+						</Message>
 					</div>
-				</div>
-			</div>
+				</template>
+				</Card>
 			</div>
 			
 			<!-- Окремі служби без груп -->
-			<div v-for="service in filteredGroupedData.services" :key="service.service_id" class="card mb-4">
-				<div class="card-header">
-					<h5 class="m-0">
+			<Card v-for="service in filteredGroupedData.services" :key="service.service_id" class="mb-4">
+				<template #title>
+					<div class="flex align-items-center">
 						<i class="fas fa-tachometer-alt mr-2"></i>
 						{{ service.service_name }}
-					</h5>
-				</div>
-				<div class="card-body">
+					</div>
+				</template>
+				<template #content>
 					<!-- Десктопна версія таблиці -->
 					<div class="table-responsive hidden md:block">
 						<table class="table table-sm">
@@ -301,14 +300,13 @@
 					
 					<!-- Мобільна версія - карточки -->
 					<div class="md:hidden">
-						<div v-for="reading in service.readings as ExtendedGroupedReadingItem[]" :key="reading.id" 
-							 class="card mb-2">
-							<div class="card-body p-3">
+						<Card v-for="reading in service.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mb-2">
+							<template #content>
 								<div class="flex justify-content-between align-items-start">
 									<div class="flex-grow-1">
-										<h6 class="card-title mb-1">{{ reading.tariff_name || 'Без тарифу' }}</h6>
-										<small v-if="reading.tariff_type === 'subscription'" class="text-muted badge bg-secondary">Абонплата</small>
-										<small v-else-if="reading.tariff?.calculation_method === 'fixed'" class="text-muted badge bg-info">Фіксована сума</small>
+										<h6 class="mb-1">{{ reading.tariff_name || 'Без тарифу' }}</h6>
+										<Tag v-if="reading.tariff_type === 'subscription'" severity="secondary" class="text-sm">Абонплата</Tag>
+										<Tag v-else-if="reading.tariff?.calculation_method === 'fixed'" severity="info" class="text-sm">Фіксована сума</Tag>
 									</div>
 									<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
 									<Button
@@ -321,8 +319,8 @@
 										class="ml-2"
 									/>
 								</div>
-								
-								<div class="row mt-2">
+
+								<div class="grid mt-2">
 									<div class="col-6" v-if="reading.tariff?.calculation_method !== 'fixed' && reading.current_reading">
 										<small class="text-muted">Останній показник:</small><br>
 										<strong>{{ reading.current_reading }}</strong>
@@ -332,10 +330,10 @@
 										<strong class="text-success">{{ formatCurrency(reading.amount) }}</strong>
 									</div>
 								</div>
-								
+
 								<!-- Додаткова інформація -->
-								<div v-if="reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed' && reading.consumption" 
-									 class="mt-2 pt-2 border-top">
+								<div v-if="reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed' && reading.consumption"
+									 class="mt-2 pt-2 border-top-1 surface-border">
 									<small class="text-muted">
 										Споживання: <strong>{{ reading.consumption }}</strong> {{ service.unit }}
 										<span v-if="reading.tariff">
@@ -343,22 +341,22 @@
 										</span>
 									</small>
 								</div>
-							</div>
-						</div>
-						
+							</template>
+						</Card>
+
 						<!-- Підсумок для служби на мобільному -->
-						<div class="alert alert-success flex justify-content-between align-items-center">
+						<Message severity="success" :closable="false" class="flex justify-content-between align-items-center">
 							<strong>Всього:</strong>
-							<span class="h5 m-0 text-success">{{ formatCurrency(service.total_amount) }}</span>
-						</div>
+							<span class="text-xl font-bold text-success ml-3">{{ formatCurrency(service.total_amount) }}</span>
+						</Message>
 					</div>
-				</div>
+				</template>
+				</Card>
 			</div>
-		</div>
-		<div v-else class="alert alert-info">
+		<Message v-else severity="info" :closable="false">
 			<i class="fas fa-info-circle mr-2"></i>
 			Немає даних для відображення за вибраний період.
-		</div>
+		</Message>
 	</div>
 </template>
 
@@ -369,6 +367,10 @@ import { useGetGroupedReadingsEndpointApiUtilitiesGroupedReadingsGet } from '@/a
 import type { GroupedReadingsResponse } from '@/api/model/groupedReadingsResponse';
 import Button from 'primevue/button';
 import ProgressSpinner from 'primevue/progressspinner';
+import Card from 'primevue/card';
+import Message from 'primevue/message';
+import Tag from 'primevue/tag';
+import Divider from 'primevue/divider';
 
 // Розширюємо тип для включення service_id
 interface ExtendedGroupedReadingItem {
@@ -391,7 +393,11 @@ export default defineComponent({
 	name: 'GroupedReadings',
 	components: {
 		Button,
-		ProgressSpinner
+		ProgressSpinner,
+		Card,
+		Message,
+		Tag,
+		Divider
 	},
 	props: {
 		addressId: {

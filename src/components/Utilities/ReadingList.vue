@@ -1,6 +1,6 @@
 <template>
 	<div class="reading-list">
-		<div v-if="!addressId || addressId === 0" class="container-fluid">
+		<div v-if="!addressId || addressId === 0">
 			<Message severity="warn" :closable="false">
 				Невірна адреса. Будь ласка, оберіть адресу зі списку.
 				<Button
@@ -11,45 +11,39 @@
 				/>
 			</Message>
 		</div>
-		<div v-else class="container-fluid">
-			<div class="row mb-4">
-				<div class="col-sm-8">
-					<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
-						<template #item="{ item }">
-							<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
-								<span class="p-menuitem-text">{{ item.label }}</span>
-							</router-link>
-							<span v-else class="p-menuitem-text">{{ item.label }}</span>
-						</template>
-					</Breadcrumb>
+		<div v-else>
+			<div class="mb-4">
+				<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
+					<template #item="{ item }">
+						<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
+							<span class="p-menuitem-text">{{ item.label }}</span>
+						</router-link>
+						<span v-else class="p-menuitem-text">{{ item.label }}</span>
+					</template>
+				</Breadcrumb>
+				<div class="flex justify-content-between align-items-center mb-2">
 					<h2><i class="fas fa-chart-line mr-2"></i>Показники лічильників</h2>
-					<p v-if="currentAddress" class="text-muted">
-						<i class="fas fa-map-marker-alt mr-2"></i>{{ currentAddress.address }}
-					</p>
-				</div>
-				<div class="col-sm-4 text-right">
 					<Button
 						label="Додати показники"
 						icon="pi pi-plus"
 						@click="$router.push({ name: 'utilities_add_reading', query: { addressId: addressId } })"
 					/>
 				</div>
+				<p v-if="currentAddress" class="text-muted">
+					<i class="fas fa-map-marker-alt mr-2"></i>{{ currentAddress.address }}
+				</p>
 			</div>
 
 			<!-- Filters -->
-			<div class="card mb-4">
-				<div class="card-body">
+			<Card class="mb-4">
+				<template #content>
 					<div class="formgrid grid">
-						<div class="field col-12 md:col-2">
-							<label for="periodFilter">Період</label>
-						</div>
-						<div class="field col-12 md:col-4">
+						<div class="field col-12 md:col-6">
+							<label for="periodFilter" class="font-semibold mb-2 block">Період</label>
 							<MonthSelector v-model="selectedPeriod" />
 						</div>
-						<div class="field col-12 md:col-2">
-							<label for="serviceFilter">Служба</label>
-						</div>
-						<div class="field col-12 md:col-4">
+						<div class="field col-12 md:col-6">
+							<label for="serviceFilter" class="font-semibold mb-2 block">Служба</label>
 							<Dropdown
 								id="serviceFilter"
 								v-model="selectedService"
@@ -58,31 +52,29 @@
 								optionValue="id"
 								placeholder="Всі служби"
 								showClear
+								class="w-full"
 							/>
 						</div>
 					</div>
-					<div class="formgrid grid">
-						<div class="field col-12 md:col-2"></div>
-						<div class="field col-12 md:col-10">
-							<Button
-								label="Скинути фільтри"
-								icon="pi pi-times"
-								outlined
-								severity="secondary"
-								@click="resetFilters"
-							/>
-						</div>
+					<div class="flex justify-content-end">
+						<Button
+							label="Скинути фільтри"
+							icon="pi pi-times"
+							outlined
+							severity="secondary"
+							@click="resetFilters"
+						/>
 					</div>
-				</div>
-			</div>
+				</template>
+			</Card>
 
 			<div v-if="isLoading" class="text-center">
 				<ProgressSpinner />
 			</div>
 
 			<div v-else-if="filteredReadings.length === 0" class="text-center">
-				<div class="card">
-					<div class="card-body">
+				<Card>
+					<template #content>
 						<i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
 						<h5>Показників не знайдено</h5>
 						<p class="text-muted">
@@ -93,15 +85,15 @@
 							icon="pi pi-plus"
 							@click="$router.push({ name: 'utilities_add_reading', query: { addressId: addressId } })"
 						/>
-					</div>
-				</div>
+					</template>
+				</Card>
 			</div>
 
 			<div v-else>
 				<!-- Grouped view always -->
-				<GroupedReadings 
-					:addressId="addressId" 
-					:period="selectedPeriod || currentPeriod" 
+				<GroupedReadings
+					:addressId="addressId"
+					:period="selectedPeriod || currentPeriod"
 					:serviceFilter="selectedService"
 				/>
 			</div>
@@ -125,6 +117,7 @@ import Dropdown from 'primevue/dropdown';
 import Message from 'primevue/message';
 import Breadcrumb from 'primevue/breadcrumb';
 import MonthSelector from './MonthSelector.vue';
+import Card from 'primevue/card';
 
 interface AddressData {
 	id: number;
@@ -166,7 +159,8 @@ export default defineComponent({
 		ProgressSpinner,
 		Dropdown,
 		Message,
-		Breadcrumb
+		Breadcrumb,
+		Card
 	},
 	setup() {
 		const route = useRoute();
