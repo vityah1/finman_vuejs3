@@ -10,7 +10,7 @@
 				</template>
 			</Breadcrumb>
 			<div class="flex justify-content-between align-items-center">
-				<h2><i class="fas fa-map-marker-alt mr-2"></i>Адреси</h2>
+				<h2><i class="pi pi-map-marker mr-2"></i>Адреси</h2>
 				<Button label="Додати адресу" icon="pi pi-plus" @click="showAddModal = true" />
 			</div>
 		</div>
@@ -22,7 +22,7 @@
 		<div v-else-if="addresses.length === 0" class="text-center">
 			<Card>
 				<template #content>
-					<i class="fas fa-home fa-3x text-muted mb-3"></i>
+					<i class="pi pi-home fa-3x text-muted mb-3"></i>
 					<h5>Адрес ще не додано</h5>
 					<p class="text-muted">Почніть з додавання вашої першої адреси</p>
 					<Button label="Додати першу адресу" icon="pi pi-plus" @click="showAddModal = true" />
@@ -44,7 +44,7 @@
 					</template>
 					<template #content>
 						<p class="text-muted mb-3">
-							<i class="fas fa-map-marker-alt mr-2"></i>{{ address.address }}
+							<i class="pi pi-map-marker mr-2"></i>{{ address.address }}
 						</p>
 
 						<div v-if="address.description" class="mb-3">

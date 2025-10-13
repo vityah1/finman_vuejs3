@@ -10,11 +10,11 @@
 				</template>
 			</Breadcrumb>
 			<div class="flex justify-content-between align-items-center mb-2">
-				<h2><i class="fas fa-cogs mr-2"></i>Комунальні служби</h2>
+				<h2><i class="pi pi-cogs mr-2"></i>Комунальні служби</h2>
 				<Button label="Додати службу" icon="pi pi-plus" @click="showAddModal = true" :disabled="!currentAddress" />
 			</div>
 			<p v-if="currentAddress" class="text-muted">
-				<i class="fas fa-map-marker-alt mr-2"></i>{{ currentAddress.address }}
+				<i class="pi pi-map-marker mr-2"></i>{{ currentAddress.address }}
 			</p>
 		</div>
 
@@ -24,7 +24,7 @@
 
 		<div v-else-if="!currentAddress" class="text-center">
 			<Message severity="warn" :closable="false">
-				<i class="fas fa-exclamation-triangle mr-2"></i>
+				<i class="pi pi-exclamation-triangle mr-2"></i>
 				Адресу не знайдено
 			</Message>
 		</div>
@@ -32,7 +32,7 @@
 		<div v-else-if="services.length === 0" class="text-center">
 			<Card>
 				<template #content>
-					<i class="fas fa-cogs fa-3x text-muted mb-3"></i>
+					<i class="pi pi-cogs fa-3x text-muted mb-3"></i>
 					<h5>Служб ще не додано</h5>
 					<p class="text-muted">Додайте комунальні служби для цієї адреси</p>
 					<Button label="Додати першу службу" icon="pi pi-plus" @click="showAddModal = true" />
@@ -69,7 +69,7 @@
 								<i class="fas fa-barcode mr-1"></i>Лічильник: {{ service.meter_number }}
 							</small>
 							<small v-if="service.has_shared_meter" class="text-muted block">
-								<i class="fas fa-link mr-1"></i>Спільний показник для групи тарифів
+								<i class="pi pi-link mr-1"></i>Спільний показник для групи тарифів
 							</small>
 							<small v-if="service.description" class="text-muted block">
 								{{ service.description }}

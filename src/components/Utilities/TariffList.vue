@@ -10,7 +10,7 @@
 				</template>
 			</Breadcrumb>
 			<div class="flex justify-content-between align-items-center">
-				<h2><i class="fas fa-money-bill mr-2"></i>Тарифи</h2>
+				<h2><i class="pi pi-money-bill mr-2"></i>Тарифи</h2>
 				<div class="flex gap-2">
 					<Button
 						label="Назад до служб"
@@ -30,7 +30,7 @@
 		<div v-else-if="tariffs.length === 0" class="text-center">
 			<Card>
 				<template #content>
-					<i class="fas fa-money-bill fa-3x text-muted mb-3"></i>
+					<i class="pi pi-money-bill fa-3x text-muted mb-3"></i>
 					<h5>Тарифів ще не додано</h5>
 					<p class="text-muted">Додайте тарифи для розрахунку вартості</p>
 					<Button label="Додати перший тариф" icon="pi pi-plus" @click="showAddModal = true" />

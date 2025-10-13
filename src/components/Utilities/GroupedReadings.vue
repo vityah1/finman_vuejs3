@@ -4,12 +4,12 @@
 			<ProgressSpinner />
 		</div>
 		<Message v-else-if="error" severity="error" :closable="false">
-			<i class="fas fa-exclamation-triangle mr-2"></i>
+			<i class="pi pi-exclamation-triangle mr-2"></i>
 			Помилка при завантаженні даних: {{ error.message }}
 			<pre v-if="error.response?.data">{{ JSON.stringify(error.response.data, null, 2) }}</pre>
 		</Message>
 		<Message v-else-if="groupedData && (!groupedData.service_groups || groupedData.service_groups.length === 0) && (!groupedData.services || groupedData.services.length === 0)" severity="warn" :closable="false">
-			<i class="fas fa-exclamation-triangle mr-2"></i>
+			<i class="pi pi-exclamation-triangle mr-2"></i>
 			Немає показників за обраний період ({{ period }}).
 			<br>
 			<small class="text-muted">Останні показники доступні за {{ formatPeriod(groupedData.period) }}</small>
@@ -37,10 +37,10 @@
 				<Card v-for="group in filteredGroupedData.service_groups" :key="group.group_name" class="mb-4">
 					<template #title>
 						<div class="flex align-items-center">
-							<i class="fas fa-layer-group mr-2"></i>
+							<i class="pi pi-th-large mr-2"></i>
 							{{ getGroupTitle(group.group_name) }}
 							<Tag v-if="group?.has_shared_meter" severity="info" class="ml-2">
-								<i class="fas fa-link mr-1"></i>Спільний показник
+								<i class="pi pi-link mr-1"></i>Спільний показник
 							</Tag>
 						</div>
 					</template>
@@ -51,7 +51,7 @@
 							<div class="hidden md:block">
 								<div class="flex justify-content-between align-items-center">
 									<div>
-										<strong><i class="fas fa-tachometer-alt mr-2"></i>Спільний показник лічильника:</strong>
+										<strong><i class="pi pi-gauge mr-2"></i>Спільний показник лічильника:</strong>
 										<span class="text-xl font-bold ml-2">{{ getSharedMeterReading(group) }}</span>
 										<span v-if="getSharedMeterPreviousReading(group)" class="text-muted ml-2">
 											(попередній: {{ getSharedMeterPreviousReading(group) }})
@@ -68,7 +68,7 @@
 								</div>
 								<Divider />
 								<small class="text-muted">
-									<i class="fas fa-info-circle mr-1"></i>
+									<i class="pi pi-info-circle mr-1"></i>
 									Один показник використовується для розрахунку всіх тарифів цієї групи
 								</small>
 							</div>
@@ -76,7 +76,7 @@
 							<!-- Мобільна версія - компактна -->
 							<div class="md:hidden text-center">
 								<div class="mb-2">
-									<i class="fas fa-tachometer-alt mr-2"></i>
+									<i class="pi pi-gauge mr-2"></i>
 									<strong>Показник: {{ getSharedMeterReading(group) }}</strong>
 									<span v-if="getSharedMeterPreviousReading(group)" class="text-muted ml-2">
 										(було: {{ getSharedMeterPreviousReading(group) }})
@@ -115,7 +115,7 @@
 										<span v-if="reading.tariff_type === 'consumption' && reading.service_name.includes('Газ')" 
 											  class="badge bg-info ml-2" 
 											  :title="`Тариф діє з 01.02.2025`">
-											<i class="fas fa-info-circle"></i>
+											<i class="pi pi-info-circle"></i>
 										</span>
 									</td>
 									<td class="text-right">
@@ -225,7 +225,7 @@
 			<Card v-for="service in filteredGroupedData.services" :key="service.service_id" class="mb-4">
 				<template #title>
 					<div class="flex align-items-center">
-						<i class="fas fa-tachometer-alt mr-2"></i>
+						<i class="pi pi-gauge mr-2"></i>
 						{{ service.service_name }}
 					</div>
 				</template>
@@ -354,7 +354,7 @@
 				</Card>
 			</div>
 		<Message v-else severity="info" :closable="false">
-			<i class="fas fa-info-circle mr-2"></i>
+			<i class="pi pi-info-circle mr-2"></i>
 			Немає даних для відображення за вибраний період.
 		</Message>
 	</div>
@@ -624,9 +624,10 @@ export default defineComponent({
 	margin-top: 1rem;
 }
 
-.card-header h5 {
-	display: flex;
-	align-items: center;
+.total-card :deep(.p-card-content) {
+	padding: 1.5rem;
+	background: linear-gradient(135deg, var(--primary-50) 0%, var(--primary-100) 100%);
+	border-radius: var(--border-radius);
 }
 
 .table-sm td, .table-sm th {

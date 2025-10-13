@@ -11,7 +11,7 @@
 					<span v-else class="p-menuitem-text">{{ item.label }}</span>
 				</template>
 			</Breadcrumb>
-			<h2><i class="fas fa-plus mr-2"></i>{{ isEditing ? 'Редагувати' : 'Додати' }} показники лічильників</h2>
+			<h2><i class="pi pi-plus mr-2"></i>{{ isEditing ? 'Редагувати' : 'Додати' }} показники лічильників</h2>
 			<p class="text-muted">{{ isEditing ? 'Редагуйте' : 'Внесіть поточні' }} показники ваших лічильників</p>
 		</div>
 
@@ -365,11 +365,11 @@
 				<div class="col-12 lg:col-4">
 					<Card>
 						<template #title>
-							<i class="fas fa-calculator mr-2"></i>Розрахунок
+							<i class="pi pi-calculator mr-2"></i>Розрахунок
 						</template>
 						<template #content>
 							<div v-if="!calculationData.consumption && !selectedService?.has_shared_meter" class="text-center text-muted">
-								<i class="fas fa-info-circle fa-2x mb-3"></i>
+								<i class="pi pi-info-circle fa-2x mb-3"></i>
 								<p>Заповніть показники для автоматичного розрахунку</p>
 							</div>
 							<div v-else-if="selectedService?.has_shared_meter && readingForm.current_reading">
@@ -458,11 +458,11 @@
 
 					<Card class="mt-3">
 						<template #title>
-							<i class="fas fa-history mr-2"></i>Останні показники
+							<i class="pi pi-history mr-2"></i>Останні показники
 						</template>
 						<template #content>
 							<div v-if="recentReadings.length === 0" class="text-center text-muted">
-								<i class="fas fa-clock fa-2x mb-3"></i>
+								<i class="pi pi-clock fa-2x mb-3"></i>
 								<p>Історія показників порожня</p>
 							</div>
 							<div v-else>
@@ -485,24 +485,24 @@
 
 					<Card class="mt-3">
 						<template #title>
-							<i class="fas fa-lightbulb mr-2"></i>Поради
+							<i class="pi pi-lightbulb mr-2"></i>Поради
 						</template>
 						<template #content>
 							<ul class="list-unstyled small">
 								<li class="mb-2">
-									<i class="fas fa-check text-success mr-2"></i>
+									<i class="pi pi-check text-success mr-2"></i>
 									Знімайте показники в один і той же день місяця
 								</li>
 								<li class="mb-2">
-									<i class="fas fa-check text-success mr-2"></i>
+									<i class="pi pi-check text-success mr-2"></i>
 									Перевіряйте правильність введених даних
 								</li>
 								<li class="mb-2">
-									<i class="fas fa-check text-success mr-2"></i>
+									<i class="pi pi-check text-success mr-2"></i>
 									Фотографуйте лічильники для підтвердження
 								</li>
 								<li class="mb-2">
-									<i class="fas fa-check text-success mr-2"></i>
+									<i class="pi pi-check text-success mr-2"></i>
 									Ведіть регулярний облік споживання
 								</li>
 							</ul>

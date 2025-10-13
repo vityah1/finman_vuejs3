@@ -22,7 +22,7 @@
 					</template>
 				</Breadcrumb>
 				<div class="flex justify-content-between align-items-center mb-2">
-					<h2><i class="fas fa-chart-line mr-2"></i>Показники лічильників</h2>
+					<h2><i class="pi pi-chart-line mr-2"></i>Показники лічильників</h2>
 					<Button
 						label="Додати показники"
 						icon="pi pi-plus"
@@ -30,7 +30,7 @@
 					/>
 				</div>
 				<p v-if="currentAddress" class="text-muted">
-					<i class="fas fa-map-marker-alt mr-2"></i>{{ currentAddress.address }}
+					<i class="pi pi-map-marker mr-2"></i>{{ currentAddress.address }}
 				</p>
 			</div>
 
@@ -75,7 +75,7 @@
 			<div v-else-if="filteredReadings.length === 0" class="text-center">
 				<Card>
 					<template #content>
-						<i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+						<i class="pi pi-chart-line fa-3x text-muted mb-3"></i>
 						<h5>Показників не знайдено</h5>
 						<p class="text-muted">
 							{{ hasFilters ? 'Спробуйте змінити фільтри' : 'Додайте перші показники лічильників' }}
