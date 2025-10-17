@@ -118,55 +118,54 @@
 						</table>
 					</div>
 
-					<!-- Мобільна версія - карточки -->
+					<!-- Мобільна версія - компактний список -->
 					<div class="mobile-view">
-						<Card v-for="reading in group.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mb-2">
-							<template #content>
-								<div class="flex justify-content-between align-items-start">
-									<div class="flex-grow-1">
-										<h6 class="mb-1">{{ reading.service_name }}</h6>
-										<small v-if="reading.tariff_name" class="text-muted">{{ reading.tariff_name }}</small>
+						<!-- Кнопка редагування для спільного лічильника -->
+						<div v-if="group?.has_shared_meter" class="mb-2 text-right">
+							<Button
+								icon="pi pi-pencil"
+								label="Редагувати"
+								@click="editReading(group.readings[0]?.id)"
+								outlined
+								size="small"
+							/>
+						</div>
+
+						<!-- Компактний список тарифів -->
+						<div class="mobile-tariff-list">
+							<div v-for="reading in group.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mobile-tariff-item">
+								<div class="tariff-header">
+									<div class="tariff-info">
+										<div class="tariff-name">{{ reading.service_name }}</div>
+										<div v-if="reading.tariff_name" class="tariff-subtitle">{{ reading.tariff_name }}</div>
 									</div>
-									<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
+									<div class="tariff-amount">{{ formatCurrency(reading.amount) }}</div>
+									<!-- Кнопка редагування для окремих тарифів -->
 									<Button
-										v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)"
+										v-if="!group?.has_shared_meter"
 										icon="pi pi-pencil"
 										@click="editReading(reading.id)"
 										title="Редагувати"
-										outlined
+										text
 										size="small"
-										class="ml-2"
+										class="edit-btn-mobile"
 									/>
 								</div>
-
-								<div class="grid mt-2">
-									<div class="col-6" v-if="!group?.has_shared_meter && reading.current_reading">
-										<small class="text-muted">Останній показник:</small><br>
-										<strong>{{ reading.current_reading }}</strong>
-									</div>
-									<div class="col-6 text-right">
-										<small class="text-muted">Сума:</small><br>
-										<strong class="text-success">{{ formatCurrency(reading.amount) }}</strong>
-									</div>
+								<!-- Додаткова інформація компактно -->
+								<div v-if="reading.tariff_type !== 'subscription' && reading.consumption" class="tariff-details">
+									Споживання: {{ reading.consumption }} {{ getServiceUnit(reading.service_id) }}
+									<span v-if="reading.tariff">
+										• {{ formatRate(reading.tariff.rate) }} грн/{{ getServiceUnit(reading.service_id) }}
+									</span>
 								</div>
-
-								<!-- Додаткова інформація при розгортанні -->
-								<div v-if="reading.tariff_type !== 'subscription' && reading.consumption" class="mt-2 pt-2 border-top-1 surface-border">
-									<small class="text-muted">
-										Споживання: <strong>{{ reading.consumption }}</strong> {{ getServiceUnit(reading.service_id) }}
-										<span v-if="reading.tariff">
-											• Тариф: <strong>{{ formatRate(reading.tariff.rate) }}</strong> грн/{{ getServiceUnit(reading.service_id) }}
-										</span>
-									</small>
-								</div>
-							</template>
-						</Card>
+							</div>
+						</div>
 
 						<!-- Підсумок для групи на мобільному -->
-						<Message severity="success" :closable="false" class="flex justify-content-between align-items-center">
-							<strong>Загальна сума по групі:</strong>
-							<span class="text-xl font-bold text-success ml-3">{{ formatCurrency(group.total_amount) }}</span>
-						</Message>
+						<div class="mobile-group-total">
+							<span>Загальна сума по групі:</span>
+							<strong>{{ formatCurrency(group.total_amount) }}</strong>
+						</div>
 					</div>
 				</template>
 				</Card>
@@ -243,55 +242,43 @@
 						</table>
 					</div>
 
-					<!-- Мобільна версія - карточки -->
+					<!-- Мобільна версія - компактний список -->
 					<div class="mobile-view">
-						<Card v-for="reading in service.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mb-2">
-							<template #content>
-								<div class="flex justify-content-between align-items-start">
-									<div class="flex-grow-1">
-										<h6 class="mb-1">{{ reading.tariff_name || 'Без тарифу' }}</h6>
-										<Tag v-if="reading.tariff_type === 'subscription'" severity="secondary" class="text-sm">Абонплата</Tag>
-										<Tag v-else-if="reading.tariff?.calculation_method === 'fixed'" severity="info" class="text-sm">Фіксована сума</Tag>
+						<!-- Компактний список тарифів -->
+						<div class="mobile-tariff-list">
+							<div v-for="reading in service.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mobile-tariff-item">
+								<div class="tariff-header">
+									<div class="tariff-info">
+										<div class="tariff-name">{{ reading.tariff_name || 'Без тарифу' }}</div>
+										<div v-if="reading.tariff_type === 'subscription'" class="tariff-subtitle">Абонплата</div>
+										<div v-else-if="reading.tariff?.calculation_method === 'fixed'" class="tariff-subtitle">Фіксована сума</div>
+										<div v-else-if="reading.current_reading" class="tariff-subtitle">Показник: {{ reading.current_reading }}</div>
 									</div>
+									<div class="tariff-amount">{{ formatCurrency(reading.amount) }}</div>
 									<Button
 										icon="pi pi-pencil"
 										@click="editReading(reading.id)"
 										title="Редагувати"
-										outlined
+										text
 										size="small"
-										class="ml-2"
+										class="edit-btn-mobile"
 									/>
 								</div>
-
-								<div class="grid mt-2">
-									<div class="col-6" v-if="reading.tariff?.calculation_method !== 'fixed' && reading.current_reading">
-										<small class="text-muted">Останній показник:</small><br>
-										<strong>{{ reading.current_reading }}</strong>
-									</div>
-									<div class="col-6 text-right">
-										<small class="text-muted">Сума:</small><br>
-										<strong class="text-success">{{ formatCurrency(reading.amount) }}</strong>
-									</div>
+								<!-- Додаткова інформація компактно -->
+								<div v-if="reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed' && reading.consumption" class="tariff-details">
+									Споживання: {{ reading.consumption }} {{ service.unit }}
+									<span v-if="reading.tariff">
+										• {{ formatRate(reading.tariff.rate) }} грн/{{ service.unit }}
+									</span>
 								</div>
-
-								<!-- Додаткова інформація -->
-								<div v-if="reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed' && reading.consumption"
-									 class="mt-2 pt-2 border-top-1 surface-border">
-									<small class="text-muted">
-										Споживання: <strong>{{ reading.consumption }}</strong> {{ service.unit }}
-										<span v-if="reading.tariff">
-											• Тариф: <strong>{{ formatRate(reading.tariff.rate) }}</strong> грн/{{ service.unit }}
-										</span>
-									</small>
-								</div>
-							</template>
-						</Card>
+							</div>
+						</div>
 
 						<!-- Підсумок для служби на мобільному -->
-						<Message severity="success" :closable="false" class="flex justify-content-between align-items-center">
-							<strong>Всього:</strong>
-							<span class="text-xl font-bold text-success ml-3">{{ formatCurrency(service.total_amount) }}</span>
-						</Message>
+						<div class="mobile-group-total">
+							<span>Всього:</span>
+							<strong>{{ formatCurrency(service.total_amount) }}</strong>
+						</div>
 					</div>
 				</template>
 				</Card>
@@ -711,6 +698,87 @@ export default defineComponent({
 	display: none;
 }
 
+/* Mobile compact list styles */
+.mobile-tariff-list {
+	background: #f8f9fa;
+	border-radius: 8px;
+	overflow: hidden;
+}
+
+.mobile-tariff-item {
+	padding: 0.625rem 0.75rem;
+	border-bottom: 1px solid #e9ecef;
+	background: white;
+}
+
+.mobile-tariff-item:last-child {
+	border-bottom: none;
+}
+
+.tariff-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.5rem;
+}
+
+.tariff-info {
+	flex: 1;
+	min-width: 0;
+}
+
+.tariff-name {
+	font-weight: 600;
+	font-size: 0.9rem;
+	color: #2c3e50;
+	line-height: 1.3;
+}
+
+.tariff-subtitle {
+	font-size: 0.75rem;
+	color: #6c757d;
+	line-height: 1.2;
+	margin-top: 0.125rem;
+}
+
+.tariff-amount {
+	font-weight: 700;
+	font-size: 1rem;
+	color: var(--primary-color);
+	white-space: nowrap;
+}
+
+.tariff-details {
+	font-size: 0.75rem;
+	color: #6c757d;
+	margin-top: 0.375rem;
+	padding-top: 0.375rem;
+	border-top: 1px dashed #dee2e6;
+	line-height: 1.3;
+}
+
+.mobile-group-total {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 0.75rem 1rem;
+	margin-top: 0.5rem;
+	background: #e8f5e9;
+	border-radius: 6px;
+	font-size: 0.95rem;
+	color: #2c3e50;
+}
+
+.mobile-group-total strong {
+	font-size: 1.125rem;
+	color: #2e7d32;
+}
+
+.edit-btn-mobile {
+	padding: 0.25rem;
+	min-width: auto;
+}
+
 @media (max-width: 768px) {
 	/* Hide desktop table on mobile */
 	.desktop-view {
@@ -726,16 +794,44 @@ export default defineComponent({
 		font-size: 1.5rem;
 	}
 
-	.reading-value {
-		font-size: 1.125rem;
+	/* Зменшити відступи в картках на мобільному */
+	.grouped-readings :deep(.p-card-content) {
+		padding: 0.75rem;
 	}
 
-	.consumption-value {
+	.grouped-readings :deep(.p-card-title) {
+		padding: 0.75rem 0.75rem 0.5rem;
 		font-size: 1rem;
 	}
 
-	.group-total .total-value {
-		font-size: 1.125rem;
+	/* Компактніша загальна сума */
+	.total-summary-card :deep(.p-card-content) {
+		padding: 0.625rem 0.875rem;
+	}
+
+	.total-label {
+		font-size: 0.875rem;
+	}
+
+	.total-amount {
+		font-size: 1.375rem;
+	}
+
+	/* Компактніший заголовок групи */
+	.meter-display {
+		font-size: 0.875rem;
+	}
+
+	.meter-display .current-reading {
+		font-size: 1.25rem;
+	}
+
+	.meter-display .reading-diff {
+		font-size: 0.8rem;
+	}
+
+	.meter-display .reading-diff strong {
+		font-size: 1rem;
 	}
 }
 </style>
