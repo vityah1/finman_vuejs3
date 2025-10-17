@@ -57,7 +57,7 @@
 					</template>
 					<template #content>
 					<!-- Деталізація за службами/тарифами -->
-					<div class="table-responsive">
+					<div class="table-responsive desktop-view">
 						<table class="table table-sm readings-table">
 							<thead>
 								<tr>
@@ -117,9 +117,9 @@
 							</tbody>
 						</table>
 					</div>
-					
+
 					<!-- Мобільна версія - карточки -->
-					<div class="md:hidden">
+					<div class="mobile-view">
 						<Card v-for="reading in group.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mb-2">
 							<template #content>
 								<div class="flex justify-content-between align-items-start">
@@ -182,7 +182,7 @@
 				</template>
 				<template #content>
 					<!-- Десктопна версія таблиці -->
-					<div class="table-responsive">
+					<div class="table-responsive desktop-view">
 						<table class="table table-sm readings-table">
 							<thead>
 								<tr>
@@ -242,9 +242,9 @@
 							</tbody>
 						</table>
 					</div>
-					
+
 					<!-- Мобільна версія - карточки -->
-					<div class="md:hidden">
+					<div class="mobile-view">
 						<Card v-for="reading in service.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mb-2">
 							<template #content>
 								<div class="flex justify-content-between align-items-start">
@@ -253,9 +253,7 @@
 										<Tag v-if="reading.tariff_type === 'subscription'" severity="secondary" class="text-sm">Абонплата</Tag>
 										<Tag v-else-if="reading.tariff?.calculation_method === 'fixed'" severity="info" class="text-sm">Фіксована сума</Tag>
 									</div>
-									<!-- Кнопка редагування тільки для першого запису спільного лічильника -->
 									<Button
-										v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)"
 										icon="pi pi-pencil"
 										@click="editReading(reading.id)"
 										title="Редагувати"
@@ -704,7 +702,26 @@ export default defineComponent({
 	padding-bottom: 0.75rem;
 }
 
+/* Responsive visibility */
+.desktop-view {
+	display: block;
+}
+
+.mobile-view {
+	display: none;
+}
+
 @media (max-width: 768px) {
+	/* Hide desktop table on mobile */
+	.desktop-view {
+		display: none;
+	}
+
+	/* Show mobile cards on mobile */
+	.mobile-view {
+		display: block;
+	}
+
 	.total-amount {
 		font-size: 1.5rem;
 	}
