@@ -120,14 +120,26 @@
 
 					<!-- Мобільна версія - компактний список -->
 					<div class="mobile-view">
-						<!-- Кнопка редагування для спільного лічильника -->
-						<div v-if="group?.has_shared_meter" class="mb-2 text-right">
+						<!-- Показники лічильника для спільного лічильника -->
+						<div v-if="group?.has_shared_meter && group.readings.length > 0" class="mobile-meter-reading">
+							<div class="meter-reading-content">
+								<span class="current-reading">{{ getSharedMeterReading(group) }}</span>
+								<span v-if="getSharedMeterPreviousReading(group)" class="reading-diff">
+									- {{ getSharedMeterPreviousReading(group) }} =
+									<strong>{{
+										typeof getSharedMeterReading(group) === 'number'
+											? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0))
+											: 0
+									}}</strong>
+								</span>
+							</div>
 							<Button
 								icon="pi pi-pencil"
 								label="Редагувати"
 								@click="editReading(group.readings[0]?.id)"
 								outlined
 								size="small"
+								class="edit-btn-shared-meter"
 							/>
 						</div>
 
@@ -779,6 +791,51 @@ export default defineComponent({
 	min-width: auto;
 }
 
+/* Shared meter reading row with edit button */
+.mobile-meter-reading {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 0.75rem;
+	padding: 0.75rem;
+	margin-bottom: 0.75rem;
+	background: #e3f2fd;
+	border-radius: 6px;
+	border: 1px solid #90caf9;
+}
+
+.meter-reading-content {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	flex: 1;
+	font-size: 0.9rem;
+	color: #495057;
+}
+
+.mobile-meter-reading .current-reading {
+	font-size: 1.375rem;
+	font-weight: 700;
+	color: var(--primary-color);
+}
+
+.mobile-meter-reading .reading-diff {
+	display: flex;
+	align-items: center;
+	gap: 0.25rem;
+	font-size: 0.85rem;
+	color: #6c757d;
+}
+
+.mobile-meter-reading .reading-diff strong {
+	font-size: 1rem;
+	color: #2c3e50;
+}
+
+.edit-btn-shared-meter {
+	flex-shrink: 0;
+}
+
 @media (max-width: 768px) {
 	/* Hide desktop table on mobile */
 	.desktop-view {
@@ -832,6 +889,19 @@ export default defineComponent({
 
 	.meter-display .reading-diff strong {
 		font-size: 1rem;
+	}
+
+	/* Адаптувати мобільний блок показників */
+	.mobile-meter-reading .current-reading {
+		font-size: 1.25rem;
+	}
+
+	.mobile-meter-reading .reading-diff {
+		font-size: 0.8rem;
+	}
+
+	.mobile-meter-reading .reading-diff strong {
+		font-size: 0.95rem;
 	}
 }
 </style>
