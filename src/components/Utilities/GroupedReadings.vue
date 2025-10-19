@@ -29,23 +29,13 @@
 			<div v-if="filteredGroupedData.service_groups && filteredGroupedData.service_groups.length > 0">
 				<Card v-for="group in filteredGroupedData.service_groups" :key="group.group_name" class="mb-4 mobile-compact-card">
 					<template #title>
-						<div class="mobile-title-wrapper">
-							<div class="title-main">
-								<i class="pi pi-th-large"></i>
-								<span>{{ getGroupTitle(group.group_name) }}</span>
-							</div>
+						<div class="title-main">
+							<i class="pi pi-th-large"></i>
+							<span>{{ getGroupTitle(group.group_name) }}</span>
 							<!-- Показники в заголовку для спільного лічильника -->
-							<div v-if="group?.has_shared_meter && group.readings.length > 0" class="title-meter-display">
-								<span class="current-reading">{{ getSharedMeterReading(group) }}</span>
-								<span v-if="getSharedMeterPreviousReading(group)" class="reading-diff">
-									- {{ getSharedMeterPreviousReading(group) }} =
-									<strong>{{
-										typeof getSharedMeterReading(group) === 'number'
-											? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0))
-											: 0
-									}}</strong>
-								</span>
-							</div>
+							<span v-if="group?.has_shared_meter && group.readings.length > 0" class="title-meter-display">
+								{{ getSharedMeterReading(group) }}<span v-if="getSharedMeterPreviousReading(group)"> - {{ getSharedMeterPreviousReading(group) }} = <strong>{{ typeof getSharedMeterReading(group) === 'number' ? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0)) : 0 }}</strong></span>
+							</span>
 						</div>
 					</template>
 					<template #content>
@@ -118,8 +108,16 @@
 							<div v-for="reading in group.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mobile-tariff-item">
 								<div class="tariff-header">
 									<div class="tariff-info">
-										<div class="tariff-name">{{ reading.service_name }}</div>
-										<div v-if="reading.tariff_name" class="tariff-subtitle">{{ reading.tariff_name }}</div>
+										<!-- Для спільного лічильника: тільки назва тарифу -->
+										<div class="tariff-name">{{ reading.tariff_name || reading.service_name }}</div>
+										<!-- Показники для груп БЕЗ спільного лічильника (якщо >1 тарифу) -->
+										<div v-if="!group?.has_shared_meter && group.readings.length > 1 && reading.current_reading && reading.tariff_type !== 'subscription'" class="tariff-subtitle meter-with-price">
+											{{ reading.current_reading }}<span v-if="reading.previous_reading"> - {{ reading.previous_reading }} = <strong>{{ reading.consumption || 0 }}</strong></span>
+											<span v-if="reading.tariff" class="price-inline">• {{ formatRate(reading.tariff.rate) }} грн/{{ getServiceUnit(reading.service_id) }}</span>
+										</div>
+										<!-- Для абонплати та фіксованих -->
+										<div v-else-if="reading.tariff_type === 'subscription'" class="tariff-subtitle">Абонплата</div>
+										<div v-else-if="reading.tariff?.calculation_method === 'fixed'" class="tariff-subtitle">Фіксована сума</div>
 									</div>
 									<div class="tariff-amount">{{ formatCurrency(reading.amount) }}</div>
 									<!-- Кнопка редагування: для спільного лічильника тільки на першому елементі -->
@@ -132,35 +130,6 @@
 										size="small"
 										class="edit-btn-mobile"
 									/>
-								</div>
-								<!-- Додаткова інформація компактно -->
-								<div v-if="reading.tariff_type !== 'subscription' && reading.consumption" class="tariff-details">
-									<!-- Показники для груп БЕЗ спільного лічильника -->
-									<div v-if="!group?.has_shared_meter && reading.current_reading" class="meter-info">
-										<span class="current-reading">{{ reading.current_reading }}</span>
-										<span v-if="reading.previous_reading" class="reading-diff">
-											- {{ reading.previous_reading }} = <strong>{{ reading.consumption || 0 }}</strong>
-										</span>
-									</div>
-									<!-- Споживання та ціна -->
-									<div class="consumption-info">
-										Споживання: {{ reading.consumption }} {{ getServiceUnit(reading.service_id) }}
-										<span v-if="reading.tariff">
-											• {{ formatRate(reading.tariff.rate) }} грн/{{ getServiceUnit(reading.service_id) }}
-										</span>
-									</div>
-								</div>
-								<!-- Показники для спільного лічильника (тільки на першому елементі) -->
-								<div v-if="group?.has_shared_meter && group.readings.indexOf(reading) === 0" class="tariff-details meter-info">
-									<span class="current-reading">{{ getSharedMeterReading(group) }}</span>
-									<span v-if="getSharedMeterPreviousReading(group)" class="reading-diff">
-										- {{ getSharedMeterPreviousReading(group) }} =
-										<strong>{{
-											typeof getSharedMeterReading(group) === 'number'
-												? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0))
-												: 0
-										}}</strong>
-									</span>
 								</div>
 							</div>
 						</div>
@@ -178,9 +147,13 @@
 			<!-- Окремі служби без груп -->
 			<Card v-for="service in filteredGroupedData.services" :key="service.service_id" class="mb-4 mobile-compact-card">
 				<template #title>
-					<div class="flex align-items-center gap-2">
+					<div class="title-main">
 						<i class="pi pi-gauge"></i>
 						<span>{{ service.service_name }}</span>
+						<!-- Показники в заголовку якщо 1 тариф -->
+						<span v-if="service.readings.length === 1 && service.readings[0].current_reading && service.readings[0].tariff_type !== 'subscription'" class="title-meter-display">
+							{{ service.readings[0].current_reading }}<span v-if="service.readings[0].previous_reading"> - {{ service.readings[0].previous_reading }} = <strong>{{ service.readings[0].consumption || 0 }}</strong></span>
+						</span>
 					</div>
 				</template>
 				<template #content>
@@ -254,7 +227,13 @@
 								<div class="tariff-header">
 									<div class="tariff-info">
 										<div class="tariff-name">{{ reading.tariff_name || 'Без тарифу' }}</div>
-										<div v-if="reading.tariff_type === 'subscription'" class="tariff-subtitle">Абонплата</div>
+										<!-- Якщо >1 тарифу - показники з ціною в один рядок -->
+										<div v-if="service.readings.length > 1 && reading.current_reading && reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed'" class="tariff-subtitle meter-with-price">
+											{{ reading.current_reading }}<span v-if="reading.previous_reading"> - {{ reading.previous_reading }} = <strong>{{ reading.consumption || 0 }}</strong></span>
+											<span v-if="reading.tariff" class="price-inline">• {{ formatRate(reading.tariff.rate) }} грн/{{ service.unit }}</span>
+										</div>
+										<!-- Для абонплати та фіксованих -->
+										<div v-else-if="reading.tariff_type === 'subscription'" class="tariff-subtitle">Абонплата</div>
 										<div v-else-if="reading.tariff?.calculation_method === 'fixed'" class="tariff-subtitle">Фіксована сума</div>
 									</div>
 									<div class="tariff-amount">{{ formatCurrency(reading.amount) }}</div>
@@ -266,23 +245,6 @@
 										size="small"
 										class="edit-btn-mobile"
 									/>
-								</div>
-								<!-- Додаткова інформація компактно -->
-								<div v-if="reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed'" class="tariff-details">
-									<!-- Показники лічильника -->
-									<div v-if="reading.current_reading" class="meter-info">
-										<span class="current-reading">{{ reading.current_reading }}</span>
-										<span v-if="reading.previous_reading" class="reading-diff">
-											- {{ reading.previous_reading }} = <strong>{{ reading.consumption || 0 }}</strong>
-										</span>
-									</div>
-									<!-- Споживання та ціна -->
-									<div v-if="reading.consumption" class="consumption-info">
-										Споживання: {{ reading.consumption }} {{ service.unit }}
-										<span v-if="reading.tariff">
-											• {{ formatRate(reading.tariff.rate) }} грн/{{ service.unit }}
-										</span>
-									</div>
 								</div>
 							</div>
 						</div>
@@ -711,44 +673,25 @@ export default defineComponent({
 	display: none;
 }
 
-/* Mobile title wrapper */
-.mobile-title-wrapper {
-	display: flex;
-	flex-direction: column;
-	gap: 0.375rem;
-	width: 100%;
-}
-
+/* Mobile title */
 .title-main {
 	display: flex;
-	align-items: center;
+	align-items: baseline;
 	gap: 0.5rem;
 	font-size: 1rem;
+	flex-wrap: wrap;
 }
 
 .title-meter-display {
-	display: flex;
-	align-items: center;
-	gap: 0.375rem;
-	font-size: 0.85rem;
-	color: #495057;
-	margin-left: 1.75rem; /* Вирівнювання по назві */
-}
-
-.title-meter-display .current-reading {
-	font-size: 1.25rem;
-	font-weight: 700;
-	color: var(--primary-color);
-}
-
-.title-meter-display .reading-diff {
 	font-size: 0.8rem;
-	color: #6c757d;
+	color: #495057;
+	font-weight: 600;
 }
 
-.title-meter-display .reading-diff strong {
-	font-size: 0.95rem;
+.title-meter-display strong {
+	font-size: 0.9rem;
 	color: #2c3e50;
+	font-weight: 700;
 }
 
 /* Mobile compact list styles */
@@ -792,6 +735,22 @@ export default defineComponent({
 	color: #6c757d;
 	line-height: 1.2;
 	margin-top: 0.125rem;
+}
+
+.tariff-subtitle.meter-with-price {
+	font-size: 0.75rem;
+	font-weight: 600;
+}
+
+.tariff-subtitle.meter-with-price strong {
+	font-weight: 700;
+	color: #2c3e50;
+}
+
+.tariff-subtitle.meter-with-price .price-inline {
+	font-size: 0.8rem;
+	color: #495057;
+	margin-left: 0.25rem;
 }
 
 .tariff-amount {
