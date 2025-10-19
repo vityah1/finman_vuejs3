@@ -108,12 +108,16 @@
 							<div v-for="reading in group.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mobile-tariff-item">
 								<div class="tariff-header">
 									<div class="tariff-info">
-										<!-- Для спільного лічильника: тільки назва тарифу -->
-										<div class="tariff-name">{{ reading.tariff_name || reading.service_name }}</div>
+										<!-- Назва тарифу з ціною в одному рядку -->
+										<div class="tariff-name">
+											{{ reading.tariff_name || reading.service_name }}
+											<span v-if="reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed' && reading.tariff" class="price-inline">
+												• {{ formatRate(reading.tariff.rate) }} грн/{{ getServiceUnit(reading.service_id) }}
+											</span>
+										</div>
 										<!-- Показники для груп БЕЗ спільного лічильника (якщо >1 тарифу) -->
-										<div v-if="!group?.has_shared_meter && group.readings.length > 1 && reading.current_reading && reading.tariff_type !== 'subscription'" class="tariff-subtitle meter-with-price">
+										<div v-if="!group?.has_shared_meter && group.readings.length > 1 && reading.current_reading && reading.tariff_type !== 'subscription'" class="tariff-subtitle meter-readings">
 											{{ reading.current_reading }}<span v-if="reading.previous_reading"> - {{ reading.previous_reading }} = <strong>{{ reading.consumption || 0 }}</strong></span>
-											<span v-if="reading.tariff" class="price-inline">• {{ formatRate(reading.tariff.rate) }} грн/{{ getServiceUnit(reading.service_id) }}</span>
 										</div>
 										<!-- Для абонплати та фіксованих -->
 										<div v-else-if="reading.tariff_type === 'subscription'" class="tariff-subtitle">Абонплата</div>
@@ -226,11 +230,16 @@
 							<div v-for="reading in service.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mobile-tariff-item">
 								<div class="tariff-header">
 									<div class="tariff-info">
-										<div class="tariff-name">{{ reading.tariff_name || 'Без тарифу' }}</div>
-										<!-- Якщо >1 тарифу - показники з ціною в один рядок -->
-										<div v-if="service.readings.length > 1 && reading.current_reading && reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed'" class="tariff-subtitle meter-with-price">
+										<!-- Назва тарифу з ціною в одному рядку -->
+										<div class="tariff-name">
+											{{ reading.tariff_name || 'Без тарифу' }}
+											<span v-if="reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed' && reading.tariff" class="price-inline">
+												• {{ formatRate(reading.tariff.rate) }} грн/{{ service.unit }}
+											</span>
+										</div>
+										<!-- Якщо >1 тарифу - показники окремим рядком -->
+										<div v-if="service.readings.length > 1 && reading.current_reading && reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed'" class="tariff-subtitle meter-readings">
 											{{ reading.current_reading }}<span v-if="reading.previous_reading"> - {{ reading.previous_reading }} = <strong>{{ reading.consumption || 0 }}</strong></span>
-											<span v-if="reading.tariff" class="price-inline">• {{ formatRate(reading.tariff.rate) }} грн/{{ service.unit }}</span>
 										</div>
 										<!-- Для абонплати та фіксованих -->
 										<div v-else-if="reading.tariff_type === 'subscription'" class="tariff-subtitle">Абонплата</div>
@@ -730,6 +739,13 @@ export default defineComponent({
 	line-height: 1.3;
 }
 
+.tariff-name .price-inline {
+	font-size: 0.75rem;
+	color: #6c757d;
+	font-weight: 400;
+	margin-left: 0.25rem;
+}
+
 .tariff-subtitle {
 	font-size: 0.7rem;
 	color: #6c757d;
@@ -737,20 +753,15 @@ export default defineComponent({
 	margin-top: 0.125rem;
 }
 
-.tariff-subtitle.meter-with-price {
+.tariff-subtitle.meter-readings {
 	font-size: 0.75rem;
 	font-weight: 600;
+	color: #495057;
 }
 
-.tariff-subtitle.meter-with-price strong {
+.tariff-subtitle.meter-readings strong {
 	font-weight: 700;
 	color: #2c3e50;
-}
-
-.tariff-subtitle.meter-with-price .price-inline {
-	font-size: 0.8rem;
-	color: #495057;
-	margin-left: 0.25rem;
 }
 
 .tariff-amount {
