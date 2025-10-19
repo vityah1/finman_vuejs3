@@ -120,29 +120,6 @@
 
 					<!-- Мобільна версія - компактний список -->
 					<div class="mobile-view">
-						<!-- Показники лічильника для спільного лічильника -->
-						<div v-if="group?.has_shared_meter && group.readings.length > 0" class="mobile-meter-reading">
-							<div class="meter-reading-content">
-								<span class="current-reading">{{ getSharedMeterReading(group) }}</span>
-								<span v-if="getSharedMeterPreviousReading(group)" class="reading-diff">
-									- {{ getSharedMeterPreviousReading(group) }} =
-									<strong>{{
-										typeof getSharedMeterReading(group) === 'number'
-											? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0))
-											: 0
-									}}</strong>
-								</span>
-							</div>
-							<Button
-								icon="pi pi-pencil"
-								label="Редагувати"
-								@click="editReading(group.readings[0]?.id)"
-								outlined
-								size="small"
-								class="edit-btn-shared-meter"
-							/>
-						</div>
-
 						<!-- Компактний список тарифів -->
 						<div class="mobile-tariff-list">
 							<div v-for="reading in group.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mobile-tariff-item">
@@ -152,9 +129,9 @@
 										<div v-if="reading.tariff_name" class="tariff-subtitle">{{ reading.tariff_name }}</div>
 									</div>
 									<div class="tariff-amount">{{ formatCurrency(reading.amount) }}</div>
-									<!-- Кнопка редагування для окремих тарифів -->
+									<!-- Кнопка редагування: для спільного лічильника тільки на першому елементі -->
 									<Button
-										v-if="!group?.has_shared_meter"
+										v-if="!group?.has_shared_meter || (group?.readings && group.readings.indexOf(reading) === 0)"
 										icon="pi pi-pencil"
 										@click="editReading(reading.id)"
 										title="Редагувати"
@@ -168,6 +145,18 @@
 									Споживання: {{ reading.consumption }} {{ getServiceUnit(reading.service_id) }}
 									<span v-if="reading.tariff">
 										• {{ formatRate(reading.tariff.rate) }} грн/{{ getServiceUnit(reading.service_id) }}
+									</span>
+								</div>
+								<!-- Показники для спільного лічильника (тільки на першому елементі) -->
+								<div v-if="group?.has_shared_meter && group.readings.indexOf(reading) === 0" class="tariff-details meter-info">
+									<span class="current-reading">{{ getSharedMeterReading(group) }}</span>
+									<span v-if="getSharedMeterPreviousReading(group)" class="reading-diff">
+										- {{ getSharedMeterPreviousReading(group) }} =
+										<strong>{{
+											typeof getSharedMeterReading(group) === 'number'
+												? (getSharedMeterReading(group) - (getSharedMeterPreviousReading(group) || 0))
+												: 0
+										}}</strong>
 									</span>
 								</div>
 							</div>
@@ -264,7 +253,6 @@
 										<div class="tariff-name">{{ reading.tariff_name || 'Без тарифу' }}</div>
 										<div v-if="reading.tariff_type === 'subscription'" class="tariff-subtitle">Абонплата</div>
 										<div v-else-if="reading.tariff?.calculation_method === 'fixed'" class="tariff-subtitle">Фіксована сума</div>
-										<div v-else-if="reading.current_reading" class="tariff-subtitle">Показник: {{ reading.current_reading }}</div>
 									</div>
 									<div class="tariff-amount">{{ formatCurrency(reading.amount) }}</div>
 									<Button
@@ -277,11 +265,21 @@
 									/>
 								</div>
 								<!-- Додаткова інформація компактно -->
-								<div v-if="reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed' && reading.consumption" class="tariff-details">
-									Споживання: {{ reading.consumption }} {{ service.unit }}
-									<span v-if="reading.tariff">
-										• {{ formatRate(reading.tariff.rate) }} грн/{{ service.unit }}
-									</span>
+								<div v-if="reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed'" class="tariff-details">
+									<!-- Показники лічильника -->
+									<div v-if="reading.current_reading" class="meter-info">
+										<span class="current-reading">{{ reading.current_reading }}</span>
+										<span v-if="reading.previous_reading" class="reading-diff">
+											- {{ reading.previous_reading }} = <strong>{{ reading.consumption || 0 }}</strong>
+										</span>
+									</div>
+									<!-- Споживання та ціна -->
+									<div v-if="reading.consumption" class="consumption-info">
+										Споживання: {{ reading.consumption }} {{ service.unit }}
+										<span v-if="reading.tariff">
+											• {{ formatRate(reading.tariff.rate) }} грн/{{ service.unit }}
+										</span>
+									</div>
 								</div>
 							</div>
 						</div>
@@ -769,6 +767,35 @@ export default defineComponent({
 	line-height: 1.3;
 }
 
+.tariff-details .meter-info {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	margin-bottom: 0.25rem;
+	font-size: 0.85rem;
+}
+
+.tariff-details .meter-info .current-reading {
+	font-size: 1.125rem;
+	font-weight: 700;
+	color: var(--primary-color);
+}
+
+.tariff-details .meter-info .reading-diff {
+	color: #6c757d;
+	font-size: 0.8rem;
+}
+
+.tariff-details .meter-info .reading-diff strong {
+	font-size: 0.9rem;
+	color: #2c3e50;
+}
+
+.tariff-details .consumption-info {
+	font-size: 0.75rem;
+	color: #6c757d;
+}
+
 .mobile-group-total {
 	display: flex;
 	justify-content: space-between;
@@ -789,51 +816,6 @@ export default defineComponent({
 .edit-btn-mobile {
 	padding: 0.25rem;
 	min-width: auto;
-}
-
-/* Shared meter reading row with edit button */
-.mobile-meter-reading {
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	gap: 0.75rem;
-	padding: 0.75rem;
-	margin-bottom: 0.75rem;
-	background: #e3f2fd;
-	border-radius: 6px;
-	border: 1px solid #90caf9;
-}
-
-.meter-reading-content {
-	display: flex;
-	align-items: center;
-	gap: 0.5rem;
-	flex: 1;
-	font-size: 0.9rem;
-	color: #495057;
-}
-
-.mobile-meter-reading .current-reading {
-	font-size: 1.375rem;
-	font-weight: 700;
-	color: var(--primary-color);
-}
-
-.mobile-meter-reading .reading-diff {
-	display: flex;
-	align-items: center;
-	gap: 0.25rem;
-	font-size: 0.85rem;
-	color: #6c757d;
-}
-
-.mobile-meter-reading .reading-diff strong {
-	font-size: 1rem;
-	color: #2c3e50;
-}
-
-.edit-btn-shared-meter {
-	flex-shrink: 0;
 }
 
 @media (max-width: 768px) {
@@ -889,19 +871,6 @@ export default defineComponent({
 
 	.meter-display .reading-diff strong {
 		font-size: 1rem;
-	}
-
-	/* Адаптувати мобільний блок показників */
-	.mobile-meter-reading .current-reading {
-		font-size: 1.25rem;
-	}
-
-	.mobile-meter-reading .reading-diff {
-		font-size: 0.8rem;
-	}
-
-	.mobile-meter-reading .reading-diff strong {
-		font-size: 0.95rem;
 	}
 }
 </style>
