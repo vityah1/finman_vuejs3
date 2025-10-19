@@ -108,19 +108,20 @@
 							<div v-for="reading in group.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mobile-tariff-item">
 								<div class="tariff-header">
 									<div class="tariff-info">
-										<!-- Назва тарифу з ціною в одному рядку -->
+										<!-- Назва тарифу з ціною -->
 										<div class="tariff-name">
 											{{ reading.tariff_name || reading.service_name }}
-											<span v-if="reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed' && reading.tariff" class="price-inline">
+											<span v-if="reading.tariff && reading.tariff?.calculation_method === 'standard'" class="price-inline">
 												• {{ formatRate(reading.tariff.rate) }} грн/{{ getServiceUnit(reading.service_id) }}
 											</span>
 										</div>
-										<!-- Показники для груп БЕЗ спільного лічильника (якщо >1 тарифу) -->
-										<div v-if="!group?.has_shared_meter && group.readings.length > 1 && reading.current_reading && reading.tariff_type !== 'subscription'" class="tariff-subtitle meter-readings">
+										<!-- Показники ТІЛЬКИ для standard тарифів БЕЗ спільного лічильника -->
+										<div v-if="!group?.has_shared_meter && group.readings.length > 1 && reading.tariff?.calculation_method === 'standard' && reading.current_reading" class="tariff-subtitle meter-readings">
 											{{ reading.current_reading }}<span v-if="reading.previous_reading"> - {{ reading.previous_reading }} = <strong>{{ reading.consumption || 0 }}</strong></span>
 										</div>
-										<!-- Для абонплати та фіксованих -->
+										<!-- Для абонплати -->
 										<div v-else-if="reading.tariff_type === 'subscription'" class="tariff-subtitle">Абонплата</div>
+										<!-- Для фіксованих та manual -->
 										<div v-else-if="reading.tariff?.calculation_method === 'fixed'" class="tariff-subtitle">Фіксована сума</div>
 									</div>
 									<div class="tariff-amount">{{ formatCurrency(reading.amount) }}</div>
@@ -230,19 +231,20 @@
 							<div v-for="reading in service.readings as ExtendedGroupedReadingItem[]" :key="reading.id" class="mobile-tariff-item">
 								<div class="tariff-header">
 									<div class="tariff-info">
-										<!-- Назва тарифу з ціною в одному рядку -->
+										<!-- Назва тарифу з ціною -->
 										<div class="tariff-name">
 											{{ reading.tariff_name || 'Без тарифу' }}
-											<span v-if="reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed' && reading.tariff" class="price-inline">
+											<span v-if="reading.tariff && reading.tariff?.calculation_method === 'standard'" class="price-inline">
 												• {{ formatRate(reading.tariff.rate) }} грн/{{ service.unit }}
 											</span>
 										</div>
-										<!-- Якщо >1 тарифу - показники окремим рядком -->
-										<div v-if="service.readings.length > 1 && reading.current_reading && reading.tariff_type !== 'subscription' && reading.tariff?.calculation_method !== 'fixed'" class="tariff-subtitle meter-readings">
+										<!-- Показники ТІЛЬКИ для standard тарифів (якщо >1 тарифу) -->
+										<div v-if="service.readings.length > 1 && reading.tariff?.calculation_method === 'standard' && reading.current_reading" class="tariff-subtitle meter-readings">
 											{{ reading.current_reading }}<span v-if="reading.previous_reading"> - {{ reading.previous_reading }} = <strong>{{ reading.consumption || 0 }}</strong></span>
 										</div>
-										<!-- Для абонплати та фіксованих -->
+										<!-- Для абонплати -->
 										<div v-else-if="reading.tariff_type === 'subscription'" class="tariff-subtitle">Абонплата</div>
+										<!-- Для фіксованих та manual -->
 										<div v-else-if="reading.tariff?.calculation_method === 'fixed'" class="tariff-subtitle">Фіксована сума</div>
 									</div>
 									<div class="tariff-amount">{{ formatCurrency(reading.amount) }}</div>
