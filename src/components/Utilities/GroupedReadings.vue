@@ -27,22 +27,15 @@
 			
 			<!-- Групи служб (електрика, вода) -->
 			<div v-if="filteredGroupedData.service_groups && filteredGroupedData.service_groups.length > 0">
-				<Card v-for="group in filteredGroupedData.service_groups" :key="group.group_name" class="mb-4">
+				<Card v-for="group in filteredGroupedData.service_groups" :key="group.group_name" class="mb-4 mobile-compact-card">
 					<template #title>
-						<div class="flex align-items-center justify-content-between flex-wrap gap-2">
-							<div class="flex align-items-center gap-2">
+						<div class="mobile-title-wrapper">
+							<div class="title-main">
 								<i class="pi pi-th-large"></i>
 								<span>{{ getGroupTitle(group.group_name) }}</span>
-								<Tag
-									v-if="group?.has_shared_meter"
-									severity="info"
-									v-tooltip.top="'Один показник використовується для розрахунку всіх тарифів цієї групи'"
-								>
-									<i class="pi pi-link mr-1"></i>Спільний лічильник
-								</Tag>
 							</div>
-							<!-- Показники в заголовку ТІЛЬКИ для спільного лічильника -->
-							<div v-if="group?.has_shared_meter && group.readings.length > 0" class="meter-display">
+							<!-- Показники в заголовку для спільного лічильника -->
+							<div v-if="group?.has_shared_meter && group.readings.length > 0" class="title-meter-display">
 								<span class="current-reading">{{ getSharedMeterReading(group) }}</span>
 								<span v-if="getSharedMeterPreviousReading(group)" class="reading-diff">
 									- {{ getSharedMeterPreviousReading(group) }} =
@@ -142,10 +135,20 @@
 								</div>
 								<!-- Додаткова інформація компактно -->
 								<div v-if="reading.tariff_type !== 'subscription' && reading.consumption" class="tariff-details">
-									Споживання: {{ reading.consumption }} {{ getServiceUnit(reading.service_id) }}
-									<span v-if="reading.tariff">
-										• {{ formatRate(reading.tariff.rate) }} грн/{{ getServiceUnit(reading.service_id) }}
-									</span>
+									<!-- Показники для груп БЕЗ спільного лічильника -->
+									<div v-if="!group?.has_shared_meter && reading.current_reading" class="meter-info">
+										<span class="current-reading">{{ reading.current_reading }}</span>
+										<span v-if="reading.previous_reading" class="reading-diff">
+											- {{ reading.previous_reading }} = <strong>{{ reading.consumption || 0 }}</strong>
+										</span>
+									</div>
+									<!-- Споживання та ціна -->
+									<div class="consumption-info">
+										Споживання: {{ reading.consumption }} {{ getServiceUnit(reading.service_id) }}
+										<span v-if="reading.tariff">
+											• {{ formatRate(reading.tariff.rate) }} грн/{{ getServiceUnit(reading.service_id) }}
+										</span>
+									</div>
 								</div>
 								<!-- Показники для спільного лічильника (тільки на першому елементі) -->
 								<div v-if="group?.has_shared_meter && group.readings.indexOf(reading) === 0" class="tariff-details meter-info">
@@ -173,7 +176,7 @@
 			</div>
 			
 			<!-- Окремі служби без груп -->
-			<Card v-for="service in filteredGroupedData.services" :key="service.service_id" class="mb-4">
+			<Card v-for="service in filteredGroupedData.services" :key="service.service_id" class="mb-4 mobile-compact-card">
 				<template #title>
 					<div class="flex align-items-center gap-2">
 						<i class="pi pi-gauge"></i>
@@ -708,6 +711,46 @@ export default defineComponent({
 	display: none;
 }
 
+/* Mobile title wrapper */
+.mobile-title-wrapper {
+	display: flex;
+	flex-direction: column;
+	gap: 0.375rem;
+	width: 100%;
+}
+
+.title-main {
+	display: flex;
+	align-items: center;
+	gap: 0.5rem;
+	font-size: 1rem;
+}
+
+.title-meter-display {
+	display: flex;
+	align-items: center;
+	gap: 0.375rem;
+	font-size: 0.85rem;
+	color: #495057;
+	margin-left: 1.75rem; /* Вирівнювання по назві */
+}
+
+.title-meter-display .current-reading {
+	font-size: 1.25rem;
+	font-weight: 700;
+	color: var(--primary-color);
+}
+
+.title-meter-display .reading-diff {
+	font-size: 0.8rem;
+	color: #6c757d;
+}
+
+.title-meter-display .reading-diff strong {
+	font-size: 0.95rem;
+	color: #2c3e50;
+}
+
 /* Mobile compact list styles */
 .mobile-tariff-list {
 	background: #f8f9fa;
@@ -716,7 +759,7 @@ export default defineComponent({
 }
 
 .mobile-tariff-item {
-	padding: 0.625rem 0.75rem;
+	padding: 0.375rem 0.5rem;
 	border-bottom: 1px solid #e9ecef;
 	background: white;
 }
@@ -729,7 +772,7 @@ export default defineComponent({
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 0.5rem;
+	gap: 0.375rem;
 }
 
 .tariff-info {
@@ -739,13 +782,13 @@ export default defineComponent({
 
 .tariff-name {
 	font-weight: 600;
-	font-size: 0.9rem;
+	font-size: 0.875rem;
 	color: #2c3e50;
 	line-height: 1.3;
 }
 
 .tariff-subtitle {
-	font-size: 0.75rem;
+	font-size: 0.7rem;
 	color: #6c757d;
 	line-height: 1.2;
 	margin-top: 0.125rem;
@@ -753,46 +796,47 @@ export default defineComponent({
 
 .tariff-amount {
 	font-weight: 700;
-	font-size: 1rem;
+	font-size: 0.95rem;
 	color: var(--primary-color);
 	white-space: nowrap;
 }
 
 .tariff-details {
-	font-size: 0.75rem;
+	font-size: 0.7rem;
 	color: #6c757d;
-	margin-top: 0.375rem;
-	padding-top: 0.375rem;
+	margin-top: 0.25rem;
+	padding-top: 0.25rem;
 	border-top: 1px dashed #dee2e6;
 	line-height: 1.3;
+	padding-left: 0; /* Вирівнювання по назві служби */
 }
 
 .tariff-details .meter-info {
 	display: flex;
 	align-items: center;
 	gap: 0.375rem;
-	margin-bottom: 0.25rem;
-	font-size: 0.85rem;
+	margin-bottom: 0.125rem;
+	font-size: 0.8rem;
 }
 
 .tariff-details .meter-info .current-reading {
-	font-size: 1.125rem;
+	font-size: 1rem;
 	font-weight: 700;
 	color: var(--primary-color);
 }
 
 .tariff-details .meter-info .reading-diff {
 	color: #6c757d;
-	font-size: 0.8rem;
+	font-size: 0.75rem;
 }
 
 .tariff-details .meter-info .reading-diff strong {
-	font-size: 0.9rem;
+	font-size: 0.85rem;
 	color: #2c3e50;
 }
 
 .tariff-details .consumption-info {
-	font-size: 0.75rem;
+	font-size: 0.7rem;
 	color: #6c757d;
 }
 
@@ -833,44 +877,27 @@ export default defineComponent({
 		font-size: 1.5rem;
 	}
 
-	/* Зменшити відступи в картках на мобільному */
-	.grouped-readings :deep(.p-card-content) {
-		padding: 0.75rem;
+	/* Мінімальні відступи в картках на мобільному */
+	.mobile-compact-card :deep(.p-card-content) {
+		padding: 0.375rem;
 	}
 
-	.grouped-readings :deep(.p-card-title) {
-		padding: 0.75rem 0.75rem 0.5rem;
-		font-size: 1rem;
+	.mobile-compact-card :deep(.p-card-title) {
+		padding: 0.5rem;
+		font-size: 0.95rem;
 	}
 
 	/* Компактніша загальна сума */
 	.total-summary-card :deep(.p-card-content) {
-		padding: 0.625rem 0.875rem;
+		padding: 0.5rem 0.625rem;
 	}
 
 	.total-label {
-		font-size: 0.875rem;
-	}
-
-	.total-amount {
-		font-size: 1.375rem;
-	}
-
-	/* Компактніший заголовок групи */
-	.meter-display {
-		font-size: 0.875rem;
-	}
-
-	.meter-display .current-reading {
-		font-size: 1.25rem;
-	}
-
-	.meter-display .reading-diff {
 		font-size: 0.8rem;
 	}
 
-	.meter-display .reading-diff strong {
-		font-size: 1rem;
+	.total-amount {
+		font-size: 1.25rem;
 	}
 }
 </style>
