@@ -57,7 +57,7 @@
 										{{ reading.tariff_name || reading.service_name }}
 									</td>
 									<td v-if="!group?.has_shared_meter" class="text-right">
-										<span v-if="reading.tariff_type === 'subscription'">
+										<span v-if="reading.tariff_type === 'subscription' || reading.tariff?.calculation_method === 'fixed'">
 											-
 										</span>
 										<span v-else class="meter-inline">
