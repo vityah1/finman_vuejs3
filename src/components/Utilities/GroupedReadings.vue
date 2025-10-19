@@ -46,7 +46,6 @@
 								<tr>
 									<th>Тариф</th>
 									<th v-if="!group?.has_shared_meter" class="text-right">Показник</th>
-									<th class="text-right">Споживання</th>
 									<th class="text-right">Ціна</th>
 									<th class="text-right">Сума</th>
 									<th class="text-center" style="width: 50px;">Дії</th>
@@ -69,10 +68,6 @@
 										</span>
 									</td>
 									<td class="text-right">
-										<span v-if="reading.tariff_type === 'subscription'">-</span>
-										<span v-else class="consumption-value">{{ reading.consumption || 0 }}</span>
-									</td>
-									<td class="text-right">
 										<span v-if="reading.tariff_type === 'subscription'" class="subscription-label">
 											Абонплата
 										</span>
@@ -93,7 +88,7 @@
 									</td>
 								</tr>
 								<tr class="total-row">
-									<td :colspan="group?.has_shared_meter ? 3 : 4" class="text-right total-label">Загальна сума:</td>
+									<td :colspan="group?.has_shared_meter ? 2 : 3" class="text-right total-label">Загальна сума:</td>
 									<td class="text-right total-value">{{ formatCurrency(group.total_amount) }}</td>
 									<td></td>
 								</tr>
@@ -111,7 +106,7 @@
 										<!-- Назва тарифу з ціною -->
 										<div class="tariff-name">
 											{{ reading.tariff_name || reading.service_name }}
-											<span v-if="reading.tariff && reading.tariff?.calculation_method === 'standard'" class="price-inline">
+											<span v-if="reading.tariff && reading.tariff_type !== 'subscription'" class="price-inline">
 												• {{ formatRate(reading.tariff.rate) }} грн/{{ getServiceUnit(reading.service_id) }}
 											</span>
 										</div>
@@ -234,7 +229,7 @@
 										<!-- Назва тарифу з ціною -->
 										<div class="tariff-name">
 											{{ reading.tariff_name || 'Без тарифу' }}
-											<span v-if="reading.tariff && reading.tariff?.calculation_method === 'standard'" class="price-inline">
+											<span v-if="reading.tariff && reading.tariff_type !== 'subscription'" class="price-inline">
 												• {{ formatRate(reading.tariff.rate) }} грн/{{ service.unit }}
 											</span>
 										</div>
