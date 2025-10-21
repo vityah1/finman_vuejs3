@@ -1094,14 +1094,5 @@ export default defineComponent({
   }
 }
 
-/* Dialog styles - using global styles from main.css for fullscreen mobile */
-.payment-dialog :deep(.p-dialog) {
-  width: 750px;
-  max-width: 95vw;
-}
-
-.confirmation-dialog :deep(.p-dialog) {
-  width: 500px;
-  max-width: 95vw;
-}
+/* Dialog styles come from main.css (fullscreen on mobile, 750px on desktop) */
 </style>

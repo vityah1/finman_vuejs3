@@ -691,15 +691,7 @@ export default defineComponent({
 }
 
 /* Dialog styles */
-.tariff-dialog :deep(.p-dialog) {
-	width: 800px;
-	max-width: 95vw;
-}
-
-.confirm-dialog :deep(.p-dialog) {
-	width: 500px;
-	max-width: 95vw;
-}
+/* Dialog styles come from main.css (fullscreen on mobile, 750px on desktop) */
 
 /* Mobile optimization */
 @media (max-width: 768px) {

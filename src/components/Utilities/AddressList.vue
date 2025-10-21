@@ -475,16 +475,7 @@ export default defineComponent({
 	border-right: 1px solid #dee2e6 !important;
 }
 
-/* Dialog styles - using global styles from main.css for fullscreen mobile */
-.address-dialog :deep(.p-dialog) {
-	width: 700px;
-	max-width: 95vw;
-}
-
-.confirm-dialog :deep(.p-dialog) {
-	width: 500px;
-	max-width: 95vw;
-}
+/* Dialog styles come from main.css (fullscreen on mobile, 750px on desktop) */
 
 /* Mobile optimization */
 @media (max-width: 768px) {

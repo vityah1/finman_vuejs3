@@ -17,6 +17,12 @@ export default {
 	components: {
 		NavigationMenu
 	},
+	mounted() {
+		const buildVersion = 'BUILD_' + new Date().toISOString().replace(/[:.]/g, '-');
+		console.log('%c🚀 FinMan Build Version: ' + buildVersion, 'background: #4CAF50; color: white; padding: 5px 10px; border-radius: 3px; font-weight: bold');
+		console.log('%c📅 Build Time: ' + new Date().toLocaleString('uk-UA'), 'color: #2196F3; font-weight: bold');
+		window.APP_BUILD_VERSION = buildVersion;
+	}
 };
 </script>
 
