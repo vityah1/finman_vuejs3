@@ -41,7 +41,8 @@
 		</div>
 
 		<div v-else>
-				<div class="table-responsive">
+				<!-- Desktop table -->
+				<div class="table-responsive desktop-table">
 					<table class="table table-hover">
 						<thead>
 							<tr>
@@ -104,6 +105,47 @@
 						</tbody>
 					</table>
 				</div>
+
+				<!-- Mobile card view -->
+				<div class="mobile-cards">
+					<div v-for="tariff in tariffs" :key="tariff.id" class="tariff-card">
+						<div class="tariff-card-header">
+							<div class="tariff-name">{{ tariff.name }}</div>
+							<Tag v-if="tariff.is_active" severity="success" value="Активний" />
+							<Tag v-else severity="secondary" value="Неактивний" />
+						</div>
+						<div class="tariff-card-body">
+							<div class="tariff-info-row">
+								<span class="info-label">Ставка:</span>
+								<span class="info-value rate">{{ formatRate(tariff.rate) }} {{ tariff.currency || 'UAH' }}</span>
+							</div>
+							<div class="tariff-info-row" v-if="tariff.tariff_type">
+								<span class="info-label">Тип:</span>
+								<Tag severity="info" :value="getTariffTypeLabel(tariff.tariff_type)" />
+							</div>
+							<div class="tariff-info-row" v-if="tariff.group_code">
+								<span class="info-label">Група:</span>
+								<Tag severity="secondary" :value="tariff.group_code" />
+							</div>
+							<div class="tariff-info-row">
+								<span class="info-label">Період:</span>
+								<span class="info-value period">
+									{{ formatDate(tariff.valid_from) }}
+									<span v-if="tariff.valid_to"> - {{ formatDate(tariff.valid_to) }}</span>
+									<span v-else> - безстроковий</span>
+								</span>
+							</div>
+							<div class="tariff-info-row" v-if="tariff.calculation_method === 'percentage' && tariff.percentage_of">
+								<span class="info-label">Розрахунок:</span>
+								<span class="info-value">{{ tariff.percentage_of }}% від основного</span>
+							</div>
+						</div>
+						<div class="tariff-card-footer">
+							<Button icon="pi pi-pencil" label="Редагувати" @click="editTariff(tariff)" outlined size="small" class="flex-1" />
+							<Button icon="pi pi-trash" @click="confirmDelete(tariff)" outlined severity="danger" size="small" />
+						</div>
+					</div>
+				</div>
 			</div>
 
 		<!-- Add/Edit Tariff Dialog -->
@@ -111,7 +153,7 @@
 			v-model:visible="showAddModal"
 			:header="editingTariff ? 'Редагувати тариф' : 'Додати новий тариф'"
 			:modal="true"
-			:style="{ width: '800px' }"
+			class="tariff-dialog"
 			@hide="closeModal"
 		>
 			<form @submit.prevent="saveTariff">
@@ -125,6 +167,7 @@
 							v-model="tariffForm.name"
 							required
 							placeholder="Наприклад: Денний тариф, Нічний тариф"
+							class="w-full"
 						/>
 					</div>
 				</div>
@@ -141,6 +184,7 @@
 							:minFractionDigits="2"
 							:maxFractionDigits="2"
 							placeholder="0.00"
+							class="w-full"
 						/>
 					</div>
 					<div class="field col-12 md:col-4">
@@ -149,6 +193,7 @@
 							v-model="tariffForm.currency"
 							:options="['UAH', 'USD', 'EUR']"
 							placeholder="Валюта"
+							class="w-full"
 						/>
 					</div>
 				</div>
@@ -163,6 +208,7 @@
 							v-model="tariffForm.valid_from"
 							dateFormat="yy-mm-dd"
 							required
+							class="w-full"
 						/>
 					</div>
 					<div class="field col-12 md:col-4">
@@ -171,6 +217,7 @@
 							v-model="tariffForm.valid_to"
 							dateFormat="yy-mm-dd"
 							placeholder="Дійсний до"
+							class="w-full"
 						/>
 						<small class="block text-color-secondary">Порожнє = безстроковий</small>
 					</div>
@@ -207,6 +254,7 @@
 							optionLabel="label"
 							optionValue="value"
 							placeholder="Стандартний"
+							class="w-full"
 						/>
 					</div>
 				</div>
@@ -220,6 +268,7 @@
 							id="groupCode"
 							v-model="tariffForm.group_code"
 							placeholder="Наприклад: water_2025"
+							class="w-full"
 						/>
 						<small class="block text-color-secondary">Для групування пов'язаних тарифів</small>
 					</div>
@@ -236,6 +285,7 @@
 							:options="calculationMethodOptions"
 							optionLabel="label"
 							optionValue="value"
+							class="w-full"
 						/>
 					</div>
 				</div>
@@ -251,6 +301,7 @@
 							:minFractionDigits="2"
 							:maxFractionDigits="2"
 							placeholder="80"
+							class="w-full"
 						/>
 						<small class="block text-color-secondary">Відсоток від основного тарифу</small>
 					</div>
@@ -274,7 +325,7 @@
 			v-model:visible="showDeleteModal"
 			header="Підтвердити видалення"
 			:modal="true"
-			:style="{ width: '500px' }"
+			class="confirm-dialog"
 		>
 			<div class="confirmation-content">
 				<p class="mb-3">Ви дійсно хочете видалити тариф "<strong>{{ tariffToDelete?.name }}</strong>"?</p>
@@ -634,6 +685,22 @@ export default defineComponent({
 	margin-bottom: 1rem;
 }
 
+/* Mobile cards - hidden on desktop */
+.mobile-cards {
+	display: none;
+}
+
+/* Dialog styles */
+.tariff-dialog :deep(.p-dialog) {
+	width: 800px;
+	max-width: 95vw;
+}
+
+.confirm-dialog :deep(.p-dialog) {
+	width: 500px;
+	max-width: 95vw;
+}
+
 /* Mobile optimization */
 @media (max-width: 768px) {
 	.header-section {
@@ -654,7 +721,7 @@ export default defineComponent({
 	}
 
 	.action-buttons {
-		flex-direction: column;
+		flex-direction: row;
 		gap: 0.375rem;
 	}
 
@@ -684,18 +751,115 @@ export default defineComponent({
 		margin: 0;
 	}
 
-	.table-responsive {
+	/* Hide desktop table, show mobile cards */
+	.desktop-table {
+		display: none;
+	}
+
+	.mobile-cards {
+		display: block;
+	}
+
+	/* Tariff cards */
+	.tariff-card {
+		background: var(--surface-card);
+		border: 1px solid var(--surface-border);
+		border-radius: 0.375rem;
+		padding: 0.75rem;
+		margin-bottom: 0.5rem;
+	}
+
+	.tariff-card-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
 		margin-bottom: 0.75rem;
-		overflow-x: auto;
+		padding-bottom: 0.5rem;
+		border-bottom: 1px solid var(--surface-border);
 	}
 
-	.table {
-		font-size: 0.85rem;
+	.tariff-name {
+		font-weight: 600;
+		font-size: 1rem;
+		flex: 1;
 	}
 
-	.table th,
-	.table td {
-		padding: 0.5rem 0.375rem;
+	.tariff-card-body {
+		margin-bottom: 0.75rem;
+	}
+
+	.tariff-info-row {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0.375rem 0;
+		gap: 0.5rem;
+	}
+
+	.info-label {
+		color: var(--text-color-secondary);
+		font-size: 0.875rem;
+		flex-shrink: 0;
+	}
+
+	.info-value {
+		font-weight: 500;
+		text-align: right;
+	}
+
+	.info-value.rate {
+		font-weight: 700;
+		font-size: 1.125rem;
+		color: var(--primary-color);
+	}
+
+	.info-value.period {
+		font-size: 0.875rem;
+	}
+
+	.tariff-card-footer {
+		display: flex;
+		gap: 0.5rem;
+		padding-top: 0.5rem;
+		border-top: 1px solid var(--surface-border);
+	}
+
+	.tariff-card-footer .flex-1 :deep(.p-button-label) {
+		display: inline;
+	}
+
+	/* Dialog forms */
+	.tariff-dialog :deep(.p-dialog) {
+		width: 95vw;
+	}
+
+	.tariff-dialog :deep(.p-dialog-content) {
+		padding: 0.5rem;
+	}
+
+	.tariff-dialog .formgrid {
+		margin: 0;
+	}
+
+	.tariff-dialog .field {
+		padding: 0.25rem 0;
+	}
+
+	.tariff-dialog .field label {
+		font-size: 0.875rem;
+		margin-bottom: 0.25rem;
+	}
+
+	.tariff-dialog .divider {
+		margin: 0.75rem 0;
+	}
+
+	.confirm-dialog :deep(.p-dialog) {
+		width: 90vw;
+	}
+
+	.confirm-dialog :deep(.p-dialog-content) {
+		padding: 0.5rem;
 	}
 }
 </style>
