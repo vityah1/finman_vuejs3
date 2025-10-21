@@ -634,12 +634,21 @@ export default defineComponent({
 	}
 
 	.service-card :deep(.p-card-title) {
-		font-size: 1rem;
+		font-size: 1.125rem;
 		padding: 0.75rem 0.75rem 0.5rem;
 	}
 
 	.service-card :deep(.p-card-content) {
 		padding: 0 0.75rem 0.75rem;
+		font-size: 1rem;
+	}
+
+	.service-card :deep(.p-card-content small) {
+		font-size: 0.95rem;
+	}
+
+	.service-card :deep(.p-card-content h6) {
+		font-size: 1.1rem;
 	}
 
 	.d-md-flex {

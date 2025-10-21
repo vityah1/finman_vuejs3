@@ -790,23 +790,29 @@ export default defineComponent({
 
 	.info-label {
 		color: var(--text-color-secondary);
-		font-size: 0.875rem;
+		font-size: 0.95rem;
 		flex-shrink: 0;
 	}
 
 	.info-value {
 		font-weight: 500;
 		text-align: right;
+		font-size: 0.95rem;
 	}
 
 	.info-value.rate {
 		font-weight: 700;
-		font-size: 1.125rem;
+		font-size: 1.15rem;
 		color: var(--primary-color);
 	}
 
 	.info-value.period {
-		font-size: 0.875rem;
+		font-size: 0.95rem;
+	}
+
+	.tariff-name {
+		font-weight: 600;
+		font-size: 1.05rem;
 	}
 
 	.tariff-card-footer {

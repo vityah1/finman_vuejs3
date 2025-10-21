@@ -498,6 +498,26 @@ export default defineComponent({
 		font-size: 1.125rem;
 	}
 
+	.address-card :deep(.p-card-title) {
+		font-size: 1.125rem;
+	}
+
+	.address-card :deep(.p-card-content) {
+		font-size: 1rem;
+	}
+
+	.address-card :deep(.p-card-content p) {
+		font-size: 1rem;
+	}
+
+	.address-card :deep(.p-card-content small) {
+		font-size: 0.9rem;
+	}
+
+	.address-card :deep(.p-card-content h6) {
+		font-size: 1.1rem;
+	}
+
 	.add-btn {
 		font-size: 0.8rem;
 		padding: 0.375rem 0.75rem;
