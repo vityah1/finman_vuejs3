@@ -202,15 +202,29 @@ const goToAddPayment = () => {
 
 /* Currency dropdown alignment */
 .menubar-container :deep(.p-dropdown) {
-  height: 2.5rem;
+  height: 2.75rem;
+  min-width: 7rem;
 }
 
 .menubar-container :deep(.p-dropdown .p-dropdown-label) {
-  padding: 0.5rem;
-  font-size: 0.875rem;
+  padding: 0.65rem 0.75rem;
+  font-size: 1rem;
+  font-weight: 500;
 }
 
 .menubar-container :deep(.p-dropdown .p-dropdown-trigger) {
-  width: 2rem;
+  width: 2.5rem;
+}
+
+@media (max-width: 768px) {
+  .menubar-container :deep(.p-dropdown) {
+    height: 3rem;
+    min-width: 6.5rem;
+  }
+
+  .menubar-container :deep(.p-dropdown .p-dropdown-label) {
+    padding: 0.75rem;
+    font-size: 1.05rem;
+  }
 }
 </style>
