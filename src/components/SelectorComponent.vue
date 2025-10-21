@@ -336,31 +336,3 @@ async getUserGroup() {
 	}
 };
 </script>
-
-<style scoped>
-@media (max-width: 768px) {
-	/* Period dialog - FULLSCREEN on mobile */
-	.period-dialog :deep(.p-dialog) {
-		width: 100vw;
-		height: 100vh;
-		margin: 0;
-		max-height: 100vh;
-		border-radius: 0;
-	}
-
-	.period-dialog :deep(.p-dialog-content) {
-		padding: 0.5rem;
-		flex: 1;
-		overflow-y: auto;
-	}
-
-	.period-dialog :deep(.p-dialog-header) {
-		padding: 0.75rem 0.5rem;
-	}
-
-	.period-dialog :deep(.p-dialog-footer) {
-		padding: 0.75rem 0.5rem;
-		border-top: 1px solid var(--surface-border);
-	}
-}
-</style>

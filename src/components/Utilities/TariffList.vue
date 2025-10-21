@@ -829,35 +829,8 @@ export default defineComponent({
 	}
 
 	/* Dialog forms - FULLSCREEN on mobile */
-	.tariff-dialog :deep(.p-dialog) {
-		width: 100vw;
-		height: 100vh;
-		margin: 0;
-		max-height: 100vh;
-		border-radius: 0;
-	}
-
-	.tariff-dialog :deep(.p-dialog-content) {
-		padding: 0.5rem;
-		flex: 1;
-		overflow-y: auto;
-	}
-
-	.tariff-dialog :deep(.p-dialog-header) {
-		padding: 0.75rem 0.5rem;
-	}
-
-	.tariff-dialog :deep(.p-dialog-footer) {
-		padding: 0.75rem 0.5rem;
-		border-top: 1px solid var(--surface-border);
-	}
-
 	.tariff-dialog .formgrid {
 		margin: 0;
-	}
-
-	.tariff-dialog .field {
-		padding: 0.25rem 0;
 	}
 
 	.tariff-dialog .field label {
@@ -867,14 +840,6 @@ export default defineComponent({
 
 	.tariff-dialog .divider {
 		margin: 0.75rem 0;
-	}
-
-	.confirm-dialog :deep(.p-dialog) {
-		width: 90vw;
-	}
-
-	.confirm-dialog :deep(.p-dialog-content) {
-		padding: 0.5rem;
 	}
 }
 </style>

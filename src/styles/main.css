@@ -506,6 +506,76 @@ a:hover {
   .modal-dialog {
     margin: var(--spacing-sm);
   }
+
+  /* Fullscreen forms on mobile */
+  .address-dialog :deep(.p-dialog),
+  .service-dialog :deep(.p-dialog),
+  .tariff-dialog :deep(.p-dialog),
+  .payment-dialog :deep(.p-dialog),
+  .period-dialog :deep(.p-dialog),
+  .category-dialog :deep(.p-dialog),
+  .config-dialog :deep(.p-dialog),
+  .category-rule-dialog :deep(.p-dialog) {
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    max-height: 100vh;
+    border-radius: 0;
+  }
+
+  .address-dialog :deep(.p-dialog-content),
+  .service-dialog :deep(.p-dialog-content),
+  .tariff-dialog :deep(.p-dialog-content),
+  .payment-dialog :deep(.p-dialog-content),
+  .period-dialog :deep(.p-dialog-content),
+  .category-dialog :deep(.p-dialog-content),
+  .config-dialog :deep(.p-dialog-content),
+  .category-rule-dialog :deep(.p-dialog-content) {
+    padding: 0.5rem;
+    flex: 1;
+    overflow-y: auto;
+  }
+
+  .address-dialog :deep(.p-dialog-header),
+  .service-dialog :deep(.p-dialog-header),
+  .tariff-dialog :deep(.p-dialog-header),
+  .payment-dialog :deep(.p-dialog-header),
+  .period-dialog :deep(.p-dialog-header),
+  .category-dialog :deep(.p-dialog-header),
+  .config-dialog :deep(.p-dialog-header),
+  .category-rule-dialog :deep(.p-dialog-header) {
+    padding: 0.75rem 0.5rem;
+  }
+
+  .address-dialog :deep(.p-dialog-footer),
+  .service-dialog :deep(.p-dialog-footer),
+  .tariff-dialog :deep(.p-dialog-footer),
+  .payment-dialog :deep(.p-dialog-footer),
+  .period-dialog :deep(.p-dialog-footer),
+  .category-dialog :deep(.p-dialog-footer),
+  .config-dialog :deep(.p-dialog-footer),
+  .category-rule-dialog :deep(.p-dialog-footer) {
+    padding: 0.75rem 0.5rem;
+    border-top: 1px solid var(--surface-border);
+  }
+
+  .address-dialog .field,
+  .service-dialog .field,
+  .tariff-dialog .field {
+    padding: 0.25rem 0;
+  }
+
+  /* Compact confirmation dialogs on mobile */
+  .confirmation-dialog :deep(.p-dialog) {
+    width: 90vw !important;
+    max-width: 90vw;
+  }
+
+  .confirmation-dialog :deep(.p-dialog-content),
+  .confirmation-dialog :deep(.p-dialog-header),
+  .confirmation-dialog :deep(.p-dialog-footer) {
+    padding: 0.5rem;
+  }
 }
 
 /* Print styles */
