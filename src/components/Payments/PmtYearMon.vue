@@ -21,7 +21,7 @@
 					</template>
 
 					<template #content>
-						<!-- Categories table - Desktop only -->
+						<!-- Categories table -->
 						<DataTable
 							:value="catcosts"
 							:loading="loading"
@@ -30,7 +30,6 @@
 							:paginator="false"
 							showGridlines
 							stripedRows
-							class="desktop-table"
 						>
 							<template #empty>
 								<div style="text-align: center; padding: 2rem;">
@@ -64,29 +63,6 @@
 							</Column>
 
 						</DataTable>
-
-						<!-- Mobile Card View -->
-						<div class="mobile-cards" v-if="!loading">
-							<div v-if="catcosts.length === 0" class="empty-state">
-								<i class="pi pi-inbox"></i>
-								<span>Немає даних за цей період</span>
-							</div>
-							<div v-for="category in catcosts" :key="category.category_id" class="category-card" @click="navigateToCategory(category.category_id)">
-								<div class="category-card-header">
-									<div class="category-info">
-										<i class="pi pi-folder"></i>
-										<span class="category-name">{{ category.name }}</span>
-									</div>
-									<div class="category-count">
-										<PTag :value="category.cnt" severity="info" />
-									</div>
-								</div>
-								<div class="category-amount">
-									<span class="amount-value">{{ category.amount.toLocaleString() }}</span>
-									<span class="amount-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
-								</div>
-							</div>
-						</div>
 
 						<!-- Summary panel -->
 						<div class="summary-panel">
@@ -383,11 +359,6 @@ export default {
   font-weight: 600;
 }
 
-/* Mobile cards - hidden on desktop */
-.mobile-cards {
-  display: none;
-}
-
 /* Summary panel */
 .summary-panel {
   margin-top: 1rem;
@@ -444,87 +415,6 @@ export default {
 
   .month-title {
     font-size: 1.125rem;
-  }
-
-  /* Hide desktop table, show mobile cards */
-  .desktop-table {
-    display: none;
-  }
-
-  .mobile-cards {
-    display: block;
-  }
-
-  /* Empty state */
-  .empty-state {
-    text-align: center;
-    padding: 2rem 1rem;
-  }
-
-  .empty-state i {
-    font-size: 3rem;
-    color: var(--text-color-secondary);
-    margin-bottom: 1rem;
-    display: block;
-  }
-
-  .empty-state span {
-    color: var(--text-color-secondary);
-  }
-
-  /* Category cards */
-  .category-card {
-    background: var(--surface-card);
-    border: 1px solid var(--surface-border);
-    border-radius: 0.375rem;
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
-    cursor: pointer;
-    transition: box-shadow 0.2s;
-  }
-
-  .category-card:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .category-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--surface-border);
-  }
-
-  .category-info {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .category-info i {
-    color: var(--primary-color);
-  }
-
-  .category-name {
-    font-weight: 500;
-  }
-
-  .category-amount {
-    display: flex;
-    align-items: baseline;
-    gap: 0.25rem;
-  }
-
-  .amount-value {
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: var(--primary-color);
-  }
-
-  .amount-currency {
-    color: var(--text-color-secondary);
-    font-size: 0.875rem;
   }
 
   /* Summary panel */
