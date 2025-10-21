@@ -19,8 +19,10 @@ export default defineComponent({
     return {
       htmlContent: "",
       content: "",
-      buildVersion: (window as any).APP_BUILD_VERSION || 'Unknown',
-      buildTime: new Date().toLocaleString('uk-UA'),
+      buildVersion: process.env.VUE_APP_FULL_VERSION || 'dev',
+      buildTime: process.env.VUE_APP_BUILD_TIME
+        ? new Date(process.env.VUE_APP_BUILD_TIME).toLocaleString('uk-UA')
+        : new Date().toLocaleString('uk-UA'),
     };
   },
   setup() {
