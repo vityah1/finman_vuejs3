@@ -122,7 +122,7 @@
 			v-model:visible="showAddModal"
 			:header="editingService ? 'Редагувати службу' : 'Додати нову службу'"
 			:modal="true"
-			:style="{ width: '750px' }"
+			class="service-dialog"
 			@hide="closeModal"
 		>
 			<form @submit.prevent="saveService">
@@ -136,6 +136,7 @@
 							v-model="serviceForm.name"
 							required
 							placeholder="Наприклад: Електроенергія, Газ, Вода"
+							class="w-full"
 						/>
 					</div>
 				</div>
@@ -150,6 +151,7 @@
 							v-model="serviceForm.unit"
 							required
 							placeholder="Наприклад: кВт·год, м³, Гкал"
+							class="w-full"
 						/>
 					</div>
 				</div>
@@ -163,6 +165,7 @@
 							id="meterNumber"
 							v-model="serviceForm.meter_number"
 							placeholder="Серійний номер лічильника"
+							class="w-full"
 						/>
 					</div>
 				</div>
@@ -177,8 +180,8 @@
 							v-model="serviceForm.description"
 							placeholder="Додаткова інформація про службу"
 							rows="3"
-							cols="50"
 							auto-resize
+							class="w-full"
 						/>
 					</div>
 				</div>
@@ -232,7 +235,7 @@
 			v-model:visible="showDeleteModal"
 			header="Підтвердити видалення"
 			:modal="true"
-			:style="{ width: '500px' }"
+			class="confirm-dialog"
 		>
 			<div class="confirmation-content">
 				<p class="mb-3">Ви дійсно хочете видалити службу "<strong>{{ serviceToDelete?.name }}</strong>"?</p>
@@ -578,8 +581,48 @@ export default defineComponent({
 	border-right: 1px solid #dee2e6 !important;
 }
 
+/* Dialog styles */
+.service-dialog :deep(.p-dialog) {
+	width: 750px;
+	max-width: 95vw;
+}
+
+.confirm-dialog :deep(.p-dialog) {
+	width: 500px;
+	max-width: 95vw;
+}
+
 /* Mobile optimization */
 @media (max-width: 768px) {
+	/* Dialog forms */
+	.service-dialog :deep(.p-dialog) {
+		width: 95vw;
+	}
+
+	.service-dialog :deep(.p-dialog-content) {
+		padding: 0.75rem;
+	}
+
+	.service-dialog .formgrid {
+		margin: 0;
+	}
+
+	.service-dialog .field {
+		padding: 0.25rem 0.5rem;
+	}
+
+	.service-dialog .field label {
+		font-size: 0.875rem;
+		margin-bottom: 0.25rem;
+	}
+
+	.confirm-dialog :deep(.p-dialog) {
+		width: 90vw;
+	}
+
+	.confirm-dialog :deep(.p-dialog-content) {
+		padding: 0.75rem;
+	}
 	.header-section {
 		margin-bottom: 0.5rem;
 	}
