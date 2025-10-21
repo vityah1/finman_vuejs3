@@ -199,4 +199,18 @@ const goToAddPayment = () => {
   background: transparent;
   padding: 0;
 }
+
+/* Currency dropdown alignment */
+.menubar-container :deep(.p-dropdown) {
+  height: 2.5rem;
+}
+
+.menubar-container :deep(.p-dropdown .p-dropdown-label) {
+  padding: 0.5rem;
+  font-size: 0.875rem;
+}
+
+.menubar-container :deep(.p-dropdown .p-dropdown-trigger) {
+  width: 2rem;
+}
 </style>
