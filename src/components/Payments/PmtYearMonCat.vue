@@ -11,7 +11,7 @@
 							<div class="header-left">
 								<PButton icon="pi pi-arrow-left" text @click="$router.go(-1)" size="small" class="back-btn" />
 								<i class="pi pi-folder category-icon"></i>
-								<h2 class="category-title">{{ category_name }} - {{ getMonthName(month) }} {{ year }}</h2>
+								<h2 class="category-title">{{ category_name }}</h2>
 							</div>
 							<div class="header-right">
 								<PButton icon="pi pi-plus" label="Додати" @click="openFormAddPayment" size="small" class="add-btn" />
@@ -864,6 +864,8 @@ export default defineComponent({
 .category-title {
   margin: 0;
   font-weight: 600;
+  font-size: 1.5rem;
+  color: var(--text-color);
 }
 
 .header-right {
@@ -930,19 +932,21 @@ export default defineComponent({
 }
 
 .summary-label {
-  color: var(--text-color-secondary);
-  font-weight: 500;
+  color: #495057;
+  font-weight: 600;
+  font-size: 0.95rem;
 }
 
 .total-amount {
   font-weight: 700;
-  font-size: 1.3rem;
-  color: var(--green-500);
+  font-size: 1.5rem;
+  color: var(--green-600);
 }
 
 .total-currency {
-  color: var(--text-color-secondary);
-  font-size: 0.9rem;
+  color: #6c757d;
+  font-size: 1rem;
+  font-weight: 600;
 }
 
 /* Mobile specific styles */
@@ -963,7 +967,7 @@ export default defineComponent({
   }
 
   .category-title {
-    font-size: 1rem;
+    font-size: 1.25rem;
   }
 
   .back-btn,
@@ -1024,12 +1028,14 @@ export default defineComponent({
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    color: var(--text-color-secondary);
-    font-size: 0.9rem;
+    color: #6c757d;
+    font-size: 0.95rem;
+    font-weight: 500;
   }
 
   .payment-date i {
-    font-size: 0.9rem;
+    font-size: 0.95rem;
+    color: var(--primary-color);
   }
 
   .payment-amount {
@@ -1040,13 +1046,15 @@ export default defineComponent({
   }
 
   .amount-value {
-    font-size: 1.125rem;
-    color: var(--green-500);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--green-600);
   }
 
   .amount-currency {
-    font-size: 0.9rem;
-    color: var(--text-color-secondary);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #6c757d;
   }
 
   .payment-card-body {
@@ -1062,12 +1070,16 @@ export default defineComponent({
 
   .payment-subcategory {
     font-style: italic;
-    color: var(--text-color-secondary);
-    font-size: 0.85rem;
+    color: #6c757d;
+    font-size: 0.875rem;
+    font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 120px;
+    background: #f8f9fa;
+    padding: 0.125rem 0.375rem;
+    border-radius: 0.25rem;
   }
 
   .payment-card-footer {
@@ -1112,7 +1124,7 @@ export default defineComponent({
   }
 
   .total-amount {
-    font-size: 1.1rem;
+    font-size: 1.35rem;
   }
 }
 
