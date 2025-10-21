@@ -594,13 +594,28 @@ export default defineComponent({
 
 /* Mobile optimization */
 @media (max-width: 768px) {
-	/* Dialog forms */
+	/* Dialog forms - FULLSCREEN on mobile */
 	.service-dialog :deep(.p-dialog) {
-		width: 95vw;
+		width: 100vw;
+		height: 100vh;
+		margin: 0;
+		max-height: 100vh;
+		border-radius: 0;
 	}
 
 	.service-dialog :deep(.p-dialog-content) {
 		padding: 0.5rem;
+		flex: 1;
+		overflow-y: auto;
+	}
+
+	.service-dialog :deep(.p-dialog-header) {
+		padding: 0.75rem 0.5rem;
+	}
+
+	.service-dialog :deep(.p-dialog-footer) {
+		padding: 0.75rem 0.5rem;
+		border-top: 1px solid var(--surface-border);
 	}
 
 	.service-dialog .formgrid {

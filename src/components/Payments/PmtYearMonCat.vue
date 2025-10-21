@@ -126,12 +126,13 @@
 		</PCard>
 	</div>
 
-		<!-- Edit Dialog - NO CUSTOM STYLES -->
+		<!-- Edit Dialog -->
 		<Dialog
 			v-model:visible="showModal"
 			:header="okTitle"
 			:modal="true"
 			:style="{ width: '500px' }"
+			class="payment-dialog"
 		>
 			<div v-if="currentPayment">
 				<div style="margin-bottom: 1rem;">
@@ -218,6 +219,7 @@
 			header="Змінити категорію для вибраних записів"
 			:modal="true"
 			:style="{ width: '450px' }"
+			class="payment-dialog"
 		>
 			<div style="margin-bottom: 1rem;">
 				<p style="margin-bottom: 1rem;">
@@ -246,6 +248,7 @@
 			header="Підтвердження видалення"
 			:modal="true"
 			:style="{ width: '350px' }"
+			class="confirmation-dialog"
 		>
 			<p>Ви впевнені, що хочете видалити цей платіж?</p>
 			<template #footer>
@@ -260,6 +263,7 @@
         header="Підтвердження видалення"
         :modal="true"
         :style="{ width: '350px' }"
+        class="confirmation-dialog"
     >
       <p>Ви впевнені, що хочете видалити <strong>{{ selectedPayments.length }}</strong> платежів?</p>
       <template #footer>
@@ -741,5 +745,47 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* NO CUSTOM STYLES - USING PURE PRIMEVUE DEFAULTS */
+@media (max-width: 768px) {
+	/* Dialog forms - FULLSCREEN on mobile */
+	.payment-dialog :deep(.p-dialog) {
+		width: 100vw;
+		height: 100vh;
+		margin: 0;
+		max-height: 100vh;
+		border-radius: 0;
+	}
+
+	.payment-dialog :deep(.p-dialog-content) {
+		padding: 0.5rem;
+		flex: 1;
+		overflow-y: auto;
+	}
+
+	.payment-dialog :deep(.p-dialog-header) {
+		padding: 0.75rem 0.5rem;
+	}
+
+	.payment-dialog :deep(.p-dialog-footer) {
+		padding: 0.75rem 0.5rem;
+		border-top: 1px solid var(--surface-border);
+	}
+
+	/* Confirmation dialogs - 90vw on mobile (not fullscreen) */
+	.confirmation-dialog :deep(.p-dialog) {
+		width: 90vw !important;
+		max-width: 90vw;
+	}
+
+	.confirmation-dialog :deep(.p-dialog-content) {
+		padding: 0.5rem;
+	}
+
+	.confirmation-dialog :deep(.p-dialog-header) {
+		padding: 0.75rem 0.5rem;
+	}
+
+	.confirmation-dialog :deep(.p-dialog-footer) {
+		padding: 0.75rem 0.5rem;
+	}
+}
 </style>

@@ -278,6 +278,7 @@
 			modal
 			style="width: 50rem"
 			:breakpoints="{ '1199px': '75vw', '575px': '90vw' }"
+			class="category-rule-dialog"
 		>
 			<div v-if="selectedPaymentForRule" style="margin-bottom: 1rem;">
 				<div style="margin-bottom: 1rem;">
@@ -684,5 +685,31 @@ export default defineComponent({
 .loading-content p {
 	color: #6c757d;
 	font-weight: 500;
+}
+
+@media (max-width: 768px) {
+	/* Category rule dialog - FULLSCREEN on mobile */
+	.category-rule-dialog :deep(.p-dialog) {
+		width: 100vw;
+		height: 100vh;
+		margin: 0;
+		max-height: 100vh;
+		border-radius: 0;
+	}
+
+	.category-rule-dialog :deep(.p-dialog-content) {
+		padding: 0.5rem;
+		flex: 1;
+		overflow-y: auto;
+	}
+
+	.category-rule-dialog :deep(.p-dialog-header) {
+		padding: 0.75rem 0.5rem;
+	}
+
+	.category-rule-dialog :deep(.p-dialog-footer) {
+		padding: 0.75rem 0.5rem;
+		border-top: 1px solid var(--surface-border);
+	}
 }
 </style>
