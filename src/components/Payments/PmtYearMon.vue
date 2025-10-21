@@ -11,16 +11,8 @@
 
 				<!-- Summary panel -->
 				<div class="summary-panel">
-					<div class="summary-content">
-						<div class="summary-operations">
-							<span class="summary-label">Операцій:</span>
-							<PTag :value="total_cnt" severity="success" class="summary-tag" />
-						</div>
-						<div class="summary-total">
-							<span class="summary-label">Загальна сума:</span>
-							<span class="total-amount">{{ total.toLocaleString() }}</span>
-							<span class="total-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
-						</div>
+					<div class="summary-line">
+						<span class="summary-text">Всього: {{ total_cnt }} оп., {{ total.toLocaleString() }} {{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
 					</div>
 				</div>
 
@@ -363,39 +355,16 @@ export default {
   border: 1px solid var(--surface-border);
 }
 
-.summary-content {
+.summary-line {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 2rem;
 }
 
-.summary-operations,
-.summary-total {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.summary-label {
-  color: var(--text-color-secondary);
-  font-weight: 500;
-  font-size: 0.95rem;
-}
-
-.summary-tag {
+.summary-text {
+  color: var(--text-color);
   font-weight: 600;
-}
-
-.total-amount {
-  font-weight: 700;
-  font-size: 1.3rem;
-  color: var(--primary-color);
-}
-
-.total-currency {
-  color: var(--text-color-secondary);
-  font-size: 0.95rem;
+  font-size: 1.1rem;
 }
 
 /* Mobile optimization */
@@ -421,27 +390,12 @@ export default {
     margin-top: 0.5rem;
   }
 
-  .summary-content {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
+  .summary-line {
+    justify-content: center;
   }
 
-  .summary-operations,
-  .summary-total {
-    justify-content: space-between;
-  }
-
-  .summary-label {
-    font-size: 0.875rem;
-  }
-
-  .total-amount {
-    font-size: 1rem;
-  }
-
-  .total-currency {
-    font-size: 0.8rem;
+  .summary-text {
+    font-size: 0.95rem;
   }
 }
 </style>
