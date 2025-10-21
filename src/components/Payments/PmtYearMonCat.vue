@@ -970,6 +970,10 @@ export default defineComponent({
     font-size: 1.25rem;
   }
 
+  .category-icon {
+    display: none;
+  }
+
   .back-btn,
   .add-btn {
     font-size: 0.875rem;
