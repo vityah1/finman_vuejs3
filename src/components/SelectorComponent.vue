@@ -337,9 +337,5 @@ async getUserGroup() {
 };
 </script>
 <style scoped>
-/* Dialog styles - using global styles from main.css for fullscreen mobile */
-.period-dialog :deep(.p-dialog) {
-  width: 750px;
-  max-width: 95vw;
-}
+/* Dialog styles come from main.css (fullscreen on mobile, 750px on desktop) */
 </style>
