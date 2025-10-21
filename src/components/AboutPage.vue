@@ -112,11 +112,22 @@ export default defineComponent({
   }
 
   .about-card :deep(.p-card-content) {
-    padding: 0.75rem;
+    padding: 0.5rem;
   }
 
   .about-card :deep(.p-card-body) {
-    padding: 0.5rem;
+    padding: 0.25rem;
+  }
+
+  /* Збільшуємо текст для зручності читання на мобільних */
+  .about-card :deep(.p-card-content) {
+    font-size: 0.9375rem;
+    line-height: 1.6;
+  }
+
+  /* Зменшуємо відступи в блоці з інформацією про білд */
+  .build-info {
+    font-size: 0.8125rem;
   }
 }
 </style>

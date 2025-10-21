@@ -53,7 +53,7 @@ export default {
 /* Mobile optimization */
 @media (max-width: 768px) {
   .layout-content {
-    padding: 0.75rem;
+    padding: 0.5rem;
   }
 }
 
