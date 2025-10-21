@@ -163,12 +163,12 @@
 	</div>
 
 	<!-- Edit Dialog -->
-	<div class="payment-dialog">
-		<Dialog
-			v-model:visible="showModal"
-			:header="okTitle"
-			:modal="true"
-		>
+	<Dialog
+		v-model:visible="showModal"
+		:header="okTitle"
+		:modal="true"
+		class="payment-dialog"
+	>
 			<div v-if="currentPayment">
 				<div class="field">
 					<label for="rdate">Дата:</label>
@@ -244,69 +244,61 @@
 				<PButton v-if="okTitle !== 'Додати'" label="Видалити" icon="pi pi-trash" severity="danger" @click="deletePayment" />
 			</template>
 		</Dialog>
-	</div>
 
 	<!-- Bulk Category Change Dialog -->
-	<div class="payment-dialog">
-		<Dialog
-			v-model:visible="showBulkCategoryDialog"
-			header="Змінити категорію для вибраних записів"
-			:modal="true"
-			:style="{ width: '450px' }"
-		>
-			<div style="margin-bottom: 1rem;">
-				<p style="margin-bottom: 1rem;">
-					Ви збираєтесь змінити категорію для <strong>{{ selectedPayments.length }}</strong> записів.
-				</p>
-				<label for="bulk-category" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Нова категорія:</label>
-				<Dropdown
-					v-model="bulkCategoryId"
-					:options="formattedCategories"
-					optionLabel="name"
-					optionValue="id"
-					placeholder="Виберіть категорію"
-					id="bulk-category"
-					style="width: 100%;" />
-			</div>
+	<Dialog
+		v-model:visible="showBulkCategoryDialog"
+		header="Змінити категорію для вибраних записів"
+		:modal="true"
+		class="confirmation-dialog"
+	>
+		<div class="field">
+			<p style="margin-bottom: 1rem;">
+				Ви збираєтесь змінити категорію для <strong>{{ selectedPayments.length }}</strong> записів.
+			</p>
+			<label for="bulk-category">Нова категорія:</label>
+			<Dropdown
+				v-model="bulkCategoryId"
+				:options="formattedCategories"
+				optionLabel="name"
+				optionValue="id"
+				placeholder="Виберіть категорію"
+				id="bulk-category" />
+		</div>
 
-			<template #footer>
-				<PButton label="Скасувати" icon="pi pi-times" text @click="showBulkCategoryDialog = false" />
-				<PButton label="Змінити" icon="pi pi-check" @click="saveBulkCategoryChange" :disabled="!bulkCategoryId" />
-			</template>
-		</Dialog>
-	</div>
+		<template #footer>
+			<PButton label="Скасувати" icon="pi pi-times" text @click="showBulkCategoryDialog = false" />
+			<PButton label="Змінити" icon="pi pi-check" @click="saveBulkCategoryChange" :disabled="!bulkCategoryId" />
+		</template>
+	</Dialog>
 
 	<!-- Delete Confirmation -->
-	<div class="confirmation-dialog">
-		<Dialog
-			v-model:visible="showDeleteConfirm"
-			header="Підтвердження видалення"
-			:modal="true"
-			:style="{ width: '350px' }"
-		>
-			<p>Ви впевнені, що хочете видалити цей платіж?</p>
-			<template #footer>
-				<PButton label="Ні" icon="pi pi-times" text @click="showDeleteConfirm = false" />
-				<PButton label="Так" icon="pi pi-check" severity="danger" @click="deletePayment" />
-			</template>
-		</Dialog>
-	</div>
+	<Dialog
+		v-model:visible="showDeleteConfirm"
+		header="Підтвердження видалення"
+		:modal="true"
+		class="confirmation-dialog"
+	>
+		<p>Ви впевнені, що хочете видалити цей платіж?</p>
+		<template #footer>
+			<PButton label="Ні" icon="pi pi-times" text @click="showDeleteConfirm = false" />
+			<PButton label="Так" icon="pi pi-check" severity="danger" @click="deletePayment" />
+		</template>
+	</Dialog>
 
 	<!-- Bulk Delete Confirmation -->
-	<div class="confirmation-dialog">
-		<Dialog
-			v-model:visible="showBulkDeleteConfirm"
-			header="Підтвердження видалення"
-			:modal="true"
-			:style="{ width: '350px' }"
-		>
-      <p>Ви впевнені, що хочете видалити <strong>{{ selectedPayments.length }}</strong> платежів?</p>
-			<template #footer>
-				<PButton label="Ні" icon="pi pi-times" text @click="showBulkDeleteConfirm = false" />
-				<PButton label="Так" icon="pi pi-check" severity="danger" @click="handleBulkDeleteConfirm" />
-			</template>
-		</Dialog>
-	</div>
+	<Dialog
+		v-model:visible="showBulkDeleteConfirm"
+		header="Підтвердження видалення"
+		:modal="true"
+		class="confirmation-dialog"
+	>
+		<p>Ви впевнені, що хочете видалити <strong>{{ selectedPayments.length }}</strong> платежів?</p>
+		<template #footer>
+			<PButton label="Ні" icon="pi pi-times" text @click="showBulkDeleteConfirm = false" />
+			<PButton label="Так" icon="pi pi-check" severity="danger" @click="handleBulkDeleteConfirm" />
+		</template>
+	</Dialog>
 </template>
 
 <script>
@@ -1100,5 +1092,16 @@ export default defineComponent({
   .total-amount {
     font-size: 1.1rem;
   }
+}
+
+/* Dialog styles - using global styles from main.css for fullscreen mobile */
+.payment-dialog :deep(.p-dialog) {
+  width: 750px;
+  max-width: 95vw;
+}
+
+.confirmation-dialog :deep(.p-dialog) {
+  width: 500px;
+  max-width: 95vw;
 }
 </style>

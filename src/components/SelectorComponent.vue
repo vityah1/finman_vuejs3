@@ -336,90 +336,10 @@ async getUserGroup() {
 	}
 };
 </script>
-
 <style scoped>
-.selector-wrapper {
-  margin-bottom: 1rem;
-}
-
-.selector-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  align-items: center;
-}
-
-.filter-dropdown {
-  flex: 1 1 auto;
-  min-width: 150px;
-}
-
-.period-btn {
-  flex: 0 0 auto;
-}
-
-@media (max-width: 768px) {
-  .selector-wrapper {
-    margin-bottom: 0.75rem;
-  }
-
-  .selector-filters {
-    gap: 0.375rem;
-  }
-
-  .filter-dropdown {
-    flex: 1 1 calc(50% - 0.375rem);
-    min-width: 0;
-  }
-
-  .filter-dropdown:nth-last-child(2) {
-    /* Джерело dropdown - full width if it's the second to last */
-    flex: 1 1 100%;
-  }
-
-  .period-btn {
-    flex: 1 1 100%;
-  }
-
-  .period-btn :deep(.p-button-label) {
-    display: inline; /* Keep label on button for clarity */
-  }
-
-  /* Make dropdowns more compact */
-  .filter-dropdown :deep(.p-dropdown) {
-    font-size: 0.875rem;
-  }
-
-  .filter-dropdown :deep(.p-dropdown-label) {
-    padding: 0.5rem;
-  }
-
-  /* Period dialog - FULLSCREEN on mobile */
-  .period-dialog :deep(.p-dialog) {
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    max-height: 100vh;
-    border-radius: 0;
-  }
-
-  .period-dialog :deep(.p-dialog-content) {
-    padding: 0.5rem;
-    flex: 1;
-    overflow-y: auto;
-  }
-
-  .period-dialog :deep(.p-dialog-header) {
-    padding: 0.75rem 0.5rem;
-  }
-
-  .period-dialog :deep(.p-dialog-footer) {
-    padding: 0.75rem 0.5rem;
-    border-top: 1px solid var(--surface-border);
-  }
-
-  .period-form {
-    gap: 0.75rem;
-  }
+/* Dialog styles - using global styles from main.css for fullscreen mobile */
+.period-dialog :deep(.p-dialog) {
+  width: 750px;
+  max-width: 95vw;
 }
 </style>
