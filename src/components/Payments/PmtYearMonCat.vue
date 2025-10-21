@@ -1091,41 +1091,16 @@ export default defineComponent({
   border: 1px solid var(--surface-border);
 }
 
-.summary-content {
+.summary-line {
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 1.5rem;
-  flex-wrap: wrap;
 }
 
-.summary-count,
-.summary-total {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.summary-label {
-  color: var(--text-color-secondary);
-  font-weight: 500;
-  font-size: 0.95rem;
-}
-
-.summary-tag {
+.summary-text {
+  color: var(--text-color);
   font-weight: 600;
-}
-
-.total-amount {
-  font-weight: 700;
-  font-size: 1.3rem;
-  color: var(--green-600);
-}
-
-.total-currency {
-  color: var(--text-color-secondary);
-  font-size: 0.95rem;
-  font-weight: 600;
+  font-size: 1.1rem;
 }
 
 /* Mobile specific styles */
@@ -1297,27 +1272,12 @@ export default defineComponent({
     margin-bottom: 0.5rem;
   }
 
-  .summary-content {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
+  .summary-line {
+    justify-content: center;
   }
 
-  .summary-count,
-  .summary-total {
-    justify-content: space-between;
-  }
-
-  .summary-label {
-    font-size: 0.875rem;
-  }
-
-  .total-amount {
-    font-size: 1rem;
-  }
-
-  .total-currency {
-    font-size: 0.8rem;
+  .summary-text {
+    font-size: 0.95rem;
   }
 }
 
