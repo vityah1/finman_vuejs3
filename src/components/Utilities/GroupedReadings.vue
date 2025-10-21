@@ -536,18 +536,22 @@ export default defineComponent({
 }
 
 /* Total summary card */
+.total-summary-card {
+	margin-bottom: 0.75rem;
+}
+
 .total-summary-card :deep(.p-card-content) {
-	padding: 0.875rem 1.25rem;
+	padding: 0.75rem;
 }
 
 .total-label {
-	font-size: 1rem;
+	font-size: 0.95rem;
 	font-weight: 600;
 	color: #2c3e50;
 }
 
 .total-amount {
-	font-size: 1.75rem;
+	font-size: 1.5rem;
 	font-weight: 700;
 	color: var(--primary-color);
 }
@@ -840,23 +844,31 @@ export default defineComponent({
 		display: block;
 	}
 
-	.total-amount {
-		font-size: 1.5rem;
+	.grouped-readings {
+		margin-top: 0.5rem;
 	}
 
 	/* Мінімальні відступи в картках на мобільному */
+	.mobile-compact-card {
+		margin-bottom: 0.75rem;
+	}
+
 	.mobile-compact-card :deep(.p-card-content) {
-		padding: 0.375rem;
+		padding: 0.5rem;
 	}
 
 	.mobile-compact-card :deep(.p-card-title) {
 		padding: 0.5rem;
-		font-size: 0.95rem;
+		font-size: 0.9rem;
 	}
 
 	/* Компактніша загальна сума */
+	.total-summary-card {
+		margin-bottom: 0.5rem;
+	}
+
 	.total-summary-card :deep(.p-card-content) {
-		padding: 0.5rem 0.625rem;
+		padding: 0.5rem;
 	}
 
 	.total-label {
@@ -864,7 +876,7 @@ export default defineComponent({
 	}
 
 	.total-amount {
-		font-size: 1.25rem;
+		font-size: 1.125rem;
 	}
 }
 </style>

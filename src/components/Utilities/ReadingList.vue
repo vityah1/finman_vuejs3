@@ -12,8 +12,8 @@
 			</Message>
 		</div>
 		<div v-else>
-			<div class="mb-4">
-				<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
+			<div class="header-section">
+				<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="breadcrumb-custom">
 					<template #item="{ item }">
 						<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
 							<span class="p-menuitem-text">{{ item.label }}</span>
@@ -21,15 +21,17 @@
 						<span v-else class="p-menuitem-text">{{ item.label }}</span>
 					</template>
 				</Breadcrumb>
-				<div class="flex justify-content-between align-items-center mb-2">
-					<h2><i class="pi pi-chart-line mr-2"></i>Показники лічильників</h2>
+				<div class="flex justify-content-between align-items-center title-row">
+					<h2 class="page-title"><i class="pi pi-chart-line mr-2"></i>Показники</h2>
 					<Button
 						label="Додати показники"
 						icon="pi pi-plus"
+						size="small"
+						class="add-reading-btn"
 						@click="$router.push({ name: 'utilities_add_reading', query: { addressId: addressId } })"
 					/>
 				</div>
-				<p v-if="currentAddress" class="text-muted">
+				<p v-if="currentAddress" class="address-info">
 					<i class="pi pi-map-marker mr-2"></i>{{ currentAddress.address }}
 				</p>
 			</div>
@@ -459,12 +461,33 @@ export default defineComponent({
 
 <style scoped>
 .reading-list {
-	padding: 20px 0;
+	padding: 0;
 }
 
-.breadcrumb {
+/* Header section */
+.header-section {
+	margin-bottom: 0.75rem;
+}
+
+.breadcrumb-custom {
 	background: none;
 	padding: 0;
+	margin-bottom: 0.5rem;
+}
+
+.title-row {
+	margin-bottom: 0.5rem;
+}
+
+.page-title {
+	margin: 0;
+	font-size: 1.5rem;
+}
+
+.address-info {
+	margin: 0;
+	font-size: 0.875rem;
+	color: #6c757d;
 }
 
 .card {
@@ -486,8 +509,12 @@ export default defineComponent({
 }
 
 /* Filters styling */
+.filters-card {
+	margin-bottom: 0.75rem;
+}
+
 .filters-card :deep(.p-card-content) {
-	padding: 1rem;
+	padding: 0.75rem;
 }
 
 .filter-field {
@@ -512,9 +539,71 @@ export default defineComponent({
 }
 
 @media (max-width: 768px) {
+	.reading-list {
+		padding: 0;
+	}
+
+	/* Compact header on mobile */
+	.header-section {
+		margin-bottom: 0.5rem;
+	}
+
+	.breadcrumb-custom {
+		margin-bottom: 0.375rem;
+	}
+
+	.breadcrumb-custom :deep(.p-breadcrumb) {
+		padding: 0.25rem 0;
+		font-size: 0.8rem;
+	}
+
+	.title-row {
+		margin-bottom: 0.375rem;
+	}
+
+	.page-title {
+		font-size: 1.125rem;
+	}
+
+	.add-reading-btn {
+		font-size: 0.8rem;
+		padding: 0.375rem 0.75rem;
+	}
+
+	.add-reading-btn :deep(.p-button-label) {
+		display: none;
+	}
+
+	.add-reading-btn :deep(.p-button-icon) {
+		margin: 0;
+	}
+
+	.address-info {
+		font-size: 0.75rem;
+	}
+
+	/* Compact filters */
+	.filters-card {
+		margin-bottom: 0.5rem;
+	}
+
+	.filters-card :deep(.p-card-content) {
+		padding: 0.5rem;
+	}
+
 	.filter-field {
 		flex: 1 1 100%;
 		min-width: 100%;
+		margin-bottom: 0.5rem;
+	}
+
+	.filter-field:last-of-type {
+		margin-bottom: 0;
+	}
+
+	.filter-label {
+		font-size: 0.75rem;
+		margin-bottom: 0.25rem;
 	}
 
 	.filter-dropdown {
@@ -523,6 +612,8 @@ export default defineComponent({
 
 	.reset-button {
 		width: 100%;
+		margin-top: 0.5rem;
+		font-size: 0.8rem;
 	}
 }
 </style>
