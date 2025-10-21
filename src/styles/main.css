@@ -492,19 +492,19 @@ a:hover {
 }
 
 /* Dialog styles for desktop */
-.address-dialog .p-dialog,
-.service-dialog .p-dialog,
-.tariff-dialog .p-dialog,
-.payment-dialog .p-dialog,
-.period-dialog .p-dialog,
-.category-dialog .p-dialog,
-.config-dialog .p-dialog,
-.category-rule-dialog .p-dialog {
+.p-dialog.address-dialog,
+.p-dialog.service-dialog,
+.p-dialog.tariff-dialog,
+.p-dialog.payment-dialog,
+.p-dialog.period-dialog,
+.p-dialog.category-dialog,
+.p-dialog.config-dialog,
+.p-dialog.category-rule-dialog {
   width: 750px;
   max-width: 95vw;
 }
 
-.confirmation-dialog .p-dialog {
+.p-dialog.confirmation-dialog {
   width: 500px;
   max-width: 95vw;
 }
@@ -526,14 +526,14 @@ a:hover {
   }
 
   /* Fullscreen forms on mobile */
-  .address-dialog .p-dialog,
-  .service-dialog .p-dialog,
-  .tariff-dialog .p-dialog,
-  .payment-dialog .p-dialog,
-  .period-dialog .p-dialog,
-  .category-dialog .p-dialog,
-  .config-dialog .p-dialog,
-  .category-rule-dialog .p-dialog {
+  .p-dialog.address-dialog,
+  .p-dialog.service-dialog,
+  .p-dialog.tariff-dialog,
+  .p-dialog.payment-dialog,
+  .p-dialog.period-dialog,
+  .p-dialog.category-dialog,
+  .p-dialog.config-dialog,
+  .p-dialog.category-rule-dialog {
     width: 100vw !important;
     height: 100vh !important;
     margin: 0 !important;
@@ -541,57 +541,57 @@ a:hover {
     border-radius: 0 !important;
   }
 
-  .address-dialog .p-dialog-content,
-  .service-dialog .p-dialog-content,
-  .tariff-dialog .p-dialog-content,
-  .payment-dialog .p-dialog-content,
-  .period-dialog .p-dialog-content,
-  .category-dialog .p-dialog-content,
-  .config-dialog .p-dialog-content,
-  .category-rule-dialog .p-dialog-content {
+  .p-dialog.address-dialog .p-dialog-content,
+  .p-dialog.service-dialog .p-dialog-content,
+  .p-dialog.tariff-dialog .p-dialog-content,
+  .p-dialog.payment-dialog .p-dialog-content,
+  .p-dialog.period-dialog .p-dialog-content,
+  .p-dialog.category-dialog .p-dialog-content,
+  .p-dialog.config-dialog .p-dialog-content,
+  .p-dialog.category-rule-dialog .p-dialog-content {
     padding: 0.5rem !important;
     flex: 1 !important;
     overflow-y: auto !important;
   }
 
-  .address-dialog .p-dialog-header,
-  .service-dialog .p-dialog-header,
-  .tariff-dialog .p-dialog-header,
-  .payment-dialog .p-dialog-header,
-  .period-dialog .p-dialog-header,
-  .category-dialog .p-dialog-header,
-  .config-dialog .p-dialog-header,
-  .category-rule-dialog .p-dialog-header {
+  .p-dialog.address-dialog .p-dialog-header,
+  .p-dialog.service-dialog .p-dialog-header,
+  .p-dialog.tariff-dialog .p-dialog-header,
+  .p-dialog.payment-dialog .p-dialog-header,
+  .p-dialog.period-dialog .p-dialog-header,
+  .p-dialog.category-dialog .p-dialog-header,
+  .p-dialog.config-dialog .p-dialog-header,
+  .p-dialog.category-rule-dialog .p-dialog-header {
     padding: 0.75rem 0.5rem !important;
   }
 
-  .address-dialog .p-dialog-footer,
-  .service-dialog .p-dialog-footer,
-  .tariff-dialog .p-dialog-footer,
-  .payment-dialog .p-dialog-footer,
-  .period-dialog .p-dialog-footer,
-  .category-dialog .p-dialog-footer,
-  .config-dialog .p-dialog-footer,
-  .category-rule-dialog .p-dialog-footer {
+  .p-dialog.address-dialog .p-dialog-footer,
+  .p-dialog.service-dialog .p-dialog-footer,
+  .p-dialog.tariff-dialog .p-dialog-footer,
+  .p-dialog.payment-dialog .p-dialog-footer,
+  .p-dialog.period-dialog .p-dialog-footer,
+  .p-dialog.category-dialog .p-dialog-footer,
+  .p-dialog.config-dialog .p-dialog-footer,
+  .p-dialog.category-rule-dialog .p-dialog-footer {
     padding: 0.75rem 0.5rem !important;
     border-top: 1px solid var(--surface-border) !important;
   }
 
-  .address-dialog .field,
-  .service-dialog .field,
-  .tariff-dialog .field {
+  .p-dialog.address-dialog .field,
+  .p-dialog.service-dialog .field,
+  .p-dialog.tariff-dialog .field {
     padding: 0.25rem 0;
   }
 
   /* Compact confirmation dialogs on mobile */
-  .confirmation-dialog .p-dialog {
+  .p-dialog.confirmation-dialog {
     width: 90vw !important;
     max-width: 90vw !important;
   }
 
-  .confirmation-dialog .p-dialog-content,
-  .confirmation-dialog .p-dialog-header,
-  .confirmation-dialog .p-dialog-footer {
+  .p-dialog.confirmation-dialog .p-dialog-content,
+  .p-dialog.confirmation-dialog .p-dialog-header,
+  .p-dialog.confirmation-dialog .p-dialog-footer {
     padding: 0.5rem !important;
   }
 }

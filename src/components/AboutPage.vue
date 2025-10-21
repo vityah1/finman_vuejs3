@@ -19,6 +19,8 @@ export default defineComponent({
     return {
       htmlContent: "",
       content: "",
+      buildVersion: (window as any).APP_BUILD_VERSION || 'Unknown',
+      buildTime: new Date().toLocaleString('uk-UA'),
     };
   },
   setup() {
@@ -69,6 +71,24 @@ export default defineComponent({
       <template #content>
         <div v-html="htmlContent"></div>
         {{ content }}
+
+        <div class="build-info">
+          <hr style="margin: 1.5rem 0; border: none; border-top: 1px solid #e0e0e0;" />
+          <div style="display: flex; flex-direction: column; gap: 0.5rem;">
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <i class="pi pi-code" style="color: var(--primary-color);"></i>
+              <strong>Версія білду:</strong>
+              <span style="font-family: monospace; font-size: 0.875rem; background: #f5f5f5; padding: 0.25rem 0.5rem; border-radius: 4px;">
+                {{ buildVersion }}
+              </span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.5rem;">
+              <i class="pi pi-calendar" style="color: var(--primary-color);"></i>
+              <strong>Час завантаження:</strong>
+              <span style="font-size: 0.875rem;">{{ buildTime }}</span>
+            </div>
+          </div>
+        </div>
       </template>
     </Card>
   </div>
