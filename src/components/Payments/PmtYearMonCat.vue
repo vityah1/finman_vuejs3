@@ -5,22 +5,38 @@
 				<alert-component ref="myAlert"></alert-component>
 
 				<!-- Category header with back button and info -->
-				<PCard>
-					<template #header>
-						<div class="category-header">
-							<div class="header-left">
-								<PButton icon="pi pi-arrow-left" text @click="$router.go(-1)" size="small" class="back-btn" />
-								<i class="pi pi-folder category-icon"></i>
-								<h2 class="category-title">{{ category_name }} - {{ getMonthName(month) }} {{ year }}</h2>
-							</div>
-							<div class="header-right">
-								<PButton icon="pi pi-plus" label="Додати" @click="openFormAddPayment" size="small" class="add-btn" />
-							</div>
-						</div>
-					</template>
+				<div class="category-header">
+					<div class="header-left">
+						<PButton icon="pi pi-arrow-left" text @click="$router.go(-1)" size="small" class="back-btn" />
+						<i class="pi pi-folder category-icon"></i>
+						<h2 class="category-title">{{ category_name }} - {{ getMonthName(month) }} {{ year }}</h2>
+					</div>
+					<div class="header-right">
+						<PButton icon="pi pi-plus" label="Додати" @click="openFormAddPayment" size="small" class="add-btn" />
+					</div>
+				</div>
 
-					<template #content>
-						<!-- Group operations toolbar -->
+				<!-- Period and filter selector -->
+				<div>
+					<selector-component @change="handleSelectChange" :currentYear="year" :currentMonth="month" />
+				</div>
+
+				<!-- Summary panel -->
+				<div class="summary-panel">
+					<div class="summary-content">
+						<div class="summary-count">
+							<span class="summary-label">Записів:</span>
+							<PTag :value="payments.length" severity="info" class="summary-tag" />
+						</div>
+						<div class="summary-total">
+							<span class="summary-label">Загальна сума:</span>
+							<span class="total-amount">{{ formatAmount(total) }}</span>
+							<span class="total-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+						</div>
+					</div>
+				</div>
+
+				<!-- Group operations toolbar -->
 						<PCard v-if="selectedPayments.length > 0" class="bulk-toolbar">
 							<template #content>
 								<div class="bulk-toolbar-content">
@@ -143,23 +159,6 @@
 								</div>
 							</div>
 						</div>
-
-						<!-- Summary panel -->
-						<div class="summary-panel">
-							<div class="summary-content">
-								<div class="summary-count">
-									<span class="summary-label">Записів:</span>
-									<PTag :value="payments.length" severity="info" class="summary-tag" />
-								</div>
-								<div class="summary-total">
-									<span class="summary-label">Загальна сума:</span>
-									<span class="total-amount">{{ formatAmount(total) }}</span>
-									<span class="total-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
-								</div>
-							</div>
-						</div>
-					</template>
-				</PCard>
 			</template>
 		</PCard>
 	</div>
@@ -305,6 +304,7 @@
 
 <script>
 import { defineComponent } from 'vue';
+import SelectorComponent from "../SelectorComponent.vue";
 import PaymentService from "../../services/PaymentService";
 import store from "@/store";
 import { getErrorMessage, logError } from '@/utils/errorHandler';
@@ -321,6 +321,7 @@ import Tag from 'primevue/tag';
 export default defineComponent({
 	name: "PaymentDetail",
 	components: {
+		SelectorComponent,
 		Dialog,
 		Calendar,
 		InputNumber,
@@ -434,6 +435,35 @@ export default defineComponent({
 			const date = new Date();
 			date.setMonth(monthNumber - 1);
 			return date.toLocaleString('uk-UA', { month: 'long' });
+		},
+
+		handleSelectChange(eventData) {
+			if (!eventData) {
+				console.warn("Пропуск обробки події з неповними даними", eventData);
+				return;
+			}
+
+			console.log("Обробка події зміни фільтрів у PmtYearMonCat:", eventData);
+
+			// Оновлюємо параметри запиту
+			const query = {};
+			if (eventData.group_user_id) {
+				query.group_user_id = eventData.group_user_id;
+			}
+			if (eventData.source) {
+				query.source = eventData.source;
+			}
+
+			// Оновлюємо URL та перезавантажуємо дані
+			this.$router.replace({
+				name: this.$route.name,
+				params: this.$route.params,
+				query
+			}).then(() => {
+				this.getPayments();
+			}).catch((err) => {
+				console.warn("Ігнорована помилка навігації:", err);
+			});
 		},
 
 		formatDate(dateString) {
@@ -842,12 +872,13 @@ export default defineComponent({
 
 /* Category header styles */
 .category-header {
-  padding: 1rem;
+  padding: 0.5rem 0;
+  margin-bottom: 0.75rem;
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 .header-left {
@@ -857,26 +888,26 @@ export default defineComponent({
 }
 
 .category-icon {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--primary-color);
 }
 
 .category-title {
   margin: 0;
   font-weight: 600;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--text-color);
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.75rem;
 }
 
 /* Bulk toolbar styles */
 .bulk-toolbar {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .bulk-toolbar-content {
@@ -884,7 +915,8 @@ export default defineComponent({
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
 }
 
 .bulk-selection-info {
@@ -909,8 +941,8 @@ export default defineComponent({
 
 /* Summary panel styles */
 .summary-panel {
-  margin-top: 1rem;
-  padding: 1rem;
+  margin-bottom: 0.75rem;
+  padding: 0.75rem 1rem;
   background: var(--surface-ground);
   border-radius: 0.375rem;
   border: 1px solid var(--surface-border);
@@ -920,7 +952,7 @@ export default defineComponent({
   display: flex;
   justify-content: flex-end;
   align-items: center;
-  gap: 2rem;
+  gap: 1.5rem;
   flex-wrap: wrap;
 }
 
@@ -932,20 +964,24 @@ export default defineComponent({
 }
 
 .summary-label {
-  color: #495057;
-  font-weight: 600;
+  color: var(--text-color-secondary);
+  font-weight: 500;
   font-size: 0.95rem;
+}
+
+.summary-tag {
+  font-weight: 600;
 }
 
 .total-amount {
   font-weight: 700;
-  font-size: 1.5rem;
+  font-size: 1.3rem;
   color: var(--green-600);
 }
 
 .total-currency {
-  color: #6c757d;
-  font-size: 1rem;
+  color: var(--text-color-secondary);
+  font-size: 0.95rem;
   font-weight: 600;
 }
 
@@ -962,12 +998,13 @@ export default defineComponent({
 
   /* Category header mobile */
   .category-header {
-    padding: 0.75rem;
-    gap: 0.5rem;
+    padding: 0.25rem 0;
+    margin-bottom: 0.5rem;
+    gap: 0.375rem;
   }
 
   .category-title {
-    font-size: 1.25rem;
+    font-size: 1rem;
   }
 
   .category-icon {
@@ -1113,13 +1150,14 @@ export default defineComponent({
 
   /* Summary panel mobile */
   .summary-panel {
-    padding: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    margin-bottom: 0.5rem;
   }
 
   .summary-content {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   .summary-count,
@@ -1127,8 +1165,16 @@ export default defineComponent({
     justify-content: space-between;
   }
 
+  .summary-label {
+    font-size: 0.875rem;
+  }
+
   .total-amount {
-    font-size: 1.35rem;
+    font-size: 1rem;
+  }
+
+  .total-currency {
+    font-size: 0.8rem;
   }
 }
 
