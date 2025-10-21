@@ -981,25 +981,27 @@ export default defineComponent({
 
   /* Mobile payment cards */
   .payment-card {
-    background: var(--surface-card);
+    background: var(--surface-0);
     border: 1px solid var(--surface-border);
     border-radius: 0.5rem;
-    padding: 1rem;
-    margin-bottom: 0.75rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
     cursor: pointer;
     transition: all 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   }
 
   .payment-card:hover {
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     border-color: var(--primary-color);
+    background: var(--surface-card);
   }
 
   .payment-card-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
     gap: 0.5rem;
   }
 
@@ -1008,11 +1010,11 @@ export default defineComponent({
     align-items: center;
     gap: 0.25rem;
     color: var(--text-color-secondary);
-    font-size: 0.875rem;
+    font-size: 0.9rem;
   }
 
   .payment-date i {
-    font-size: 0.875rem;
+    font-size: 0.9rem;
   }
 
   .payment-amount {
@@ -1023,36 +1025,37 @@ export default defineComponent({
   }
 
   .amount-value {
-    font-size: 1.1rem;
+    font-size: 1.125rem;
     color: var(--green-500);
   }
 
   .amount-currency {
-    font-size: 0.875rem;
+    font-size: 0.9rem;
     color: var(--text-color-secondary);
   }
 
   .payment-card-body {
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
   }
 
   .payment-description {
     font-weight: 500;
-    margin-bottom: 0.5rem;
-    font-size: 0.95rem;
+    margin-bottom: 0.35rem;
+    font-size: 1rem;
+    color: var(--text-color);
   }
 
   .payment-subcategory {
     font-style: italic;
     color: var(--text-color-secondary);
-    font-size: 0.875rem;
+    font-size: 0.9rem;
   }
 
   .payment-card-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-top: 0.75rem;
+    padding-top: 0.5rem;
     border-top: 1px solid var(--surface-border);
   }
 

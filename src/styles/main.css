@@ -549,7 +549,8 @@ a:hover {
   .p-dialog.category-dialog .p-dialog-content,
   .p-dialog.config-dialog .p-dialog-content,
   .p-dialog.category-rule-dialog .p-dialog-content {
-    padding: 0.5rem !important;
+    padding: 1rem !important;
+    padding-bottom: 0.5rem !important;
     flex: 1 !important;
     overflow-y: auto !important;
   }
@@ -562,7 +563,7 @@ a:hover {
   .p-dialog.category-dialog .p-dialog-header,
   .p-dialog.config-dialog .p-dialog-header,
   .p-dialog.category-rule-dialog .p-dialog-header {
-    padding: 0.75rem 0.5rem !important;
+    padding: 0.75rem 1rem !important;
   }
 
   .p-dialog.address-dialog .p-dialog-footer,
@@ -573,7 +574,8 @@ a:hover {
   .p-dialog.category-dialog .p-dialog-footer,
   .p-dialog.config-dialog .p-dialog-footer,
   .p-dialog.category-rule-dialog .p-dialog-footer {
-    padding: 0.75rem 0.5rem !important;
+    padding: 0.75rem 1rem !important;
+    padding-top: 0.5rem !important;
     border-top: 1px solid var(--surface-border) !important;
   }
 
