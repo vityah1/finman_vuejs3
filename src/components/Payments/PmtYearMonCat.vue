@@ -9,7 +9,11 @@
 					<div class="header-left">
 						<PButton icon="pi pi-arrow-left" text @click="$router.go(-1)" size="small" class="back-btn" />
 						<i class="pi pi-folder category-icon"></i>
-						<h2 class="category-title">{{ category_name }} - {{ getMonthName(month) }} {{ year }}</h2>
+						<h2 class="category-title">
+							{{ category_name }} -
+							<span v-if="isYearView">{{ year }} (всі місяці)</span>
+							<span v-else>{{ getMonthName(month) }} {{ year }}</span>
+						</h2>
 					</div>
 					<div class="header-right">
 						<PButton icon="pi pi-plus" label="Додати" @click="openFormAddPayment" size="small" class="add-btn" />
@@ -23,13 +27,95 @@
 
 				<!-- Summary panel -->
 				<div class="summary-panel">
-					<div class="summary-line">
-						<span class="summary-text">Всього: {{ payments.length }} оп., {{ formatAmount(total) }} {{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+					<div class="summary-content">
+						<div class="summary-count">
+							<span class="summary-label">Записів:</span>
+							<PTag :value="isYearView ? total_cnt : payments.length" severity="info" class="summary-tag" />
+						</div>
+						<div class="summary-total">
+							<span class="summary-label">Загальна сума:</span>
+							<span class="total-amount">{{ formatAmount(total) }}</span>
+							<span class="total-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+						</div>
 					</div>
 				</div>
 
-				<!-- Group operations toolbar -->
-						<PCard v-if="selectedPayments.length > 0" class="bulk-toolbar">
+				<!-- Year view - table by months -->
+				<div v-if="isYearView">
+					<DataTable
+						:value="paymentsGroupedByMonth"
+						:loading="loading"
+						@row-click="navigateToMonth"
+						dataKey="month"
+						:paginator="false"
+						showGridlines
+						stripedRows
+						class="desktop-table"
+					>
+						<template #empty>
+							<div style="text-align: center; padding: 2rem;">
+								<i class="pi pi-inbox" style="font-size: 3rem; color: var(--text-color-secondary); margin-bottom: 1rem; display: block;"></i>
+								<span style="color: var(--text-color-secondary);">Немає даних за цей рік</span>
+							</div>
+						</template>
+
+						<Column field="month" header="Місяць" style="width: 50%;">
+							<template #body="slotProps">
+								<div style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+									<i class="pi pi-calendar" style="color: var(--primary-color);"></i>
+									<span style="font-weight: 600; text-transform: capitalize;">{{ getMonthName(slotProps.data.month) }}</span>
+								</div>
+							</template>
+						</Column>
+
+						<Column field="amount" header="Сума" style="width: 35%; text-align: right;">
+							<template #body="slotProps">
+								<div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem;">
+									<span style="font-weight: 600; font-size: 1.1rem; color: var(--green-500);">{{ formatAmount(slotProps.data.amount) }}</span>
+									<span style="color: var(--text-color-secondary); font-size: 0.9rem;">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+								</div>
+							</template>
+						</Column>
+
+						<Column field="cnt" header="К-ть" style="width: 15%; text-align: center;">
+							<template #body="slotProps">
+								<PTag :value="slotProps.data.cnt" severity="info" />
+							</template>
+						</Column>
+					</DataTable>
+
+					<!-- Mobile cards for year view -->
+					<div class="mobile-cards" v-if="!loading">
+						<div v-if="paymentsGroupedByMonth.length === 0" class="empty-state">
+							<i class="pi pi-inbox"></i>
+							<span>Немає даних за цей рік</span>
+						</div>
+						<div v-for="monthData in paymentsGroupedByMonth" :key="monthData.month" class="payment-card" @click="navigateToMonth({ data: monthData })">
+							<div class="payment-card-header">
+								<div class="payment-date-category">
+									<div class="payment-date">
+										<i class="pi pi-calendar"></i>
+										<span style="font-weight: 600; text-transform: capitalize;">{{ getMonthName(monthData.month) }}</span>
+									</div>
+								</div>
+								<div class="payment-amount">
+									<span class="amount-value">{{ formatAmount(monthData.amount) }}</span>
+									<span class="amount-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+								</div>
+							</div>
+							<div class="payment-card-footer">
+								<div class="payment-user">
+									<PTag :value="monthData.cnt + ' операцій'" severity="info" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<!-- Month view - detailed payments list -->
+				<div v-else>
+					<!-- Group operations toolbar -->
+					<PCard v-if="selectedPayments.length > 0" class="bulk-toolbar">
 							<template #content>
 								<div class="bulk-toolbar-content">
 									<div class="bulk-selection-info">
@@ -151,6 +237,7 @@
 								</div>
 							</div>
 						</div>
+					</div>
 			</template>
 		</PCard>
 	</div>
@@ -328,6 +415,7 @@ export default defineComponent({
 		return {
 			payments: [],
 			selectedPayments: [],
+			paymentsGroupedByMonth: [], // Додано для перегляду за рік
 			q: this.$route.query.q || "",
 			total: 0,
 			total_cnt: 0,
@@ -374,6 +462,10 @@ export default defineComponent({
 	computed: {
 		currentUser() {
 			return this.$store.state.auth.user;
+		},
+		isYearView() {
+			// Якщо місяць дорівнює 99 (Всі), показуємо перегляд за рік
+			return parseInt(this.month) === 99;
 		},
 		formattedCategories() {
 			if (!this.categories || this.categories.length === 0) {
@@ -437,8 +529,23 @@ export default defineComponent({
 
 			console.log("Обробка події зміни фільтрів у PmtYearMonCat:", eventData);
 
-			// Оновлюємо параметри запиту
+			// Формуємо нові параметри
+			const newParams = { ...this.$route.params };
 			const query = {};
+
+			// Обробляємо зміну року/місяця
+			if (eventData.mode === 'period') {
+				if (eventData.year) {
+					newParams.year = eventData.year;
+					this.year = eventData.year;
+				}
+				if (eventData.month !== undefined) {
+					newParams.month = eventData.month;
+					this.month = eventData.month;
+				}
+			}
+
+			// Обробляємо інші фільтри
 			if (eventData.group_user_id) {
 				query.group_user_id = eventData.group_user_id;
 			}
@@ -449,7 +556,7 @@ export default defineComponent({
 			// Оновлюємо URL та перезавантажуємо дані
 			this.$router.replace({
 				name: this.$route.name,
-				params: this.$route.params,
+				params: newParams,
 				query
 			}).then(() => {
 				this.getPayments();
@@ -735,10 +842,13 @@ export default defineComponent({
 			// Якщо category_id === '_', не фільтруємо по категорії
 			const categoryId = this.$route.params.category_id === '_' ? '' : this.$route.params.category_id;
 
+			// Якщо місяць = 99 (Всі), не передаємо параметр місяця для отримання всіх платежів за рік
+			const month = parseInt(this.$route.params.month) === 99 ? '' : this.$route.params.month;
+
 			let data = {
 				sort: this.$route.query.sort || "",
 				year: this.$route.params.year || "",
-				month: this.$route.params.month || "",
+				month: month || "",
 				category_id: categoryId || "",
 				q: this.$route.query.q || "",
 				currency: store.state.sprs.selectedCurrency || "UAH",
@@ -750,6 +860,11 @@ export default defineComponent({
 				this.payments = response.data;
 				this.total = this.payments.reduce((sum, val) => sum + Number(val.amount), 0);
 				this.total_cnt = this.payments.length;
+
+				// Якщо перегляд за рік, групуємо платежі по місяцях
+				if (this.isYearView) {
+					this.groupPaymentsByMonth();
+				}
 			} catch (e) {
 				logError(e, "PmtYearMonCat getPayments");
 				const errorMessage = getErrorMessage(e, "Помилка завантаження платежів");
@@ -800,6 +915,42 @@ export default defineComponent({
 					this.selectedPayments.push(payment);
 				}
 			}
+		},
+
+		groupPaymentsByMonth() {
+			// Групуємо платежі по місяцях
+			const grouped = {};
+			this.payments.forEach(payment => {
+				const date = new Date(payment.rdate);
+				const month = date.getMonth() + 1; // 1-12
+
+				if (!grouped[month]) {
+					grouped[month] = {
+						month: month,
+						amount: 0,
+						cnt: 0
+					};
+				}
+
+				grouped[month].amount += Number(payment.amount);
+				grouped[month].cnt += 1;
+			});
+
+			// Перетворюємо об'єкт в масив і сортуємо за місяцем
+			this.paymentsGroupedByMonth = Object.values(grouped).sort((a, b) => a.month - b.month);
+		},
+
+		navigateToMonth(event) {
+			const monthData = event.data;
+			this.$router.push({
+				name: 'payments',
+				params: {
+					year: this.year,
+					month: monthData.month,
+					category_id: this.$route.params.category_id
+				},
+				query: this.$route.query // зберігаємо існуючі query параметри
+			});
 		},
 	},
 	async mounted() {
