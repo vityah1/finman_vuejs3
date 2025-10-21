@@ -162,13 +162,13 @@
 		</PCard>
 	</div>
 
-		<!-- Edit Dialog -->
+	<!-- Edit Dialog -->
+	<div class="payment-dialog">
 		<Dialog
 			v-model:visible="showModal"
 			:header="okTitle"
 			:modal="true"
 			:style="{ width: '500px' }"
-			class="payment-dialog"
 		>
 			<div v-if="currentPayment">
 				<div style="margin-bottom: 1rem;">
@@ -248,14 +248,15 @@
 				<PButton v-if="okTitle !== 'Додати'" label="Видалити" icon="pi pi-trash" severity="danger" @click="deletePayment" />
 			</template>
 		</Dialog>
+	</div>
 
-		<!-- Bulk Category Change Dialog -->
+	<!-- Bulk Category Change Dialog -->
+	<div class="payment-dialog">
 		<Dialog
 			v-model:visible="showBulkCategoryDialog"
 			header="Змінити категорію для вибраних записів"
 			:modal="true"
 			:style="{ width: '450px' }"
-			class="payment-dialog"
 		>
 			<div style="margin-bottom: 1rem;">
 				<p style="margin-bottom: 1rem;">
@@ -277,14 +278,15 @@
 				<PButton label="Змінити" icon="pi pi-check" @click="saveBulkCategoryChange" :disabled="!bulkCategoryId" />
 			</template>
 		</Dialog>
+	</div>
 
-		<!-- Delete Confirmation -->
+	<!-- Delete Confirmation -->
+	<div class="confirmation-dialog">
 		<Dialog
 			v-model:visible="showDeleteConfirm"
 			header="Підтвердження видалення"
 			:modal="true"
 			:style="{ width: '350px' }"
-			class="confirmation-dialog"
 		>
 			<p>Ви впевнені, що хочете видалити цей платіж?</p>
 			<template #footer>
@@ -292,21 +294,23 @@
 				<PButton label="Так" icon="pi pi-check" severity="danger" @click="deletePayment" />
 			</template>
 		</Dialog>
+	</div>
 
-    <!-- Bulk Delete Confirmation -->
-    <Dialog
-        v-model:visible="showBulkDeleteConfirm"
-        header="Підтвердження видалення"
-        :modal="true"
-        :style="{ width: '350px' }"
-        class="confirmation-dialog"
-    >
+	<!-- Bulk Delete Confirmation -->
+	<div class="confirmation-dialog">
+		<Dialog
+			v-model:visible="showBulkDeleteConfirm"
+			header="Підтвердження видалення"
+			:modal="true"
+			:style="{ width: '350px' }"
+		>
       <p>Ви впевнені, що хочете видалити <strong>{{ selectedPayments.length }}</strong> платежів?</p>
-      <template #footer>
-        <PButton label="Ні" icon="pi pi-times" text @click="showBulkDeleteConfirm = false" />
-        <PButton label="Так" icon="pi pi-check" severity="danger" @click="handleBulkDeleteConfirm" />
-      </template>
-    </Dialog>
+			<template #footer>
+				<PButton label="Ні" icon="pi pi-times" text @click="showBulkDeleteConfirm = false" />
+				<PButton label="Так" icon="pi pi-check" severity="danger" @click="handleBulkDeleteConfirm" />
+			</template>
+		</Dialog>
+	</div>
 </template>
 
 <script>
@@ -476,8 +480,13 @@ export default defineComponent({
 
 		openFormAddPayment() {
 			this.okTitle = "Додати";
+			// Якщо category_id === '_', використовуємо першу доступну категорію
+			const categoryId = this.$route.params.category_id === '_'
+				? (this.$store.state.sprs.categories?.[0]?.id || null)
+				: this.$route.params.category_id;
+
 			this.currentPayment = {
-				category_id: this.$route.params.category_id,
+				category_id: categoryId,
 				rdate: this.getCurrentDate(),
 				mydesc: "",
 				amount: 0,
@@ -639,17 +648,21 @@ export default defineComponent({
 				this.currentPayment.rdate = rdateString;
 			}
 
+			this.showModal = false;
+
+			// Спочатку зберігаємо платіж
+			await PaymentService.createPayment(this.currentPayment);
+
+			// Потім завжди переходимо в вибрану категорію
 			const [year, month, day] = rdateString.split('-');
 			const formattedMonth = month.replace(/^0+/, "");
-			if (this.$route.params.year !== year || this.$route.params.month !== formattedMonth || this.$route.params.category_id !== this.currentPayment.category_id) {
-				this.$router.push({
-					name: "payments",
-					params: { year, month: formattedMonth, category_id: this.currentPayment.category_id },
-				});
-			}
-			this.showModal = false;
-			await PaymentService.createPayment(this.currentPayment);
-			await this.getPayments();
+
+			// Завжди переходимо в категорію яка була вибрана при створенні розходу
+			this.$router.push({
+				name: "payments",
+				params: { year, month: formattedMonth, category_id: this.currentPayment.category_id },
+			});
+
 			if (this.$refs.myAlert) {
 				this.$refs.myAlert.showAlert("success", "Платіж успішно додано");
 			}
@@ -689,11 +702,14 @@ export default defineComponent({
 
 		async getPayments() {
 			this.loading = true;
+			// Якщо category_id === '_', не фільтруємо по категорії
+			const categoryId = this.$route.params.category_id === '_' ? '' : this.$route.params.category_id;
+
 			let data = {
 				sort: this.$route.query.sort || "",
 				year: this.$route.params.year || "",
 				month: this.$route.params.month || "",
-				category_id: this.$route.params.category_id || "",
+				category_id: categoryId || "",
 				q: this.$route.query.q || "",
 				currency: store.state.sprs.selectedCurrency || "UAH",
 				group_user_id: this.$route.query.group_user_id || "",
@@ -764,7 +780,13 @@ export default defineComponent({
 
 		const storeCategories = this.$store.state.sprs.categories;
 		this.categories = Array.isArray(storeCategories) ? storeCategories : [];
-		this.category_name = this.findCategoryNameById(this.$route.params.category_id);
+
+		// Якщо category_id === '_', показуємо "Всі категорії"
+		if (this.$route.params.category_id === '_') {
+			this.category_name = "Всі категорії";
+		} else {
+			this.category_name = this.findCategoryNameById(this.$route.params.category_id);
+		}
 
 		await this.getPayments();
 

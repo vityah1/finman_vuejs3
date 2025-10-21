@@ -146,13 +146,13 @@ const logOut = () => {
 };
 
 const goToAddPayment = () => {
-    const category_id = store.state.sprs.categories?.[0]?.id || '_';
+    // Не вибираємо конкретну категорію, дозволяємо користувачу вибрати її у формі
     router.push({
         name: "payments",
         params: {
             year: currentYear,
             month: currentMonth,
-            category_id: category_id,
+            category_id: '_',  // Плейсхолдер - категорія буде вибрана у формі
         },
         query: {
             action: "add",
