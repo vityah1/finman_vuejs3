@@ -8,8 +8,8 @@
           </router-link>
         </template>
         <template #end>
-          <div class="flex align-items-center gap-2">
-            <Dropdown v-if="currentUser" v-model="selectedCurrency" :options="currencyOptions" placeholder="Валюта" style="width: 6rem;" />
+          <div class="flex align-items-center gap-2 menubar-end-content">
+            <Dropdown v-if="currentUser" v-model="selectedCurrency" :options="currencyOptions" placeholder="Валюта" class="currency-selector" />
             <Button v-if="currentUser" icon="pi pi-plus" @click="goToAddPayment" rounded text />
             <Button type="button" icon="pi pi-user" @click="toggleUserMenu" aria-haspopup="true" aria-controls="overlay_menu" rounded text/>
             <Menu ref="userMenu" id="overlay_menu" :model="userMenuItems" :popup="true" />
@@ -200,41 +200,53 @@ const goToAddPayment = () => {
   padding: 0;
 }
 
-/* Currency dropdown alignment */
+/* Fix PrimeVue Menubar end alignment */
 .menubar-container :deep(.p-menubar-end) {
   display: flex;
   align-items: center;
+  height: 100%;
 }
 
-.menubar-container :deep(.p-dropdown) {
+/* Menubar end content alignment */
+.menubar-end-content {
+  height: 100%;
+  display: flex;
+  align-items: center !important;
+  gap: 0.5rem;
+}
+
+/* Currency dropdown */
+.currency-selector {
+  width: 7rem;
+  align-self: center;
+}
+
+.currency-selector :deep(.p-dropdown) {
   height: 2.75rem;
-  min-width: 7rem;
-  display: inline-flex;
-  align-items: center;
+  width: 100%;
 }
 
-.menubar-container :deep(.p-dropdown .p-dropdown-label) {
+.currency-selector :deep(.p-dropdown-label) {
   padding: 0.65rem 0.75rem;
   font-size: 1rem;
   font-weight: 500;
-  display: flex;
-  align-items: center;
+  line-height: 1.2;
 }
 
-.menubar-container :deep(.p-dropdown .p-dropdown-trigger) {
+.currency-selector :deep(.p-dropdown-trigger) {
   width: 2.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 }
 
 @media (max-width: 768px) {
-  .menubar-container :deep(.p-dropdown) {
-    height: 3rem;
-    min-width: 6.5rem;
+  .currency-selector {
+    width: 6.5rem;
   }
 
-  .menubar-container :deep(.p-dropdown .p-dropdown-label) {
+  .currency-selector :deep(.p-dropdown) {
+    height: 3rem;
+  }
+
+  .currency-selector :deep(.p-dropdown-label) {
     padding: 0.75rem;
     font-size: 1.05rem;
   }
