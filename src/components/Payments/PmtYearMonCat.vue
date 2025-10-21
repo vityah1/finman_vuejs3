@@ -168,16 +168,16 @@
 			v-model:visible="showModal"
 			:header="okTitle"
 			:modal="true"
-			:style="{ width: '500px' }"
+			class="payment-form-dialog"
 		>
-			<div v-if="currentPayment">
-				<div style="margin-bottom: 1rem;">
-					<label for="rdate" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Дата:</label>
-					<Calendar v-model="currentPayment.rdate" id="rdate" dateFormat="yy-mm-dd" style="width: 100%;" />
+			<div v-if="currentPayment" class="payment-form">
+				<div class="form-field">
+					<label for="rdate" class="field-label">Дата:</label>
+					<Calendar v-model="currentPayment.rdate" id="rdate" dateFormat="yy-mm-dd" class="field-input" />
 				</div>
 
-				<div style="margin-bottom: 1rem;">
-					<label for="category" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Категорія:</label>
+				<div class="form-field">
+					<label for="category" class="field-label">Категорія:</label>
 					<Dropdown
 						v-model="selectedCategoryId"
 						:options="formattedCategories"
@@ -185,40 +185,40 @@
 						optionValue="id"
 						placeholder="Виберіть категорію"
 						id="category"
-						style="width: 100%;" />
+						class="field-input" />
 				</div>
 
-				<div v-if="!isFuel" style="margin-bottom: 1rem;">
-					<label for="mydesc" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Опис:</label>
-					<InputText v-model="currentPayment.mydesc" id="mydesc" style="width: 100%;" />
+				<div v-if="!isFuel" class="form-field">
+					<label for="mydesc" class="field-label">Опис:</label>
+					<InputText v-model="currentPayment.mydesc" id="mydesc" class="field-input" />
 				</div>
 
 				<div v-if="isFuel">
-					<div style="margin-bottom: 1rem;">
-						<label for="km" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Кілометри:</label>
-						<InputText v-model="currentPayment.refuel_data.km" id="km" style="width: 100%;" />
+					<div class="form-field">
+						<label for="km" class="field-label">Кілометри:</label>
+						<InputText v-model="currentPayment.refuel_data.km" id="km" class="field-input" />
 					</div>
-					<div style="margin-bottom: 1rem;">
-						<label for="litres" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Літри:</label>
-						<InputText v-model="currentPayment.refuel_data.litres" id="litres" style="width: 100%;" />
+					<div class="form-field">
+						<label for="litres" class="field-label">Літри:</label>
+						<InputText v-model="currentPayment.refuel_data.litres" id="litres" class="field-input" />
 					</div>
-					<div style="margin-bottom: 1rem;">
-						<label for="price" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Ціна (EUR):</label>
-						<InputText v-model="currentPayment.refuel_data.price_val" id="price" style="width: 100%;" />
+					<div class="form-field">
+						<label for="price" class="field-label">Ціна (EUR):</label>
+						<InputText v-model="currentPayment.refuel_data.price_val" id="price" class="field-input" />
 					</div>
-					<div style="margin-bottom: 1rem;">
-						<label for="station" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Заправка:</label>
-						<InputText v-model="currentPayment.refuel_data.station_name" id="station" style="width: 100%;" />
+					<div class="form-field">
+						<label for="station" class="field-label">Заправка:</label>
+						<InputText v-model="currentPayment.refuel_data.station_name" id="station" class="field-input" />
 					</div>
 				</div>
 
-				<div style="margin-bottom: 1rem;">
-					<label for="amount" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Сума:</label>
-					<InputText v-model="currentPayment.currency_amount" id="amount" type="number" style="width: 100%;" />
+				<div class="form-field">
+					<label for="amount" class="field-label">Сума:</label>
+					<InputText v-model="currentPayment.currency_amount" id="amount" type="number" class="field-input" />
 				</div>
 
-				<div style="margin-bottom: 1rem;">
-					<label for="currency" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Валюта:</label>
+				<div class="form-field">
+					<label for="currency" class="field-label">Валюта:</label>
 					<Dropdown
 						v-model="currentPayment.currency"
 						:options="currencyOptions"
@@ -226,11 +226,11 @@
 						optionValue="value"
 						placeholder="Виберіть валюту"
 						id="currency"
-						style="width: 100%;" />
+						class="field-input" />
 				</div>
 
-				<div style="margin-bottom: 1rem;">
-					<label for="source" style="display: block; margin-bottom: 0.5rem; font-weight: 600;">Джерело:</label>
+				<div class="form-field">
+					<label for="source" class="field-label">Джерело:</label>
 					<Dropdown
 						v-model="currentPayment.source"
 						:options="sources"
@@ -238,14 +238,16 @@
 						optionValue="value"
 						placeholder="Виберіть джерело"
 						id="source"
-						style="width: 100%;" />
+						class="field-input" />
 				</div>
 			</div>
 
 			<template #footer>
-				<PButton label="Скасувати" icon="pi pi-times" text @click="showModal = false" />
-				<PButton label="Зберегти" icon="pi pi-check" @click="doFormAction" />
-				<PButton v-if="okTitle !== 'Додати'" label="Видалити" icon="pi pi-trash" severity="danger" @click="deletePayment" />
+				<div class="dialog-footer">
+					<PButton label="Скасувати" icon="pi pi-times" text @click="showModal = false" />
+					<PButton label="Зберегти" icon="pi pi-check" @click="doFormAction" />
+					<PButton v-if="okTitle !== 'Додати'" label="Видалити" icon="pi pi-trash" severity="danger" @click="deletePayment" />
+				</div>
 			</template>
 		</Dialog>
 	</div>
@@ -639,32 +641,55 @@ export default defineComponent({
 		},
 
 		async addPayment() {
-			// Ensure rdate is in correct format
-			let rdateString;
-			if (typeof this.currentPayment.rdate === 'string') {
-				rdateString = this.currentPayment.rdate;
-			} else if (this.currentPayment.rdate instanceof Date) {
-				rdateString = this.currentPayment.rdate.toISOString().split('T')[0];
-				this.currentPayment.rdate = rdateString;
-			}
+			try {
+				// Ensure rdate is in correct format
+				let rdateString;
+				if (typeof this.currentPayment.rdate === 'string') {
+					rdateString = this.currentPayment.rdate;
+				} else if (this.currentPayment.rdate instanceof Date) {
+					rdateString = this.currentPayment.rdate.toISOString().split('T')[0];
+					this.currentPayment.rdate = rdateString;
+				}
 
-			this.showModal = false;
+				this.showModal = false;
 
-			// Спочатку зберігаємо платіж
-			await PaymentService.createPayment(this.currentPayment);
+				// Спочатку зберігаємо платіж
+				await PaymentService.createPayment(this.currentPayment);
 
-			// Потім завжди переходимо в вибрану категорію
-			const [year, month, day] = rdateString.split('-');
-			const formattedMonth = month.replace(/^0+/, "");
+				// Потім завжди переходимо в вибрану категорію
+				const [year, month, day] = rdateString.split('-');
+				const formattedMonth = month.replace(/^0+/, "");
 
-			// Завжди переходимо в категорію яка була вибрана при створенні розходу
-			this.$router.push({
-				name: "payments",
-				params: { year, month: formattedMonth, category_id: this.currentPayment.category_id },
-			});
+				// Перевіряємо, чи залишаємося на тій же сторінці
+				const currentYear = this.$route.params.year;
+				const currentMonth = this.$route.params.month;
+				const currentCategoryId = this.$route.params.category_id;
 
-			if (this.$refs.myAlert) {
-				this.$refs.myAlert.showAlert("success", "Платіж успішно додано");
+				const isSamePage =
+					currentYear === year &&
+					currentMonth === formattedMonth &&
+					currentCategoryId === String(this.currentPayment.category_id);
+
+				if (isSamePage) {
+					// Якщо залишаємося на тій же сторінці, просто оновлюємо список
+					await this.getPayments();
+				} else {
+					// Інакше переходимо в категорію яка була вибрана при створенні розходу
+					this.$router.push({
+						name: "payments",
+						params: { year, month: formattedMonth, category_id: this.currentPayment.category_id },
+					});
+				}
+
+				if (this.$refs.myAlert) {
+					this.$refs.myAlert.showAlert("success", "Платіж успішно додано");
+				}
+			} catch (e) {
+				logError(e, "PmtYearMonCat addPayment");
+				const errorMessage = getErrorMessage(e, "Помилка додавання платежу");
+				if (this.$refs.myAlert) {
+					this.$refs.myAlert.showAlert("danger", errorMessage);
+				}
 			}
 		},
 
@@ -1072,6 +1097,61 @@ export default defineComponent({
 
   .total-amount {
     font-size: 1.1rem;
+  }
+}
+
+/* Payment Form Dialog Styles */
+.payment-form-dialog {
+  width: 90vw;
+  max-width: 500px;
+}
+
+.payment-form {
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.form-field {
+  margin-bottom: 1rem;
+}
+
+.field-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.field-input {
+  width: 100%;
+}
+
+.dialog-footer {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+/* Mobile styles for payment form */
+@media (max-width: 768px) {
+  .payment-form-dialog {
+    width: 95vw;
+    max-width: none;
+  }
+
+  .payment-form {
+    max-height: 70vh;
+  }
+
+  .dialog-footer {
+    flex-direction: column-reverse;
+    gap: 0.5rem;
+  }
+
+  .dialog-footer button {
+    width: 100%;
   }
 }
 </style>
