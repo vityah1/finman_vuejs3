@@ -168,86 +168,80 @@
 			v-model:visible="showModal"
 			:header="okTitle"
 			:modal="true"
-			class="payment-form-dialog"
 		>
-			<div v-if="currentPayment" class="payment-form">
-				<div class="form-field">
-					<label for="rdate" class="field-label">Дата:</label>
-					<Calendar v-model="currentPayment.rdate" id="rdate" dateFormat="yy-mm-dd" class="field-input" />
+			<div v-if="currentPayment">
+				<div class="field">
+					<label for="rdate">Дата:</label>
+					<Calendar v-model="currentPayment.rdate" id="rdate" dateFormat="yy-mm-dd" />
 				</div>
 
-				<div class="form-field">
-					<label for="category" class="field-label">Категорія:</label>
+				<div class="field">
+					<label for="category">Категорія:</label>
 					<Dropdown
 						v-model="selectedCategoryId"
 						:options="formattedCategories"
 						optionLabel="name"
 						optionValue="id"
 						placeholder="Виберіть категорію"
-						id="category"
-						class="field-input" />
+						id="category" />
 				</div>
 
-				<div v-if="!isFuel" class="form-field">
-					<label for="mydesc" class="field-label">Опис:</label>
-					<InputText v-model="currentPayment.mydesc" id="mydesc" class="field-input" />
+				<div v-if="!isFuel" class="field">
+					<label for="mydesc">Опис:</label>
+					<InputText v-model="currentPayment.mydesc" id="mydesc" />
 				</div>
 
 				<div v-if="isFuel">
-					<div class="form-field">
-						<label for="km" class="field-label">Кілометри:</label>
-						<InputText v-model="currentPayment.refuel_data.km" id="km" class="field-input" />
+					<div class="field">
+						<label for="km">Кілометри:</label>
+						<InputText v-model="currentPayment.refuel_data.km" id="km" />
 					</div>
-					<div class="form-field">
-						<label for="litres" class="field-label">Літри:</label>
-						<InputText v-model="currentPayment.refuel_data.litres" id="litres" class="field-input" />
+					<div class="field">
+						<label for="litres">Літри:</label>
+						<InputText v-model="currentPayment.refuel_data.litres" id="litres" />
 					</div>
-					<div class="form-field">
-						<label for="price" class="field-label">Ціна (EUR):</label>
-						<InputText v-model="currentPayment.refuel_data.price_val" id="price" class="field-input" />
+					<div class="field">
+						<label for="price">Ціна (EUR):</label>
+						<InputText v-model="currentPayment.refuel_data.price_val" id="price" />
 					</div>
-					<div class="form-field">
-						<label for="station" class="field-label">Заправка:</label>
-						<InputText v-model="currentPayment.refuel_data.station_name" id="station" class="field-input" />
+					<div class="field">
+						<label for="station">Заправка:</label>
+						<InputText v-model="currentPayment.refuel_data.station_name" id="station" />
 					</div>
 				</div>
 
-				<div class="form-field">
-					<label for="amount" class="field-label">Сума:</label>
-					<InputText v-model="currentPayment.currency_amount" id="amount" type="number" class="field-input" />
+				<div class="field">
+					<label for="amount">Сума:</label>
+					<InputText v-model="currentPayment.currency_amount" id="amount" type="number" />
 				</div>
 
-				<div class="form-field">
-					<label for="currency" class="field-label">Валюта:</label>
+				<div class="field">
+					<label for="currency">Валюта:</label>
 					<Dropdown
 						v-model="currentPayment.currency"
 						:options="currencyOptions"
 						optionLabel="label"
 						optionValue="value"
 						placeholder="Виберіть валюту"
-						id="currency"
-						class="field-input" />
+						id="currency" />
 				</div>
 
-				<div class="form-field">
-					<label for="source" class="field-label">Джерело:</label>
+				<div class="field">
+					<label for="source">Джерело:</label>
 					<Dropdown
 						v-model="currentPayment.source"
 						:options="sources"
 						optionLabel="label"
 						optionValue="value"
 						placeholder="Виберіть джерело"
-						id="source"
-						class="field-input" />
+						id="source" />
 				</div>
 			</div>
 
 			<template #footer>
-				<div class="dialog-footer">
-					<PButton label="Скасувати" icon="pi pi-times" text @click="showModal = false" />
-					<PButton label="Зберегти" icon="pi pi-check" @click="doFormAction" />
-					<PButton v-if="okTitle !== 'Додати'" label="Видалити" icon="pi pi-trash" severity="danger" @click="deletePayment" />
-				</div>
+				<PButton label="Скасувати" icon="pi pi-times" text @click="showModal = false" />
+				<PButton label="Зберегти" icon="pi pi-check" @click="doFormAction" />
+				<PButton v-if="okTitle !== 'Додати'" label="Видалити" icon="pi pi-trash" severity="danger" @click="deletePayment" />
 			</template>
 		</Dialog>
 	</div>
@@ -656,30 +650,19 @@ export default defineComponent({
 				// Спочатку зберігаємо платіж
 				await PaymentService.createPayment(this.currentPayment);
 
-				// Потім завжди переходимо в вибрану категорію
+				// Завжди переходимо до категорії та періоду доданого платежу
 				const [year, month, day] = rdateString.split('-');
 				const formattedMonth = month.replace(/^0+/, "");
 
-				// Перевіряємо, чи залишаємося на тій же сторінці
-				const currentYear = this.$route.params.year;
-				const currentMonth = this.$route.params.month;
-				const currentCategoryId = this.$route.params.category_id;
-
-				const isSamePage =
-					currentYear === year &&
-					currentMonth === formattedMonth &&
-					currentCategoryId === String(this.currentPayment.category_id);
-
-				if (isSamePage) {
-					// Якщо залишаємося на тій же сторінці, просто оновлюємо список
-					await this.getPayments();
-				} else {
-					// Інакше переходимо в категорію яка була вибрана при створенні розходу
-					this.$router.push({
-						name: "payments",
-						params: { year, month: formattedMonth, category_id: this.currentPayment.category_id },
-					});
-				}
+				// Завжди переходимо до категорії та періоду платежу
+				this.$router.push({
+					name: "payments",
+					params: {
+						year,
+						month: formattedMonth,
+						category_id: this.currentPayment.category_id
+					},
+				});
 
 				if (this.$refs.myAlert) {
 					this.$refs.myAlert.showAlert("success", "Платіж успішно додано");
@@ -815,13 +798,32 @@ export default defineComponent({
 
 		await this.getPayments();
 
+		// Перевіряємо параметр action і відкриваємо форму, потім прибираємо параметр
 		if (this.$route.query.action === "add") {
 			this.openFormAddPayment();
+			// Прибираємо параметр action з URL щоб форма не відкривалась при перезавантаженні
+			this.$router.replace({
+				name: this.$route.name,
+				params: this.$route.params,
+				query: {}
+			});
 		}
 	},
 	watch: {
 		'$store.state.sprs.selectedCurrency'() {
 			this.getPayments();
+		},
+		'$route.query.action'(newVal) {
+			// Якщо з'явився параметр action=add, відкриваємо форму
+			if (newVal === 'add' && !this.showModal) {
+				this.openFormAddPayment();
+				// Прибираємо параметр action з URL
+				this.$router.replace({
+					name: this.$route.name,
+					params: this.$route.params,
+					query: {}
+				});
+			}
 		}
 	}
 });
@@ -1097,61 +1099,6 @@ export default defineComponent({
 
   .total-amount {
     font-size: 1.1rem;
-  }
-}
-
-/* Payment Form Dialog Styles */
-.payment-form-dialog {
-  width: 90vw;
-  max-width: 500px;
-}
-
-.payment-form {
-  max-height: 60vh;
-  overflow-y: auto;
-  padding-right: 0.5rem;
-}
-
-.form-field {
-  margin-bottom: 1rem;
-}
-
-.field-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  font-weight: 600;
-  color: var(--text-color);
-}
-
-.field-input {
-  width: 100%;
-}
-
-.dialog-footer {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-/* Mobile styles for payment form */
-@media (max-width: 768px) {
-  .payment-form-dialog {
-    width: 95vw;
-    max-width: none;
-  }
-
-  .payment-form {
-    max-height: 70vh;
-  }
-
-  .dialog-footer {
-    flex-direction: column-reverse;
-    gap: 0.5rem;
-  }
-
-  .dialog-footer button {
-    width: 100%;
   }
 }
 </style>
