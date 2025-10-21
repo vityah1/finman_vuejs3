@@ -63,9 +63,9 @@ export default defineComponent({
 </script>
 
 <template>
-  <div>
-    <h2 class="mb-4"><i class="pi pi-info-circle mr-2"></i>Про програму</h2>
-    <Card>
+  <div class="about-page">
+    <h2 class="page-title"><i class="pi pi-info-circle mr-2"></i>Про програму</h2>
+    <Card class="about-card">
       <template #content>
         <div v-html="htmlContent"></div>
         {{ content }}
@@ -73,3 +73,30 @@ export default defineComponent({
     </Card>
   </div>
 </template>
+
+<style scoped>
+.about-page {
+  padding: 0;
+}
+
+.page-title {
+  margin-bottom: 0.75rem;
+  font-size: 1.5rem;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 1.125rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .about-card :deep(.p-card-content) {
+    padding: 0.75rem;
+  }
+
+  .about-card :deep(.p-card-body) {
+    padding: 0.5rem;
+  }
+}
+</style>
