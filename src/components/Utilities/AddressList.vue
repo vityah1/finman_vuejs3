@@ -475,7 +475,7 @@ export default defineComponent({
 	border-right: 1px solid #dee2e6 !important;
 }
 
-/* Dialog styles */
+/* Dialog styles - using global styles from main.css for fullscreen mobile */
 .address-dialog :deep(.p-dialog) {
 	width: 700px;
 	max-width: 95vw;
@@ -488,14 +488,7 @@ export default defineComponent({
 
 /* Mobile optimization */
 @media (max-width: 768px) {
-	.address-dialog .formgrid {
-		margin: 0;
-	}
-
-	.address-dialog .field label {
-		font-size: 0.875rem;
-		margin-bottom: 0.25rem;
-	}
+	/* Dialog styles come from main.css - fullscreen on mobile */
 
 	.header-section {
 		margin-bottom: 0.5rem;

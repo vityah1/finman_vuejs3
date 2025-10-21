@@ -780,3 +780,276 @@ export default defineComponent({
 });
 </script>
 
+<style scoped>
+/* Desktop table - hidden on mobile */
+.desktop-table {
+  display: block;
+}
+
+/* Mobile cards - hidden on desktop */
+.mobile-cards {
+  display: none;
+}
+
+/* Category header styles */
+.category-header {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.category-icon {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.category-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* Bulk toolbar styles */
+.bulk-toolbar {
+  margin-bottom: 1rem;
+}
+
+.bulk-toolbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.bulk-selection-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bulk-selection-info i {
+  color: var(--primary-color);
+}
+
+.selection-count {
+  font-weight: 600;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Summary panel styles */
+.summary-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--surface-ground);
+  border-radius: 0.375rem;
+  border: 1px solid var(--surface-border);
+}
+
+.summary-content {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.summary-count,
+.summary-total {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.summary-label {
+  color: var(--text-color-secondary);
+  font-weight: 500;
+}
+
+.total-amount {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--green-500);
+}
+
+.total-currency {
+  color: var(--text-color-secondary);
+  font-size: 0.9rem;
+}
+
+/* Mobile specific styles */
+@media (max-width: 768px) {
+  /* Hide desktop table, show mobile cards */
+  .desktop-table {
+    display: none !important;
+  }
+
+  .mobile-cards {
+    display: block;
+  }
+
+  /* Category header mobile */
+  .category-header {
+    padding: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .category-title {
+    font-size: 1rem;
+  }
+
+  .back-btn,
+  .add-btn {
+    font-size: 0.875rem;
+  }
+
+  /* Bulk toolbar mobile */
+  .bulk-toolbar-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .bulk-actions {
+    width: 100%;
+  }
+
+  .bulk-btn {
+    flex: 1;
+    font-size: 0.875rem;
+  }
+
+  /* Mobile payment cards */
+  .payment-card {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .payment-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
+  }
+
+  .payment-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    gap: 0.5rem;
+  }
+
+  .payment-date {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+  }
+
+  .payment-date i {
+    font-size: 0.875rem;
+  }
+
+  .payment-amount {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+    font-weight: 600;
+  }
+
+  .amount-value {
+    font-size: 1.1rem;
+    color: var(--green-500);
+  }
+
+  .amount-currency {
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+  }
+
+  .payment-card-body {
+    margin-bottom: 0.75rem;
+  }
+
+  .payment-description {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .payment-subcategory {
+    font-style: italic;
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+  }
+
+  .payment-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 0.75rem;
+    border-top: 1px solid var(--surface-border);
+  }
+
+  .payment-actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: var(--text-color-secondary);
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    display: block;
+    margin-bottom: 1rem;
+  }
+
+  /* Summary panel mobile */
+  .summary-panel {
+    padding: 0.75rem;
+  }
+
+  .summary-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .summary-count,
+  .summary-total {
+    justify-content: space-between;
+  }
+
+  .total-amount {
+    font-size: 1.1rem;
+  }
+}
+</style>
