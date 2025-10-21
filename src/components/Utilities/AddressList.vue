@@ -1,7 +1,7 @@
 <template>
 	<div class="address-list">
-		<div class="mb-4">
-			<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
+		<div class="header-section">
+			<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="breadcrumb-custom">
 				<template #item="{ item }">
 					<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
 						<span class="p-menuitem-text">{{ item.label }}</span>
@@ -9,9 +9,9 @@
 					<span v-else class="p-menuitem-text">{{ item.label }}</span>
 				</template>
 			</Breadcrumb>
-			<div class="flex justify-content-between align-items-center">
-				<h2><i class="pi pi-map-marker mr-2"></i>Адреси</h2>
-				<Button label="Додати адресу" icon="pi pi-plus" @click="showAddModal = true" />
+			<div class="flex justify-content-between align-items-center title-row">
+				<h2 class="page-title"><i class="pi pi-map-marker mr-2"></i>Адреси</h2>
+				<Button label="Додати адресу" icon="pi pi-plus" size="small" class="add-btn" @click="showAddModal = true" />
 			</div>
 		</div>
 
@@ -431,13 +431,34 @@ export default defineComponent({
 
 <style scoped>
 .address-list {
-	padding: 20px 0;
+	padding: 0;
+}
+
+/* Header section */
+.header-section {
+	margin-bottom: 0.75rem;
+}
+
+.breadcrumb-custom {
+	background: none;
+	padding: 0;
+	margin-bottom: 0.5rem;
+}
+
+.title-row {
+	margin-bottom: 0;
+}
+
+.page-title {
+	margin: 0;
+	font-size: 1.5rem;
 }
 
 .address-card {
 	transition: transform 0.2s, box-shadow 0.2s;
 	border: none;
 	box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+	margin-bottom: 1rem;
 }
 
 .address-card:hover {
@@ -453,7 +474,55 @@ export default defineComponent({
 	border-right: 1px solid #dee2e6 !important;
 }
 
+/* Mobile optimization */
 @media (max-width: 768px) {
+	.header-section {
+		margin-bottom: 0.5rem;
+	}
+
+	.breadcrumb-custom {
+		margin-bottom: 0.375rem;
+	}
+
+	.breadcrumb-custom :deep(.p-breadcrumb) {
+		padding: 0.25rem 0;
+		font-size: 0.8rem;
+	}
+
+	.page-title {
+		font-size: 1.125rem;
+	}
+
+	.add-btn {
+		font-size: 0.8rem;
+		padding: 0.375rem 0.75rem;
+	}
+
+	.add-btn :deep(.p-button-label) {
+		display: none;
+	}
+
+	.add-btn :deep(.p-button-icon) {
+		margin: 0;
+	}
+
+	.address-card {
+		margin-bottom: 0.75rem;
+	}
+
+	.address-card :deep(.p-card-body) {
+		padding: 0.75rem;
+	}
+
+	.address-card :deep(.p-card-title) {
+		font-size: 1rem;
+		padding: 0.75rem 0.75rem 0.5rem;
+	}
+
+	.address-card :deep(.p-card-content) {
+		padding: 0 0.75rem 0.75rem;
+	}
+
 	.d-md-flex {
 		flex-direction: column;
 	}

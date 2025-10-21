@@ -44,6 +44,13 @@ export default {
   width: 100%;
 }
 
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .layout-content {
+    padding: 0.75rem;
+  }
+}
+
 @media (min-width: 1400px) {
   .layout-content {
     max-width: 1300px;

@@ -1,7 +1,7 @@
 <template>
 	<div class="tariff-list">
-		<div class="mb-4">
-			<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="mb-3">
+		<div class="header-section">
+			<Breadcrumb :home="breadcrumbHome" :model="breadcrumbItems" class="breadcrumb-custom">
 				<template #item="{ item }">
 					<router-link v-if="item.route" :to="item.route" class="p-menuitem-link">
 						<span class="p-menuitem-text">{{ item.label }}</span>
@@ -9,16 +9,18 @@
 					<span v-else class="p-menuitem-text">{{ item.label }}</span>
 				</template>
 			</Breadcrumb>
-			<div class="flex justify-content-between align-items-center">
-				<h2><i class="pi pi-money-bill mr-2"></i>Тарифи</h2>
-				<div class="flex gap-2">
+			<div class="flex justify-content-between align-items-center title-row">
+				<h2 class="page-title"><i class="pi pi-money-bill mr-2"></i>Тарифи</h2>
+				<div class="flex gap-2 action-buttons">
 					<Button
-						label="Назад до служб"
+						label="Назад"
 						icon="pi pi-arrow-left"
 						severity="secondary"
+						size="small"
+						class="back-btn"
 						@click="$router.push(getServicesRoute())"
 					/>
-					<Button label="Додати тариф" icon="pi pi-plus" @click="showAddModal = true" />
+					<Button label="Додати тариф" icon="pi pi-plus" size="small" class="add-btn" @click="showAddModal = true" />
 				</div>
 			</div>
 		</div>
@@ -596,12 +598,27 @@ export default defineComponent({
 
 <style scoped>
 .tariff-list {
-	padding: 20px 0;
+	padding: 0;
 }
 
-.breadcrumb {
+/* Header section */
+.header-section {
+	margin-bottom: 0.75rem;
+}
+
+.breadcrumb-custom {
 	background: none;
 	padding: 0;
+	margin-bottom: 0.5rem;
+}
+
+.title-row {
+	margin-bottom: 0;
+}
+
+.page-title {
+	margin: 0;
+	font-size: 1.5rem;
 }
 
 .modal {
@@ -611,5 +628,74 @@ export default defineComponent({
 .card {
 	border: none;
 	box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.table-responsive {
+	margin-bottom: 1rem;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+	.header-section {
+		margin-bottom: 0.5rem;
+	}
+
+	.breadcrumb-custom {
+		margin-bottom: 0.375rem;
+	}
+
+	.breadcrumb-custom :deep(.p-breadcrumb) {
+		padding: 0.25rem 0;
+		font-size: 0.8rem;
+	}
+
+	.page-title {
+		font-size: 1.125rem;
+	}
+
+	.action-buttons {
+		flex-direction: column;
+		gap: 0.375rem;
+	}
+
+	.back-btn {
+		font-size: 0.8rem;
+		padding: 0.375rem 0.75rem;
+	}
+
+	.back-btn :deep(.p-button-label) {
+		display: none;
+	}
+
+	.back-btn :deep(.p-button-icon) {
+		margin: 0;
+	}
+
+	.add-btn {
+		font-size: 0.8rem;
+		padding: 0.375rem 0.75rem;
+	}
+
+	.add-btn :deep(.p-button-label) {
+		display: none;
+	}
+
+	.add-btn :deep(.p-button-icon) {
+		margin: 0;
+	}
+
+	.table-responsive {
+		margin-bottom: 0.75rem;
+		overflow-x: auto;
+	}
+
+	.table {
+		font-size: 0.85rem;
+	}
+
+	.table th,
+	.table td {
+		padding: 0.5rem 0.375rem;
+	}
 }
 </style>
