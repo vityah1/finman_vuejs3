@@ -19,7 +19,7 @@ export default {
 	},
 	mounted() {
 		// Логування інформації про версію білда
-		console.log('%c🚀 FinMan Version: ' + (process.env.VUE_APP_FULL_VERSION || 'dev'), 'background: #4CAF50; color: white; padding: 5px 10px; border-radius: 3px; font-weight: bold');
+		console.log('%c🚀 FinMan Build: ' + (process.env.VUE_APP_BUILD_NUMBER || 'dev'), 'background: #4CAF50; color: white; padding: 5px 10px; border-radius: 3px; font-weight: bold');
 		console.log('%c📅 Build Time: ' + (process.env.VUE_APP_BUILD_TIME || 'N/A'), 'color: #2196F3; font-weight: bold');
 	}
 };

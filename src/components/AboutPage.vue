@@ -19,10 +19,24 @@ export default defineComponent({
     return {
       htmlContent: "",
       content: "",
-      buildVersion: process.env.VUE_APP_FULL_VERSION || 'dev',
+      buildNumber: process.env.VUE_APP_BUILD_NUMBER || 'dev',
       buildTime: process.env.VUE_APP_BUILD_TIME
-        ? new Date(process.env.VUE_APP_BUILD_TIME).toLocaleString('uk-UA')
-        : new Date().toLocaleString('uk-UA'),
+        ? new Date(process.env.VUE_APP_BUILD_TIME).toLocaleString(undefined, {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          })
+        : new Date().toLocaleString(undefined, {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit'
+          }),
     };
   },
   setup() {
@@ -79,14 +93,14 @@ export default defineComponent({
           <div style="display: flex; flex-direction: column; gap: 0.5rem;">
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <i class="pi pi-code" style="color: var(--primary-color);"></i>
-              <strong>Версія білду:</strong>
+              <strong>Білд:</strong>
               <span style="font-family: monospace; font-size: 0.875rem; background: #f5f5f5; padding: 0.25rem 0.5rem; border-radius: 4px;">
-                {{ buildVersion }}
+                {{ buildNumber }}
               </span>
             </div>
             <div style="display: flex; align-items: center; gap: 0.5rem;">
               <i class="pi pi-calendar" style="color: var(--primary-color);"></i>
-              <strong>Час завантаження:</strong>
+              <strong>Дата збірки:</strong>
               <span style="font-size: 0.875rem;">{{ buildTime }}</span>
             </div>
           </div>
