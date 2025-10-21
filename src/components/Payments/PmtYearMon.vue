@@ -12,16 +12,16 @@
 				<!-- Month and Year display with icon -->
 				<PCard>
 					<template #header>
-						<div style="padding: 1rem; display: flex; align-items: center; gap: 0.5rem;">
-							<i class="pi pi-calendar" style="font-size: 1.5rem; color: var(--primary-color);"></i>
-							<h2 style="margin: 0; font-weight: 600;">
+						<div class="month-header">
+							<i class="pi pi-calendar month-icon"></i>
+							<h2 class="month-title">
 								{{ getMonthName(month) }} {{ year }}
 							</h2>
 						</div>
 					</template>
 
 					<template #content>
-						<!-- Categories table with PrimeVue DataTable - NO CHECKBOXES on month level -->
+						<!-- Categories table -->
 						<DataTable
 							:value="catcosts"
 							:loading="loading"
@@ -64,17 +64,17 @@
 
 						</DataTable>
 
-						<!-- Summary panel aligned with table -->
-						<div style="margin-top: 1rem; padding: 1rem; background: var(--surface-ground); border-radius: 0.375rem; border: 1px solid var(--surface-border);">
-							<div style="display: flex; justify-content: flex-end; align-items: center; gap: 2rem;">
-								<div style="display: flex; align-items: center; gap: 0.5rem;">
-									<span style="color: var(--text-color-secondary); font-weight: 500;">Операцій:</span>
-									<PTag :value="total_cnt" severity="success" style="font-weight: 600;" />
+						<!-- Summary panel -->
+						<div class="summary-panel">
+							<div class="summary-content">
+								<div class="summary-operations">
+									<span class="summary-label">Операцій:</span>
+									<PTag :value="total_cnt" severity="success" class="summary-tag" />
 								</div>
-								<div style="display: flex; align-items: center; gap: 0.25rem;">
-									<span style="color: var(--text-color-secondary); font-weight: 500;">Загальна сума:</span>
-									<span style="font-weight: 700; font-size: 1.4rem; color: var(--primary-color);">{{ total.toLocaleString() }}</span>
-									<span style="color: var(--text-color-secondary); font-size: 1rem;">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+								<div class="summary-total">
+									<span class="summary-label">Загальна сума:</span>
+									<span class="total-amount">{{ total.toLocaleString() }}</span>
+									<span class="total-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
 								</div>
 							</div>
 						</div>
@@ -341,5 +341,104 @@ export default {
 </script>
 
 <style scoped>
-/* NO CUSTOM STYLES - USING PURE PRIMEVUE DEFAULTS */
+/* Month header */
+.month-header {
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.month-icon {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.month-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+/* Summary panel */
+.summary-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--surface-ground);
+  border-radius: 0.375rem;
+  border: 1px solid var(--surface-border);
+}
+
+.summary-content {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2rem;
+}
+
+.summary-operations,
+.summary-total {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.summary-label {
+  color: var(--text-color-secondary);
+  font-weight: 500;
+}
+
+.summary-tag {
+  font-weight: 600;
+}
+
+.total-amount {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--primary-color);
+}
+
+.total-currency {
+  color: var(--text-color-secondary);
+  font-size: 1rem;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  /* Header */
+  .month-header {
+    padding: 0.5rem;
+  }
+
+  .month-icon {
+    font-size: 1.25rem;
+  }
+
+  .month-title {
+    font-size: 1.125rem;
+  }
+
+  /* Summary panel */
+  .summary-panel {
+    padding: 0.75rem;
+  }
+
+  .summary-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .summary-operations,
+  .summary-total {
+    justify-content: space-between;
+  }
+
+  .total-amount {
+    font-size: 1.125rem;
+  }
+
+  .total-currency {
+    font-size: 0.875rem;
+  }
+}
 </style>

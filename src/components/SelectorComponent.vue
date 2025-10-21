@@ -1,11 +1,12 @@
 <template>
-	<div>
-		<div>
+	<div class="selector-wrapper">
+		<div class="selector-filters">
 			<Dropdown
 				v-model="localYear"
 				:options="years"
 				placeholder="Рік"
 				@change="emitChange"
+				class="filter-dropdown"
 			/>
 			<Dropdown
 				v-model="localMonth"
@@ -14,6 +15,7 @@
 				optionValue="value"
 				placeholder="Місяць"
 				@change="emitChange"
+				class="filter-dropdown"
 			/>
 			<Dropdown
 				v-if="userGroup"
@@ -23,6 +25,7 @@
 				optionValue="value"
 				placeholder="Користувач"
 				@change="emitChange"
+				class="filter-dropdown"
 			/>
 			<Dropdown
 				v-model="localSource"
@@ -31,11 +34,14 @@
 				optionValue="value"
 				placeholder="Джерело"
 				@change="emitChange"
+				class="filter-dropdown"
 			/>
 			<PButton
 				icon="pi pi-calendar"
 				label="Період"
 				@click="openCustomPeriodModal"
+				size="small"
+				class="period-btn"
 			/>
 		</div>
 
@@ -48,23 +54,25 @@
 			:style="{ width: '450px' }"
 			class="period-dialog"
 		>
-			<div>
-				<div>
+			<div class="period-form">
+				<div class="form-field">
 					<label for="start_date">Дата початку:</label>
 					<Calendar
 						v-model="modalStartDate"
 						id="start_date"
 						dateFormat="yy-mm-dd"
 						showIcon
+						class="w-full"
 					/>
 				</div>
-				<div>
+				<div class="form-field">
 					<label for="end_date">Дата кінця:</label>
 					<Calendar
 						v-model="modalEndDate"
 						id="end_date"
 						dateFormat="yy-mm-dd"
 						showIcon
+						class="w-full"
 					/>
 				</div>
 			</div>

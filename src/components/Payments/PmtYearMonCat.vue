@@ -7,37 +7,37 @@
 				<!-- Category header with back button and info -->
 				<PCard>
 					<template #header>
-						<div style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-							<div style="display: flex; align-items: center; gap: 0.5rem;">
-								<PButton icon="pi pi-arrow-left" text @click="$router.go(-1)" />
-								<i class="pi pi-folder" style="font-size: 1.5rem; color: var(--primary-color);"></i>
-								<h2 style="margin: 0; font-weight: 600;">{{ category_name }} - {{ getMonthName(month) }} {{ year }}</h2>
+						<div class="category-header">
+							<div class="header-left">
+								<PButton icon="pi pi-arrow-left" text @click="$router.go(-1)" size="small" class="back-btn" />
+								<i class="pi pi-folder category-icon"></i>
+								<h2 class="category-title">{{ category_name }} - {{ getMonthName(month) }} {{ year }}</h2>
 							</div>
-							<div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-								<PButton icon="pi pi-plus" label="Додати" @click="openFormAddPayment" />
+							<div class="header-right">
+								<PButton icon="pi pi-plus" label="Додати" @click="openFormAddPayment" size="small" class="add-btn" />
 							</div>
 						</div>
 					</template>
 
 					<template #content>
 						<!-- Group operations toolbar -->
-						<PCard v-if="selectedPayments.length > 0" style="margin-bottom: 1rem;">
+						<PCard v-if="selectedPayments.length > 0" class="bulk-toolbar">
 							<template #content>
-								<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-									<div style="display: flex; align-items: center; gap: 0.5rem;">
-										<i class="pi pi-check-square" style="color: var(--primary-color);"></i>
-										<span style="font-weight: 600;">Вибрано: {{ selectedPayments.length }}</span>
+								<div class="bulk-toolbar-content">
+									<div class="bulk-selection-info">
+										<i class="pi pi-check-square"></i>
+										<span class="selection-count">Вибрано: {{ selectedPayments.length }}</span>
 									</div>
-									<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-										<PButton icon="pi pi-folder" label="Змінити категорію" @click="openBulkCategoryChange" />
-										<PButton icon="pi pi-trash" label="Видалити" severity="danger" @click="confirmBulkDelete" />
-										<PButton icon="pi pi-times" label="Скасувати" text @click="selectedPayments = []" />
+									<div class="bulk-actions">
+										<PButton icon="pi pi-folder" label="Змінити категорію" @click="openBulkCategoryChange" size="small" class="bulk-btn" />
+										<PButton icon="pi pi-trash" label="Видалити" severity="danger" @click="confirmBulkDelete" size="small" class="bulk-btn" />
+										<PButton icon="pi pi-times" label="Скасувати" text @click="selectedPayments = []" size="small" class="bulk-btn" />
 									</div>
 								</div>
 							</template>
 						</PCard>
 
-						<!-- DataTable -->
+						<!-- DataTable - Desktop only -->
 						<DataTable
 							:value="payments"
 							v-model:selection="selectedPayments"
@@ -48,6 +48,7 @@
 							:metaKeySelection="false"
 							showGridlines
 							stripedRows
+							class="desktop-table"
 						>
 							<template #empty>
 								<div style="text-align: center; padding: 2rem;">
@@ -106,17 +107,52 @@
 							</Column>
 						</DataTable>
 
-						<!-- Summary panel aligned with table -->
-						<div style="margin-top: 1rem; padding: 1rem; background: var(--surface-ground); border-radius: 0.375rem; border: 1px solid var(--surface-border);">
-							<div style="display: flex; justify-content: flex-end; align-items: center; gap: 2rem;">
-								<div style="display: flex; align-items: center; gap: 0.5rem;">
-									<span style="color: var(--text-color-secondary); font-weight: 500;">Записів:</span>
-									<PTag :value="payments.length" severity="info" style="font-weight: 600;" />
+						<!-- Mobile Card View -->
+						<div class="mobile-cards" v-if="!loading">
+							<div v-if="payments.length === 0" class="empty-state">
+								<i class="pi pi-inbox"></i>
+								<span>Немає платежів у цій категорії</span>
+							</div>
+							<div v-for="payment in payments" :key="payment.id" class="payment-card" @click="openFormEditPayment(payment.id)">
+								<div class="payment-card-header">
+									<div class="payment-date">
+										<i class="pi pi-calendar"></i>
+										<span>{{ formatDate(payment.rdate) }}</span>
+									</div>
+									<div class="payment-amount">
+										<span class="amount-value">{{ formatAmount(payment.amount) }}</span>
+										<span class="amount-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+									</div>
 								</div>
-								<div style="display: flex; align-items: center; gap: 0.25rem;">
-									<span style="color: var(--text-color-secondary); font-weight: 500;">Загальна сума:</span>
-									<span style="font-weight: 700; font-size: 1.3rem; color: var(--green-500);">{{ formatAmount(total) }}</span>
-									<span style="color: var(--text-color-secondary); font-size: 0.9rem;">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+								<div class="payment-card-body">
+									<div class="payment-description">{{ payment.mydesc }}</div>
+									<div v-if="payment.category_name !== category_name" class="payment-subcategory">
+										{{ payment.category_name }}
+									</div>
+								</div>
+								<div class="payment-card-footer">
+									<div class="payment-user">
+										<PTag v-if="payment.user_login" :value="payment.user_login" severity="secondary" />
+									</div>
+									<div class="payment-actions">
+										<PButton icon="pi pi-pencil" text size="small" @click.stop="openFormEditPayment(payment.id)" />
+										<PButton icon="pi pi-trash" text severity="danger" size="small" @click.stop="confirmDelete(payment.id)" />
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Summary panel -->
+						<div class="summary-panel">
+							<div class="summary-content">
+								<div class="summary-count">
+									<span class="summary-label">Записів:</span>
+									<PTag :value="payments.length" severity="info" class="summary-tag" />
+								</div>
+								<div class="summary-total">
+									<span class="summary-label">Загальна сума:</span>
+									<span class="total-amount">{{ formatAmount(total) }}</span>
+									<span class="total-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
 								</div>
 							</div>
 						</div>

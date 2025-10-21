@@ -4,8 +4,7 @@
       <Menubar :model="menuItems">
         <template #start>
           <router-link to="/" class="flex align-items-center mr-2 no-underline">
-            <i class="pi pi-home mr-2"></i>
-            <span class="font-bold">FinMan</span>
+            <i class="pi pi-home"></i>
           </router-link>
         </template>
         <template #end>
