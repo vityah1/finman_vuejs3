@@ -115,9 +115,14 @@
 							</div>
 							<div v-for="payment in payments" :key="payment.id" class="payment-card" @click="openFormEditPayment(payment.id)">
 								<div class="payment-card-header">
-									<div class="payment-date">
-										<i class="pi pi-calendar"></i>
-										<span>{{ formatDate(payment.rdate) }}</span>
+									<div class="payment-date-category">
+										<div class="payment-date">
+											<i class="pi pi-calendar"></i>
+											<span>{{ formatDate(payment.rdate) }}</span>
+										</div>
+										<div v-if="payment.category_name !== category_name" class="payment-subcategory">
+											{{ payment.category_name }}
+										</div>
 									</div>
 									<div class="payment-amount">
 										<span class="amount-value">{{ formatAmount(payment.amount) }}</span>
@@ -126,9 +131,6 @@
 								</div>
 								<div class="payment-card-body">
 									<div class="payment-description">{{ payment.mydesc }}</div>
-									<div v-if="payment.category_name !== category_name" class="payment-subcategory">
-										{{ payment.category_name }}
-									</div>
 								</div>
 								<div class="payment-card-footer">
 									<div class="payment-user">
@@ -646,15 +648,21 @@ export default defineComponent({
 				const [year, month, day] = rdateString.split('-');
 				const formattedMonth = month.replace(/^0+/, "");
 
-				// Завжди переходимо до категорії та періоду платежу
-				this.$router.push({
+				const targetCategoryId = this.currentPayment.category_id;
+				console.log('Redirecting to category:', targetCategoryId, 'Year:', year, 'Month:', formattedMonth);
+
+				// Використовуємо replace замість push щоб уникнути дублювання історії
+				await this.$router.replace({
 					name: "payments",
 					params: {
 						year,
 						month: formattedMonth,
-						category_id: this.currentPayment.category_id
+						category_id: targetCategoryId
 					},
 				});
+
+				// Перезавантажуємо дані для нової сторінки
+				this.loadPayments();
 
 				if (this.$refs.myAlert) {
 					this.$refs.myAlert.showAlert("success", "Платіж успішно додано");
@@ -1005,6 +1013,13 @@ export default defineComponent({
     gap: 0.5rem;
   }
 
+  .payment-date-category {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
   .payment-date {
     display: flex;
     align-items: center;
@@ -1048,7 +1063,11 @@ export default defineComponent({
   .payment-subcategory {
     font-style: italic;
     color: var(--text-color-secondary);
-    font-size: 0.9rem;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 120px;
   }
 
   .payment-card-footer {
