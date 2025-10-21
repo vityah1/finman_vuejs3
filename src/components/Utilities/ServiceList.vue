@@ -600,7 +600,7 @@ export default defineComponent({
 	}
 
 	.service-dialog :deep(.p-dialog-content) {
-		padding: 0.75rem;
+		padding: 0.5rem;
 	}
 
 	.service-dialog .formgrid {
@@ -608,7 +608,7 @@ export default defineComponent({
 	}
 
 	.service-dialog .field {
-		padding: 0.25rem 0.5rem;
+		padding: 0.25rem 0;
 	}
 
 	.service-dialog .field label {
@@ -621,7 +621,7 @@ export default defineComponent({
 	}
 
 	.confirm-dialog :deep(.p-dialog-content) {
-		padding: 0.75rem;
+		padding: 0.5rem;
 	}
 	.header-section {
 		margin-bottom: 0.5rem;

@@ -494,7 +494,7 @@ export default defineComponent({
 	}
 
 	.address-dialog :deep(.p-dialog-content) {
-		padding: 0.75rem;
+		padding: 0.5rem;
 	}
 
 	.address-dialog .formgrid {
@@ -502,7 +502,7 @@ export default defineComponent({
 	}
 
 	.address-dialog .field {
-		padding: 0.25rem 0.5rem;
+		padding: 0.25rem 0;
 	}
 
 	.address-dialog .field label {
@@ -515,7 +515,7 @@ export default defineComponent({
 	}
 
 	.confirm-dialog :deep(.p-dialog-content) {
-		padding: 0.75rem;
+		padding: 0.5rem;
 	}
 	.header-section {
 		margin-bottom: 0.5rem;
