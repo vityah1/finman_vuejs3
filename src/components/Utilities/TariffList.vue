@@ -828,18 +828,6 @@ export default defineComponent({
 		display: inline;
 	}
 
-	/* Dialog forms - FULLSCREEN on mobile */
-	.tariff-dialog .formgrid {
-		margin: 0;
-	}
-
-	.tariff-dialog .field label {
-		font-size: 0.875rem;
-		margin-bottom: 0.25rem;
-	}
-
-	.tariff-dialog .divider {
-		margin: 0.75rem 0;
-	}
+	/* Dialog fullscreen styles come from main.css */
 }
 </style>

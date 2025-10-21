@@ -594,14 +594,7 @@ export default defineComponent({
 
 /* Mobile optimization */
 @media (max-width: 768px) {
-	.service-dialog .formgrid {
-		margin: 0;
-	}
-
-	.service-dialog .field label {
-		font-size: 0.875rem;
-		margin-bottom: 0.25rem;
-	}
+	/* Dialog fullscreen styles come from main.css */
 
 	.header-section {
 		margin-bottom: 0.5rem;
