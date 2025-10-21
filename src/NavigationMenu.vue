@@ -146,13 +146,26 @@ const logOut = () => {
 };
 
 const goToAddPayment = () => {
-    // Не вибираємо конкретну категорію, дозволяємо користувачу вибрати її у формі
+    // Перевіряємо, чи користувач вже на сторінці розходів
+    const currentRoute = router.currentRoute.value;
+
+    let year = currentYear;
+    let month = currentMonth;
+    let categoryId = '_'; // За замовчуванням - всі категорії
+
+    // Якщо користувач вже на сторінці payments, використовуємо поточні параметри
+    if (currentRoute.name === 'payments') {
+        year = currentRoute.params.year ? Number(currentRoute.params.year) : currentYear;
+        month = currentRoute.params.month ? Number(currentRoute.params.month) : currentMonth;
+        categoryId = currentRoute.params.category_id || '_';
+    }
+
     router.push({
         name: "payments",
         params: {
-            year: currentYear,
-            month: currentMonth,
-            category_id: '_',  // Плейсхолдер - категорія буде вибрана у формі
+            year: year,
+            month: month,
+            category_id: categoryId,
         },
         query: {
             action: "add",
