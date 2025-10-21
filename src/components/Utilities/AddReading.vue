@@ -306,12 +306,11 @@
 											id="notes"
 											v-model="readingForm.notes"
 											rows="3"
-											cols="50"
 											placeholder="Додаткова інформація про показники"
 											auto-resize
+											class="w-full"
 										/>
 									</div>
-									<div class="field col-12 md:col-4"></div>
 								</div>
 
 								<div class="formgrid grid">
@@ -328,13 +327,15 @@
 									</div>
 								</div>
 
-								<div class="flex justify-content-between">
+								<div class="form-actions">
 									<Button
 										type="button"
 										label="Назад"
 										icon="pi pi-arrow-left"
 										severity="secondary"
 										@click="goBack"
+										size="small"
+										class="action-btn back-btn"
 									/>
 
 									<div class="flex gap-2">
@@ -347,6 +348,8 @@
 											@click="promptDeleteReading"
 											:disabled="isDeleting"
 											:loading="isDeleting"
+											size="small"
+											class="action-btn delete-btn"
 										/>
 										<Button
 											type="submit"
@@ -354,6 +357,8 @@
 											icon="pi pi-save"
 											:disabled="isSaving"
 											:loading="isSaving"
+											size="small"
+											class="action-btn save-btn"
 										/>
 									</div>
 								</div>
@@ -1278,27 +1283,71 @@ export default defineComponent({
 							data: readingData
 						});
 					}
-				} else if (isEditing.value && selectedService.value?.has_shared_meter) {
-					// Update existing readings for shared meter with fixed amounts (квартплата з освітленням)
-					console.log('DEBUG: Updating shared meter with fixed amounts reading');
-					
-					// Get all readings for this service and period from recentReadings
-					// This data is already loaded when editing form is opened
+				} else if (isEditing.value && isFixedAmountService.value) {
+					// Update existing readings for services with multiple fixed tariffs (квартплата)
+					console.log('DEBUG: Updating fixed amount service readings');
+
+					// Get all readings for this service and period
 					const allReadings = recentReadings.value.filter((r: any) => r.service_id === readingForm.service_id) as UtilityReadingResponse[];
-					
+
 					console.log('All readings to update:', allReadings);
-					
+
 					// Update each reading with new period, date, and amounts
 					for (const reading of allReadings) {
 						if (!reading.id || !reading.tariff) {
 							console.log('Skipping reading without ID or tariff:', reading);
 							continue;
 						}
-						
+
+						const tariff = reading.tariff;
+						let amount: number = 0;
+
+						// For subscription tariffs, use tariff.rate automatically
+						if (tariff.tariff_type === 'subscription') {
+							amount = tariff.rate;
+						} else {
+							// For non-subscription fixed tariffs, use manually entered amount from tariffAmounts
+							amount = tariffAmounts.value[tariff.id] || 0;
+						}
+
+						const updateData: UtilityReadingUpdate = {
+							period: readingForm.period,
+							current_reading: amount,
+							previous_reading: 0,
+							tariff_id: tariff.id,
+							reading_date: readingForm.reading_date || undefined,
+							is_paid: readingForm.is_paid || undefined,
+							notes: readingForm.notes || undefined
+						};
+
+						console.log(`Updating reading ${reading.id} for tariff ${tariff.name}:`, updateData);
+
+						await updateReadingMutation.mutateAsync({
+							readingId: reading.id,
+							data: updateData
+						});
+					}
+				} else if (isEditing.value && selectedService.value?.has_shared_meter) {
+					// Update existing readings for shared meter with fixed amounts (вода з водовідведенням)
+					console.log('DEBUG: Updating shared meter with fixed amounts reading');
+
+					// Get all readings for this service and period from recentReadings
+					// This data is already loaded when editing form is opened
+					const allReadings = recentReadings.value.filter((r: any) => r.service_id === readingForm.service_id) as UtilityReadingResponse[];
+
+					console.log('All readings to update:', allReadings);
+
+					// Update each reading with new period, date, and amounts
+					for (const reading of allReadings) {
+						if (!reading.id || !reading.tariff) {
+							console.log('Skipping reading without ID or tariff:', reading);
+							continue;
+						}
+
 						const tariff = reading.tariff;
 						let amount: number = 0;
 						let previousReading: number = 0;
-						
+
 						if (tariff.calculation_method === 'standard') {
 							// For standard tariffs, use meter readings
 							amount = readingForm.current_reading;
@@ -1308,13 +1357,12 @@ export default defineComponent({
 							if (tariff.tariff_type === 'subscription') {
 								amount = tariff.rate;
 							} else {
-								// For non-subscription fixed tariffs, use manually entered amount
-								const amountFieldName = `tariff_${tariff.id}_amount` as keyof typeof readingForm;
-								amount = readingForm[amountFieldName] as number || 0;
+								// For non-subscription fixed tariffs, use manually entered amount from tariffAmounts
+								amount = tariffAmounts.value[tariff.id] || 0;
 							}
 							previousReading = 0;
 						}
-						
+
 						const updateData: UtilityReadingUpdate = {
 							period: readingForm.period,
 							current_reading: amount,
@@ -1326,7 +1374,7 @@ export default defineComponent({
 						};
 
 						console.log(`Updating reading ${reading.id} for tariff ${tariff.name}:`, updateData);
-						
+
 						await updateReadingMutation.mutateAsync({
 							readingId: reading.id,
 							data: updateData
@@ -1492,12 +1540,12 @@ export default defineComponent({
 			if (data?.data && sharedMeterLoadParams.value) {
 				const groupedData = data.data;
 				console.log('Grouped data received:', groupedData);
-				
+
 				// Find the service group or individual service
 				let readings: any[] = [];
 				if (groupedData.service_groups) {
 					console.log('Checking service_groups:', groupedData.service_groups);
-					const serviceGroup = groupedData.service_groups.find((g: any) => 
+					const serviceGroup = groupedData.service_groups.find((g: any) =>
 						g.readings.some((r: any) => r.service_id === sharedMeterLoadParams.value?.serviceId)
 					);
 					if (serviceGroup) {
@@ -1513,29 +1561,39 @@ export default defineComponent({
 						console.log('Found individual service readings:', readings);
 					}
 				}
-				
+
 				console.log('All readings found:', readings);
-				
+
 				// Populate tariff amounts in form
+				// Use tariffAmounts ref object instead of readingForm dynamic properties
 				readings.forEach((reading: any, index: number) => {
 					console.log(`Processing reading ${index}:`, reading);
 					console.log('Tariff object:', reading.tariff);
-					
+
 					// Get the actual tariff ID from the tariff object
 					const tariffId = reading.tariff?.id;
 					console.log(`Using tariff ID: ${tariffId}`);
-					
+
 					if (tariffId) {
-						const fieldName = `tariff_${tariffId}_amount`;
-						console.log(`Setting ${fieldName} = ${reading.amount}`);
-						readingForm[fieldName] = reading.amount || 0;
+						console.log(`Setting tariffAmounts[${tariffId}] = ${reading.amount}`);
+						tariffAmounts.value[tariffId] = reading.amount || 0;
 					} else {
 						console.log('No tariff ID found in reading.tariff:', reading.tariff);
 					}
 				});
-				
+
+				// Also set current_reading for shared meter if available
+				if (readings.length > 0) {
+					const firstReading = readings.find((r: any) => r.current_reading && r.tariff?.calculation_method !== 'fixed');
+					if (firstReading) {
+						readingForm.current_reading = firstReading.current_reading;
+						readingForm.previous_reading = firstReading.previous_reading || 0;
+					}
+				}
+
+				console.log('tariffAmounts after population:', tariffAmounts.value);
 				console.log('readingForm after population:', readingForm);
-				
+
 				// Reset the trigger
 				sharedMeterLoadParams.value = null;
 			}
@@ -1627,13 +1685,13 @@ export default defineComponent({
 			if (data?.data && isEditing.value) {
 				const reading = data.data as any;
 				console.log('Editing reading data:', reading);
-				
+
 				// Перевірка на наявність reading
 				if (!reading) {
 					console.error('Reading data is undefined');
 					return;
 				}
-				
+
 				// Безпечне присвоєння значень
 				readingForm.address_id = reading.address_id || 0;
 				readingForm.service_id = reading.service_id || 0;
@@ -1644,12 +1702,21 @@ export default defineComponent({
 				readingForm.reading_date = reading.reading_date ? reading.reading_date.slice(0, 10) : new Date().toISOString().slice(0, 10);
 				readingForm.is_paid = reading.is_paid || false;
 				readingForm.notes = reading.notes || '';
-				
+
 				// For fixed payment services, amount field should be filled
 				if (reading.service && hasFixedPaymentTariff.value) {
 					readingForm.amount = reading.current_reading || 0;
 				}
-				
+
+				// For services with multiple fixed tariffs (like квартплата), load amounts for all tariffs
+				// Wait for service to be loaded and check if it's a fixed amount service
+				setTimeout(() => {
+					if (isFixedAmountService.value) {
+						console.log('Loading fixed amount service tariffs for service:', reading.service_id, 'period:', reading.period);
+						loadSharedMeterTariffAmounts(reading.service_id, reading.period);
+					}
+				}, 100);
+
 				// For shared meter services with fixed amounts, load amounts for all tariffs
 				if (reading.service && reading.service.has_shared_meter) {
 					console.log('Loading shared meter tariff amounts for service:', reading.service_id, 'period:', reading.period);
@@ -1790,5 +1857,74 @@ export default defineComponent({
 <style scoped>
 .bg-light {
 	background-color: var(--surface-100);
+}
+
+/* Form actions buttons */
+.form-actions {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 0.5rem;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+	/* Reduce card padding on mobile */
+	.add-reading :deep(.p-card-content) {
+		padding: 0.75rem;
+	}
+
+	.add-reading :deep(.p-card-title) {
+		padding: 0.75rem;
+		font-size: 1rem;
+	}
+
+	/* Stack buttons vertically on mobile */
+	.form-actions {
+		flex-direction: column;
+		gap: 0.5rem;
+	}
+
+	.form-actions .action-btn {
+		width: 100%;
+		font-size: 0.875rem;
+	}
+
+	/* Make gap smaller for right buttons group */
+	.form-actions .flex {
+		width: 100%;
+		gap: 0.5rem;
+	}
+
+	.form-actions .flex .action-btn {
+		flex: 1;
+	}
+
+	/* Reduce grid gaps on mobile */
+	.grid {
+		margin-left: -0.25rem !important;
+		margin-right: -0.25rem !important;
+	}
+
+	.grid > * {
+		padding-left: 0.25rem !important;
+		padding-right: 0.25rem !important;
+	}
+
+	/* Ensure textarea doesn't overflow */
+	:deep(.p-inputtextarea) {
+		width: 100% !important;
+		max-width: 100% !important;
+	}
+
+	/* Reduce field margins */
+	.field {
+		margin-bottom: 0.75rem;
+	}
+
+	/* Make labels smaller */
+	label {
+		font-size: 0.875rem;
+	}
 }
 </style>
