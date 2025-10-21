@@ -395,11 +395,6 @@ async getUserGroup() {
     min-width: 0;
   }
 
-  .filter-dropdown:nth-last-child(2) {
-    /* Джерело dropdown - full width if it's the second to last */
-    flex: 1 1 100%;
-  }
-
   .period-btn {
     flex: 1 1 100%;
   }
