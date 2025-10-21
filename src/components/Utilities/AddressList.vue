@@ -93,7 +93,7 @@
 			v-model:visible="showAddModal"
 			:header="editingAddress ? 'Редагувати адресу' : 'Додати нову адресу'"
 			:modal="true"
-			:style="{ width: '700px' }"
+			class="address-dialog"
 			@hide="closeModal"
 		>
 			<form @submit.prevent="saveAddress">
@@ -107,6 +107,7 @@
 							v-model="addressForm.name"
 							required
 							placeholder="Наприклад: Квартира, Дача, Офіс"
+							class="w-full"
 						/>
 					</div>
 				</div>
@@ -122,8 +123,8 @@
 							required
 							placeholder="Повна адреса з індексом"
 							rows="3"
-							cols="50"
 							auto-resize
+							class="w-full"
 						/>
 					</div>
 				</div>
@@ -138,8 +139,8 @@
 							v-model="addressForm.description"
 							placeholder="Додаткова інформація про адресу"
 							rows="3"
-							cols="50"
 							auto-resize
+							class="w-full"
 						/>
 					</div>
 				</div>
@@ -176,7 +177,7 @@
 			v-model:visible="showDeleteModal"
 			header="Підтвердити видалення"
 			:modal="true"
-			:style="{ width: '500px' }"
+			class="confirm-dialog"
 		>
 			<div class="confirmation-content">
 				<p class="mb-3">Ви дійсно хочете видалити адресу "<strong>{{ addressToDelete?.name }}</strong>"?</p>
@@ -474,8 +475,48 @@ export default defineComponent({
 	border-right: 1px solid #dee2e6 !important;
 }
 
+/* Dialog styles */
+.address-dialog :deep(.p-dialog) {
+	width: 700px;
+	max-width: 95vw;
+}
+
+.confirm-dialog :deep(.p-dialog) {
+	width: 500px;
+	max-width: 95vw;
+}
+
 /* Mobile optimization */
 @media (max-width: 768px) {
+	/* Dialog forms */
+	.address-dialog :deep(.p-dialog) {
+		width: 95vw;
+	}
+
+	.address-dialog :deep(.p-dialog-content) {
+		padding: 0.75rem;
+	}
+
+	.address-dialog .formgrid {
+		margin: 0;
+	}
+
+	.address-dialog .field {
+		padding: 0.25rem 0.5rem;
+	}
+
+	.address-dialog .field label {
+		font-size: 0.875rem;
+		margin-bottom: 0.25rem;
+	}
+
+	.confirm-dialog :deep(.p-dialog) {
+		width: 90vw;
+	}
+
+	.confirm-dialog :deep(.p-dialog-content) {
+		padding: 0.75rem;
+	}
 	.header-section {
 		margin-bottom: 0.5rem;
 	}
