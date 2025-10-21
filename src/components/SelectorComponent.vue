@@ -1,11 +1,12 @@
 <template>
-	<div>
-		<div>
+	<div class="selector-wrapper">
+		<div class="selector-filters">
 			<Dropdown
 				v-model="localYear"
 				:options="years"
 				placeholder="Рік"
 				@change="emitChange"
+				class="filter-dropdown"
 			/>
 			<Dropdown
 				v-model="localMonth"
@@ -14,6 +15,7 @@
 				optionValue="value"
 				placeholder="Місяць"
 				@change="emitChange"
+				class="filter-dropdown"
 			/>
 			<Dropdown
 				v-if="userGroup"
@@ -23,6 +25,7 @@
 				optionValue="value"
 				placeholder="Користувач"
 				@change="emitChange"
+				class="filter-dropdown"
 			/>
 			<Dropdown
 				v-model="localSource"
@@ -31,11 +34,14 @@
 				optionValue="value"
 				placeholder="Джерело"
 				@change="emitChange"
+				class="filter-dropdown"
 			/>
 			<PButton
 				icon="pi pi-calendar"
 				label="Період"
 				@click="openCustomPeriodModal"
+				size="small"
+				class="period-btn"
 			/>
 		</div>
 
@@ -45,25 +51,27 @@
 			header="Вибрати кастомний період"
 			:modal="true"
 			:closable="true"
-			:style="{ width: '450px' }"
+			class="period-dialog"
 		>
-			<div>
-				<div>
+			<div class="period-form">
+				<div class="form-field">
 					<label for="start_date">Дата початку:</label>
 					<Calendar
 						v-model="modalStartDate"
 						id="start_date"
 						dateFormat="yy-mm-dd"
 						showIcon
+						class="w-full"
 					/>
 				</div>
-				<div>
+				<div class="form-field">
 					<label for="end_date">Дата кінця:</label>
 					<Calendar
 						v-model="modalEndDate"
 						id="end_date"
 						dateFormat="yy-mm-dd"
 						showIcon
+						class="w-full"
 					/>
 				</div>
 			</div>
@@ -329,5 +337,97 @@ async getUserGroup() {
 </script>
 
 <style scoped>
-/* NO CUSTOM STYLES - USING PURE PRIMEVUE DEFAULTS */
+.selector-wrapper {
+  margin-bottom: 1rem;
+}
+
+.selector-filters {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-dropdown {
+  flex: 1;
+  min-width: 120px;
+}
+
+.period-btn {
+  flex-shrink: 0;
+}
+
+/* Period form */
+.period-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.form-field label {
+  font-weight: 600;
+}
+
+/* Dialog responsive width */
+.period-dialog :deep(.p-dialog) {
+  width: 450px;
+  max-width: 95vw;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .selector-wrapper {
+    margin-bottom: 0.75rem;
+  }
+
+  .selector-filters {
+    gap: 0.375rem;
+  }
+
+  .filter-dropdown {
+    flex: 1 1 calc(50% - 0.375rem);
+    min-width: 0;
+  }
+
+  .filter-dropdown:nth-last-child(2) {
+    /* Джерело dropdown - full width if it's the second to last */
+    flex: 1 1 100%;
+  }
+
+  .period-btn {
+    flex: 1 1 100%;
+  }
+
+  .period-btn :deep(.p-button-label) {
+    display: inline; /* Keep label on button for clarity */
+  }
+
+  /* Make dropdowns more compact */
+  .filter-dropdown :deep(.p-dropdown) {
+    font-size: 0.875rem;
+  }
+
+  .filter-dropdown :deep(.p-dropdown-label) {
+    padding: 0.5rem;
+  }
+
+  /* Dialog optimization */
+  .period-dialog :deep(.p-dialog) {
+    width: 95vw;
+  }
+
+  .period-dialog :deep(.p-dialog-content) {
+    padding: 0.75rem;
+  }
+
+  .period-form {
+    gap: 0.75rem;
+  }
+}
 </style>

@@ -7,37 +7,37 @@
 				<!-- Category header with back button and info -->
 				<PCard>
 					<template #header>
-						<div style="padding: 1rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-							<div style="display: flex; align-items: center; gap: 0.5rem;">
-								<PButton icon="pi pi-arrow-left" text @click="$router.go(-1)" />
-								<i class="pi pi-folder" style="font-size: 1.5rem; color: var(--primary-color);"></i>
-								<h2 style="margin: 0; font-weight: 600;">{{ category_name }} - {{ getMonthName(month) }} {{ year }}</h2>
+						<div class="category-header">
+							<div class="header-left">
+								<PButton icon="pi pi-arrow-left" text @click="$router.go(-1)" size="small" class="back-btn" />
+								<i class="pi pi-folder category-icon"></i>
+								<h2 class="category-title">{{ category_name }} - {{ getMonthName(month) }} {{ year }}</h2>
 							</div>
-							<div style="display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;">
-								<PButton icon="pi pi-plus" label="Додати" @click="openFormAddPayment" />
+							<div class="header-right">
+								<PButton icon="pi pi-plus" label="Додати" @click="openFormAddPayment" size="small" class="add-btn" />
 							</div>
 						</div>
 					</template>
 
 					<template #content>
 						<!-- Group operations toolbar -->
-						<PCard v-if="selectedPayments.length > 0" style="margin-bottom: 1rem;">
+						<PCard v-if="selectedPayments.length > 0" class="bulk-toolbar">
 							<template #content>
-								<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">
-									<div style="display: flex; align-items: center; gap: 0.5rem;">
-										<i class="pi pi-check-square" style="color: var(--primary-color);"></i>
-										<span style="font-weight: 600;">Вибрано: {{ selectedPayments.length }}</span>
+								<div class="bulk-toolbar-content">
+									<div class="bulk-selection-info">
+										<i class="pi pi-check-square"></i>
+										<span class="selection-count">Вибрано: {{ selectedPayments.length }}</span>
 									</div>
-									<div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
-										<PButton icon="pi pi-folder" label="Змінити категорію" @click="openBulkCategoryChange" />
-										<PButton icon="pi pi-trash" label="Видалити" severity="danger" @click="confirmBulkDelete" />
-										<PButton icon="pi pi-times" label="Скасувати" text @click="selectedPayments = []" />
+									<div class="bulk-actions">
+										<PButton icon="pi pi-folder" label="Змінити категорію" @click="openBulkCategoryChange" size="small" class="bulk-btn" />
+										<PButton icon="pi pi-trash" label="Видалити" severity="danger" @click="confirmBulkDelete" size="small" class="bulk-btn" />
+										<PButton icon="pi pi-times" label="Скасувати" text @click="selectedPayments = []" size="small" class="bulk-btn" />
 									</div>
 								</div>
 							</template>
 						</PCard>
 
-						<!-- DataTable -->
+						<!-- DataTable - Desktop only -->
 						<DataTable
 							:value="payments"
 							v-model:selection="selectedPayments"
@@ -48,6 +48,7 @@
 							:metaKeySelection="false"
 							showGridlines
 							stripedRows
+							class="desktop-table"
 						>
 							<template #empty>
 								<div style="text-align: center; padding: 2rem;">
@@ -106,17 +107,52 @@
 							</Column>
 						</DataTable>
 
-						<!-- Summary panel aligned with table -->
-						<div style="margin-top: 1rem; padding: 1rem; background: var(--surface-ground); border-radius: 0.375rem; border: 1px solid var(--surface-border);">
-							<div style="display: flex; justify-content: flex-end; align-items: center; gap: 2rem;">
-								<div style="display: flex; align-items: center; gap: 0.5rem;">
-									<span style="color: var(--text-color-secondary); font-weight: 500;">Записів:</span>
-									<PTag :value="payments.length" severity="info" style="font-weight: 600;" />
+						<!-- Mobile Card View -->
+						<div class="mobile-cards" v-if="!loading">
+							<div v-if="payments.length === 0" class="empty-state">
+								<i class="pi pi-inbox"></i>
+								<span>Немає платежів у цій категорії</span>
+							</div>
+							<div v-for="payment in payments" :key="payment.id" class="payment-card" @click="openFormEditPayment(payment.id)">
+								<div class="payment-card-header">
+									<div class="payment-date">
+										<i class="pi pi-calendar"></i>
+										<span>{{ formatDate(payment.rdate) }}</span>
+									</div>
+									<div class="payment-amount">
+										<span class="amount-value">{{ formatAmount(payment.amount) }}</span>
+										<span class="amount-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+									</div>
 								</div>
-								<div style="display: flex; align-items: center; gap: 0.25rem;">
-									<span style="color: var(--text-color-secondary); font-weight: 500;">Загальна сума:</span>
-									<span style="font-weight: 700; font-size: 1.3rem; color: var(--green-500);">{{ formatAmount(total) }}</span>
-									<span style="color: var(--text-color-secondary); font-size: 0.9rem;">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+								<div class="payment-card-body">
+									<div class="payment-description">{{ payment.mydesc }}</div>
+									<div v-if="payment.category_name !== category_name" class="payment-subcategory">
+										{{ payment.category_name }}
+									</div>
+								</div>
+								<div class="payment-card-footer">
+									<div class="payment-user">
+										<PTag v-if="payment.user_login" :value="payment.user_login" severity="secondary" />
+									</div>
+									<div class="payment-actions">
+										<PButton icon="pi pi-pencil" text size="small" @click.stop="openFormEditPayment(payment.id)" />
+										<PButton icon="pi pi-trash" text severity="danger" size="small" @click.stop="confirmDelete(payment.id)" />
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<!-- Summary panel -->
+						<div class="summary-panel">
+							<div class="summary-content">
+								<div class="summary-count">
+									<span class="summary-label">Записів:</span>
+									<PTag :value="payments.length" severity="info" class="summary-tag" />
+								</div>
+								<div class="summary-total">
+									<span class="summary-label">Загальна сума:</span>
+									<span class="total-amount">{{ formatAmount(total) }}</span>
+									<span class="total-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
 								</div>
 							</div>
 						</div>
@@ -126,12 +162,12 @@
 		</PCard>
 	</div>
 
-		<!-- Edit Dialog - NO CUSTOM STYLES -->
+		<!-- Edit Dialog -->
 		<Dialog
 			v-model:visible="showModal"
 			:header="okTitle"
 			:modal="true"
-			:style="{ width: '500px' }"
+			class="payment-dialog"
 		>
 			<div v-if="currentPayment">
 				<div style="margin-bottom: 1rem;">
@@ -217,7 +253,7 @@
 			v-model:visible="showBulkCategoryDialog"
 			header="Змінити категорію для вибраних записів"
 			:modal="true"
-			:style="{ width: '450px' }"
+			class="bulk-category-dialog"
 		>
 			<div style="margin-bottom: 1rem;">
 				<p style="margin-bottom: 1rem;">
@@ -245,7 +281,7 @@
 			v-model:visible="showDeleteConfirm"
 			header="Підтвердження видалення"
 			:modal="true"
-			:style="{ width: '350px' }"
+			class="confirm-dialog"
 		>
 			<p>Ви впевнені, що хочете видалити цей платіж?</p>
 			<template #footer>
@@ -259,7 +295,7 @@
         v-model:visible="showBulkDeleteConfirm"
         header="Підтвердження видалення"
         :modal="true"
-        :style="{ width: '350px' }"
+        class="confirm-dialog"
     >
       <p>Ви впевнені, що хочете видалити <strong>{{ selectedPayments.length }}</strong> платежів?</p>
       <template #footer>
@@ -741,5 +777,328 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* NO CUSTOM STYLES - USING PURE PRIMEVUE DEFAULTS */
+/* Category header */
+.category-header {
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.category-icon {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+}
+
+.category-title {
+  margin: 0;
+  font-weight: 600;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+/* Bulk toolbar */
+.bulk-toolbar {
+  margin-bottom: 1rem;
+}
+
+.bulk-toolbar-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.bulk-selection-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.bulk-selection-info i {
+  color: var(--primary-color);
+}
+
+.selection-count {
+  font-weight: 600;
+}
+
+.bulk-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* Mobile cards - hidden on desktop */
+.mobile-cards {
+  display: none;
+}
+
+/* Summary panel */
+.summary-panel {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: var(--surface-ground);
+  border-radius: 0.375rem;
+  border: 1px solid var(--surface-border);
+}
+
+.summary-content {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 2rem;
+}
+
+.summary-count,
+.summary-total {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.summary-label {
+  color: var(--text-color-secondary);
+  font-weight: 500;
+}
+
+.summary-tag {
+  font-weight: 600;
+}
+
+.total-amount {
+  font-weight: 700;
+  font-size: 1.3rem;
+  color: var(--green-500);
+}
+
+.total-currency {
+  color: var(--text-color-secondary);
+  font-size: 0.9rem;
+}
+
+/* Dialog responsive widths */
+.payment-dialog :deep(.p-dialog) {
+  width: 500px;
+  max-width: 95vw;
+}
+
+.bulk-category-dialog :deep(.p-dialog) {
+  width: 450px;
+  max-width: 95vw;
+}
+
+.confirm-dialog :deep(.p-dialog) {
+  width: 350px;
+  max-width: 95vw;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  /* Header */
+  .category-header {
+    padding: 0.5rem;
+    gap: 0.5rem;
+  }
+
+  .category-icon {
+    font-size: 1.25rem;
+  }
+
+  .category-title {
+    font-size: 1.125rem;
+  }
+
+  .add-btn :deep(.p-button-label) {
+    display: none;
+  }
+
+  .add-btn :deep(.p-button-icon) {
+    margin: 0;
+  }
+
+  /* Bulk toolbar */
+  .bulk-toolbar :deep(.p-card-content) {
+    padding: 0.5rem;
+  }
+
+  .bulk-toolbar-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
+
+  .bulk-actions {
+    width: 100%;
+  }
+
+  .bulk-btn :deep(.p-button-label) {
+    display: none;
+  }
+
+  .bulk-btn :deep(.p-button-icon) {
+    margin: 0;
+  }
+
+  /* Hide desktop table, show mobile cards */
+  .desktop-table {
+    display: none;
+  }
+
+  .mobile-cards {
+    display: block;
+  }
+
+  /* Empty state */
+  .empty-state {
+    text-align: center;
+    padding: 2rem 1rem;
+  }
+
+  .empty-state i {
+    font-size: 3rem;
+    color: var(--text-color-secondary);
+    margin-bottom: 1rem;
+    display: block;
+  }
+
+  .empty-state span {
+    color: var(--text-color-secondary);
+  }
+
+  /* Payment cards */
+  .payment-card {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    border-radius: 0.375rem;
+    padding: 0.75rem;
+    margin-bottom: 0.5rem;
+    cursor: pointer;
+    transition: box-shadow 0.2s;
+  }
+
+  .payment-card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .payment-card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  .payment-date {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+  }
+
+  .payment-date i {
+    color: var(--primary-color);
+    font-size: 0.875rem;
+  }
+
+  .payment-amount {
+    display: flex;
+    align-items: baseline;
+    gap: 0.25rem;
+  }
+
+  .amount-value {
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--green-500);
+  }
+
+  .amount-currency {
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+  }
+
+  .payment-card-body {
+    margin-bottom: 0.5rem;
+  }
+
+  .payment-description {
+    font-weight: 500;
+    margin-bottom: 0.25rem;
+  }
+
+  .payment-subcategory {
+    font-style: italic;
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+  }
+
+  .payment-card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .payment-user {
+    flex: 1;
+  }
+
+  .payment-actions {
+    display: flex;
+    gap: 0.25rem;
+  }
+
+  /* Summary panel */
+  .summary-panel {
+    padding: 0.75rem;
+  }
+
+  .summary-content {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+  }
+
+  .summary-count,
+  .summary-total {
+    justify-content: space-between;
+  }
+
+  .total-amount {
+    font-size: 1.125rem;
+  }
+
+  /* Dialog mobile optimization */
+  .payment-dialog :deep(.p-dialog) {
+    width: 95vw;
+  }
+
+  .bulk-category-dialog :deep(.p-dialog) {
+    width: 95vw;
+  }
+
+  .confirm-dialog :deep(.p-dialog) {
+    width: 90vw;
+  }
+
+  .payment-dialog :deep(.p-dialog-content),
+  .bulk-category-dialog :deep(.p-dialog-content) {
+    padding: 0.75rem;
+  }
+}
 </style>
