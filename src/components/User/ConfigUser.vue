@@ -450,6 +450,12 @@
 .p-datatable .p-filter-row .p-column-filter {
 	width: 100%;
 }
+
+/* Dialog styles - using global styles from main.css for fullscreen mobile */
+.config-dialog :deep(.p-dialog) {
+	width: 750px;
+	max-width: 95vw;
+}
 </style>
 
 <script lang="ts">
