@@ -340,13 +340,13 @@ async getUserGroup() {
 /* Dialog styles come from main.css (fullscreen on mobile, 750px on desktop) */
 
 .selector-wrapper {
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .selector-filters {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.5rem;
+  gap: 0.375rem;
   align-items: center;
 }
 
@@ -355,8 +355,22 @@ async getUserGroup() {
   min-width: 150px;
 }
 
+.filter-dropdown :deep(.p-dropdown) {
+  padding: 0.4rem 0.5rem;
+}
+
+.filter-dropdown :deep(.p-dropdown-label) {
+  padding: 0.4rem 0.5rem;
+  font-size: 0.95rem;
+}
+
 .period-btn {
   flex: 0 0 auto;
+}
+
+.period-btn :deep(.p-button) {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.95rem;
 }
 
 @media (max-width: 768px) {

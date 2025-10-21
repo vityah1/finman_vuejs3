@@ -9,75 +9,69 @@
 					<selector-component @change="handleSelectChange" :currentYear="year" :currentMonth="month" />
 				</div>
 
+				<!-- Summary panel -->
+				<div class="summary-panel">
+					<div class="summary-content">
+						<div class="summary-operations">
+							<span class="summary-label">Операцій:</span>
+							<PTag :value="total_cnt" severity="success" class="summary-tag" />
+						</div>
+						<div class="summary-total">
+							<span class="summary-label">Загальна сума:</span>
+							<span class="total-amount">{{ total.toLocaleString() }}</span>
+							<span class="total-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+						</div>
+					</div>
+				</div>
+
 				<!-- Categories by month -->
-				<PCard>
-					<template #header>
-						<div class="month-header">
-							<i class="pi pi-wallet month-icon"></i>
-							<h2 class="month-title">Витрати за місяць</h2>
+				<div class="month-header">
+					<i class="pi pi-wallet month-icon"></i>
+					<h2 class="month-title">Витрати за місяць</h2>
+				</div>
+
+				<!-- Categories table -->
+				<DataTable
+					:value="catcosts"
+					:loading="loading"
+					@row-click="onRowClick"
+					dataKey="category_id"
+					:paginator="false"
+					showGridlines
+					stripedRows
+				>
+					<template #empty>
+						<div style="text-align: center; padding: 2rem;">
+							<i class="pi pi-inbox" style="font-size: 3rem; color: var(--text-color-secondary); margin-bottom: 1rem; display: block;"></i>
+							<span style="color: var(--text-color-secondary);">Немає даних за цей період</span>
 						</div>
 					</template>
 
-					<template #content>
-						<!-- Categories table -->
-						<DataTable
-							:value="catcosts"
-							:loading="loading"
-							@row-click="onRowClick"
-							dataKey="category_id"
-							:paginator="false"
-							showGridlines
-							stripedRows
-						>
-							<template #empty>
-								<div style="text-align: center; padding: 2rem;">
-									<i class="pi pi-inbox" style="font-size: 3rem; color: var(--text-color-secondary); margin-bottom: 1rem; display: block;"></i>
-									<span style="color: var(--text-color-secondary);">Немає даних за цей період</span>
-								</div>
-							</template>
-
-							<Column field="name" header="Категорія" style="width: 50%">
-								<template #body="slotProps">
-									<div style="display: flex; align-items: center; gap: 0.5rem;">
-										<i class="pi pi-folder" style="color: var(--primary-color);"></i>
-										<span style="font-weight: 500;">{{ slotProps.data.name }}</span>
-									</div>
-								</template>
-							</Column>
-
-							<Column field="amount" header="Сума" style="width: 35%; text-align: right;">
-								<template #body="slotProps">
-									<div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem;">
-										<span style="font-weight: 600; font-size: 1.1rem;">{{ slotProps.data.amount.toLocaleString() }}</span>
-										<span style="color: var(--text-color-secondary); font-size: 0.9rem;">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
-									</div>
-								</template>
-							</Column>
-
-							<Column field="cnt" header="К-ть" style="width: 15%; text-align: center;">
-								<template #body="slotProps">
-									<PTag :value="slotProps.data.cnt" severity="info" />
-								</template>
-							</Column>
-
-						</DataTable>
-
-						<!-- Summary panel -->
-						<div class="summary-panel">
-							<div class="summary-content">
-								<div class="summary-operations">
-									<span class="summary-label">Операцій:</span>
-									<PTag :value="total_cnt" severity="success" class="summary-tag" />
-								</div>
-								<div class="summary-total">
-									<span class="summary-label">Загальна сума:</span>
-									<span class="total-amount">{{ total.toLocaleString() }}</span>
-									<span class="total-currency">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
-								</div>
+					<Column field="name" header="Категорія" style="width: 50%">
+						<template #body="slotProps">
+							<div style="display: flex; align-items: center; gap: 0.5rem;">
+								<i class="pi pi-folder" style="color: var(--primary-color);"></i>
+								<span style="font-weight: 500;">{{ slotProps.data.name }}</span>
 							</div>
-						</div>
-					</template>
-				</PCard>
+						</template>
+					</Column>
+
+					<Column field="amount" header="Сума" style="width: 35%; text-align: right;">
+						<template #body="slotProps">
+							<div style="display: flex; align-items: center; justify-content: flex-end; gap: 0.25rem;">
+								<span style="font-weight: 600; font-size: 1.1rem;">{{ slotProps.data.amount.toLocaleString() }}</span>
+								<span style="color: var(--text-color-secondary); font-size: 0.9rem;">{{ $store.state.sprs.selectedCurrency || "UAH" }}</span>
+							</div>
+						</template>
+					</Column>
+
+					<Column field="cnt" header="К-ть" style="width: 15%; text-align: center;">
+						<template #body="slotProps">
+							<PTag :value="slotProps.data.cnt" severity="info" />
+						</template>
+					</Column>
+
+				</DataTable>
 			</template>
 		</PCard>
 	</div>
@@ -341,27 +335,29 @@ export default {
 <style scoped>
 /* Month header */
 .month-header {
-  padding: 1rem;
+  padding: 0.5rem 0;
+  margin-top: 0.5rem;
+  margin-bottom: 0.75rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
 }
 
 .month-icon {
-  font-size: 1.5rem;
+  font-size: 1.25rem;
   color: var(--primary-color);
 }
 
 .month-title {
   margin: 0;
   font-weight: 600;
-  font-size: 1.5rem;
+  font-size: 1.25rem;
 }
 
 /* Summary panel */
 .summary-panel {
-  margin-top: 1rem;
-  padding: 1rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem 1rem;
   background: var(--surface-ground);
   border-radius: 0.375rem;
   border: 1px solid var(--surface-border);
@@ -384,6 +380,7 @@ export default {
 .summary-label {
   color: var(--text-color-secondary);
   font-weight: 500;
+  font-size: 0.95rem;
 }
 
 .summary-tag {
@@ -392,20 +389,22 @@ export default {
 
 .total-amount {
   font-weight: 700;
-  font-size: 1.4rem;
+  font-size: 1.3rem;
   color: var(--primary-color);
 }
 
 .total-currency {
   color: var(--text-color-secondary);
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 /* Mobile optimization */
 @media (max-width: 768px) {
   /* Header */
   .month-header {
-    padding: 0.5rem;
+    padding: 0.25rem 0;
+    margin-top: 0.25rem;
+    margin-bottom: 0.5rem;
   }
 
   .month-icon {
@@ -413,18 +412,19 @@ export default {
   }
 
   .month-title {
-    font-size: 1.125rem;
+    font-size: 1rem;
   }
 
   /* Summary panel */
   .summary-panel {
-    padding: 0.75rem;
+    padding: 0.5rem 0.75rem;
+    margin-top: 0.5rem;
   }
 
   .summary-content {
     flex-direction: column;
     align-items: stretch;
-    gap: 0.75rem;
+    gap: 0.5rem;
   }
 
   .summary-operations,
@@ -432,12 +432,16 @@ export default {
     justify-content: space-between;
   }
 
+  .summary-label {
+    font-size: 0.875rem;
+  }
+
   .total-amount {
-    font-size: 1.125rem;
+    font-size: 1rem;
   }
 
   .total-currency {
-    font-size: 0.875rem;
+    font-size: 0.8rem;
   }
 }
 </style>
