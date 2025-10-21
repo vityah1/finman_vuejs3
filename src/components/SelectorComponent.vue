@@ -51,6 +51,7 @@
 			header="Вибрати кастомний період"
 			:modal="true"
 			:closable="true"
+			:style="{ width: '450px' }"
 			class="period-dialog"
 		>
 			<div class="period-form">
@@ -337,92 +338,29 @@ async getUserGroup() {
 </script>
 
 <style scoped>
-.selector-wrapper {
-  margin-bottom: 1rem;
-}
-
-.selector-filters {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  align-items: center;
-}
-
-.filter-dropdown {
-  flex: 1;
-  min-width: 120px;
-}
-
-.period-btn {
-  flex-shrink: 0;
-}
-
-/* Period form */
-.period-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.form-field {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.form-field label {
-  font-weight: 600;
-}
-
-/* Dialog responsive width */
-.period-dialog :deep(.p-dialog) {
-  width: 450px;
-  max-width: 95vw;
-}
-
-/* Mobile optimization */
 @media (max-width: 768px) {
-  .selector-wrapper {
-    margin-bottom: 0.75rem;
-  }
+	/* Period dialog - FULLSCREEN on mobile */
+	.period-dialog :deep(.p-dialog) {
+		width: 100vw;
+		height: 100vh;
+		margin: 0;
+		max-height: 100vh;
+		border-radius: 0;
+	}
 
-  .selector-filters {
-    gap: 0.375rem;
-  }
+	.period-dialog :deep(.p-dialog-content) {
+		padding: 0.5rem;
+		flex: 1;
+		overflow-y: auto;
+	}
 
-  .filter-dropdown {
-    flex: 1 1 calc(50% - 0.375rem);
-    min-width: 0;
-  }
+	.period-dialog :deep(.p-dialog-header) {
+		padding: 0.75rem 0.5rem;
+	}
 
-  .period-btn {
-    flex: 1 1 100%;
-  }
-
-  .period-btn :deep(.p-button-label) {
-    display: inline; /* Keep label on button for clarity */
-  }
-
-  /* Make dropdowns more compact */
-  .filter-dropdown :deep(.p-dropdown) {
-    font-size: 0.875rem;
-  }
-
-  .filter-dropdown :deep(.p-dropdown-label) {
-    padding: 0.5rem;
-  }
-
-  /* Dialog optimization */
-  .period-dialog :deep(.p-dialog) {
-    width: 95vw;
-  }
-
-  .period-dialog :deep(.p-dialog-content) {
-    padding: 0.75rem;
-  }
-
-  .period-form {
-    gap: 0.75rem;
-  }
+	.period-dialog :deep(.p-dialog-footer) {
+		padding: 0.75rem 0.5rem;
+		border-top: 1px solid var(--surface-border);
+	}
 }
 </style>

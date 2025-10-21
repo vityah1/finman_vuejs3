@@ -522,6 +522,7 @@
 			header="Підтвердження дії"
 			:modal="true"
 			:style="{ width: '450px' }"
+			class="confirmation-dialog"
 		>
 			<p>Ви впевнені, що хочете видалити цей показник?</p>
 			<p class="text-muted small">Цю дію не можна буде скасувати.</p>
@@ -1925,6 +1926,24 @@ export default defineComponent({
 	/* Make labels smaller */
 	label {
 		font-size: 0.875rem;
+	}
+
+	/* Confirmation dialogs - 90vw on mobile (not fullscreen) */
+	.confirmation-dialog :deep(.p-dialog) {
+		width: 90vw !important;
+		max-width: 90vw;
+	}
+
+	.confirmation-dialog :deep(.p-dialog-content) {
+		padding: 0.5rem;
+	}
+
+	.confirmation-dialog :deep(.p-dialog-header) {
+		padding: 0.75rem 0.5rem;
+	}
+
+	.confirmation-dialog :deep(.p-dialog-footer) {
+		padding: 0.75rem 0.5rem;
 	}
 }
 </style>

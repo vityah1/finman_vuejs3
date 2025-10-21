@@ -167,6 +167,7 @@
 			v-model:visible="showModal"
 			:header="okTitle"
 			:modal="true"
+			:style="{ width: '500px' }"
 			class="payment-dialog"
 		>
 			<div v-if="currentPayment">
@@ -253,7 +254,8 @@
 			v-model:visible="showBulkCategoryDialog"
 			header="Змінити категорію для вибраних записів"
 			:modal="true"
-			class="bulk-category-dialog"
+			:style="{ width: '450px' }"
+			class="payment-dialog"
 		>
 			<div style="margin-bottom: 1rem;">
 				<p style="margin-bottom: 1rem;">
@@ -281,7 +283,8 @@
 			v-model:visible="showDeleteConfirm"
 			header="Підтвердження видалення"
 			:modal="true"
-			class="confirm-dialog"
+			:style="{ width: '350px' }"
+			class="confirmation-dialog"
 		>
 			<p>Ви впевнені, що хочете видалити цей платіж?</p>
 			<template #footer>
@@ -295,7 +298,8 @@
         v-model:visible="showBulkDeleteConfirm"
         header="Підтвердження видалення"
         :modal="true"
-        class="confirm-dialog"
+        :style="{ width: '350px' }"
+        class="confirmation-dialog"
     >
       <p>Ви впевнені, що хочете видалити <strong>{{ selectedPayments.length }}</strong> платежів?</p>
       <template #footer>
@@ -777,328 +781,47 @@ export default defineComponent({
 </script>
 
 <style scoped>
-/* Category header */
-.category-header {
-  padding: 1rem;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.category-icon {
-  font-size: 1.5rem;
-  color: var(--primary-color);
-}
-
-.category-title {
-  margin: 0;
-  font-weight: 600;
-}
-
-.header-right {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-}
-
-/* Bulk toolbar */
-.bulk-toolbar {
-  margin-bottom: 1rem;
-}
-
-.bulk-toolbar-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-}
-
-.bulk-selection-info {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.bulk-selection-info i {
-  color: var(--primary-color);
-}
-
-.selection-count {
-  font-weight: 600;
-}
-
-.bulk-actions {
-  display: flex;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-/* Mobile cards - hidden on desktop */
-.mobile-cards {
-  display: none;
-}
-
-/* Summary panel */
-.summary-panel {
-  margin-top: 1rem;
-  padding: 1rem;
-  background: var(--surface-ground);
-  border-radius: 0.375rem;
-  border: 1px solid var(--surface-border);
-}
-
-.summary-content {
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  gap: 2rem;
-}
-
-.summary-count,
-.summary-total {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.summary-label {
-  color: var(--text-color-secondary);
-  font-weight: 500;
-}
-
-.summary-tag {
-  font-weight: 600;
-}
-
-.total-amount {
-  font-weight: 700;
-  font-size: 1.3rem;
-  color: var(--green-500);
-}
-
-.total-currency {
-  color: var(--text-color-secondary);
-  font-size: 0.9rem;
-}
-
-/* Dialog responsive widths */
-.payment-dialog :deep(.p-dialog) {
-  width: 500px;
-  max-width: 95vw;
-}
-
-.bulk-category-dialog :deep(.p-dialog) {
-  width: 450px;
-  max-width: 95vw;
-}
-
-.confirm-dialog :deep(.p-dialog) {
-  width: 350px;
-  max-width: 95vw;
-}
-
-/* Mobile optimization */
 @media (max-width: 768px) {
-  /* Header */
-  .category-header {
-    padding: 0.5rem;
-    gap: 0.5rem;
-  }
+	/* Dialog forms - FULLSCREEN on mobile */
+	.payment-dialog :deep(.p-dialog) {
+		width: 100vw;
+		height: 100vh;
+		margin: 0;
+		max-height: 100vh;
+		border-radius: 0;
+	}
 
-  .category-icon {
-    font-size: 1.25rem;
-  }
+	.payment-dialog :deep(.p-dialog-content) {
+		padding: 0.5rem;
+		flex: 1;
+		overflow-y: auto;
+	}
 
-  .category-title {
-    font-size: 1.125rem;
-  }
+	.payment-dialog :deep(.p-dialog-header) {
+		padding: 0.75rem 0.5rem;
+	}
 
-  .add-btn :deep(.p-button-label) {
-    display: none;
-  }
+	.payment-dialog :deep(.p-dialog-footer) {
+		padding: 0.75rem 0.5rem;
+		border-top: 1px solid var(--surface-border);
+	}
 
-  .add-btn :deep(.p-button-icon) {
-    margin: 0;
-  }
+	/* Confirmation dialogs - 90vw on mobile (not fullscreen) */
+	.confirmation-dialog :deep(.p-dialog) {
+		width: 90vw !important;
+		max-width: 90vw;
+	}
 
-  /* Bulk toolbar */
-  .bulk-toolbar :deep(.p-card-content) {
-    padding: 0.5rem;
-  }
+	.confirmation-dialog :deep(.p-dialog-content) {
+		padding: 0.5rem;
+	}
 
-  .bulk-toolbar-content {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.5rem;
-  }
+	.confirmation-dialog :deep(.p-dialog-header) {
+		padding: 0.75rem 0.5rem;
+	}
 
-  .bulk-actions {
-    width: 100%;
-  }
-
-  .bulk-btn :deep(.p-button-label) {
-    display: none;
-  }
-
-  .bulk-btn :deep(.p-button-icon) {
-    margin: 0;
-  }
-
-  /* Hide desktop table, show mobile cards */
-  .desktop-table {
-    display: none;
-  }
-
-  .mobile-cards {
-    display: block;
-  }
-
-  /* Empty state */
-  .empty-state {
-    text-align: center;
-    padding: 2rem 1rem;
-  }
-
-  .empty-state i {
-    font-size: 3rem;
-    color: var(--text-color-secondary);
-    margin-bottom: 1rem;
-    display: block;
-  }
-
-  .empty-state span {
-    color: var(--text-color-secondary);
-  }
-
-  /* Payment cards */
-  .payment-card {
-    background: var(--surface-card);
-    border: 1px solid var(--surface-border);
-    border-radius: 0.375rem;
-    padding: 0.75rem;
-    margin-bottom: 0.5rem;
-    cursor: pointer;
-    transition: box-shadow 0.2s;
-  }
-
-  .payment-card:hover {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .payment-card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--surface-border);
-  }
-
-  .payment-date {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    font-size: 0.875rem;
-  }
-
-  .payment-date i {
-    color: var(--primary-color);
-    font-size: 0.875rem;
-  }
-
-  .payment-amount {
-    display: flex;
-    align-items: baseline;
-    gap: 0.25rem;
-  }
-
-  .amount-value {
-    font-weight: 700;
-    font-size: 1.25rem;
-    color: var(--green-500);
-  }
-
-  .amount-currency {
-    color: var(--text-color-secondary);
-    font-size: 0.875rem;
-  }
-
-  .payment-card-body {
-    margin-bottom: 0.5rem;
-  }
-
-  .payment-description {
-    font-weight: 500;
-    margin-bottom: 0.25rem;
-  }
-
-  .payment-subcategory {
-    font-style: italic;
-    color: var(--text-color-secondary);
-    font-size: 0.875rem;
-  }
-
-  .payment-card-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .payment-user {
-    flex: 1;
-  }
-
-  .payment-actions {
-    display: flex;
-    gap: 0.25rem;
-  }
-
-  /* Summary panel */
-  .summary-panel {
-    padding: 0.75rem;
-  }
-
-  .summary-content {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.75rem;
-  }
-
-  .summary-count,
-  .summary-total {
-    justify-content: space-between;
-  }
-
-  .total-amount {
-    font-size: 1.125rem;
-  }
-
-  /* Dialog mobile optimization */
-  .payment-dialog :deep(.p-dialog) {
-    width: 95vw;
-  }
-
-  .bulk-category-dialog :deep(.p-dialog) {
-    width: 95vw;
-  }
-
-  .confirm-dialog :deep(.p-dialog) {
-    width: 90vw;
-  }
-
-  .payment-dialog :deep(.p-dialog-content),
-  .bulk-category-dialog :deep(.p-dialog-content) {
-    padding: 0.75rem;
-  }
+	.confirmation-dialog :deep(.p-dialog-footer) {
+		padding: 0.75rem 0.5rem;
+	}
 }
 </style>
