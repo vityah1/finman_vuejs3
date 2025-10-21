@@ -368,22 +368,19 @@ async getUserGroup() {
     gap: 0.375rem;
   }
 
+  /* Рік і Місяць - по 50% в один рядок */
   .filter-dropdown {
     flex: 1 1 calc(50% - 0.375rem);
     min-width: 0;
   }
 
-  .filter-dropdown:nth-last-child(2) {
-    /* Джерело dropdown - full width if it's the second to last */
-    flex: 1 1 100%;
-  }
-
+  /* Кнопка Період на всю ширину */
   .period-btn {
     flex: 1 1 100%;
   }
 
   .period-btn :deep(.p-button-label) {
-    display: inline; /* Keep label on button for clarity */
+    display: inline;
   }
 
   /* Make dropdowns more compact */
