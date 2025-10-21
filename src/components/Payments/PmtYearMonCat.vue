@@ -11,7 +11,7 @@
 							<div class="header-left">
 								<PButton icon="pi pi-arrow-left" text @click="$router.go(-1)" size="small" class="back-btn" />
 								<i class="pi pi-folder category-icon"></i>
-								<h2 class="category-title">{{ category_name }}</h2>
+								<h2 class="category-title">{{ category_name }} - {{ getMonthName(month) }} {{ year }}</h2>
 							</div>
 							<div class="header-right">
 								<PButton icon="pi pi-plus" label="Додати" @click="openFormAddPayment" size="small" class="add-btn" />

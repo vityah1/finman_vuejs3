@@ -9,14 +9,12 @@
 					<selector-component @change="handleSelectChange" :currentYear="year" :currentMonth="month" />
 				</div>
 
-				<!-- Month and Year display with icon -->
+				<!-- Categories by month -->
 				<PCard>
 					<template #header>
 						<div class="month-header">
-							<i class="pi pi-calendar month-icon"></i>
-							<h2 class="month-title">
-								{{ getMonthName(month) }} {{ year }}
-							</h2>
+							<i class="pi pi-wallet month-icon"></i>
+							<h2 class="month-title">Витрати за місяць</h2>
 						</div>
 					</template>
 
@@ -357,6 +355,7 @@ export default {
 .month-title {
   margin: 0;
   font-weight: 600;
+  font-size: 1.5rem;
 }
 
 /* Summary panel */
@@ -410,7 +409,7 @@ export default {
   }
 
   .month-icon {
-    font-size: 1.25rem;
+    display: none;
   }
 
   .month-title {
