@@ -508,55 +508,55 @@ a:hover {
   }
 
   /* Fullscreen forms on mobile */
-  .address-dialog :deep(.p-dialog),
-  .service-dialog :deep(.p-dialog),
-  .tariff-dialog :deep(.p-dialog),
-  .payment-dialog :deep(.p-dialog),
-  .period-dialog :deep(.p-dialog),
-  .category-dialog :deep(.p-dialog),
-  .config-dialog :deep(.p-dialog),
-  .category-rule-dialog :deep(.p-dialog) {
-    width: 100vw;
-    height: 100vh;
-    margin: 0;
-    max-height: 100vh;
-    border-radius: 0;
+  .address-dialog .p-dialog,
+  .service-dialog .p-dialog,
+  .tariff-dialog .p-dialog,
+  .payment-dialog .p-dialog,
+  .period-dialog .p-dialog,
+  .category-dialog .p-dialog,
+  .config-dialog .p-dialog,
+  .category-rule-dialog .p-dialog {
+    width: 100vw !important;
+    height: 100vh !important;
+    margin: 0 !important;
+    max-height: 100vh !important;
+    border-radius: 0 !important;
   }
 
-  .address-dialog :deep(.p-dialog-content),
-  .service-dialog :deep(.p-dialog-content),
-  .tariff-dialog :deep(.p-dialog-content),
-  .payment-dialog :deep(.p-dialog-content),
-  .period-dialog :deep(.p-dialog-content),
-  .category-dialog :deep(.p-dialog-content),
-  .config-dialog :deep(.p-dialog-content),
-  .category-rule-dialog :deep(.p-dialog-content) {
-    padding: 0.5rem;
-    flex: 1;
-    overflow-y: auto;
+  .address-dialog .p-dialog-content,
+  .service-dialog .p-dialog-content,
+  .tariff-dialog .p-dialog-content,
+  .payment-dialog .p-dialog-content,
+  .period-dialog .p-dialog-content,
+  .category-dialog .p-dialog-content,
+  .config-dialog .p-dialog-content,
+  .category-rule-dialog .p-dialog-content {
+    padding: 0.5rem !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
   }
 
-  .address-dialog :deep(.p-dialog-header),
-  .service-dialog :deep(.p-dialog-header),
-  .tariff-dialog :deep(.p-dialog-header),
-  .payment-dialog :deep(.p-dialog-header),
-  .period-dialog :deep(.p-dialog-header),
-  .category-dialog :deep(.p-dialog-header),
-  .config-dialog :deep(.p-dialog-header),
-  .category-rule-dialog :deep(.p-dialog-header) {
-    padding: 0.75rem 0.5rem;
+  .address-dialog .p-dialog-header,
+  .service-dialog .p-dialog-header,
+  .tariff-dialog .p-dialog-header,
+  .payment-dialog .p-dialog-header,
+  .period-dialog .p-dialog-header,
+  .category-dialog .p-dialog-header,
+  .config-dialog .p-dialog-header,
+  .category-rule-dialog .p-dialog-header {
+    padding: 0.75rem 0.5rem !important;
   }
 
-  .address-dialog :deep(.p-dialog-footer),
-  .service-dialog :deep(.p-dialog-footer),
-  .tariff-dialog :deep(.p-dialog-footer),
-  .payment-dialog :deep(.p-dialog-footer),
-  .period-dialog :deep(.p-dialog-footer),
-  .category-dialog :deep(.p-dialog-footer),
-  .config-dialog :deep(.p-dialog-footer),
-  .category-rule-dialog :deep(.p-dialog-footer) {
-    padding: 0.75rem 0.5rem;
-    border-top: 1px solid var(--surface-border);
+  .address-dialog .p-dialog-footer,
+  .service-dialog .p-dialog-footer,
+  .tariff-dialog .p-dialog-footer,
+  .payment-dialog .p-dialog-footer,
+  .period-dialog .p-dialog-footer,
+  .category-dialog .p-dialog-footer,
+  .config-dialog .p-dialog-footer,
+  .category-rule-dialog .p-dialog-footer {
+    padding: 0.75rem 0.5rem !important;
+    border-top: 1px solid var(--surface-border) !important;
   }
 
   .address-dialog .field,
@@ -566,15 +566,15 @@ a:hover {
   }
 
   /* Compact confirmation dialogs on mobile */
-  .confirmation-dialog :deep(.p-dialog) {
+  .confirmation-dialog .p-dialog {
     width: 90vw !important;
-    max-width: 90vw;
+    max-width: 90vw !important;
   }
 
-  .confirmation-dialog :deep(.p-dialog-content),
-  .confirmation-dialog :deep(.p-dialog-header),
-  .confirmation-dialog :deep(.p-dialog-footer) {
-    padding: 0.5rem;
+  .confirmation-dialog .p-dialog-content,
+  .confirmation-dialog .p-dialog-header,
+  .confirmation-dialog .p-dialog-footer {
+    padding: 0.5rem !important;
   }
 }
 
