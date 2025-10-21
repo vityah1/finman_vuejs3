@@ -942,31 +942,3 @@ export default defineComponent({
 	},
 });
 </script>
-
-<style scoped>
-@media (max-width: 768px) {
-	/* Config dialog - FULLSCREEN on mobile */
-	.config-dialog :deep(.p-dialog) {
-		width: 100vw;
-		height: 100vh;
-		margin: 0;
-		max-height: 100vh;
-		border-radius: 0;
-	}
-
-	.config-dialog :deep(.p-dialog-content) {
-		padding: 0.5rem;
-		flex: 1;
-		overflow-y: auto;
-	}
-
-	.config-dialog :deep(.p-dialog-header) {
-		padding: 0.75rem 0.5rem;
-	}
-
-	.config-dialog :deep(.p-dialog-footer) {
-		padding: 0.75rem 0.5rem;
-		border-top: 1px solid var(--surface-border);
-	}
-}
-</style>
